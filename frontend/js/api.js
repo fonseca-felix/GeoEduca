@@ -8,12 +8,11 @@ let API_BASE;
 if (window.location.protocol === 'file:') {
   // Abrindo arquivo diretamente (double-click index.html)
   API_BASE = 'http://localhost:3000/api';
-} else if (window.location.port !== '3000') {
-  // Frontend servido em porta diferente (ex: 3001 via npx serve)
-  // API sempre roda na porta 3000
-  API_BASE = `${window.location.protocol}//${window.location.hostname}:3000/api`;
+} else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  // Desenvolvimento local (Live Server ou npx serve)
+  API_BASE = 'http://localhost:3000/api';
 } else {
-  // Frontend servido pelo próprio backend (porta 3000)
+  // Produção (Render): Frontend e Backend dividem a mesma URL
   API_BASE = `${window.location.origin}/api`;
 }
 
