@@ -4,6 +4,7 @@
 
 O **Frigorífico Bah** é uma plataforma de e-commerce de alta performance, projetada para proporcionar uma experiência imersiva e intuitiva na jornada de compra de cortes bovinos premium. O sistema integra visualização interativa com um fluxo de checkout otimizado, conectando a tradição gaúcha à modernidade digital.
 
+**Acesse o projeto online:** [frigorifico-bah.vercel.app](https://frigorifico-bah.vercel.app/)
 ---
 
 ## 🛠️ Stack Tecnológico
