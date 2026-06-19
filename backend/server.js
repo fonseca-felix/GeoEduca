@@ -28,8 +28,8 @@ app.use(express.static(frontendPath));
 
 // Rate limiting
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
+    windowMs: 5 * 60 * 1000,
+    max: 1000,
     message: { error: 'Muitas requisições, tente novamente mais tarde' }
 });
 app.use('/api/', limiter);
