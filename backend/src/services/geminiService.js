@@ -8,6 +8,7 @@ const CHAVES_API = [
 
 // Modelos em ordem de preferência
 const MODELOS = [
+    "gemini-3.1-flash-lite",
     "gemini-2.0-flash-lite",
     "gemini-1.5-flash-8b",
     "gemini-1.5-flash",
