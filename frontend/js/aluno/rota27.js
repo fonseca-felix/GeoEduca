@@ -141,78 +141,81 @@ window.verificarAlternativa = function(elemento, escolha, correta, explicacaoId)
     
     alternativas.forEach(alt => {
         const letra = alt.dataset.letra;
-        
-        alt.classList.remove('hover:bg-gray-50', 'cursor-pointer');
-        alt.classList.add('cursor-default');
+        alt.style.cursor = 'default';
 
         if (letra === correta) {
-            alt.classList.remove('bg-white', 'border-gray-200');
-            alt.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-900', 'font-bold');
+            alt.style.background = 'rgba(16, 185, 129, 0.15)';
+            alt.style.borderColor = 'var(--color-success)';
+            alt.style.fontWeight = '700';
+            alt.style.color = 'var(--color-text-primary)';
         } else if (letra === escolha && escolha !== correta) {
-            alt.classList.remove('bg-white', 'border-gray-200');
-            alt.classList.add('bg-rose-50', 'border-rose-500', 'text-rose-900', 'font-bold');
+            alt.style.background = 'rgba(239, 68, 68, 0.1)';
+            alt.style.borderColor = 'var(--color-danger)';
+            alt.style.fontWeight = '700';
+            alt.style.color = 'var(--color-text-primary)';
         }
     });
 
-    document.getElementById(explicacaoId).classList.remove('hidden');
+    const expEl = document.getElementById(explicacaoId);
+    if (expEl) expEl.style.display = 'block';
 }
 
 window.renderizarEstudo = function(dados) {
-    document.getElementById("tituloResultado").innerHTML = `<i class="fa-solid fa-graduation-cap text-emerald-600"></i> Plano de Estudos: ${dados.tema}`;
+    document.getElementById("tituloResultado").innerHTML = `<i class="fa-solid fa-graduation-cap" style="color: var(--color-success);"></i> Plano de Estudos: ${dados.tema}`;
     
     let topicosHtml = dados.explicacao_topicos.map(t => `
-        <div class="mb-4 p-4 bg-emerald-50 rounded-lg border-l-4 border-emerald-600 dark:bg-emerald-900/20">
-            <h4 class="font-bold text-base text-emerald-900 dark:text-emerald-300 mb-1">${t.titulo}</h4>
-            <p class="whitespace-pre-line text-sm text-gray-700 dark:text-gray-300">${t.conteudo}</p>
+        <div style="margin-bottom: 1rem; padding: 1rem; background: var(--color-surface-2); border-radius: var(--radius-md); border-left: 4px solid var(--color-success);">
+            <h4 style="font-weight: 700; font-size: 1rem; color: var(--color-text-primary); margin-bottom: 0.25rem;">${t.titulo}</h4>
+            <p style="white-space: pre-line; font-size: 0.875rem; color: var(--color-text-muted);">${t.conteudo}</p>
         </div>
     `).join('');
 
-    let curiosidadesHtml = dados.curiosidades.map(c => `<li class="text-sm">💡 ${c}</li>`).join('');
+    let curiosidadesHtml = dados.curiosidades.map(c => `<li style="font-size: 0.875rem; color: var(--color-text-primary); margin-bottom: 0.25rem;">💡 ${c}</li>`).join('');
 
     document.getElementById("conteudoResultado").innerHTML = `
-        <div class="space-y-6">
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
             <div>
-                <h3 class="text-lg font-bold text-emerald-800 dark:text-emerald-400 mb-1">📌 Introdução</h3>
-                <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">${dados.introducao}</p>
+                <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 0.25rem;">📌 Introdução</h3>
+                <p style="font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.6;">${dados.introducao}</p>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-emerald-800 dark:text-emerald-400 mb-2">🌎 Explicação Detalhada</h3>
+                <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 0.5rem;">🌎 Explicação Detalhada</h3>
                 ${topicosHtml}
             </div>
             <div>
-                <h3 class="text-lg font-bold text-emerald-800 dark:text-emerald-400 mb-1">🧠 Fatos & Curiosidades</h3>
-                <ul class="list-none space-y-1.5 text-gray-700 dark:text-gray-300">${curiosidadesHtml}</ul>
+                <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 0.25rem;">🧠 Fatos & Curiosidades</h3>
+                <ul style="list-style: none; padding: 0;">${curiosidadesHtml}</ul>
             </div>
-            <div class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-200 dark:border-amber-800">
-                <h3 class="text-lg font-bold text-amber-800 dark:text-amber-400 mb-1">📝 Resumo para Memorização</h3>
-                <p class="text-sm text-gray-700 dark:text-gray-300">${dados.resumo}</p>
+            <div style="background: var(--color-surface-2); padding: 1rem; border-radius: var(--radius-lg); border: 1px solid var(--color-warning);">
+                <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--color-warning); margin-bottom: 0.25rem;">📝 Resumo para Memorização</h3>
+                <p style="font-size: 0.875rem; color: var(--color-text-primary);">${dados.resumo}</p>
             </div>
         </div>
     `;
 }
 
 window.renderizarFlashcards = function(dados) {
-    document.getElementById("tituloResultado").innerHTML = `<i class="fa-solid fa-layer-group text-amber-600"></i> Flashcards Criados (${dados.flashcards.length})`;
+    document.getElementById("tituloResultado").innerHTML = `<i class="fa-solid fa-layer-group" style="color: var(--color-warning);"></i> Flashcards Criados (${dados.flashcards.length})`;
     
     let gridHtml = dados.flashcards.map((f, index) => `
-        <div class="flashcard-container">
+        <div class="flashcard-container" style="margin-bottom: 1rem;">
             <div class="flashcard-inner">
-                <div class="flashcard-front border-2 border-amber-200 rounded-xl p-4 bg-amber-50/40 dark:bg-amber-900/10 shadow-sm">
+                <div class="flashcard-front geo-card" style="padding: 1.5rem; justify-content: space-between;">
                     <div>
-                        <div class="text-[10px] font-black text-amber-600 dark:text-amber-500 uppercase mb-2">Card #${index + 1}</div>
-                        <div class="font-bold text-sm text-gray-800 dark:text-gray-200 text-center">❓ ${f.frente}</div>
+                        <div style="font-size: 0.75rem; font-weight: 900; color: var(--color-warning); text-transform: uppercase; margin-bottom: 0.5rem;">Card #${index + 1}</div>
+                        <div style="font-weight: 700; font-size: 0.95rem; color: var(--color-text-primary); text-align: center;">❓ ${f.frente}</div>
                     </div>
-                    <button onclick="flipCard(this)" class="w-full mt-2 font-bold text-xs text-amber-700 bg-amber-200/80 hover:bg-amber-200 py-1.5 rounded-lg transition-colors flex items-center justify-center gap-1">
+                    <button class="btn btn-primary" onclick="flipCard(this)" style="width: 100%; margin-top: 1rem; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                         <span>VER RESPOSTA</span> <i class="fa-solid fa-rotate"></i>
                     </button>
                 </div>
-                <div class="flashcard-back border-2 border-emerald-300 rounded-xl p-4 bg-emerald-50/50 dark:bg-emerald-900/10 shadow-sm">
+                <div class="flashcard-back geo-card" style="padding: 1.5rem; justify-content: space-between; border-color: var(--color-success);">
                     <div>
-                        <div class="text-[10px] font-black text-emerald-600 dark:text-emerald-500 uppercase mb-2">Resposta</div>
-                        <div class="text-xs text-emerald-950 dark:text-emerald-200 font-semibold text-center overflow-y-auto max-h-[110px] pr-1">${f.verso}</div>
+                        <div style="font-size: 0.75rem; font-weight: 900; color: var(--color-success); text-transform: uppercase; margin-bottom: 0.5rem;">Resposta</div>
+                        <div style="font-size: 0.85rem; color: var(--color-text-primary); font-weight: 600; text-align: center; overflow-y: auto; max-height: 110px;">${f.verso}</div>
                     </div>
-                    <button onclick="flipCard(this)" class="w-full mt-2 font-bold text-xs text-emerald-700 bg-amber-200/80 hover:bg-amber-200 py-1.5 rounded-lg transition-colors flex items-center justify-center gap-1">
-                        <span>VOLTAR À PERGUNTA</span> <i class="fa-solid fa-rotate"></i>
+                    <button class="btn btn-outline" onclick="flipCard(this)" style="width: 100%; margin-top: 1rem; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <span>VOLTAR</span> <i class="fa-solid fa-rotate"></i>
                     </button>
                 </div>
             </div>
@@ -220,95 +223,93 @@ window.renderizarFlashcards = function(dados) {
     `).join('');
 
     document.getElementById("conteudoResultado").innerHTML = `
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-2">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; padding: 0.5rem;">
             ${gridHtml}
         </div>
     `;
 }
 
 window.renderizarQuiz = function(dados) {
-    document.getElementById("tituloResultado").innerHTML = `<i class="fa-solid fa-circle-question text-blue-600"></i> Quiz Temático Interativo`;
+    document.getElementById("tituloResultado").innerHTML = `<i class="fa-solid fa-circle-question" style="color: var(--color-info);"></i> Quiz Temático Interativo`;
     
     let perguntasHtml = dados.quiz.map((q, i) => {
         const explicacaoId = `explicacao_${i}`;
         const correta = q.resposta_correta.trim().toUpperCase();
 
         return `
-            <div class="questao-box mb-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700" data-respondido="false">
-                <h4 class="font-bold text-sm text-gray-800 dark:text-gray-200 mb-3">${i+1}. ${q.pergunta}</h4>
+            <div class="questao-box geo-card" style="margin-bottom: 1.5rem; padding: 1.5rem;" data-respondido="false">
+                <h4 style="font-weight: 700; font-size: 1rem; color: var(--color-text-primary); margin-bottom: 1rem;">${i+1}. ${q.pergunta}</h4>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; margin-bottom: 0.5rem;">
                     <div data-letra="A" onclick="verificarAlternativa(this, 'A', '${correta}', '${explicacaoId}')" 
-                         class="alternativa-item p-2.5 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors select-none text-gray-800 dark:text-gray-200">
-                        <strong class="text-blue-600 dark:text-blue-400 mr-1">A)</strong> ${q.opcoes.A}
+                         class="alternativa-item" style="padding: 0.75rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.875rem; cursor: pointer; color: var(--color-text-primary); transition: all 0.2s;">
+                        <strong style="color: var(--color-info); margin-right: 0.25rem;">A)</strong> ${q.opcoes.A}
                     </div>
                     <div data-letra="B" onclick="verificarAlternativa(this, 'B', '${correta}', '${explicacaoId}')" 
-                         class="alternativa-item p-2.5 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors select-none text-gray-800 dark:text-gray-200">
-                        <strong class="text-blue-600 dark:text-blue-400 mr-1">B)</strong> ${q.opcoes.B}
+                         class="alternativa-item" style="padding: 0.75rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.875rem; cursor: pointer; color: var(--color-text-primary); transition: all 0.2s;">
+                        <strong style="color: var(--color-info); margin-right: 0.25rem;">B)</strong> ${q.opcoes.B}
                     </div>
                     <div data-letra="C" onclick="verificarAlternativa(this, 'C', '${correta}', '${explicacaoId}')" 
-                         class="alternativa-item p-2.5 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors select-none text-gray-800 dark:text-gray-200">
-                        <strong class="text-blue-600 dark:text-blue-400 mr-1">C)</strong> ${q.opcoes.C}
+                         class="alternativa-item" style="padding: 0.75rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.875rem; cursor: pointer; color: var(--color-text-primary); transition: all 0.2s;">
+                        <strong style="color: var(--color-info); margin-right: 0.25rem;">C)</strong> ${q.opcoes.C}
                     </div>
                     <div data-letra="D" onclick="verificarAlternativa(this, 'D', '${correta}', '${explicacaoId}')" 
-                         class="alternativa-item p-2.5 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors select-none text-gray-800 dark:text-gray-200">
-                        <strong class="text-blue-600 dark:text-blue-400 mr-1">D)</strong> ${q.opcoes.D}
+                         class="alternativa-item" style="padding: 0.75rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.875rem; cursor: pointer; color: var(--color-text-primary); transition: all 0.2s;">
+                        <strong style="color: var(--color-info); margin-right: 0.25rem;">D)</strong> ${q.opcoes.D}
                     </div>
                 </div>
 
-                <div id="${explicacaoId}" class="mt-2 p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg hidden transition-all">
-                    <p class="font-bold text-emerald-800 dark:text-emerald-400 text-xs mb-0.5">Gabrito Correto: Alternativa [ ${correta} ]</p>
-                    <p class="text-xs text-gray-700 dark:text-gray-300 font-medium leading-relaxed">${q.explicacao}</p>
+                <div id="${explicacaoId}" style="margin-top: 1rem; padding: 1rem; background: var(--color-surface-2); border: 1px solid var(--color-success); border-radius: var(--radius-md); display: none; transition: all 0.3s;">
+                    <p style="font-weight: 700; color: var(--color-success); font-size: 0.85rem; margin-bottom: 0.25rem;">Gabarito Correto: Alternativa [ ${correta} ]</p>
+                    <p style="font-size: 0.85rem; color: var(--color-text-primary); font-weight: 500; line-height: 1.5;">${q.explicacao}</p>
                 </div>
             </div>
         `;
     }).join('');
 
-    document.getElementById("conteudoResultado").innerHTML = `<div class="space-y-1">${perguntasHtml}</div>`;
+    document.getElementById("conteudoResultado").innerHTML = `<div style="display: flex; flex-direction: column; gap: 0.5rem;">${perguntasHtml}</div>`;
 }
 
 window.renderizarMapas = function(dados) {
-    document.getElementById("tituloResultado").innerHTML = `<i class="fa-solid fa-map text-rose-600"></i> Recomendações Geográficas de Mídia`;
+    document.getElementById("tituloResultado").innerHTML = `<i class="fa-solid fa-map" style="color: var(--color-danger);"></i> Recomendações Geográficas de Mídia`;
     
     let midiasHtml = dados.midias.map(m => `
-        <div class="p-4 bg-rose-50/60 dark:bg-rose-900/20 rounded-xl border border-rose-100 dark:border-rose-800 flex flex-col justify-between">
+        <div class="geo-card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; border-color: var(--color-danger);">
             <div>
-                <span class="inline-block text-[10px] font-bold px-1.5 py-0.5 bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-300 rounded mb-1.5">${m.tipo}</span>
-                <h4 class="font-bold text-sm text-gray-800 dark:text-gray-200 mb-0.5">${m.titulo}</h4>
-                <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-3">Fonte: <strong>${m.sugestao_fonte}</strong></p>
+                <span style="display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.4rem; background: var(--color-surface-2); color: var(--color-danger); border-radius: 4px; margin-bottom: 0.5rem;">${m.tipo}</span>
+                <h4 style="font-weight: 700; font-size: 0.95rem; color: var(--color-text-primary); margin-bottom: 0.25rem;">${m.titulo}</h4>
+                <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 1rem;">Fonte: <strong>${m.sugestao_fonte}</strong></p>
             </div>
-            <a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(m.termo_busca_google)}" target="_blank" 
-               class="text-center text-xs font-bold bg-white dark:bg-slate-800 text-rose-700 dark:text-rose-400 border border-rose-300 dark:border-rose-700 py-1.5 rounded-lg hover:bg-rose-700 hover:text-white dark:hover:bg-rose-800 dark:hover:text-white transition-all block">
-                <i class="fa-solid fa-images mr-1"></i> Buscar no Google Imagens
+            <a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(m.termo_busca_google)}" target="_blank" class="btn btn-outline" style="text-align: center; font-size: 0.8rem; font-weight: 700; padding: 0.5rem; width: 100%; border-color: var(--color-danger); color: var(--color-danger);">
+                <i class="fa-solid fa-images" style="margin-right: 0.25rem;"></i> Buscar Imagens
             </a>
         </div>
     `).join('');
 
     document.getElementById("conteudoResultado").innerHTML = `
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
             ${midiasHtml}
         </div>
     `;
 }
 
 window.renderizarVideos = function(dados) {
-    document.getElementById("tituloResultado").innerHTML = `<i class="fa-brands fa-youtube text-red-600"></i> Vídeos Educativos Recomendados`;
+    document.getElementById("tituloResultado").innerHTML = `<i class="fa-brands fa-youtube" style="color: #FF0000;"></i> Vídeos Educativos Recomendados`;
     
     let videosHtml = dados.videos_recommendedados.map(v => `
-        <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-800 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-circle-play text-2xl text-red-600 dark:text-red-500"></i>
+        <div class="geo-card" style="padding: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-circle-play" style="font-size: 1.5rem; color: #FF0000;"></i>
                 <div>
-                    <h4 class="font-bold text-gray-800 dark:text-gray-200 text-xs md:text-sm">${v.titulo_sugerido}</h4>
-                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Canal: <strong class="text-red-700 dark:text-red-400">${v.canal}</strong></p>
+                    <h4 style="font-weight: 700; color: var(--color-text-primary); font-size: 0.95rem; margin: 0;">${v.titulo_sugerido}</h4>
+                    <p style="font-size: 0.75rem; color: var(--color-text-muted); margin: 0;">Canal: <strong style="color: var(--color-danger);">${v.canal}</strong></p>
                 </div>
             </div>
-            <a href="${v.url_busca_pronta}" target="_blank" 
-               class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-2.5 rounded-lg text-xs whitespace-nowrap flex items-center gap-1 transition-colors">
-                Assistir <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+            <a href="${v.url_busca_pronta}" target="_blank" class="btn btn-primary" style="background: #FF0000; font-weight: 700; padding: 0.5rem 1rem; font-size: 0.8rem; display: flex; align-items: center; gap: 0.25rem; white-space: nowrap;">
+                Assistir <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.6rem;"></i>
             </a>
         </div>
     `).join('');
 
-    document.getElementById("conteudoResultado").innerHTML = `<div class="space-y-2">${videosHtml}</div>`;
+    document.getElementById("conteudoResultado").innerHTML = `<div style="display: flex; flex-direction: column;">${videosHtml}</div>`;
 }
