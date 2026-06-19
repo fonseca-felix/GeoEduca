@@ -76,7 +76,7 @@ async function _chamarGeminiJson(prompt) {
                 const msg = error.message || "";
 
                 // Se for cota esgotada ou modelo inválido, tenta o próximo
-                if (msg.includes("429") || msg.includes("404") || msg.includes("not found") || msg.includes("quota")) {
+                if (msg.includes("429") || msg.includes("404") || msg.includes("not found") || msg.includes("quota") || msg.includes("not supported") || msg.includes("unsupported")) {
                     console.warn(`⚠️ Tentando próximo modelo/chave (${nomeModelo}): ${msg.substring(0, 80)}`);
                     continue;
                 }
