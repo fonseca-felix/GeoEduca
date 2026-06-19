@@ -86,8 +86,10 @@ async function buscarDados(endpoint, callbackRender) {
 
         // Detecta URL do backend da mesma forma que api.js
         let API_BASE;
-        if (window.location.protocol === 'file:' || window.location.port !== '3000') {
-            API_BASE = `http://${window.location.hostname || 'localhost'}:3000/api`;
+        if (window.location.protocol === 'file:') {
+            API_BASE = 'http://localhost:3000/api';
+        } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            API_BASE = 'http://localhost:3000/api';
         } else {
             API_BASE = `${window.location.origin}/api`;
         }
