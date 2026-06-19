@@ -6,6 +6,10 @@ O **Frigorífico Bah** é uma plataforma de e-commerce de alta performance, proj
 
 ---
 
+**Acesse o projeto online:** [frigorifico-bah.vercel.app](https://frigorifico-bah.vercel.app/)
+
+---
+
 ## 🛠️ Stack Tecnológico
 
 O projeto foi arquitetado utilizando as tecnologias mais robustas do mercado para garantir escalabilidade, SEO impecável e performance de carregamento instantâneo.
@@ -71,5 +75,3 @@ Desenvolvido por: fonseca-felix
 
 Frigorífico Bah — Tecnologia e Tradição à mesa. 🥩✨
 
----
-**Acesse o projeto online:** [frigorifico-bah.vercel.app](https://frigorifico-bah.vercel.app/)
