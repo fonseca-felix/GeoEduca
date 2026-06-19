@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca - Dashboard Professor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <style>
+    /* ── Stats Grid ─────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--bg-surface, #ffffff);
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid var(--border-color, #e5e7eb);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .stat-title {
+      color: var(--text-muted, #6b7280);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.5rem;
+    }
+    .stat-value {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--text-primary, #111827);
+      font-family: 'Space Grotesk', sans-serif;
+      line-height: 1.1;
+    }
+    .stat-change {
+      font-size: 0.8rem;
+      color: #10b981;
+      margin-top: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-weight: 500;
+    }
+    .stat-change.negative { color: #ef4444; }
+
+    /* ── Dashboard layout ───────────────────────── */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+    .panel {
+      background: var(--bg-surface, #ffffff);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid var(--border-color, #e5e7eb);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary, #111827);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.875rem 0;
+      border-bottom: 1px solid var(--border-color, #f3f4f6);
+    }
+    .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    /* ── Shimmer animation ──────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Bem-vindo de volta! Aqui está o resumo das suas turmas.</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" onclick="window.location.href='salas.html'">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Nova Sala
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <!-- Stats -->
+      <div class="stats-grid" id="stats-container">
+        <!-- populated by dashboard.js -->
+      </div>
+
+      <!-- Main grid: activities + rooms -->
+      <div class="dashboard-layout">
+        <!-- Atividades Recentes -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Atividades Recentes</h2>
+            <button class="btn btn-outline"
+                    style="padding: 0.3rem 0.875rem; font-size: 0.8rem;"
+                    onclick="window.location.href='atividades.html'">
+              Ver tudo
+            </button>
+          </div>
+          <div id="activity-feed">
+            <!-- populated by dashboard.js -->
+          </div>
+        </div>
+
+        <!-- Salas por alunos -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Alunos por Sala</h2>
+            <button class="btn btn-outline"
+                    style="padding: 0.3rem 0.875rem; font-size: 0.8rem;"
+                    onclick="window.location.href='salas.html'">
+              Ver salas
+            </button>
+          </div>
+          <div id="top-rooms">
+            <!-- populated by dashboard.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Scripts -->
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/professor/dashboard.js"></script>
+</body>
+</html>

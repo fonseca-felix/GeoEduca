@@ -1,0 +1,57 @@
+/* Wordsearch Game Styles – uses existing design tokens */
+.ws-grid {
+  display: grid;
+  grid-template-columns: repeat(15, 2rem);
+  gap: 2px;
+  justify-content: center;
+  margin-top: var(--space-4);
+}
+.ws-cell {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: center;
+  line-height: 2rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.ws-cell:hover {
+  background: var(--color-surface-2);
+}
+.ws-cell.found {
+  background: var(--gold);
+  color: var(--white);
+}
+.letra.found {
+  background: var(--gold);
+  color: var(--white);
+}
+.letra.selecting {
+  background: var(--accent);
+}
+.ws-clues {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.ws-clues h3 {
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+}
+.ws-controls {
+  margin-top: var(--space-4);
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+}
+.ws-controls button {
+  padding: var(--space-2) var(--space-5);
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca - Resultados</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <style>
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { padding: 16px; border-bottom: 1px solid var(--border-color); text-align: left; }
+    .table th { color: var(--text-secondary); font-weight: 500; font-size: 14px; }
+    .table tbody tr:hover { background: var(--surface-hover); }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Resultados</h1>
+        <p class="page-subtitle">Acompanhe o desempenho dos alunos nas atividades</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-secondary" onclick="Toast.success('Exportação iniciada!')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; vertical-align:middle;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Exportar CSV
+        </button>
+      </div>
+    </header>
+    <div class="page-content">
+      
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-body" style="display:flex; gap:24px; align-items:center;">
+                <div style="flex:1;">
+                    <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Filtrar por Turma</label>
+                    <select id="filter-turma" class="select" style="width:100%;">
+                        <option value="">Todas as Turmas</option>
+                        <option value="1º Ano A">1º Ano A</option>
+                        <option value="2º Ano B">2º Ano B</option>
+                        <option value="3º Ano C">3º Ano C</option>
+                    </select>
+                </div>
+                <div style="flex:1;">
+                    <label style="display:block; margin-bottom:8px; font-size:14px; color:var(--text-secondary);">Filtrar por Jogo</label>
+                    <select id="filter-jogo" class="select" style="width:100%;">
+                        <option value="">Todos os Jogos</option>
+                        <option value="Capitais do Brasil">Capitais do Brasil</option>
+                        <option value="Geopolítica Mundial">Geopolítica Mundial</option>
+                        <option value="Biomas Brasileiros">Biomas Brasileiros</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Últimas Participações</h3>
+            </div>
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Turma</th>
+                            <th>Jogo</th>
+                            <th>Pontuação</th>
+                            <th>Precisão / Progresso</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body">
+                        <!-- JS injected -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="no-results" style="display:none; padding: 48px; text-align:center; color:var(--text-secondary);">
+                Nenhum resultado encontrado para os filtros selecionados.
+            </div>
+        </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/professor/resultados.js"></script>
+</body>
+</html>

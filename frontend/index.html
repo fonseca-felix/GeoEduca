@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca — Plataforma de Ensino de Geografia</title>
+  <meta name="description" content="GeoEduca: Plataforma educacional interativa de geografia para professores e alunos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/login.css" />
+  <link rel="stylesheet" href="css/darkmode.css" />
+  <style>
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted, #9ca3af);
+      transition: color 0.2s;
+    }
+    .password-toggle:hover { color: var(--color-text-primary, #374151); }
+    .password-toggle svg { width: 18px; height: 18px; }
+    .input-wrapper { position: relative; }
+  </style>
+</head>
+<body>
+
+<div class="login-page">
+
+  <!-- LEFT PANEL -->
+  <div class="login-left">
+    <canvas id="bg-canvas"></canvas>
+    <div class="geo-grid"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="hud hud-tl">
+      <span class="hud-pulse">SYS // ONLINE</span>
+      <span>LAT -15.7801°</span>
+      <span>LON -47.9292°</span>
+    </div>
+    <div class="hud hud-tr">
+      <span>GEO-EDU v2.6</span>
+      <span class="hud-pulse">⬤ LIVE</span>
+      <span>BR / BSB</span>
+    </div>
+    <div class="hud hud-bl">
+      <span>BRASÍLIA · DF</span>
+      <span>REGIÃO: CENTRO-OESTE</span>
+    </div>
+    <div class="hud hud-br hud-pulse">
+      <span>SESSION SECURE</span>
+      <span>ENC AES-256</span>
+    </div>
+
+    <!-- Radar SVG -->
+    <svg class="radar-ring" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" stroke="var(--forest-light)" stroke-width="1" stroke-opacity="0.5"/>
+      <circle cx="40" cy="40" r="24" stroke="var(--forest-light)" stroke-width="1" stroke-opacity="0.3"/>
+      <circle cx="40" cy="40" r="12" stroke="var(--forest-light)" stroke-width="1" stroke-opacity="0.4"/>
+      <line x1="4" y1="40" x2="76" y2="40" stroke="rgba(255,255,255,0.2)" stroke-width=".5"/>
+      <line x1="40" y1="4" x2="40" y2="76" stroke="rgba(255,255,255,0.2)" stroke-width=".5"/>
+      <g style="transform-origin:40px 40px;animation:radarSpin 4s linear infinite">
+        <path d="M40 40 L72 40 A32 32 0 0 1 40 72 Z" fill="var(--gold)" fill-opacity="0.12"/>
+        <line x1="40" y1="40" x2="72" y2="40" stroke="var(--gold)" stroke-width="1" stroke-opacity="0.6"/>
+      </g>
+      <circle cx="52" cy="28" r="2" fill="var(--gold)" fill-opacity="0.8"/>
+      <circle cx="30" cy="50" r="1.5" fill="var(--forest-light)" fill-opacity="0.8"/>
+    </svg>
+
+    <div class="scan-line"></div>
+
+    <!-- World Map SVG — foco nas Américas -->
+    <svg class="globe-wrap" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="gglobe" cx="38%" cy="32%">
+          <stop offset="0%"  stop-color="#CCA43B" stop-opacity=".30"/>
+          <stop offset="40%" stop-color="#233B0B" stop-opacity=".10"/>
+          <stop offset="100%" stop-color="#0B0A32" stop-opacity=".06"/>
+        </radialGradient>
+        <radialGradient id="oceanGrad" cx="38%" cy="32%">
+          <stop offset="0%"   stop-color="#4a8fb5" stop-opacity=".18"/>
+          <stop offset="100%" stop-color="#0B0A32" stop-opacity=".04"/>
+        </radialGradient>
+        <radialGradient id="brazilHalo" cx="50%" cy="50%">
+          <stop offset="0%"   stop-color="#CCA43B" stop-opacity=".55"/>
+          <stop offset="60%"  stop-color="#CCA43B" stop-opacity=".12"/>
+          <stop offset="100%" stop-color="#CCA43B" stop-opacity="0"/>
+        </radialGradient>
+        <clipPath id="globeClip"><circle cx="200" cy="200" r="174"/></clipPath>
+        <filter id="brazilGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="haloBlur" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="10"/>
+        </filter>
+      </defs>
+
+      <!-- Oceano -->
+      <circle cx="200" cy="200" r="174" fill="url(#oceanGrad)" stroke="rgba(100,160,210,0.25)" stroke-width="1"/>
+
+      <!-- Linhas de latitude / longitude -->
+      <ellipse cx="200" cy="200" rx="174" ry="42"  stroke="rgba(255,255,255,0.07)" stroke-width=".7" fill="none"/>
+      <ellipse cx="200" cy="200" rx="174" ry="95"  stroke="rgba(255,255,255,0.07)" stroke-width=".7" fill="none"/>
+      <ellipse cx="200" cy="200" rx="174" ry="148" stroke="rgba(255,255,255,0.07)" stroke-width=".7" fill="none"/>
+      <line x1="200" y1="26" x2="200" y2="374" stroke="rgba(255,255,255,0.08)" stroke-width=".7"/>
+      <line x1="26"  y1="200" x2="374" y2="200" stroke="rgba(255,255,255,0.08)" stroke-width=".7"/>
+
+      <!-- ═══ América do Norte (destaque) ═══ -->
+      <!-- Canadá -->
+      <path d="M80 58 Q95 42 125 38 Q155 36 175 44 Q188 50 190 62 Q185 72 172 78 Q155 84 135 82 Q110 80 95 74 Q82 68 80 58Z"
+            fill="#233B0B" fill-opacity="0.40" stroke="rgba(255,255,255,0.18)" stroke-width=".8" clip-path="url(#globeClip)"/>
+      <!-- EUA -->
+      <path d="M75 88 Q88 76 115 74 Q145 72 168 80 Q182 88 185 100 Q182 112 170 120 Q150 130 125 128 Q100 126 85 118 Q72 108 72 98 Q73 92 75 88Z"
+            fill="#233B0B" fill-opacity="0.45" stroke="rgba(255,255,255,0.20)" stroke-width=".8" clip-path="url(#globeClip)"/>
+      <!-- México -->
+      <path d="M82 125 Q95 118 115 122 Q130 128 140 138 Q148 150 142 160 Q132 168 118 165 Q102 162 90 152 Q80 142 80 132Z"
+            fill="#233B0B" fill-opacity="0.40" stroke="rgba(255,255,255,0.15)" stroke-width=".8" clip-path="url(#globeClip)"/>
+      <!-- América Central -->
+      <path d="M125 165 Q135 160 148 168 Q158 178 155 188 Q148 195 138 192 Q128 188 124 178 Q122 170 125 165Z"
+            fill="#233B0B" fill-opacity="0.35" stroke="rgba(255,255,255,0.12)" stroke-width=".7" clip-path="url(#globeClip)"/>
+
+      <!-- ═══ América do Sul ═══ -->
+      <!-- Colômbia / Venezuela / Guianas -->
+      <path d="M140 195 Q158 185 180 190 Q200 195 215 205 Q220 215 215 225 Q200 228 185 225 Q165 222 150 215 Q140 208 140 195Z"
+            fill="#233B0B" fill-opacity="0.40" stroke="rgba(255,255,255,0.15)" stroke-width=".8" clip-path="url(#globeClip)"/>
+
+      <!-- Halo dourado atrás do Brasil -->
+      <ellipse cx="195" cy="265" rx="55" ry="45" fill="url(#brazilHalo)" filter="url(#haloBlur)" clip-path="url(#globeClip)"/>
+
+      <!-- BRASIL (destaque principal) -->
+      <path id="brazil-shape"
+        d="M155 225 Q170 218 190 220 Q212 222 230 230 Q242 240 245 255
+           Q244 270 235 282 Q222 295 205 302 Q188 308 172 305
+           Q155 300 145 288 Q138 275 138 260 Q140 242 148 232Z"
+        fill="#2d6a1f" fill-opacity="0.85" stroke="#CCA43B" stroke-width="2"
+        stroke-linejoin="round" filter="url(#brazilGlow)" clip-path="url(#globeClip)"/>
+
+      <!-- Nordeste brasileiro (saliência) -->
+      <path d="M230 230 Q238 222 248 224 Q255 230 254 240 Q250 248 244 250 Q238 248 234 242 Q230 236 230 230Z"
+        fill="#2d6a1f" fill-opacity="0.80" stroke="#CCA43B" stroke-width="1.5" stroke-linejoin="round" clip-path="url(#globeClip)"/>
+
+      <!-- Pulsação dourada sobre o Brasil -->
+      <path d="M155 225 Q170 218 190 220 Q212 222 230 230 Q242 240 245 255
+           Q244 270 235 282 Q222 295 205 302 Q188 308 172 305
+           Q155 300 145 288 Q138 275 138 260 Q140 242 148 232Z"
+        fill="none" stroke="#CCA43B" stroke-width="2.5" stroke-linejoin="round" clip-path="url(#globeClip)">
+        <animate attributeName="stroke-opacity" values="0.2;0.9;0.2" dur="2.4s" repeatCount="indefinite"/>
+        <animate attributeName="stroke-width" values="2.5;5;2.5" dur="2.4s" repeatCount="indefinite"/>
+      </path>
+
+      <!-- Ponto Brasília -->
+      <circle cx="195" cy="265" r="4" fill="#CCA43B" fill-opacity="0.95">
+        <animate attributeName="r" values="4;6.5;4" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="fill-opacity" values="0.95;0.5;0.95" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="195" cy="265" r="10" fill="#CCA43B" fill-opacity="0.18">
+        <animate attributeName="r" values="10;18;10" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="fill-opacity" values="0.18;0.03;0.18" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <text x="178" y="260" font-family="'Space Grotesk',sans-serif" font-size="11" font-weight="700"
+            fill="#CCA43B" fill-opacity="0.95" letter-spacing="1.5" clip-path="url(#globeClip)">BRASIL</text>
+
+      <!-- Países restantes da América do Sul -->
+      <!-- Peru / Bolívia -->
+      <path d="M130 240 Q142 232 155 238 Q148 255 140 268 Q130 275 125 265 Q122 252 130 240Z"
+            fill="#233B0B" fill-opacity="0.35" stroke="rgba(255,255,255,0.12)" stroke-width=".7" clip-path="url(#globeClip)"/>
+      <!-- Argentina / Chile -->
+      <path d="M148 300 Q165 295 175 308 Q178 325 170 345 Q160 362 148 368 Q138 365 132 352 Q128 338 130 322 Q135 308 148 300Z"
+            fill="#233B0B" fill-opacity="0.35" stroke="rgba(255,255,255,0.15)" stroke-width=".7" clip-path="url(#globeClip)"/>
+
+      <!-- Rotas saindo do Brasil -->
+      <path d="M195 265 Q170 220 130 140" stroke="#CCA43B" stroke-width=".9" fill="none" stroke-dasharray="4 5" stroke-opacity="0.35" clip-path="url(#globeClip)"/>
+      <path d="M195 265 Q220 240 250 200" stroke="#CCA43B" stroke-width=".9" fill="none" stroke-dasharray="4 5" stroke-opacity="0.25" clip-path="url(#globeClip)"/>
+
+      <!-- ═══ Outros continentes (faint) ═══ -->
+      <!-- Europa -->
+      <path d="M280 68 Q298 58 318 64 Q332 72 330 88 Q326 100 312 105 Q296 108 284 100 Q274 90 276 78Z"
+            fill="#233B0B" fill-opacity="0.18" stroke="rgba(255,255,255,0.08)" stroke-width=".5" clip-path="url(#globeClip)"/>
+      <!-- África -->
+      <path d="M290 115 Q310 105 328 115 Q342 128 342 150 Q340 175 330 195 Q318 210 302 215 Q288 218 278 208 Q268 195 268 175 Q270 148 278 130 Q282 120 290 115Z"
+            fill="#233B0B" fill-opacity="0.18" stroke="rgba(255,255,255,0.06)" stroke-width=".5" clip-path="url(#globeClip)"/>
+
+      <!-- Pontos de cidades -->
+      <circle cx="130" cy="95" r="2" fill="#fff" fill-opacity=".5"/>
+      <circle cx="305" cy="82" r="1.8" fill="#fff" fill-opacity=".35"/>
+      <circle cx="160" cy="340" r="1.5" fill="#9de899" fill-opacity=".5"/>
+
+      <!-- Overlay -->
+      <circle cx="200" cy="200" r="174" fill="url(#gglobe)"/>
+      <circle cx="200" cy="200" r="190" stroke="#CCA43B" stroke-width="1" fill="none" stroke-opacity="0.12"/>
+      <circle cx="200" cy="200" r="174" stroke="rgba(100,180,100,0.35)" stroke-width="1" fill="none"/>
+    </svg>
+
+    <div class="login-brand">
+      <div class="login-brand-logo">
+        <svg class="login-brand-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1.5"/>
+          <ellipse cx="18" cy="18" rx="8" ry="17" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="1" y1="18" x2="35" y2="18" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="3" y1="11" x2="33" y2="11" stroke="currentColor" stroke-width="1"/>
+          <line x1="3" y1="25" x2="33" y2="25" stroke="currentColor" stroke-width="1"/>
+        </svg>
+        <span class="login-brand-name">GeoEduca</span>
+      </div>
+
+      <h1 class="login-headline">
+        Explorando o mundo<br>
+        através da <span class="highlight">geografia</span>
+      </h1>
+      <p class="login-subheadline">
+        Plataforma educacional completa para professores gerenciarem atividades,
+        quizzes e provas — e alunos aprenderem de forma interativa.
+      </p>
+    </div>
+
+    <div class="login-stats">
+      <div class="login-stat">
+        <span class="login-stat-value">Quiz</span>
+        <span class="login-stat-label">Interativos</span>
+      </div>
+      <div class="login-stat">
+        <span class="login-stat-value">Provas</span>
+        <span class="login-stat-label">Digitais</span>
+      </div>
+      <div class="login-stat">
+        <span class="login-stat-value">Jogos</span>
+        <span class="login-stat-label">de Geografia</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="login-right">
+    <div class="login-theme-toggle">
+      <button class="theme-toggle" id="login-theme-toggle" aria-label="Alternar tema">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+
+    <div class="login-form-container">
+      <div class="login-form-header">
+        <h2 class="login-form-title">Bem-vindo de volta</h2>
+        <p class="login-form-subtitle">Selecione seu perfil para continuar</p>
+      </div>
+
+      <!-- Role Selector -->
+      <div class="role-selector">
+        <button class="role-option selected" id="role-professor" data-role="professor" aria-pressed="true">
+          <div class="role-option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+              <path d="M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+          </div>
+          <span class="role-option-label">Professor</span>
+        </button>
+        <button class="role-option" id="role-aluno" data-role="aluno" aria-pressed="false">
+          <div class="role-option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <span class="role-option-label">Aluno</span>
+        </button>
+      </div>
+
+      <!-- Error -->
+      <div class="login-error" id="login-error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="login-error-msg">Credenciais inválidas</span>
+      </div>
+
+      <!-- Professor Fields -->
+      <div class="login-form-fields" id="fields-professor">
+        <div class="form-group">
+          <label class="form-label" for="prof-email">E-mail</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <input type="text" class="form-control" id="prof-email" placeholder="seu@email.com" autocomplete="username" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="prof-senha">Senha</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </span>
+            <input type="password" class="form-control" id="prof-senha" placeholder="••••••••" autocomplete="current-password" />
+            <button type="button" class="password-toggle" data-target="prof-senha" aria-label="Mostrar senha">
+              <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 01-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+        <button class="btn btn-navy btn-lg login-submit-btn" id="btn-login-prof">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Entrar como Professor
+        </button>
+      </div>
+
+      <!-- Aluno Fields -->
+      <div class="login-form-fields" id="fields-aluno" style="display:none">
+        <div class="form-group">
+          <label class="form-label" for="aluno-rm">RM do Aluno</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </span>
+            <input type="text" class="form-control" id="aluno-rm" placeholder="Seu RM" autocomplete="username" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="aluno-senha">Senha</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </span>
+            <input type="password" class="form-control" id="aluno-senha" placeholder="••••••••" autocomplete="current-password" />
+            <button type="button" class="password-toggle" data-target="aluno-senha" aria-label="Mostrar senha">
+              <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 01-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+        </div>
+        <button class="btn btn-navy btn-lg login-submit-btn" id="btn-login-aluno">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Entrar como Aluno
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/theme.js"></script>
+<script>
+  // Redirect if already logged in
+  if (Auth.isLoggedIn()) {
+    const user = Auth.getUser();
+    window.location.href = user?.tipo === 'prof'
+      ? '/professor/dashboard.html'
+      : '/aluno/dashboard.html';
+  }
+
+  // Theme toggle
+  document.getElementById('login-theme-toggle').addEventListener('click', () => Theme.toggle());
+
+  // Role switcher
+  const roles = document.querySelectorAll('.role-option');
+  roles.forEach(btn => {
+    btn.addEventListener('click', () => {
+      roles.forEach(r => { r.classList.remove('selected'); r.setAttribute('aria-pressed', 'false'); });
+      btn.classList.add('selected');
+      btn.setAttribute('aria-pressed', 'true');
+      const role = btn.dataset.role;
+      document.getElementById('fields-professor').style.display = role === 'professor' ? 'flex' : 'none';
+      document.getElementById('fields-aluno').style.display = role === 'aluno' ? 'flex' : 'none';
+      document.getElementById('login-error').classList.remove('show');
+    });
+  });
+
+  function showError(msg) {
+    const el = document.getElementById('login-error');
+    document.getElementById('login-error-msg').textContent = msg;
+    el.classList.add('show');
+  }
+
+  function setLoading(btn, loading) {
+    if (loading) { btn.classList.add('loading'); btn.disabled = true; }
+    else { btn.classList.remove('loading'); btn.disabled = false; }
+  }
+
+  // Professor login
+  document.getElementById('btn-login-prof').addEventListener('click', async () => {
+    const email = document.getElementById('prof-email').value.trim();
+    const senha = document.getElementById('prof-senha').value;
+    if (!email || !senha) { showError('Preencha o e-mail e a senha antes de continuar.'); return; }
+    const btn = document.getElementById('btn-login-prof');
+    setLoading(btn, true);
+    try {
+      const data = await api.post('/auth/login/professor', { email, senha });
+      Auth.save(data.token, data.usuario);
+      window.location.href = '/professor/dashboard.html';
+    } catch (e) {
+      showError(e.message || 'E-mail ou senha incorretos. Verifique e tente novamente.');
+    } finally {
+      setLoading(btn, false);
+    }
+  });
+
+  // Aluno login
+  document.getElementById('btn-login-aluno').addEventListener('click', async () => {
+    const rm = document.getElementById('aluno-rm').value.trim();
+    const senha = document.getElementById('aluno-senha').value;
+    if (!rm || !senha) { showError('Preencha o RM e a senha antes de continuar.'); return; }
+    const btn = document.getElementById('btn-login-aluno');
+    setLoading(btn, true);
+    try {
+      const data = await api.post('/auth/login/aluno', { rm, senha });
+      Auth.save(data.token, data.usuario);
+      window.location.href = '/aluno/dashboard.html';
+    } catch (e) {
+      showError(e.message || 'RM ou senha incorretos. Verifique e tente novamente.');
+    } finally {
+      setLoading(btn, false);
+    }
+  });
+
+  // Enter key submit
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    const profSelected = document.getElementById('role-professor').classList.contains('selected');
+    if (profSelected) document.getElementById('btn-login-prof').click();
+    else document.getElementById('btn-login-aluno').click();
+  });
+
+  // Password visibility toggle
+  document.querySelectorAll('.password-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      const eyeOpen = btn.querySelector('.eye-open');
+      const eyeClosed = btn.querySelector('.eye-closed');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eyeOpen.style.display = 'none';
+        eyeClosed.style.display = 'block';
+      } else {
+        input.type = 'password';
+        eyeOpen.style.display = 'block';
+        eyeClosed.style.display = 'none';
+      }
+    });
+  });
+
+  // Canvas Background
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, nodes = [];
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width;
+    H = canvas.height = rect.height;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function initNodes() {
+    nodes = [];
+    const count = Math.floor(W * H / 18000);
+    for (let i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - .5) * .3,
+        vy: (Math.random() - .5) * .3,
+        r: Math.random() * 2 + 1,
+        color: Math.random() > .5 ? '255,255,255' : '204,164,59'
+      });
+    }
+  }
+  initNodes();
+  window.addEventListener('resize', initNodes);
+
+  function animateCanvas() {
+    ctx.clearRect(0, 0, W, H);
+    
+    // Gradient Background
+    const bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#0B0A32');
+    bg.addColorStop(1, '#07061f');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    const gl = ctx.createRadialGradient(W * .25, H * .5, 0, W * .25, H * .5, W * .45);
+    gl.addColorStop(0, 'rgba(35, 59, 11, 0.15)');
+    gl.addColorStop(1, 'transparent');
+    ctx.fillStyle = gl;
+    ctx.fillRect(0, 0, W, H);
+
+    const gr = ctx.createRadialGradient(W * .8, H * .75, 0, W * .8, H * .75, W * .4);
+    gr.addColorStop(0, 'rgba(204, 164, 59, 0.08)');
+    gr.addColorStop(1, 'transparent');
+    ctx.fillStyle = gr;
+    ctx.fillRect(0, 0, W, H);
+
+    nodes.forEach(n => {
+      n.x += n.vx;
+      n.y += n.vy;
+      if (n.x < 0) n.x = W;
+      if (n.x > W) n.x = 0;
+      if (n.y < 0) n.y = H;
+      if (n.y > H) n.y = 0;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${n.color},0.35)`;
+      ctx.fill();
+    });
+
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxDist = 140;
+        if (dist < maxDist) {
+          const alpha = (1 - dist / maxDist) * 0.15;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+          ctx.lineWidth = .6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(animateCanvas);
+  }
+  animateCanvas();
+
+  // Particles
+  const pContainer = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 1;
+    const x = Math.random() * 100;
+    const dur = Math.random() * 20 + 15;
+    const delay = Math.random() * 15;
+    const colors = ['#FFFFFF', '#233B0B', '#CCA43B', '#E5E5E5'];
+    const selectedColor = colors[Math.floor(Math.random() * colors.length)];
+    p.style.cssText = `
+      width:${size}px;height:${size}px;left:${x}%;
+      background:${selectedColor};
+      animation-duration:${dur}s;animation-delay:-${delay}s;
+      box-shadow:0 0 ${size * 3}px ${selectedColor}
+    `;
+    pContainer.appendChild(p);
+  }
+
+</script>
+</body>
+</html>

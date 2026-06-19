@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Jogos de Geografia do Brasil</title>
+<style>
+  :root { --bg: #e0f7fa; --primary: #00796b; --secondary: #004d40; --accent: #ffb300; --text: #263238; --white: #fff; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; text-align: center; }
+  h1 { color: var(--secondary); margin-bottom: 5px; }
+  #menu { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+  button { background: var(--primary); color: var(--white); border: none; padding: 10px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+  button:hover { background: var(--secondary); transform: translateY(-2px); }
+  button:active { transform: translateY(0); }
+  .area-jogo { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; display: none; min-height: 350px; position: relative; }
+  .area-jogo.ativo { display: block; }
+  .feedback { font-size: 1.2rem; font-weight: bold; margin: 15px 0; min-height: 28px; }
+  .acerto { color: #2e7d32; } .erro { color: #c62828; }
+  #placar-global { font-size: 1.2rem; font-weight: bold; color: var(--secondary); margin-bottom: 15px; }
+  
+  /* Layouts Comuns */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .flex-wrap { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .item-clicavel { padding: 15px; border: 2px solid var(--primary); border-radius: 10px; cursor: pointer; background: var(--white); font-weight: bold; }
+  .item-clicavel:hover { background: var(--bg); }
+  .ws-cell:hover { background: var(--color-surface-2); }
+  .letra.selecting { background: var(--accent); }
+  .selecionado { background: var(--accent) !important; color: var(--secondary); border-color: var(--secondary); }
+
+  /* Jogo 4: Memória */
+  .grid-memoria { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .carta { height: 80px; background: var(--primary); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: transparent; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  .carta.virada { background: var(--white); color: var(--text); border: 2px solid var(--primary); transform: rotateY(180deg); }
+  .carta.encontrada { background: #c8e6c9; border-color: #2e7d32; color: #2e7d32; cursor: default; }
+
+  /* Jogo 8: Caça-Palavras */
+  /* Jogo 8 implementation moved to external wordsearch.js; this block removed.
+  The game logic is defined in frontend/js/wordsearch.js and loads via script tag.
+  No further inline code needed here. */
+
+  /* Campos e Inputs */
+  input[type="text"] { padding: 10px; border-radius: 8px; border: 2px solid var(--primary); font-size: 16px; width: 80%; max-width: 300px; text-transform: uppercase; text-align: center; letter-spacing: 2px; }
+</style>
+<link rel="stylesheet" href="css/wordsearch.css" />
+</head>
+<body>
+
+<h1>🌎 Explorador Brasil</h1>
+<div id="placar-global">Pontuação Total: <span id="pontos">0</span></div>
+
+<div id="menu">
+  <button onclick="mudarJogo(1)">1. Bandeiras</button>
+  <button onclick="mudarJogo(2)">2. Capitais</button>
+  <button onclick="mudarJogo(3)">3. Siglas</button>
+  <button onclick="mudarJogo(4)">4. Biomas</button>
+  <button onclick="mudarJogo(5)">5. Regiões</button>
+  <button onclick="mudarJogo(6)">6. Hidrografia</button>
+  <button onclick="mudarJogo(7)">7. Posição</button>
+  <button onclick="mudarJogo(8)">8. Caça-Palavras</button>
+  <button onclick="mudarJogo(9)">9. Município</button>
+  <button onclick="mudarJogo(10)">10. Fronteiras</button>
+  <button onclick="jogoAleatorio()" style="background: var(--accent); color: var(--secondary);">🎲 Surpresa</button>
+</div>
+
+<!-- JOGO 1 -->
+<div id="jogo-1" class="area-jogo ativo">
+  <h2>Associe a Bandeira ao Estado</h2>
+  <p>Clique no nome do estado que corresponde ao ícone (representando a bandeira).</p>
+  <div id="j1-bandeira" style="font-size: 60px; margin: 20px;"></div>
+  <div id="j1-opcoes" class="grid-2"></div>
+  <div class="feedback" id="j1-feedback"></div>
+  <button onclick="initJogo1()">Próxima</button>
+</div>
+
+<!-- JOGO 2 -->
+<div id="jogo-2" class="area-jogo">
+  <h2>Encontre a Capital</h2>
+  <p>Qual é a capital do estado: <strong id="j2-estado"></strong>?</p>
+  <div id="j2-opcoes" class="grid-2" style="margin-top: 20px;"></div>
+  <div class="feedback" id="j2-feedback"></div>
+  <button onclick="initJogo2()">Próxima</button>
+</div>
+
+<!-- JOGO 3 -->
+<div id="jogo-3" class="area-jogo">
+  <h2>Quiz de Siglas</h2>
+  <p>De qual estado é a sigla: <strong id="j3-sigla" style="font-size: 24px; color: var(--primary);"></strong>?</p>
+  <div id="j3-opcoes" class="grid-2" style="margin-top: 20px;"></div>
+  <div class="feedback" id="j3-feedback"></div>
+  <p>Acertos consecutivos: <span id="j3-combo">0</span></p>
+  <button onclick="initJogo3()">Próxima</button>
+</div>
+
+<!-- JOGO 4 -->
+<div id="jogo-4" class="area-jogo">
+  <h2>Memória dos Biomas</h2>
+  <p>Encontre os pares: Nome do bioma e sua característica.</p>
+  <div id="j4-grade" class="grid-memoria"></div>
+  <div class="feedback" id="j4-feedback"></div>
+  <button onclick="initJogo4()">Reiniciar Jogo</button>
+</div>
+
+<!-- JOGO 5 -->
+<div id="jogo-5" class="area-jogo">
+  <h2>Ordenando por Região</h2>
+  <p>Selecione um estado e depois clique na região correta.</p>
+  <div id="j5-estado-atual" style="font-size: 20px; font-weight: bold; margin: 15px; color: var(--primary);"></div>
+  <div class="flex-wrap" id="j5-regioes">
+    <div class="item-clicavel" onclick="j5Verificar('Norte')">Norte</div>
+    <div class="item-clicavel" onclick="j5Verificar('Nordeste')">Nordeste</div>
+    <div class="item-clicavel" onclick="j5Verificar('Centro-Oeste')">Centro-Oeste</div>
+    <div class="item-clicavel" onclick="j5Verificar('Sudeste')">Sudeste</div>
+    <div class="item-clicavel" onclick="j5Verificar('Sul')">Sul</div>
+  </div>
+  <div class="feedback" id="j5-feedback"></div>
+  <p>Restantes: <span id="j5-restantes">0</span></p>
+  <button onclick="initJogo5()">Reiniciar</button>
+</div>
+
+<!-- JOGO 6 -->
+<div id="jogo-6" class="area-jogo">
+  <h2>Mapa das Hidrografias</h2>
+  <p>Encontre o rio: <strong id="j6-rio"></strong></p>
+  <div class="flex-wrap" id="j6-opcoes" style="margin-top:20px;"></div>
+  <div class="feedback" id="j6-feedback"></div>
+  <button onclick="initJogo6()">Próxima</button>
+</div>
+
+<!-- JOGO 7 -->
+<div id="jogo-7" class="area-jogo">
+  <h2>Desafio da Posição</h2>
+  <p id="j7-pergunta" style="font-size: 18px; margin: 20px 0;"></p>
+  <div id="j7-opcoes" class="grid-2"></div>
+  <div class="feedback" id="j7-feedback"></div>
+  <button onclick="initJogo7()">Próxima</button>
+</div>
+
+<!-- JOGO 8 -->
+<div id="jogo-8" class="area-jogo">
+  <h2>Caça-Palavras Regional</h2>
+  <p>Encontre as palavras clicando nas letras sequencialmente. <br>Restam: <span id="j8-restantes">0</span></p>
+  <div id="j8-grade" class="grade-caca"></div>
+<div id="j8-controls" class="ws-controls"></div>
+  <div class="feedback" id="j8-feedback"></div>
+  <button onclick="initJogo8()">Nova Grade</button>
+</div>
+
+<!-- JOGO 9 -->
+<div id="jogo-9" class="area-jogo">
+  <h2>Complete o Município</h2>
+  <p>Qual é a capital da região <strong id="j9-regiao"></strong>?</p>
+  <div id="j9-lacuna" style="font-size: 24px; letter-spacing: 5px; margin: 20px; font-family: monospace;"></div>
+  <input type="text" id="j9-input" maxlength="20" placeholder="DIGITE AQUI" onkeyup="j9Verificar(event)">
+  <div class="feedback" id="j9-feedback"></div>
+  <button onclick="initJogo9()">Próxima</button>
+</div>
+
+<!-- JOGO 10 -->
+<div id="jogo-10" class="area-jogo">
+  <h2>Cronômetro das Fronteiras</h2>
+  <p>Quais estados fazem fronteira com: <strong id="j10-estado"></strong>?</p>
+  <p>Tempo: <span id="j10-tempo" style="color:red; font-weight:bold;">10</span>s</p>
+  <div id="j10-opcoes" class="flex-wrap" style="margin-bottom: 15px;"></div>
+  <div class="feedback" id="j10-feedback"></div>
+  <button id="j10-btn" onclick="initJogo10()">Iniciar Rodada</button>
+</div>
+
+<script>
+// DADOS GERAIS
+const estados = [
+  {nome: "Acre", sigla: "AC", capital: "Rio Branco", regiao: "Norte", icon: "🟢"},
+  {nome: "Alagoas", sigla: "AL", capital: "Maceió", regiao: "Nordeste", icon: "🏖️"},
+  {nome: "Amapá", sigla: "AP", capital: "Macapá", regiao: "Norte", icon: "🌐"},
+  {nome: "Amazonas", sigla: "AM", capital: "Manaus", regiao: "Norte", icon: "🌳"},
+  {nome: "Bahia", sigla: "BA", capital: "Salvador", regiao: "Nordeste", icon: "🥁"},
+  {nome: "Ceará", sigla: "CE", capital: "Fortaleza", regiao: "Nordeste", icon: "🌞"},
+  {nome: "Espírito Santo", sigla: "ES", capital: "Vitória", regiao: "Sudeste", icon: "☕"},
+  {nome: "Goiás", sigla: "GO", capital: "Goiânia", regiao: "Centro-Oeste", icon: "🎸"},
+  {nome: "Maranhão", sigla: "MA", capital: "São Luís", regiao: "Nordeste", icon: "🏘️"},
+  {nome: "Mato Grosso", sigla: "MT", capital: "Cuiabá", regiao: "Centro-Oeste", icon: "🌾"},
+  {nome: "Mato Grosso do Sul", sigla: "MS", capital: "Campo Grande", regiao: "Centro-Oeste", icon: "🦜"},
+  {nome: "Minas Gerais", sigla: "MG", capital: "Belo Horizonte", regiao: "Sudeste", icon: "🧀"},
+  {nome: "Pará", sigla: "PA", capital: "Belém", regiao: "Norte", icon: "🌧️"},
+  {nome: "Paraíba", sigla: "PB", capital: "João Pessoa", regiao: "Nordeste", icon: "🌅"},
+  {nome: "Paraná", sigla: "PR", capital: "Curitiba", regiao: "Sul", icon: "🌲"},
+  {nome: "Pernambuco", sigla: "PE", capital: "Recife", regiao: "Nordeste", icon: "🌂"},
+  {nome: "Piauí", sigla: "PI", capital: "Teresina", regiao: "Nordeste", icon: "🌵"},
+  {nome: "Rio de Janeiro", sigla: "RJ", capital: "Rio de Janeiro", regiao: "Sudeste", icon: "🗽"},
+  {nome: "Rio Grande do Norte", sigla: "RN", capital: "Natal", regiao: "Nordeste", icon: "🐪"},
+  {nome: "Rio Grande do Sul", sigla: "RS", capital: "Porto Alegre", regiao: "Sul", icon: "🧉"},
+  {nome: "Rondônia", sigla: "RO", capital: "Porto Velho", regiao: "Norte", icon: "🚂"},
+  {nome: "Roraima", sigla: "RR", capital: "Boa Vista", regiao: "Norte", icon: "⛰️"},
+  {nome: "Santa Catarina", sigla: "SC", capital: "Florianópolis", regiao: "Sul", icon: "🍎"},
+  {nome: "São Paulo", sigla: "SP", capital: "São Paulo", regiao: "Sudeste", icon: "🏙️"},
+  {nome: "Sergipe", sigla: "SE", capital: "Aracaju", regiao: "Nordeste", icon: "🦀"},
+  {nome: "Tocantins", sigla: "TO", capital: "Palmas", regiao: "Norte", icon: "🌻"}
+];
+
+let pontuacaoGlobal = 0;
+function addPonto() { pontuacaoGlobal++; document.getElementById('pontos').innerText = pontuacaoGlobal; }
+function subPonto() { pontuacaoGlobal = Math.max(0, pontuacaoGlobal - 1); document.getElementById('pontos').innerText = pontuacaoGlobal; }
+function showMsg(id, msg, isOk) { 
+  const el = document.getElementById(id); 
+  el.textContent = msg; el.className = "feedback " + (isOk ? "acerto" : "erro"); 
+}
+function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
+function pickRandom(arr, n) { return shuffle([...arr]).slice(0, n); }
+
+// SISTEMA DE ABAS
+function mudarJogo(n) {
+  document.querySelectorAll('.area-jogo').forEach(el => el.classList.remove('ativo'));
+  document.getElementById('jogo-'+n).classList.add('ativo');
+  window['initJogo'+n]();
+}
+function jogoAleatorio() { mudarJogo(Math.floor(Math.random() * 10) + 1); }
+
+// JOGO 1: Bandeiras (Ícones)
+let j1Correto;
+function initJogo1() {
+  const alvos = pickRandom(estados, 4);
+  j1Correto = alvos[0];
+  document.getElementById('j1-bandeira').innerText = j1Correto.icon;
+  const opcoes = document.getElementById('j1-opcoes');
+  opcoes.innerHTML = '';
+  shuffle(alvos).forEach(e => {
+    let btn = document.createElement('div');
+    btn.className = 'item-clicavel';
+    btn.innerText = e.nome;
+    btn.onclick = () => {
+      if(e.sigla === j1Correto.sigla) { showMsg('j1-feedback', 'Correto! '+e.nome, true); addPonto(); setTimeout(initJogo1, 1000); }
+      else { showMsg('j1-feedback', 'Incorreto!', false); subPonto(); }
+    };
+    opcoes.appendChild(btn);
+  });
+  showMsg('j1-feedback', '', true);
+}
+
+// JOGO 2: Capitais
+let j2Correto;
+function initJogo2() {
+  const alvos = pickRandom(estados, 4);
+  j2Correto = alvos[0];
+  document.getElementById('j2-estado').innerText = j2Correto.nome;
+  const opcoes = document.getElementById('j2-opcoes');
+  opcoes.innerHTML = '';
+  shuffle(alvos).forEach(e => {
+    let btn = document.createElement('div');
+    btn.className = 'item-clicavel';
+    btn.innerText = e.capital;
+    btn.onclick = () => {
+      if(e.capital === j2Correto.capital) { showMsg('j2-feedback', 'Exato!', true); addPonto(); setTimeout(initJogo2, 1000); }
+      else { showMsg('j2-feedback', 'Erro! A capital de '+j2Correto.nome+' é '+j2Correto.capital, false); subPonto(); }
+    };
+    opcoes.appendChild(btn);
+  });
+  showMsg('j2-feedback', '', true);
+}
+
+// JOGO 3: Siglas
+let j3Correto;
+let j3Combo = 0;
+function initJogo3() {
+  const alvos = pickRandom(estados, 4);
+  j3Correto = alvos[0];
+  document.getElementById('j3-sigla').innerText = j3Correto.sigla;
+  const opcoes = document.getElementById('j3-opcoes');
+  opcoes.innerHTML = '';
+  shuffle(alvos).forEach(e => {
+    let btn = document.createElement('div');
+    btn.className = 'item-clicavel';
+    btn.innerText = e.nome;
+    btn.onclick = () => {
+      if(e.sigla === j3Correto.sigla) { 
+        j3Combo++; document.getElementById('j3-combo').innerText = j3Combo;
+        showMsg('j3-feedback', 'Acertou!', true); addPonto(); setTimeout(initJogo3, 800); 
+      }
+      else { 
+        j3Combo = 0; document.getElementById('j3-combo').innerText = j3Combo;
+        showMsg('j3-feedback', 'Errou! Era '+j3Correto.nome, false); subPonto(); 
+      }
+    };
+    opcoes.appendChild(btn);
+  });
+  showMsg('j3-feedback', '', true);
+}
+
+// JOGO 4: Memória Biomas
+const biomas = [
+  {id:1, text:"Amazônia"}, {id:1, text:"Maior floresta tropical"},
+  {id:2, text:"Caatinga"}, {id:2, text:"Clima semiárido"},
+  {id:3, text:"Cerrado"}, {id:3, text:"Savana brasileira"},
+  {id:4, text:"Mata Atlântica"}, {id:4, text:"Litoral brasileiro"},
+  {id:5, text:"Pampa"}, {id:5, text:"Campos do Sul"},
+  {id:6, text:"Pantanal"}, {id:6, text:"Maior planície alagável"}
+];
+let j4Cartas = [], j4Viradas = [], j4Encontradas = 0;
+function initJogo4() {
+  j4Cartas = shuffle([...biomas]);
+  j4Viradas = []; j4Encontradas = 0;
+  const grade = document.getElementById('j4-grade');
+  grade.innerHTML = '';
+  j4Cartas.forEach((c, i) => {
+    let div = document.createElement('div');
+    div.className = 'carta';
+    div.dataset.id = c.id;
+    div.dataset.idx = i;
+    div.innerText = c.text;
+    div.onclick = () => virarCarta(div, c);
+    grade.appendChild(div);
+  });
+  showMsg('j4-feedback', '', true);
+}
+function virarCarta(div, c) {
+  if(j4Viradas.length >= 2 || div.classList.contains('virada') || div.classList.contains('encontrada')) return;
+  div.classList.add('virada');
+  j4Viradas.push({div, id: c.id});
+  if(j4Viradas.length === 2) {
+    setTimeout(() => {
+      if(j4Viradas[0].id === j4Viradas[1].id) {
+        j4Viradas[0].div.classList.add('encontrada'); j4Viradas[1].div.classList.add('encontrada');
+        j4Encontradas += 2; addPonto();
+        if(j4Encontradas === 12) showMsg('j4-feedback', 'Parabéns! Completou a memória!', true);
+      } else {
+        j4Viradas[0].div.classList.remove('virada'); j4Viradas[1].div.classList.remove('virada');
+        subPonto();
+      }
+      j4Viradas = [];
+    }, 1000);
+  }
+}
+
+// JOGO 5: Ordenando por Região
+let j5Lista = [], j5Atual;
+function initJogo5() {
+  j5Lista = pickRandom(estados, 12);
+  proxJ5();
+}
+function proxJ5() {
+  if(j5Lista.length === 0) { showMsg('j5-feedback', 'Você finalizou a lista!', true); document.getElementById('j5-estado-atual').innerText = ''; return; }
+  j5Atual = j5Lista.pop();
+  document.getElementById('j5-estado-atual').innerText = j5Atual.nome;
+  document.getElementById('j5-restantes').innerText = j5Lista.length + 1;
+  showMsg('j5-feedback', '', true);
+}
+function j5Verificar(regiao) {
+  if(!j5Atual) return;
+  if(j5Atual.regiao === regiao) { showMsg('j5-feedback', 'Correto!', true); addPonto(); setTimeout(proxJ5, 800); }
+  else { showMsg('j5-feedback', 'Erro! ' + j5Atual.nome + ' é do ' + j5Atual.regiao, false); subPonto(); }
+}
+
+// JOGO 6: Mapa Hidrografia
+const rios = ["Rio Amazonas", "Rio São Francisco", "Rio Tocantins", "Rio Paraná"];
+let j6Correto;
+function initJogo6() {
+  const alvos = shuffle([...rios]);
+  j6Correto = alvos[0];
+  document.getElementById('j6-rio').innerText = j6Correto;
+  const opcoes = document.getElementById('j6-opcoes');
+  opcoes.innerHTML = '';
+  alvos.forEach(r => {
+    let btn = document.createElement('div');
+    btn.className = 'item-clicavel';
+    btn.innerText = "🌊 " + r;
+    btn.onclick = () => {
+      if(r === j6Correto) { showMsg('j6-feedback', 'Rio encontrado!', true); addPonto(); setTimeout(initJogo6, 1000); }
+      else { showMsg('j6-feedback', 'Rio errado!', false); subPonto(); }
+    };
+    opcoes.appendChild(btn);
+  });
+  showMsg('j6-feedback', '', true);
+}
+
+// JOGO 7: Posição
+const perguntas = [
+  {p: "Qual estado fica ao norte de SC?", r: "Paraná", err: ["Rio Grande do Sul", "São Paulo", "Mato Grosso"]},
+  {p: "Qual estado fica mais a oeste?", r: "Acre", err: ["Rondônia", "Amazonas", "Roraima"]},
+  {p: "Qual estado não tem litoral?", r: "Minas Gerais", err: ["Espírito Santo", "Rio de Janeiro", "Bahia"]},
+  {p: "Estado cortado pela Linha do Equador?", r: "Amapá", err: ["Tocantins", "Maranhão", "Ceará"]}
+];
+let j7Atual;
+function initJogo7() {
+  j7Atual = shuffle(perguntas)[0];
+  document.getElementById('j7-pergunta').innerText = j7Atual.p;
+  let ops = shuffle([j7Atual.r, ...j7Atual.err]);
+  const opcoes = document.getElementById('j7-opcoes');
+  opcoes.innerHTML = '';
+  ops.forEach(o => {
+    let btn = document.createElement('div'); btn.className = 'item-clicavel'; btn.innerText = o;
+    btn.onclick = () => {
+      if(o === j7Atual.r) { showMsg('j7-feedback', 'Perfeito!', true); addPonto(); setTimeout(initJogo7, 1500); }
+      else { showMsg('j7-feedback', 'Ops! A resposta era '+j7Atual.r, false); subPonto(); }
+    }
+    opcoes.appendChild(btn);
+  });
+  showMsg('j7-feedback', '', true);
+}
+
+// Original initJogo8 removed; custom implementation is defined earlier.function cliqueLetra8(div) {
+  if(div.classList.contains('marcada')) return;
+  div.style.background = "#ffb300";
+  j8Selecao.push(div);
+  let palavraFormada = j8Selecao.map(d => d.innerText).join('');
+  if(j8Palavras.includes(palavraFormada)) {
+    j8Selecao.forEach(d => { d.classList.add('marcada'); d.style.background = '#81c784'; });
+    j8Selecao = []; j8Faltam--; document.getElementById('j8-restantes').innerText = j8Faltam;
+    addPonto();
+    if(j8Faltam === 0) showMsg('j8-feedback', 'Você achou todas!', true);
+  } else if(j8Selecao.length > 5 || (!j8Palavras.some(p => p.startsWith(palavraFormada)))) {
+    j8Selecao.forEach(d => d.style.background = '#fff');
+    j8Selecao = [];
+  }
+}
+
+// JOGO 9: Complete o Município
+let j9Capital;
+function initJogo9() {
+  j9Capital = pickRandom(estados, 1)[0];
+  document.getElementById('j9-regiao').innerText = j9Capital.regiao;
+  let nome = j9Capital.capital.toUpperCase();
+  let oculto = nome.split('').map(c => (c===' ' ? ' ' : (Math.random()>0.4 ? '_' : c))).join('');
+  document.getElementById('j9-lacuna').innerText = oculto;
+  document.getElementById('j9-input').value = '';
+  document.getElementById('j9-input').focus();
+  showMsg('j9-feedback', '', true);
+}
+function j9Verificar(e) {
+  if(e.key === 'Enter') {
+    let val = document.getElementById('j9-input').value.toUpperCase().trim();
+    // remove acentos para simplificar
+    let formatado = j9Capital.capital.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    let digitado = val.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if(digitado === formatado) { showMsg('j9-feedback', 'Correto!', true); addPonto(); setTimeout(initJogo9, 1500); }
+    else { showMsg('j9-feedback', 'Incorreto, tente novamente.', false); subPonto(); }
+  }
+}
+
+// JOGO 10: Fronteiras
+const fronteirasMock = {
+  "RJ": ["SP", "MG", "ES"],
+  "SC": ["PR", "RS"],
+  "MS": ["MT", "GO", "MG", "SP", "PR"],
+  "AM": ["RR", "PA", "MT", "RO", "AC"]
+};
+let j10Ativo = false, j10Tempo = 10, j10Timer, j10Alvo;
+function initJogo10() {
+  if(j10Ativo) return;
+  const listaIds = Object.keys(fronteirasMock);
+  j10Alvo = listaIds[Math.floor(Math.random() * listaIds.length)];
+  let estadoAlvo = estados.find(e => e.sigla === j10Alvo);
+  document.getElementById('j10-estado').innerText = estadoAlvo.nome;
+  
+  const opcoes = document.getElementById('j10-opcoes');
+  opcoes.innerHTML = '';
+  let botoesParaMostrar = shuffle(estados).slice(0, 8);
+  if(!botoesParaMostrar.find(e=> fronteirasMock[j10Alvo].includes(e.sigla))) {
+    botoesParaMostrar[0] = estados.find(e => e.sigla === fronteirasMock[j10Alvo][0]);
+  }
+  shuffle(botoesParaMostrar).forEach(e => {
+    if(e.sigla === j10Alvo) return;
+    let b = document.createElement('div'); b.className = 'item-clicavel'; b.innerText = e.sigla;
+    b.onclick = () => {
+      if(!j10Ativo) return;
+      if(fronteirasMock[j10Alvo].includes(e.sigla)) { b.classList.add('selecionado'); addPonto(); showMsg('j10-feedback', 'Boa!', true); }
+      else { showMsg('j10-feedback', 'Não faz fronteira!', false); subPonto(); }
+    };
+    opcoes.appendChild(b);
+  });
+  
+  j10Tempo = 10; j10Ativo = true; document.getElementById('j10-tempo').innerText = j10Tempo;
+  showMsg('j10-feedback', '', true);
+  clearInterval(j10Timer);
+  j10Timer = setInterval(() => {
+    j10Tempo--; document.getElementById('j10-tempo').innerText = j10Tempo;
+    if(j10Tempo <= 0) {
+      clearInterval(j10Timer); j10Ativo = false; showMsg('j10-feedback', 'Tempo Esgotado!', false);
+    }
+  }, 1000);
+}
+
+// Inicializa no jogo 1
+// Drag functionality moved to wordsearch.js
+initJogo1();
+</script>
+<script src="js/wordsearch.js"></script>
+</body>
+</html>

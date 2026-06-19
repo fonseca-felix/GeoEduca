@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca - Provas e Avaliações</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <style>
+    .exams-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .exam-card {
+      background: var(--bg-surface, #fff);
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .exam-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+    .exam-img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      background: #f3f4f6;
+    }
+    .exam-body {
+      padding: 1.25rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .exam-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary, #111827);
+    }
+    .exam-stats {
+      font-size: 0.875rem;
+      color: var(--text-muted, #6b7280);
+      margin-top: auto;
+    }
+    .exam-footer {
+      border-top: 1px solid var(--border-color, #f3f4f6);
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-muted, #f9fafb);
+    }
+
+    /* Modais Gerais */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(17,24,39,0.6);
+      backdrop-filter: blur(4px); align-items: center; justify-content: center;
+      z-index: 100; opacity: 0; transition: opacity 0.3s; padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; opacity: 1; }
+    .modal-content {
+      background: var(--bg-surface, #fff); border-radius: 16px;
+      width: 100%; max-width: 750px; max-height: 90vh; overflow-y: auto;
+      transform: translateY(20px); transition: transform 0.3s;
+    }
+    .modal-overlay.open .modal-content { transform: translateY(0); }
+    .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color, #f3f4f6); display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; }
+    .modal-body { padding: 1.5rem; }
+    .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border-color, #f3f4f6); display: flex; justify-content: space-between; gap: 1rem; }
+    .btn-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280; }
+    .btn-close:hover { color: #111827; }
+
+    /* Formulários */
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .form-control { width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 8px; font-family: 'Inter', sans-serif; outline: none; box-sizing: border-box; }
+    .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    textarea.form-control { resize: vertical; min-height: 80px; }
+
+    .step-indicator { display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 600; color: #6b7280; }
+    .option-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
+    .option-row input[type="radio"] { width: 20px; height: 20px; accent-color: #10b981; }
+
+    /* Correção */
+    .student-item { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .student-header { display: flex; justify-content: space-between; font-weight: 600; font-size: 1.1rem; }
+    .student-meta { font-size: 0.875rem; color: #6b7280; display: flex; gap: 1rem; }
+    .student-meta span { display: flex; align-items: center; gap: 0.25rem; }
+    .student-body { margin-top: 0.5rem; padding-top: 1rem; border-top: 1px dashed #e5e7eb; }
+    .correction-item { margin-bottom: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px; border-left: 4px solid #3b82f6; }
+    .correction-q-text { font-weight: 600; margin-bottom: 0.5rem; color: #111827; }
+    .correction-a-text { font-size: 0.95rem; color: #4b5563; background: #fff; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 0.75rem; white-space: pre-wrap; }
+    .grading-row { display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; }
+    .grading-input { width: 80px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; text-align: center; font-weight: 600; }
+    
+    .final-grade-box { margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; background: #ecfeff; border: 1px solid #a5f3fc; padding: 1rem; border-radius: 8px; }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Provas e Avaliações</h1>
+        <p class="page-subtitle">Crie avaliações com correção automática e sistema anti-cola.</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" onclick="startExamCreation()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 8px; vertical-align: middle;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          Nova Prova
+        </button>
+      </div>
+    </header>
+    
+    <div class="page-content">
+      <div id="loadingExams" style="text-align:center; padding: 2rem; color: #6b7280;">Carregando provas...</div>
+      <div class="exams-grid" id="exams-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Criação de Prova -->
+<div class="modal-overlay" id="modal-create-exam">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Nova Prova</h2>
+      <button class="btn-close" onclick="Modal.close('modal-create-exam')">&times;</button>
+    </div>
+    
+    <!-- Passo 1: Informações Gerais -->
+    <div id="step-1" class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Título da Prova *</label>
+        <input type="text" id="examTitle" class="form-control" placeholder="Ex: Prova Bimestral de Cartografia" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Link da Imagem de Capa (Opcional)</label>
+        <input type="url" id="examImage" class="form-control" placeholder="https://..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rubrica / Instruções *</label>
+        <textarea id="examRubric" class="form-control" placeholder="Ex: A prova contém 5 questões objetivas e 2 discursivas. Evite sair da aba para não perder pontos."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Quantidade de Questões *</label>
+        <input type="number" id="examQCount" class="form-control" min="1" max="50" value="5" />
+      </div>
+    </div>
+
+    <!-- Passo 2+: Questões -->
+    <div id="step-question" class="modal-body" style="display:none;">
+      <div class="step-indicator" id="question-indicator">Questão 1 de 5</div>
+      
+      <div class="form-group">
+        <label class="form-label">Tipo da Questão</label>
+        <select id="qType" class="form-control" onchange="toggleQuestionType()">
+          <option value="alternativa">Objetiva (Múltipla Escolha)</option>
+          <option value="descritiva">Discursiva (Texto Livre)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Pergunta *</label>
+        <textarea id="qText" class="form-control" placeholder="Digite a pergunta..."></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Valor da Questão (Pontos) *</label>
+        <input type="number" id="qValue" class="form-control" value="1" step="0.5" />
+      </div>
+
+      <!-- Apenas para objetivas -->
+      <div class="form-group" id="objective-fields">
+        <label class="form-label">Alternativas (Marque a correta) *</label>
+        <div class="option-row">
+          <input type="radio" name="qCorrect" value="0" checked />
+          <input type="text" id="qOpt0" class="form-control" placeholder="Alternativa 1" />
+        </div>
+        <div class="option-row">
+          <input type="radio" name="qCorrect" value="1" />
+          <input type="text" id="qOpt1" class="form-control" placeholder="Alternativa 2" />
+        </div>
+        <div class="option-row">
+          <input type="radio" name="qCorrect" value="2" />
+          <input type="text" id="qOpt2" class="form-control" placeholder="Alternativa 3" />
+        </div>
+        <div class="option-row">
+          <input type="radio" name="qCorrect" value="3" />
+          <input type="text" id="qOpt3" class="form-control" placeholder="Alternativa 4" />
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer" id="footer-step-1">
+      <button class="btn btn-outline" onclick="Modal.close('modal-create-exam')">Cancelar</button>
+      <button class="btn btn-primary" onclick="goToQuestions()">Próximo: Questões</button>
+    </div>
+    <div class="modal-footer" id="footer-step-question" style="display:none;">
+      <button class="btn btn-outline" onclick="prevQuestion()" id="btnPrevQ">Anterior</button>
+      <button class="btn btn-primary" onclick="nextQuestion()" id="btnNextQ">Próxima Questão</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Correção -->
+<div class="modal-overlay" id="modal-grading">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="grading-title">Corrigir Prova</h2>
+      <button class="btn-close" onclick="Modal.close('modal-grading')">&times;</button>
+    </div>
+    <div class="modal-body" style="background: #f9fafb;">
+      
+      <div class="form-group" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+        <label style="font-weight:600; font-size:0.875rem;">Selecione a Sala:</label>
+        <select id="gradeSalaSelect" class="form-control" style="max-width: 300px;" onchange="loadGradingData()">
+          <option value="">Carregando salas...</option>
+        </select>
+      </div>
+
+      <div id="grading-content" style="display:none;">
+        <div id="students-list-container">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+      
+      <div id="grading-loading" style="text-align:center; padding:2rem; display:none;">
+        Carregando entregas...
+      </div>
+      <div id="grading-empty" style="text-align:center; padding:2rem; color:#6b7280; display:none;">
+        Selecione uma sala para ver as avaliações entregues.
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- Modal Enviar Prova -->
+<div class="modal-overlay" id="modal-send-prova">
+  <div class="modal-content" style="max-width: 650px;">
+    <div class="modal-header">
+      <h2 class="modal-title">Enviar Prova</h2>
+      <button class="btn-close" onclick="Modal.close('modal-send-prova')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Destino</label>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+          <label style="display:flex; gap:0.5rem; align-items:center;">
+            <input type="radio" name="sendProvaTargetType" value="sala" checked />
+            Sala
+          </label>
+          <label style="display:flex; gap:0.5rem; align-items:center;">
+            <input type="radio" name="sendProvaTargetType" value="alunos" />
+            Alunos (um ou vários)
+          </label>
+        </div>
+      </div>
+
+      <div id="sendProvaSalaBlock">
+        <div class="form-group">
+          <label class="form-label" for="sendProvaSalaSelect">Selecione a sala</label>
+          <select id="sendProvaSalaSelect" class="form-control">
+            <option value="">Carregando salas...</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="sendProvaAlunosBlock" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Selecione os alunos</label>
+          <div id="sendProvaAlunosList" style="max-height: 260px; overflow:auto; padding:0.75rem; border:1px solid #e5e7eb; border-radius:10px; background:#fff;">
+            <div style="color:#6b7280;">Carregando alunos...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="Modal.close('modal-send-prova')">Cancelar</button>
+      <button class="btn btn-primary" id="btnSendProva">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/professor/provas.js"></script>
+</body>
+</html>

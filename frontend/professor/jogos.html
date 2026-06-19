@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca - Meus Jogos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <style>
+    /* Estilos específicos para o relatório */
+    .report-tabs {
+        display: flex; gap: 16px; border-bottom: 1px solid var(--color-border); margin-bottom: 24px;
+    }
+    .report-tab {
+        padding: 8px 16px; cursor: pointer; color: var(--color-text-secondary);
+        border-bottom: 2px solid transparent; font-weight: 500; font-size: 14px;
+    }
+    .report-tab.active {
+        color: var(--gold); border-bottom-color: var(--gold);
+    }
+    .class-card {
+        background: var(--color-surface-2); border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg); padding: 16px; cursor: pointer; transition: 0.2s;
+    }
+    .class-card:hover {
+        border-color: var(--gold); box-shadow: var(--shadow-sm);
+    }
+    .class-details {
+        display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--color-border);
+    }
+    .class-card.expanded .class-details {
+        display: block;
+    }
+    .student-row {
+        display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px;
+    }
+    .student-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Jogos e Desafios</h1>
+        <p class="page-subtitle">Acompanhe o desempenho dos alunos nos mini jogos</p>
+      </div>
+      <div class="page-header-right">
+        <!-- Botão Novo Jogo removido pois estes 10 jogos são fixos do sistema -->
+      </div>
+    </header>
+    <div class="page-content">
+      
+        <div class="filters-bar" style="display:flex; gap:16px; margin-bottom: 24px; flex-wrap: wrap;">
+            <input type="text" id="search-games" class="input form-control" placeholder="Buscar jogos por título..." style="flex:1; min-width: 250px;" />
+            <select id="filter-type" class="select form-control" style="min-width: 150px;">
+                <option value="">Todos os tipos</option>
+                <option value="quiz">Quiz</option>
+                <option value="mapa">Mapa Interativo</option>
+                <option value="memoria">Memória</option>
+            </select>
+        </div>
+        
+        <div class="games-grid" id="games-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;">
+            <!-- Rendered via JS -->
+        </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal: Relatório de Jogo -->
+<div class="modal-overlay" id="modal-relatorio-overlay">
+  <div class="modal modal-lg" id="modal-relatorio" style="max-height: 90vh; max-width: 860px;">
+      <div class="modal-header">
+          <div>
+              <h3 id="report-game-title">Resultados do Jogo</h3>
+              <p style="font-size:13px; color:var(--color-text-secondary);" id="report-game-subtitle">Estatísticas detalhadas</p>
+          </div>
+          <button class="modal-close" onclick="fecharModalRelatorio()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+      </div>
+      <div class="modal-body" style="padding-top: 0;">
+          <div class="report-tabs">
+              <div class="report-tab active" onclick="switchReportTab('sala')">Resultados Por Sala</div>
+              <div class="report-tab" onclick="switchReportTab('aluno')">Resultados Por Aluno</div>
+          </div>
+          
+          <div id="report-content-sala" style="display: flex; flex-direction: column; gap: 16px;">
+              <!-- Cards de Salas renderizados via JS -->
+          </div>
+
+          <div id="report-content-aluno" style="display: none;">
+              <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#&nbsp;&nbsp;Aluno</th>
+                                <th>Sala</th>
+                                <th>Pontuação</th>
+                                <th>Tempo</th>
+                                <th>Status</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-aluno-tbody">
+                            <!-- Tabela renderizada via JS -->
+                        </tbody>
+                    </table>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="fecharModalRelatorio()">Fechar</button>
+      </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/professor/jogos.js"></script>
+<script>
+    function fecharModalRelatorio() {
+        document.getElementById('modal-relatorio-overlay').classList.remove('open');
+    }
+    function switchReportTab(tab) {
+        document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+        if(tab === 'sala') {
+            document.querySelectorAll('.report-tab')[0].classList.add('active');
+            document.getElementById('report-content-sala').style.display = 'flex';
+            document.getElementById('report-content-aluno').style.display = 'none';
+        } else {
+            document.querySelectorAll('.report-tab')[1].classList.add('active');
+            document.getElementById('report-content-sala').style.display = 'none';
+            document.getElementById('report-content-aluno').style.display = 'block';
+        }
+    }
+</script>
+</body>
+</html>

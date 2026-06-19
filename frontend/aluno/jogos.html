@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca - Jogos Educativos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <style>
+    .page-wrapper { display: grid; grid-template-columns: 1fr 300px; gap: 2rem; align-items: start; }
+    @media (max-width: 1024px) {
+      .page-wrapper { grid-template-columns: 1fr; }
+    }
+
+    .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+
+    .game-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      display: flex; flex-direction: column;
+      transition: transform 0.3s var(--transition-spring), box-shadow 0.3s, border-color 0.2s;
+      cursor: pointer;
+    }
+    .game-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--gold);
+    }
+    .game-card:focus { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+    .game-thumb {
+      height: 160px;
+      position: relative;
+      overflow: hidden;
+    }
+    .game-thumb-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%);
+      display: flex; align-items: flex-end; padding: 1rem;
+    }
+    .game-category {
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(6px);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    .game-info { padding: 1.25rem 1.5rem 1.5rem; flex-grow: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+    .game-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+    .game-desc {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+      line-height: 1.55;
+      flex-grow: 1;
+      margin: 0;
+    }
+    .game-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
+    .play-btn {
+      background: var(--navy);
+      color: white;
+      border: none;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      flex-shrink: 0;
+    }
+    .game-card:hover .play-btn {
+      background: var(--gold);
+      transform: scale(1.12);
+      box-shadow: var(--shadow-gold);
+    }
+    .play-btn svg { width: 18px; height: 18px; fill: white; margin-left: 2px; }
+
+    /* Leaderboard Sidebar */
+    .leaderboard-panel {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      padding: 1.5rem;
+      position: sticky;
+      top: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .leaderboard-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    .rank-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .rank-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: var(--radius-md);
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .rank-item:hover { transform: translateX(3px); }
+    .rank-pos {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      width: 28px;
+      text-align: center;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+    }
+    .rank-avatar {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--color-border);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+      flex-shrink: 0;
+    }
+    .rank-info { flex: 1; min-width: 0; }
+    .rank-name {
+      font-weight: 600;
+      color: var(--color-text-primary);
+      font-size: 0.85rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rank-score { font-size: 0.75rem; color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Jogos Educativos</h1>
+        <p class="page-subtitle">Aprenda brincando e suba no ranking da turma!</p>
+      </div>
+    </header>
+    <div class="page-content">
+      
+      <div class="page-wrapper">
+        <!-- Games Section -->
+        <div>
+          <div class="games-grid" id="games-grid">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <aside class="leaderboard-panel">
+          <h3 class="leaderboard-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"></path></svg>
+            Ranking da Turma
+          </h3>
+          <div class="rank-list" id="leaderboard-list">
+            <!-- Injected via JS -->
+          </div>
+        </aside>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal / Toast logic handled by JS directly via Toast.success for games usually -->
+
+<!-- Game Active Modal -->
+<div class="modal-overlay" id="game-modal-overlay">
+  <div class="modal modal-lg" id="game-modal" style="max-height: 92vh; max-width: 680px;">
+      <div class="modal-header">
+          <div>
+              <h3 id="active-game-title">Título do Jogo</h3>
+          </div>
+          <button class="modal-close" onclick="fecharJogo()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+      </div>
+      <div class="modal-body" id="game-container" style="padding: 24px; text-align: center; display: flex; flex-direction: column; gap: 16px; background: var(--color-surface-2);">
+          <!-- Game UI will be injected here by motor-jogos.js -->
+      </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/aluno/motor-jogos.js"></script>
+<script src="../js/aluno/jogos.js"></script>
+<script src="../js/aluno/push.js"></script>
+</body>
+</html>

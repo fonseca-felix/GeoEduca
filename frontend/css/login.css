@@ -1,0 +1,391 @@
+/* =============================================
+   GeoEduca Login Page
+   ============================================= */
+
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--navy);
+  overflow: hidden;
+}
+
+/* ---- Left Panel ---- */
+.login-left {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--space-16) 60px;
+  overflow: hidden;
+}
+
+/* ---- Background Canvas ---- */
+#bg-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ─── GRID OVERLAY ─── */
+.geo-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+
+/* ─── HUD ELEMENTS ─── */
+.hud {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: rgba(255,255,255,0.45);
+}
+
+.hud-tl { top: 24px; left: 24px; }
+.hud-tr { top: 24px; right: 24px; text-align: right; }
+.hud-bl { bottom: 24px; left: 24px; }
+.hud-br { bottom: 24px; right: 24px; text-align: right; }
+
+.hud span {
+  display: block;
+  line-height: 1.8;
+}
+
+.hud-pulse {
+  animation: hudpulse 3s ease-in-out infinite;
+}
+
+@keyframes hudpulse {
+  0%, 100% { opacity: .3; }
+  50% { opacity: .65; }
+}
+
+.radar-ring {
+  position: absolute;
+  bottom: 32px;
+  left: 48px;
+  z-index: 2;
+  pointer-events: none;
+  width: 80px;
+  height: 80px;
+}
+
+@keyframes radarSpin {
+  100% { transform: rotate(360deg); }
+}
+
+.globe-wrap {
+  position: absolute;
+  right: -100px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 480px;
+  height: 480px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.scan-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.particles {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 50%;
+  animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-120vh) scale(1.2); opacity: 0; }
+}
+
+.login-brand {
+  position: relative;
+  z-index: 1;
+  margin-bottom: var(--space-12);
+}
+
+.login-brand-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.login-brand-icon {
+  width: 52px;
+  height: 52px;
+  color: var(--gold);
+}
+
+.login-brand-name {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.03em;
+}
+
+.login-headline {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-5);
+}
+
+.login-headline .highlight {
+  color: var(--gold);
+  position: relative;
+}
+
+.login-subheadline {
+  font-size: var(--text-base);
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.7;
+  max-width: 420px;
+}
+
+/* Stats row */
+.login-stats {
+  display: flex;
+  gap: var(--space-8);
+  margin-top: var(--space-10);
+  position: relative;
+  z-index: 1;
+}
+
+.login-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.login-stat-value {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: -0.02em;
+}
+
+.login-stat-label {
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+/* ---- Right Panel ---- */
+.login-right {
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  position: relative;
+}
+
+[data-theme="dark"] .login-right {
+  background: var(--color-surface);
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-form-header {
+  margin-bottom: var(--space-8);
+}
+
+.login-form-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-2);
+}
+
+[data-theme="dark"] .login-form-title {
+  color: var(--color-text-primary);
+}
+
+.login-form-subtitle {
+  font-size: var(--text-sm);
+  color: var(--gray-500);
+}
+
+/* Role Selector */
+.role-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.role-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  background: var(--gray-100);
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.role-option:hover {
+  background: rgba(11, 10, 50, 0.04);
+  border-color: var(--gray-300);
+}
+
+.role-option.selected {
+  background: rgba(11, 10, 50, 0.05);
+  border-color: var(--navy);
+}
+
+.role-option-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.role-option.selected .role-option-icon {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: white;
+}
+
+.role-option-icon svg {
+  width: 22px;
+  height: 22px;
+  color: var(--gray-500);
+}
+
+.role-option.selected .role-option-icon svg {
+  color: white;
+}
+
+.role-option-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--gray-600);
+  transition: color var(--transition-fast);
+}
+
+.role-option.selected .role-option-label {
+  color: var(--navy);
+}
+
+/* Login Form Fields */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.login-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.login-submit-btn {
+  width: 100%;
+  height: 48px;
+  font-size: var(--text-base);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.login-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-danger-light);
+  border: 1px solid rgba(197, 48, 48, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  display: none;
+}
+
+.login-error.show {
+  display: flex;
+}
+
+.login-error svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Theme toggle on login */
+.login-theme-toggle {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-5);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .login-page {
+    grid-template-columns: 1fr;
+  }
+
+  .login-left {
+    display: none;
+  }
+
+  .login-right {
+    padding: var(--space-8) var(--space-6);
+    min-height: 100vh;
+  }
+}

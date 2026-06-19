@@ -1,0 +1,7 @@
+/iniciar.bat
+/tudo.html
+node_modules/
+.env
+*.json
+!package.json
+!package-lock.json

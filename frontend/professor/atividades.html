@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca - Atividades</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <style>
+    /* ── Grid de cards ─────────────────────────────── */
+    .activities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* ── Card ──────────────────────────────────────── */
+    .activity-card {
+      background: var(--bg-surface, #fff);
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .activity-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.09);
+    }
+    .activity-card-top {
+      padding: 1.25rem 1.5rem 1rem;
+      border-bottom: 1px solid var(--border-color, #f3f4f6);
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .activity-type-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .type-video    { background: #fee2e2; }
+    .type-infografico { background: #e0e7ff; }
+    .type-site     { background: #d1fae5; }
+    .type-tarefa   { background: #fef3c7; }
+
+    .activity-card-info { flex: 1; min-width: 0; }
+    .activity-card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary, #111827);
+      margin-bottom: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .activity-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-video       { background: #fee2e2; color: #dc2626; }
+    .badge-infografico { background: #e0e7ff; color: #4338ca; }
+    .badge-site        { background: #d1fae5; color: #059669; }
+    .badge-tarefa      { background: #fef3c7; color: #d97706; }
+
+    .activity-card-body { padding: 1rem 1.5rem; flex: 1; }
+    .activity-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted, #6b7280);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .activity-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.875rem;
+    }
+    .activity-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      color: var(--text-muted, #6b7280);
+    }
+    .activity-meta-item svg { flex-shrink: 0; }
+    .date-overdue { color: #dc2626 !important; font-weight: 600; }
+
+    .activity-card-footer {
+      padding: 0.875rem 1.5rem;
+      border-top: 1px solid var(--border-color, #f3f4f6);
+      display: flex;
+      gap: 0.75rem;
+      background: var(--bg-muted, #f9fafb);
+    }
+    .btn-icon-sm {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+      color: var(--text-muted, #6b7280);
+      transition: all 0.2s;
+    }
+    .btn-icon-sm:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+
+    /* ── Barra de filtros ──────────────────────────── */
+    .filter-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-wrap { position: relative; flex: 1; min-width: 220px; }
+    .search-wrap svg { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+    .search-wrap input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-wrap input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+    .filter-select {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      background: #fff;
+      outline: none;
+      min-width: 180px;
+    }
+
+    /* ── Modal ─────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(17,24,39,0.55);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.3s;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; opacity: 1; }
+    .modal-content {
+      background: var(--bg-surface, #fff);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+      transform: translateY(20px);
+      transition: transform 0.3s;
+    }
+    .modal-overlay.open .modal-content { transform: translateY(0); }
+    .modal-header {
+      padding: 1.5rem 1.5rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-primary, #111827);
+    }
+    .modal-close-btn {
+      width: 32px; height: 32px;
+      border: none; background: #f3f4f6;
+      border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #6b7280;
+      transition: background 0.2s;
+    }
+    .modal-close-btn:hover { background: #e5e7eb; }
+    .modal-body { padding: 1.25rem 1.5rem; }
+    .modal-footer {
+      padding: 1rem 1.5rem 1.5rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      border-top: 1px solid var(--border-color, #f3f4f6);
+    }
+
+    /* ── Seletor visual de tipo ─────────────────────── */
+    .type-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
+    .type-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.875rem 0.5rem;
+      border: 2px solid var(--border-color, #e5e7eb);
+      border-radius: 12px;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted, #6b7280);
+    }
+    .type-btn .type-emoji { font-size: 1.5rem; }
+    .type-btn:hover { border-color: #93c5fd; background: #eff6ff; }
+    .type-btn.selected { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+    .type-btn.selected-video    { border-color: #ef4444; background: #fef2f2; color: #dc2626; }
+    .type-btn.selected-infografico { border-color: #6366f1; background: #eef2ff; color: #4338ca; }
+    .type-btn.selected-site     { border-color: #10b981; background: #ecfdf5; color: #059669; }
+    .type-btn.selected-tarefa   { border-color: #f59e0b; background: #fffbeb; color: #d97706; }
+
+    /* ── Form fields ───────────────────────────────── */
+    .form-group { margin-bottom: 1.1rem; }
+    .form-label { display: block; font-size: 0.875rem; font-weight: 600; color: var(--text-primary, #374151); margin-bottom: 0.4rem; }
+    .form-label span { color: #ef4444; margin-left: 2px; }
+    .form-control {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+      box-sizing: border-box;
+    }
+    .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+    textarea.form-control { resize: vertical; min-height: 90px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+
+    /* Hidden field */
+    .field-hidden { display: none !important; }
+    .field-visible { display: block !important; }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 2rem;
+      background: var(--bg-surface, #fff);
+      border-radius: 14px;
+      border: 1px dashed #d1d5db;
+      color: #6b7280;
+    }
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty-state h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: #374151; }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Atividades</h1>
+        <p class="page-subtitle">Crie e gerencie atividades para suas turmas.</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" onclick="Modal.open('modal-atividade')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:6px;vertical-align:middle;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Nova Atividade
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <!-- Filtros -->
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" id="searchInput" placeholder="Buscar atividade..." />
+        </div>
+        <select id="filterSala" class="filter-select">
+          <option value="">Todas as Salas</option>
+        </select>
+        <select id="filterTipo" class="filter-select">
+          <option value="">Todos os Tipos</option>
+          <option value="video">🎬 Vídeo</option>
+          <option value="infografico">🖼️ Infográfico</option>
+          <option value="site">🌐 Site</option>
+          <option value="tarefa">📝 Tarefa</option>
+        </select>
+      </div>
+
+      <!-- Grid de atividades -->
+      <div class="activities-grid" id="activities-container">
+        <!-- Renderizado por JS -->
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     Modal: Nova Atividade
+════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-atividade">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Nova Atividade</h2>
+      <button class="modal-close-btn" onclick="Modal.close('modal-atividade')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="form-atividade">
+
+        <!-- 1. Seletor de tipo -->
+        <div class="form-group">
+          <div class="form-label">Tipo de Atividade <span>*</span></div>
+          <div class="type-selector">
+            <button type="button" class="type-btn" data-type="video" onclick="selectTipo('video')">
+              <span class="type-emoji">🎬</span>
+              Vídeo
+            </button>
+            <button type="button" class="type-btn" data-type="infografico" onclick="selectTipo('infografico')">
+              <span class="type-emoji">🖼️</span>
+              Infográfico
+            </button>
+            <button type="button" class="type-btn" data-type="site" onclick="selectTipo('site')">
+              <span class="type-emoji">🌐</span>
+              Site / Exploração
+            </button>
+            <button type="button" class="type-btn" data-type="tarefa" onclick="selectTipo('tarefa')">
+              <span class="type-emoji">📝</span>
+              Tarefa / Produção
+            </button>
+          </div>
+          <input type="hidden" id="selectedTipo" required />
+        </div>
+
+        <!-- 2. Título -->
+        <div class="form-group">
+          <label class="form-label" for="actTitulo">Título <span>*</span></label>
+          <input type="text" id="actTitulo" class="form-control" placeholder="Ex: Assista ao documentário sobre Biomas" required />
+        </div>
+
+        <!-- 3. Link (vídeo / infográfico / site) -->
+        <div class="form-group" id="field-link" style="display:none;">
+          <label class="form-label" for="actLink">Link <span>*</span></label>
+          <input type="url" id="actLink" class="form-control" placeholder="https://..." />
+        </div>
+
+        <!-- 4. Descrição / Critérios -->
+        <div class="form-group" id="field-desc">
+          <label class="form-label" for="actDescricao" id="label-desc">Descrição</label>
+          <textarea id="actDescricao" class="form-control" placeholder="Descreva o que os alunos devem fazer..."></textarea>
+        </div>
+
+        <!-- 5. Aula de entrega (só para tarefa) -->
+        <div class="form-group" id="field-aula" style="display:none;">
+          <label class="form-label" for="actAula">Aula de Entrega</label>
+          <input type="text" id="actAula" class="form-control" placeholder="Ex: Aula de quarta-feira, 18/06" />
+        </div>
+
+        <!-- 6. Destino do envio -->
+        <div class="form-group">
+          <div class="form-label">Enviar para <span>*</span></div>
+          <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:0.75rem;">
+            <label style="display:flex; gap:0.5rem; align-items:center;">
+              <input type="radio" name="actDestinoType" value="sala" checked onchange="syncActDestinoBlocks()" />
+              Sala inteira
+            </label>
+            <label style="display:flex; gap:0.5rem; align-items:center;">
+              <input type="radio" name="actDestinoType" value="alunos" onchange="syncActDestinoBlocks()" />
+              Aluno(s) específico(s)
+            </label>
+          </div>
+        </div>
+
+        <div id="actDestinoSalaBlock">
+          <div class="form-group">
+            <label class="form-label" for="actSala">Sala <span>*</span></label>
+            <select id="actSala" class="form-control">
+              <option value="" disabled selected>Selecione...</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="actDestinoAlunosBlock" style="display:none;">
+          <div class="form-group">
+            <label class="form-label">Alunos</label>
+            <div id="actAlunosList" style="max-height:200px;overflow:auto;padding:0.75rem;border:1px solid #e5e7eb;border-radius:10px;background:#fff;">
+              <div style="color:#6b7280;">Carregando alunos...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="actData" id="label-data">Data de Entrega</label>
+          <input type="date" id="actData" class="form-control" />
+        </div>
+
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" onclick="Modal.close('modal-atividade')">Cancelar</button>
+      <button type="button" class="btn btn-primary" id="btnSalvar" onclick="submitAtividade()">
+        Criar Atividade
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/professor/atividades.js"></script>
+</body>
+</html>

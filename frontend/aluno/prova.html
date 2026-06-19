@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca - Provas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <style>
+    .exam-section { margin-bottom: 3rem; }
+    .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 600; color: var(--text-primary, #1e293b); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .section-title::before { content: ''; display: block; width: 4px; height: 1.25rem; background: var(--primary-color, #4361ee); border-radius: 2px; }
+    
+    .exam-list { display: flex; flex-direction: column; gap: 1rem; }
+    .exam-card { background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; padding: 1.5rem; display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; justify-content: space-between; transition: all 0.2s; position: relative; overflow: hidden; }
+    .exam-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .exam-card.available { border-left: 4px solid #10b981; }
+    .exam-card.scheduled { border-left: 4px solid #f5a623; opacity: 0.8; }
+    .exam-card.graded { border-left: 4px solid #64748b; background: #f8fafc; }
+    
+    .exam-info { flex: 1; min-width: 250px; }
+    .exam-title { font-size: 1.125rem; font-weight: 600; color: var(--text-primary, #1e293b); margin-bottom: 0.25rem; }
+    .exam-subject { font-size: 0.875rem; color: var(--text-secondary, #64748b); margin-bottom: 0.75rem; }
+    
+    .exam-details { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.875rem; color: var(--text-secondary, #64748b); }
+    .detail-item { display: flex; align-items: center; gap: 0.5rem; background: #f1f5f9; padding: 0.25rem 0.75rem; border-radius: 999px; }
+    
+    .exam-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; min-width: 150px; }
+    .status-badge { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.25rem 0.75rem; border-radius: 999px; }
+    .status-badge.available { background: #dcfce7; color: #059669; }
+    .status-badge.scheduled { background: #fef3c7; color: #d97706; }
+    .status-badge.graded { background: #e2e8f0; color: #475569; }
+    
+    .btn-exam { padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-exam.primary { background: #10b981; color: white; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); }
+    .btn-exam.primary:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 6px 8px -1px rgba(16, 185, 129, 0.3); }
+    .btn-exam.disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+    .btn-exam.outline { background: transparent; border: 1px solid #cbd5e1; color: #475569; }
+    .btn-exam.outline:hover { background: #f1f5f9; }
+
+    /* Strict Warning Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 1000; backdrop-filter: blur(5px); }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-content { background: #fff; width: 90%; max-width: 500px; border-radius: 12px; padding: 2rem; transform: scale(0.9); transition: transform 0.3s; position: relative; border-top: 6px solid #ef4444; }
+    .modal-overlay.active .modal-content { transform: scale(1); }
+    .warning-icon { width: 48px; height: 48px; background: #fee2e2; color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; }
+    .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; text-align: center; color: #0f172a; margin-bottom: 1rem; }
+    .warning-list { list-style: none; padding: 0; margin: 0 0 1.5rem 0; color: #475569; font-size: 0.9rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .warning-list li { display: flex; align-items: flex-start; gap: 0.5rem; }
+    .warning-list li svg { color: #ef4444; flex-shrink: 0; margin-top: 0.125rem; }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Minhas Provas</h1>
+        <p class="page-subtitle">Avaliações oficiais e simulados programados.</p>
+      </div>
+    </header>
+    <div class="page-content">
+      
+      <div class="exam-section">
+        <h2 class="section-title">Disponíveis Agora</h2>
+        <div class="exam-list" id="available-exams">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <div class="exam-section">
+        <h2 class="section-title">Próximas Provas</h2>
+        <div class="exam-list" id="scheduled-exams">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <div class="exam-section">
+        <h2 class="section-title">Resultados Recentes</h2>
+        <div class="exam-list" id="graded-exams">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="exam-modal">
+  <div class="modal-content">
+    <div class="warning-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+    </div>
+    <h2 class="modal-title">Atenção: Ambiente de Prova</h2>
+    <p style="text-align: center; color: #64748b; margin-bottom: 1.5rem;" id="exam-modal-title">—</p>
+    
+    <ul class="warning-list">
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        O tempo começará a contar assim que você clicar em "Iniciar" e não pode ser pausado.
+      </li>
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+        Navegar para fora da página ou fechar a aba encerrará a prova automaticamente.
+      </li>
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        Certifique-se de ter uma conexão estável com a internet.
+      </li>
+    </ul>
+
+    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+      <button class="btn-exam outline" style="flex: 1;" onclick="closeModal('exam-modal')">Cancelar</button>
+      <button class="btn-exam primary" style="flex: 1; background: #ef4444; box-shadow: 0 4px 6px -1px rgba(239,68,68,0.2);" id="btn-confirm-exam">Estou ciente, Iniciar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Fazer Prova -->
+<div class="modal-overlay" id="exam-taking-modal">
+  <div class="modal-content" style="max-width: 860px;">
+    <h2 class="modal-title" id="exam-taking-title">Prova</h2>
+    <div style="color:#64748b;font-size:0.9rem;margin-bottom:1rem;" id="exam-taking-subtitle"></div>
+    <div id="exam-taking-body" style="max-height: 60vh; overflow: auto; padding-right: 0.5rem;"></div>
+    <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+      <button class="btn-exam outline" style="flex:1;" onclick="closeModal('exam-taking-modal')">Cancelar</button>
+      <button class="btn-exam primary" style="flex:1;" id="btn-submit-prova">Enviar Respostas</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/aluno/prova.js"></script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca - Hub BrazilGuessr</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <style>
+    .hub-wrapper { display: flex; flex-direction: column; gap: 2rem; }
+    
+    .hub-header-card {
+      background: linear-gradient(135deg, var(--gold) 0%, #b45309 100%);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hub-header-info h2 {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: white;
+    }
+
+    .hub-header-info p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      max-width: 500px;
+    }
+
+    .hub-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-play-big {
+      background: white;
+      color: #b45309;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: var(--radius-full);
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-play-big:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .btn-play-big:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-title {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Hub BrazilGuessr</h1>
+        <p class="page-subtitle">Acompanhe seu desempenho e inicie novas partidas!</p>
+      </div>
+      <div class="page-header-right">
+        <a href="jogos.html" class="btn btn-outline">Voltar aos Jogos</a>
+      </div>
+    </header>
+    <div class="page-content">
+      <div class="hub-wrapper">
+        
+        <!-- Header Banner -->
+        <div class="hub-header-card">
+          <div class="hub-header-info">
+            <h2>BrazilGuessr</h2>
+            <p>Descubra onde você está no Brasil! Você será colocado em um local aleatório no Google Street View e terá que adivinhar no mapa.</p>
+          </div>
+          <div class="hub-action">
+            <span id="partidas-hoje" style="font-weight: 600; font-size: 1.1rem;">Tentativas Restantes: 10</span>
+            <button id="btn-jogar-agora" class="btn-play-big" onclick="irParaJogo()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              Jogar Agora
+            </button>
+            <span id="aviso-limite" style="font-size: 0.85rem; color: rgba(255,255,255,0.8); display: none;">Limite diário atingido! Volte amanhã.</span>
+          </div>
+        </div>
+
+        <!-- Estatísticas -->
+        <div>
+          <h3 style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 1rem; color: var(--color-text-primary);">Suas Estatísticas</h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-title">Total</span>
+              <span class="stat-value" id="stat-total">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Semanal</span>
+              <span class="stat-value" id="stat-semanal">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Mensal</span>
+              <span class="stat-value" id="stat-mensal">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Trimestral</span>
+              <span class="stat-value" id="stat-trimestral">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Semestral</span>
+              <span class="stat-value" id="stat-semestral">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Anual</span>
+              <span class="stat-value" id="stat-anual">0</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/aluno/hub_brazilguessr.js"></script>
+</body>
+</html>

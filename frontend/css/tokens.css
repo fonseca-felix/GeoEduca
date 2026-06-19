@@ -1,0 +1,122 @@
+/* =============================================
+   GeoEduca Design Tokens
+   Geographic Authority Design System
+   ============================================= */
+
+:root {
+  /* Brand Colors */
+  --navy: #0B0A32;
+  --navy-light: #15144a;
+  --navy-dark: #07061f;
+  --forest: #233B0B;
+  --forest-light: #2e4d0e;
+  --gold: #CCA43B;
+  --gold-light: #d9b558;
+  --gold-dark: #a8842e;
+  --gray-100: #F8F8F8;
+  --gray-200: #E5E5E5;
+  --gray-300: #D0D0D0;
+  --gray-400: #A8A8A8;
+  --gray-500: #6B6B6B;
+  --gray-600: #4A4A4A;
+  --gray-700: #2F2F2F;
+  --white: #FFFFFF;
+
+  /* Semantic Colors */
+  --color-bg: #F4F4F2;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F8F8F6;
+  --color-border: #E0DDD8;
+  --color-text-primary: #0B0A32;
+  --color-text-secondary: #4A4A6A;
+  --color-text-muted: #8888A8;
+  --color-accent: var(--gold);
+  --color-accent-hover: var(--gold-dark);
+  --color-sidebar-bg: var(--navy);
+  --color-sidebar-text: rgba(255, 255, 255, 0.75);
+  --color-sidebar-active: rgba(204, 164, 59, 0.15);
+  --color-sidebar-active-text: var(--gold);
+  --color-sidebar-hover: rgba(255, 255, 255, 0.06);
+  --color-danger: #C53030;
+  --color-danger-light: #FFF5F5;
+  --color-success: #276749;
+  --color-success-light: #F0FFF4;
+  --color-warning: #D69E2E;
+  --color-warning-light: #FFFFF0;
+  --color-info: #2B6CB0;
+  --color-info-light: #EBF8FF;
+
+  /* Sidebar */
+  --sidebar-width: 240px;
+  --sidebar-width-collapsed: 68px;
+
+  /* Typography */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+
+  /* Spacing (8pt grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* Border Radius - Sharp authority */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(11, 10, 50, 0.08);
+  --shadow-md: 0 4px 12px rgba(11, 10, 50, 0.10);
+  --shadow-lg: 0 8px 24px rgba(11, 10, 50, 0.14);
+  --shadow-xl: 0 16px 48px rgba(11, 10, 50, 0.18);
+  --shadow-gold: 0 4px 16px rgba(204, 164, 59, 0.30);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Z-index */
+  --z-sidebar: 100;
+  --z-header: 90;
+  --z-modal: 200;
+  --z-toast: 300;
+  --z-tooltip: 250;
+}
+
+/* Dark Mode Tokens */
+[data-theme="dark"] {
+  --color-bg: #0A0A1A;
+  --color-surface: #111128;
+  --color-surface-2: #161630;
+  --color-border: #232346;
+  --color-text-primary: #F0EFF8;
+  --color-text-secondary: #9E9EC8;
+  --color-text-muted: #5E5E88;
+  --color-sidebar-bg: #070716;
+  --color-sidebar-text: rgba(255, 255, 255, 0.65);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+}

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca — Sobre o Sistema</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <style>
+    /* ── Hero ───────────────────────────────────── */
+    .sobre-hero {
+      background: var(--navy);
+      border-radius: var(--radius-xl, 16px);
+      padding: 60px 48px;
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .sobre-hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 320px; height: 320px;
+      background: var(--gold);
+      opacity: 0.07;
+      border-radius: 50%;
+    }
+    .sobre-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -100px; left: -60px;
+      width: 280px; height: 280px;
+      background: var(--gold);
+      opacity: 0.05;
+      border-radius: 50%;
+    }
+    .sobre-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 100px;
+      padding: 6px 18px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      color: var(--gold);
+    }
+    .sobre-hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .sobre-hero h1 span { color: var(--gold); }
+    .sobre-hero p {
+      font-size: 1.1rem;
+      opacity: 0.85;
+      max-width: 640px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── Tech Cards ─────────────────────────────── */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .tech-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl, 16px);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .tech-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+    }
+    .tech-card-accent {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+    }
+    .tech-card-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+    }
+    .tech-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+    }
+    .tech-card p {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tech-tag {
+      background: var(--color-surface-2, #f3f4f6);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    /* ── Feature Sections ───────────────────────── */
+    .feature-section {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl, 16px);
+      padding: 36px;
+      margin-bottom: 1.5rem;
+    }
+    .feature-section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .feature-section-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .feature-section-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin: 0;
+    }
+    .feature-section-header p {
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+      margin: 4px 0 0;
+    }
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .feature-item-dot {
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .feature-item-text strong {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+    .feature-item-text span {
+      font-size: 0.82rem;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ── Architecture Diagram ───────────────────── */
+    .arch-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin: 24px 0;
+    }
+    .arch-box {
+      background: var(--color-surface-2, #f8f9fa);
+      border: 2px solid var(--color-border);
+      border-radius: 14px;
+      padding: 18px 24px;
+      text-align: center;
+      min-width: 140px;
+    }
+    .arch-box .arch-icon { font-size: 2rem; margin-bottom: 8px; }
+    .arch-box .arch-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+    .arch-box .arch-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    .arch-arrow {
+      font-size: 1.5rem;
+      color: var(--color-text-muted);
+      padding: 0 12px;
+    }
+
+    /* ── Stats bar ──────────────────────────────── */
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .about-stat {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl, 16px);
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .about-stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .about-stat-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Team card ──────────────────────────────── */
+    .team-card {
+      background: linear-gradient(135deg, var(--navy) 0%, #0077B3 100%);
+      border-radius: var(--radius-xl, 16px);
+      padding: 40px;
+      color: white;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .team-card h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .team-card p {
+      opacity: 0.85;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 500px;
+      margin: 0 auto 24px;
+    }
+    .team-members {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .team-member {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .team-avatar {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--navy);
+      border: 3px solid rgba(255,255,255,0.3);
+    }
+    .team-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .team-role {
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+
+    @media (max-width: 768px) {
+      .sobre-hero { padding: 40px 24px; }
+      .arch-diagram { gap: 4px; }
+      .arch-arrow { padding: 0 4px; font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Sobre o GeoEduca</h1>
+        <p class="page-subtitle">Apresentação técnica completa da plataforma</p>
+      </div>
+      <div class="page-header-right">
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted); background: var(--color-surface-2, #f3f4f6); border: 1px solid var(--color-border); padding: 6px 14px; border-radius: 100px;">
+          <i class="fa-solid fa-code-branch" style="margin-right: 6px; color: var(--navy);"></i>v1.0 — TCC 2026
+        </span>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Hero -->
+      <div class="sobre-hero">
+        <div class="sobre-hero-badge">
+          <i class="fa-solid fa-earth-americas"></i>
+          Trabalho de Conclusão de Curso · 2026
+        </div>
+        <h1>Geo<span>Educa</span></h1>
+        <p>
+          Uma plataforma educacional completa para o ensino de Geografia, com ferramentas interativas para professores e alunos, integração com Inteligência Artificial e jogos geográficos em tempo real.
+        </p>
+      </div>
+
+      <!-- Stats -->
+      <div class="about-stats">
+        <div class="about-stat">
+          <div class="about-stat-value">5</div>
+          <div class="about-stat-label">Módulos Principais</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-value" style="color: var(--gold);">27</div>
+          <div class="about-stat-label">Rotas de IA</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-value">2</div>
+          <div class="about-stat-label">Jogos Educativos</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-value">REST</div>
+          <div class="about-stat-label">Arquitetura da API</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-value">JWT</div>
+          <div class="about-stat-label">Autenticação</div>
+        </div>
+      </div>
+
+      <!-- Stack Tecnológico -->
+      <div class="feature-section">
+        <div class="feature-section-header">
+          <div class="feature-section-icon" style="background: rgba(11,10,50,0.08); color: var(--navy);">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div>
+            <h2>Stack Tecnológico</h2>
+            <p>Tecnologias usadas no Frontend e no Backend da plataforma</p>
+          </div>
+        </div>
+        <div class="tech-grid">
+
+          <!-- Frontend -->
+          <div class="tech-card">
+            <div class="tech-card-accent" style="background: linear-gradient(90deg, #e34c26, #f1502f);"></div>
+            <div class="tech-card-icon" style="background: rgba(227,76,38,0.1); color: #e34c26;">
+              <i class="fa-brands fa-html5"></i>
+            </div>
+            <h3>Frontend</h3>
+            <p>Interface construída com tecnologias web puras — sem frameworks pesados. Rápido, leve e fácil de manter.</p>
+            <div class="tech-tags">
+              <span class="tech-tag">HTML5</span>
+              <span class="tech-tag">CSS3 Vanilla</span>
+              <span class="tech-tag">JavaScript ES6+</span>
+              <span class="tech-tag">Font Awesome</span>
+              <span class="tech-tag">Google Fonts</span>
+            </div>
+          </div>
+
+          <!-- Backend -->
+          <div class="tech-card">
+            <div class="tech-card-accent" style="background: linear-gradient(90deg, #68a063, #3c873a);"></div>
+            <div class="tech-card-icon" style="background: rgba(104,160,99,0.1); color: #3c873a;">
+              <i class="fa-brands fa-node-js"></i>
+            </div>
+            <h3>Backend</h3>
+            <p>Servidor RESTful em Node.js com Express. Gerencia autenticação JWT, rotas da API e integração com banco de dados.</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Node.js</span>
+              <span class="tech-tag">Express.js</span>
+              <span class="tech-tag">JWT</span>
+              <span class="tech-tag">REST API</span>
+              <span class="tech-tag">Middleware</span>
+            </div>
+          </div>
+
+          <!-- Banco de Dados -->
+          <div class="tech-card">
+            <div class="tech-card-accent" style="background: linear-gradient(90deg, #FFCA28, #FFA000);"></div>
+            <div class="tech-card-icon" style="background: rgba(255,202,40,0.15); color: #FFA000;">
+              <i class="fa-solid fa-database"></i>
+            </div>
+            <h3>Banco de Dados</h3>
+            <p>Firebase Firestore como banco NoSQL em tempo real. Armazena usuários, turmas, atividades e resultados com segurança.</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Firebase</span>
+              <span class="tech-tag">Firestore</span>
+              <span class="tech-tag">NoSQL</span>
+              <span class="tech-tag">Tempo Real</span>
+              <span class="tech-tag">Google Cloud</span>
+            </div>
+          </div>
+
+          <!-- Inteligência Artificial -->
+          <div class="tech-card">
+            <div class="tech-card-accent" style="background: linear-gradient(90deg, #4285F4, #0F9D58);"></div>
+            <div class="tech-card-icon" style="background: rgba(66,133,244,0.1); color: #4285F4;">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <h3>Inteligência Artificial</h3>
+            <p>Integração com o Google Gemini AI para geração de aulas, flashcards, quizzes e curadoria de vídeos sobre qualquer tema de Geografia.</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Google Gemini</span>
+              <span class="tech-tag">Gemini 2.0 Flash</span>
+              <span class="tech-tag">Geração de Texto</span>
+              <span class="tech-tag">API REST</span>
+            </div>
+          </div>
+
+          <!-- Segurança -->
+          <div class="tech-card">
+            <div class="tech-card-accent" style="background: linear-gradient(90deg, #8B5CF6, #7C3AED);"></div>
+            <div class="tech-card-icon" style="background: rgba(139,92,246,0.1); color: #7C3AED;">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3>Autenticação & Segurança</h3>
+            <p>Sistema de login seguro com tokens JWT. Separação de perfis entre Professor e Aluno, com rotas protegidas no servidor.</p>
+            <div class="tech-tags">
+              <span class="tech-tag">JWT</span>
+              <span class="tech-tag">bcrypt</span>
+              <span class="tech-tag">CORS</span>
+              <span class="tech-tag">Middleware Auth</span>
+            </div>
+          </div>
+
+          <!-- Design System -->
+          <div class="tech-card">
+            <div class="tech-card-accent" style="background: linear-gradient(90deg, var(--gold), #b8860b);"></div>
+            <div class="tech-card-icon" style="background: rgba(204,164,59,0.12); color: var(--gold);">
+              <i class="fa-solid fa-palette"></i>
+            </div>
+            <h3>Design System</h3>
+            <p>Sistema de design próprio com variáveis CSS (tokens), modo escuro automático, componentes reutilizáveis e design responsivo.</p>
+            <div class="tech-tags">
+              <span class="tech-tag">CSS Tokens</span>
+              <span class="tech-tag">Dark Mode</span>
+              <span class="tech-tag">Responsivo</span>
+              <span class="tech-tag">Acessível</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arquitetura -->
+      <div class="feature-section">
+        <div class="feature-section-header">
+          <div class="feature-section-icon" style="background: rgba(37,99,235,0.1); color: #2563eb;">
+            <i class="fa-solid fa-diagram-project"></i>
+          </div>
+          <div>
+            <h2>Arquitetura do Sistema</h2>
+            <p>Como as camadas do GeoEduca se comunicam entre si</p>
+          </div>
+        </div>
+
+        <div class="arch-diagram">
+          <div class="arch-box">
+            <div class="arch-icon">🖥️</div>
+            <div class="arch-label">Usuário</div>
+            <div class="arch-name">Navegador</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box" style="border-color: var(--navy);">
+            <div class="arch-icon">⚡</div>
+            <div class="arch-label">Frontend</div>
+            <div class="arch-name">HTML + JS</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box" style="border-color: #3c873a;">
+            <div class="arch-icon">🛠️</div>
+            <div class="arch-label">Backend</div>
+            <div class="arch-name">Node / Express</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box" style="border-color: #FFA000;">
+            <div class="arch-icon">🔥</div>
+            <div class="arch-label">Banco</div>
+            <div class="arch-name">Firestore</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box" style="border-color: #4285F4;">
+            <div class="arch-icon">🤖</div>
+            <div class="arch-label">IA</div>
+            <div class="arch-name">Gemini AI</div>
+          </div>
+        </div>
+
+        <div class="feature-list" style="margin-top: 8px;">
+          <div class="feature-item">
+            <div class="feature-item-dot" style="background: rgba(11,10,50,0.08); color: var(--navy);">
+              <i class="fa-solid fa-arrow-right-arrow-left"></i>
+            </div>
+            <div class="feature-item-text">
+              <strong>Comunicação via REST</strong>
+              <span>Frontend e Backend conversam via chamadas HTTP com JSON, usando o padrão REST.</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-item-dot" style="background: rgba(139,92,246,0.1); color: #7C3AED;">
+              <i class="fa-solid fa-key"></i>
+            </div>
+            <div class="feature-item-text">
+              <strong>JWT em cada requisição</strong>
+              <span>Toda chamada ao servidor carrega um Token de autenticação para verificar a identidade do usuário.</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-item-dot" style="background: rgba(255,160,0,0.12); color: #FFA000;">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <div class="feature-item-text">
+              <strong>Dados em Tempo Real</strong>
+              <span>O Firestore atualiza listas de alunos, resultados e atividades sem precisar recarregar a página.</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-item-dot" style="background: rgba(66,133,244,0.1); color: #4285F4;">
+              <i class="fa-solid fa-brain"></i>
+            </div>
+            <div class="feature-item-text">
+              <strong>IA com Fallback</strong>
+              <span>O sistema tenta múltiplos modelos Gemini automaticamente se um deles estiver sobrecarregado.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Funcionalidades -->
+      <div class="feature-section">
+        <div class="feature-section-header">
+          <div class="feature-section-icon" style="background: rgba(16,185,129,0.1); color: #10b981;">
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <div>
+            <h2>Funcionalidades da Plataforma</h2>
+            <p>O que professores e alunos podem fazer no GeoEduca</p>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+          <div>
+            <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--navy); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-chalkboard-user"></i> Área do Professor
+            </p>
+            <div class="feature-list" style="grid-template-columns: 1fr;">
+              <div class="feature-item">
+                <div class="feature-item-dot" style="background: rgba(11,10,50,0.07); color: var(--navy);"><i class="fa-solid fa-users"></i></div>
+                <div class="feature-item-text"><strong>Gerenciar Turmas e Alunos</strong><span>Criação de salas, matrícula e controle de alunos por turma.</span></div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-item-dot" style="background: rgba(11,10,50,0.07); color: var(--navy);"><i class="fa-solid fa-file-pen"></i></div>
+                <div class="feature-item-text"><strong>Criar Atividades e Provas</strong><span>Montagem de avaliações com questões dissertativas e objetivas.</span></div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-item-dot" style="background: rgba(11,10,50,0.07); color: var(--navy);"><i class="fa-solid fa-chart-bar"></i></div>
+                <div class="feature-item-text"><strong>Ver Resultados</strong><span>Acompanhamento de desempenho individual e por turma em quizzes e jogos.</span></div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-item-dot" style="background: rgba(11,10,50,0.07); color: var(--navy);"><i class="fa-solid fa-gamepad"></i></div>
+                <div class="feature-item-text"><strong>Gerenciar Jogos</strong><span>Ativar e monitorar o BrazilGuessr e o Missão Brasil para as turmas.</span></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-graduation-cap"></i> Área do Aluno
+            </p>
+            <div class="feature-list" style="grid-template-columns: 1fr;">
+              <div class="feature-item">
+                <div class="feature-item-dot" style="background: rgba(204,164,59,0.12); color: var(--gold);"><i class="fa-solid fa-book-open"></i></div>
+                <div class="feature-item-text"><strong>Rota 27 — Estudos com IA</strong><span>Geração de aulas completas, flashcards, quizzes e sugestão de vídeos sobre qualquer tema geográfico.</span></div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-item-dot" style="background: rgba(204,164,59,0.12); color: var(--gold);"><i class="fa-solid fa-map-location-dot"></i></div>
+                <div class="feature-item-text"><strong>BrazilGuessr</strong><span>Jogo de adivinha a localização geográfica no mapa do Brasil a partir de pistas visuais.</span></div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-item-dot" style="background: rgba(204,164,59,0.12); color: var(--gold);"><i class="fa-solid fa-flag"></i></div>
+                <div class="feature-item-text"><strong>Missão Brasil</strong><span>Quiz interativo sobre bandeiras, capitais e biomas dos estados brasileiros.</span></div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-item-dot" style="background: rgba(204,164,59,0.12); color: var(--gold);"><i class="fa-solid fa-clipboard-check"></i></div>
+                <div class="feature-item-text"><strong>Responder Atividades</strong><span>Acesso e entrega de atividades e provas criadas pelo professor.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Equipe / Autoria -->
+      <div class="team-card">
+        <h2>Desenvolvido como Trabalho de Conclusão de Curso</h2>
+        <p>GeoEduca foi criado com o objetivo de tornar o ensino de Geografia mais dinâmico, interativo e eficiente, combinando tecnologia moderna com metodologias pedagógicas atuais.</p>
+        <div class="team-members">
+          <div class="team-member">
+            <div class="team-avatar">F</div>
+            <div class="team-name">Félix</div>
+            <div class="team-role">Desenvolvedor Full Stack</div>
+          </div>
+          <div class="team-member">
+            <div class="team-avatar" style="background: #7C3AED; color: white;">P</div>
+            <div class="team-name">Pietro</div>
+            <div class="team-role">Desenvolvedor</div>
+          </div>
+          <div class="team-member">
+            <div class="team-avatar" style="background: #EC4899; color: white;">J</div>
+            <div class="team-name">Joaquim</div>
+            <div class="team-role">Desenvolvedor Frontend</div>
+          </div>
+          <div class="team-member">
+            <div class="team-avatar" style="background: #10B981; color: white;">L</div>
+            <div class="team-name">Luiz</div>
+            <div class="team-role">Desenvolvedor</div>
+          </div>
+          <div class="team-member">
+            <div class="team-avatar" style="background: #F59E0B; color: var(--navy);">J</div>
+            <div class="team-name">Prof.ª Jesiane</div>
+            <div class="team-role">Orientadora Pedagógica</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Scripts -->
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Inject sidebar
+    const layout = document.getElementById('app-layout');
+    if (layout && typeof buildProfessorSidebar === 'function') {
+      layout.insertAdjacentHTML('afterbegin', buildProfessorSidebar());
+    }
+    const user = initPage('prof');
+    if (!user) return;
+  });
+</script>
+</body>
+</html>

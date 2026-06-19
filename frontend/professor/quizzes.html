@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca - Quizzes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <style>
+    .quizzes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .quiz-card {
+      background: var(--bg-surface, #fff);
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .quiz-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+    .quiz-img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      background: #f3f4f6;
+    }
+    .quiz-body {
+      padding: 1.25rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .quiz-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary, #111827);
+    }
+    .quiz-stats {
+      font-size: 0.875rem;
+      color: var(--text-muted, #6b7280);
+      margin-top: auto;
+    }
+    .quiz-footer {
+      border-top: 1px solid var(--border-color, #f3f4f6);
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-muted, #f9fafb);
+    }
+
+    /* Modal Criar Quiz */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(17,24,39,0.6);
+      backdrop-filter: blur(4px); align-items: center; justify-content: center;
+      z-index: 100; opacity: 0; transition: opacity 0.3s; padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; opacity: 1; }
+    .modal-content {
+      background: var(--bg-surface, #fff); border-radius: 16px;
+      width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto;
+      transform: translateY(20px); transition: transform 0.3s;
+    }
+    .modal-overlay.open .modal-content { transform: translateY(0); }
+    
+    .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color, #f3f4f6); display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; }
+    .modal-body { padding: 1.5rem; }
+    .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border-color, #f3f4f6); display: flex; justify-content: space-between; gap: 1rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .form-control { width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 8px; font-family: 'Inter', sans-serif; outline: none; }
+    .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    
+    .step-indicator { display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 600; color: #6b7280; }
+
+    /* Estilos do Relatório */
+    .report-sala-selector { margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; }
+    .report-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+    .summary-card { background: #f3f6f8; padding: 1rem; border-radius: 12px; text-align: center; }
+    .summary-val { font-size: 1.75rem; font-weight: 700; color: #111827; }
+    .summary-label { font-size: 0.875rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+
+    .question-report { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 1rem; overflow: hidden; }
+    .qr-header { padding: 1rem 1.25rem; background: #f9fafb; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid transparent; }
+    .qr-header:hover { background: #f3f4f6; }
+    .qr-header.open { border-bottom-color: #e5e7eb; }
+    .qr-title { font-weight: 600; color: #111827; }
+    .qr-stats { font-size: 0.875rem; color: #059669; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+    
+    .qr-body { padding: 1.25rem; display: none; }
+    .qr-header.open + .qr-body { display: block; }
+    
+    .student-list { margin-top: 1rem; font-size: 0.875rem; }
+    .student-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px dashed #e5e7eb; }
+    .student-item:last-child { border-bottom: none; }
+    .student-correct { color: #059669; font-weight: 500; }
+    .student-wrong { color: #dc2626; }
+    .wrong-answer { font-size: 0.75rem; color: #6b7280; background: #f3f4f6; padding: 0.2rem 0.4rem; border-radius: 4px; margin-left: 0.5rem; }
+
+    /* Respostas options (criação) */
+    .option-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
+    .option-row input[type="radio"] { width: 20px; height: 20px; accent-color: #10b981; }
+
+    .btn-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280; }
+    .btn-close:hover { color: #111827; }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Quizzes Interativos</h1>
+        <p class="page-subtitle">Crie quizzes e acompanhe o desempenho dos alunos.</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" onclick="startQuizCreation()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 8px; vertical-align: middle;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          Novo Quiz
+        </button>
+      </div>
+    </header>
+    
+    <div class="page-content">
+      <div id="loadingQuizzes" style="text-align:center; padding: 2rem; color: #6b7280;">Carregando quizzes...</div>
+      <div class="quizzes-grid" id="quizzes-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Criação de Quiz -->
+<div class="modal-overlay" id="modal-create-quiz">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="create-modal-title">Novo Quiz</h2>
+      <button class="btn-close" onclick="Modal.close('modal-create-quiz')">&times;</button>
+    </div>
+    
+    <!-- Passo 1: Informações Gerais -->
+    <div id="step-1" class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Título do Quiz *</label>
+        <input type="text" id="quizTitle" class="form-control" placeholder="Ex: Capitais da Europa" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Link da Imagem de Capa (Opcional)</label>
+        <input type="url" id="quizImage" class="form-control" placeholder="https://..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Quantidade de Questões *</label>
+        <input type="number" id="quizQCount" class="form-control" min="1" max="50" value="3" />
+      </div>
+    </div>
+
+    <!-- Passo 2+: Questões -->
+    <div id="step-question" class="modal-body" style="display:none;">
+      <div class="step-indicator" id="question-indicator">Questão 1 de 3</div>
+      
+      <div class="form-group">
+        <label class="form-label">Pergunta *</label>
+        <input type="text" id="qText" class="form-control" placeholder="Digite a pergunta..." />
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Alternativas (Marque a correta) *</label>
+        
+        <div class="option-row">
+          <input type="radio" name="qCorrect" value="0" checked />
+          <input type="text" id="qOpt0" class="form-control" placeholder="Alternativa 1" />
+        </div>
+        <div class="option-row">
+          <input type="radio" name="qCorrect" value="1" />
+          <input type="text" id="qOpt1" class="form-control" placeholder="Alternativa 2" />
+        </div>
+        <div class="option-row">
+          <input type="radio" name="qCorrect" value="2" />
+          <input type="text" id="qOpt2" class="form-control" placeholder="Alternativa 3" />
+        </div>
+        <div class="option-row">
+          <input type="radio" name="qCorrect" value="3" />
+          <input type="text" id="qOpt3" class="form-control" placeholder="Alternativa 4" />
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer" id="footer-step-1">
+      <button class="btn btn-outline" onclick="Modal.close('modal-create-quiz')">Cancelar</button>
+      <button class="btn btn-primary" onclick="goToQuestions()">Próximo: Adicionar Questões</button>
+    </div>
+    <div class="modal-footer" id="footer-step-question" style="display:none;">
+      <button class="btn btn-outline" onclick="prevQuestion()" id="btnPrevQ">Anterior</button>
+      <button class="btn btn-primary" onclick="nextQuestion()" id="btnNextQ">Próxima Questão</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Relatório -->
+<div class="modal-overlay" id="modal-report">
+  <div class="modal-content" style="max-width: 750px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="report-title">Relatório do Quiz</h2>
+      <button class="btn-close" onclick="Modal.close('modal-report')">&times;</button>
+    </div>
+    <div class="modal-body" style="background: #f9fafb;">
+      
+      <div class="report-sala-selector">
+        <label style="font-weight:600; font-size:0.875rem;">Selecione a Sala:</label>
+        <select id="reportSalaSelect" class="form-control" style="max-width: 300px;" onchange="loadReportData()">
+          <option value="">Carregando salas...</option>
+        </select>
+      </div>
+
+      <div id="report-content" style="display:none;">
+        <div class="report-summary">
+          <div class="summary-card">
+            <div class="summary-val" id="repTotalAlunos">0 / 0</div>
+            <div class="summary-label">Alunos Responderam</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-val" id="repMedia">0%</div>
+            <div class="summary-label">Média de Acertos</div>
+          </div>
+        </div>
+
+        <h3 style="font-size:1.1rem; margin-bottom:1rem; font-family:'Space Grotesk',sans-serif;">Desempenho por Questão</h3>
+        <div id="questions-report-container">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+      
+      <div id="report-loading" style="text-align:center; padding:2rem; display:none;">
+        Carregando dados...
+      </div>
+      <div id="report-empty" style="text-align:center; padding:2rem; color:#6b7280; display:none;">
+        Selecione uma sala para ver o relatório.
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- Modal Enviar Quiz -->
+<div class="modal-overlay" id="modal-send-quiz">
+  <div class="modal-content" style="max-width: 650px;">
+    <div class="modal-header">
+      <h2 class="modal-title">Enviar Quiz</h2>
+      <button class="btn-close" onclick="Modal.close('modal-send-quiz')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Destino</label>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+          <label style="display:flex; gap:0.5rem; align-items:center;">
+            <input type="radio" name="sendQuizTargetType" value="sala" checked />
+            Sala
+          </label>
+          <label style="display:flex; gap:0.5rem; align-items:center;">
+            <input type="radio" name="sendQuizTargetType" value="alunos" />
+            Alunos (um ou vários)
+          </label>
+        </div>
+      </div>
+
+      <div id="sendQuizSalaBlock">
+        <div class="form-group">
+          <label class="form-label" for="sendQuizSalaSelect">Selecione a sala</label>
+          <select id="sendQuizSalaSelect" class="form-control">
+            <option value="">Carregando salas...</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="sendQuizAlunosBlock" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Selecione os alunos</label>
+          <div id="sendQuizAlunosList" style="max-height: 260px; overflow:auto; padding:0.75rem; border:1px solid #e5e7eb; border-radius: 10px; background:#fff;">
+            <div style="color:#6b7280;">Carregando alunos...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="Modal.close('modal-send-quiz')">Cancelar</button>
+      <button class="btn btn-primary" id="btnSendQuiz">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/professor/quizzes.js"></script>
+</body>
+</html>

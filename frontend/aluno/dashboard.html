@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca – Dashboard do Aluno</title>
+  <meta name="description" content="Acompanhe seu progresso, atividades pendentes e ranking da turma no GeoEduca." />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+
+  <style>
+    /* ── Hero Card ───────────────────────────────────────── */
+    .dash-hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 60%, #1a1960 100%);
+      color: #fff;
+      border-radius: var(--radius-xl);
+      padding: 36px 40px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 48px rgba(11,10,50,.28);
+    }
+
+    .dash-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 90% 50%, rgba(204,164,59,.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 10% 0%,  rgba(255,255,255,.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .dash-hero::after {
+      content: '🌍';
+      position: absolute;
+      right: -16px;
+      bottom: -32px;
+      font-size: 160px;
+      opacity: .07;
+      transform: rotate(-12deg);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .dash-hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .dash-hero-greeting {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .dash-hero-greeting span {
+      color: var(--gold);
+    }
+
+    .dash-hero-sub {
+      font-size: var(--text-base);
+      opacity: .82;
+      max-width: 520px;
+      line-height: 1.55;
+    }
+
+    .dash-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 20px;
+      background: rgba(204,164,59,.18);
+      border: 1px solid rgba(204,164,59,.35);
+      color: var(--gold-light);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-weight: 600;
+    }
+
+    .dash-hero-badge svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ── Quick Stats Row ─────────────────────────────────── */
+    .dash-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .dash-stat {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dash-stat::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: var(--radius-full) var(--radius-full) 0 0;
+    }
+
+    .dash-stat.gold::before  { background: var(--gold); }
+    .dash-stat.navy::before  { background: var(--navy); }
+    .dash-stat.forest::before { background: #4ade80; }
+
+    .dash-stat:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .dash-stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 20px;
+    }
+
+    .dash-stat-icon.gold   { background: rgba(204,164,59,.12); }
+    .dash-stat-icon.navy   { background: rgba(11,10,50,.08); }
+    .dash-stat-icon.forest { background: rgba(74,222,128,.1); }
+
+    .dash-stat-body { flex: 1; min-width: 0; }
+
+    .dash-stat-value {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--color-text-primary);
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    .dash-stat-label {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--color-text-muted);
+      margin-top: 3px;
+    }
+
+    /* ── Section Title ───────────────────────────────────── */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: var(--text-base);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .section-link {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--gold-dark);
+      transition: color var(--transition-fast);
+    }
+
+    .section-link:hover { color: var(--gold); }
+
+    /* ── Activity Cards (injected by JS) ─────────────────── */
+    #student-games {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── Profile Card ────────────────────────────────────── */
+    .profile-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .profile-card-header {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+      padding: 28px 24px 52px;
+      position: relative;
+    }
+
+    .profile-card-header::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(204,164,59,.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      border: 4px solid rgba(255,255,255,.15);
+      box-shadow: 0 4px 16px rgba(0,0,0,.25);
+      position: relative;
+      z-index: 1;
+      margin: 0 auto;
+    }
+
+    .profile-card-body {
+      padding: 0 24px 24px;
+      margin-top: -28px;
+      text-align: center;
+    }
+
+    .profile-level-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-full);
+      padding: 4px 14px 4px 8px;
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--color-text-primary);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 8px;
+    }
+
+    .profile-level-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .profile-subtitle {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin-bottom: 20px;
+    }
+
+    .xp-track {
+      background: var(--color-surface-2);
+      border-radius: var(--radius-full);
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .xp-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+      transition: width .6s cubic-bezier(.4,0,.2,1);
+    }
+
+    .xp-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+
+    .xp-meta span:last-child { color: var(--gold-dark); }
+
+    /* ── BrazilGuessr Card ───────────────────────────────── */
+    .bg-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .bg-card-banner {
+      background: linear-gradient(135deg, #0c2340 0%, #1a3a5c 100%);
+      padding: 20px 20px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bg-card-banner::after {
+      content: '🗺️';
+      position: absolute;
+      right: -8px;
+      bottom: -16px;
+      font-size: 80px;
+      opacity: .12;
+      transform: rotate(-10deg);
+      pointer-events: none;
+    }
+
+    .bg-card-banner h4 {
+      font-family: var(--font-display);
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .bg-card-banner p {
+      font-size: var(--text-sm);
+      color: rgba(255,255,255,.6);
+      position: relative;
+      z-index: 1;
+    }
+
+    .bg-card-body {
+      padding: 0 20px 20px;
+      margin-top: -16px;
+    }
+
+    .bg-attempts {
+      background: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .bg-attempts-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .bg-attempts-value {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    /* ── Ranking Card ────────────────────────────────────── */
+    .ranking-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+    }
+
+    .ranking-card-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ranking-card-header h4 {
+      font-family: var(--font-display);
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--color-text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    #ranking-list {
+      list-style: none;
+      padding: 12px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* ── Main Grid Layout ────────────────────────────────── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .dash-main-col {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .dash-side-col {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: sticky;
+      top: 80px;
+    }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .dash-grid {
+        grid-template-columns: 1fr;
+      }
+      .dash-side-col {
+        position: static;
+        order: -1;
+      }
+      .dash-stats {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dash-hero { padding: 24px; }
+      .dash-stats { grid-template-columns: 1fr 1fr; }
+      .dash-stats .dash-stat:last-child { grid-column: 1 / -1; }
+      #student-games { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .dash-stats { grid-template-columns: 1fr; }
+    }
+
+    /* ── Animations ──────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .dash-hero      { animation: fadeUp .5s ease both; }
+    .dash-stat      { animation: fadeUp .5s ease both; }
+    .dash-stat:nth-child(1) { animation-delay: .05s; }
+    .dash-stat:nth-child(2) { animation-delay: .10s; }
+    .dash-stat:nth-child(3) { animation-delay: .15s; }
+    .profile-card   { animation: fadeUp .5s .2s ease both; }
+    .bg-card        { animation: fadeUp .5s .25s ease both; }
+    .ranking-card   { animation: fadeUp .5s .3s ease both; }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+
+    <!-- ── Page Header ── -->
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Bem-vindo de volta ao GeoEduca!</p>
+      </div>
+      <div class="page-header-right">
+        <!-- header actions (ex: notifications) podem ser injetados aqui -->
+      </div>
+    </header>
+
+    <!-- ── Page Content ── -->
+    <div class="page-content">
+      <div class="dash-grid">
+
+        <!-- ════════════ COLUNA PRINCIPAL ════════════ -->
+        <div class="dash-main-col">
+
+          <!-- Hero -->
+          <div class="dash-hero">
+            <div class="dash-hero-content">
+              <h2 class="dash-hero-greeting">
+                Olá, <span id="student-name">Aluno</span>! 👋
+              </h2>
+              <p class="dash-hero-sub">
+                <span id="hero-pending-text">Carregando suas tarefas...</span>
+              </p>
+              <div class="dash-hero-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span id="pending-count">0</span> tarefa(s) pendente(s)
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="dash-stats">
+            <div class="dash-stat gold">
+              <div class="dash-stat-icon gold">⭐</div>
+              <div class="dash-stat-body">
+                <div class="dash-stat-value" id="stat-xp">–</div>
+                <div class="dash-stat-label">XP Total</div>
+              </div>
+            </div>
+            <div class="dash-stat navy">
+              <div class="dash-stat-icon navy">🏆</div>
+              <div class="dash-stat-body">
+                <div class="dash-stat-value" id="stat-level">1</div>
+                <div class="dash-stat-label">Nível Atual</div>
+              </div>
+            </div>
+            <div class="dash-stat forest">
+              <div class="dash-stat-icon forest">📚</div>
+              <div class="dash-stat-body">
+                <div class="dash-stat-value" id="stat-pending">–</div>
+                <div class="dash-stat-label">Pendências</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activities -->
+          <div>
+            <div class="section-header">
+              <span class="section-title">Atividades Recomendadas</span>
+              <a href="atividades.html" class="section-link">Ver todas →</a>
+            </div>
+            <div id="student-games"></div>
+          </div>
+
+        </div><!-- /dash-main-col -->
+
+        <!-- ════════════ COLUNA LATERAL ════════════ -->
+        <div class="dash-side-col">
+
+          <!-- Profile / Level Card -->
+          <div class="profile-card">
+            <div class="profile-card-header">
+              <div class="profile-avatar">🎓</div>
+            </div>
+            <div class="profile-card-body">
+              <div class="profile-level-badge">
+                <span class="profile-level-dot" id="student-level">1</span>
+                Nível atual
+              </div>
+              <p class="profile-subtitle" id="student-level-title">Carregando...</p>
+
+              <div class="xp-track">
+                <div class="xp-fill" id="student-xp-bar" style="width: 0%"></div>
+              </div>
+              <div class="xp-meta">
+                <span>Progresso</span>
+                <span id="student-xp-label">0 / 200 XP</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- BrazilGuessr Card -->
+          <div class="bg-card">
+            <div class="bg-card-banner">
+              <h4>🌎 BrazilGuessr</h4>
+              <p>Descubra o Brasil com geografias!</p>
+            </div>
+            <div class="bg-card-body">
+              <div class="bg-attempts">
+                <span class="bg-attempts-label">Tentativas hoje</span>
+                <span class="bg-attempts-value" id="dashboard-bg-tentativas">–</span>
+              </div>
+              <a href="hub_brazilguessr.html" class="btn btn-secondary btn-sm" style="width:100%; justify-content:center; margin-bottom:8px;">
+                Ver Hub
+              </a>
+              <a href="play_brazilguessr.html" class="btn btn-navy" style="width:100%; justify-content:center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Jogar Agora
+              </a>
+            </div>
+          </div>
+
+          <!-- Ranking Card -->
+          <div class="ranking-card">
+            <div class="ranking-card-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <h4>Top da Turma</h4>
+            </div>
+            <ul id="ranking-list"></ul>
+          </div>
+
+        </div><!-- /dash-side-col -->
+
+      </div><!-- /dash-grid -->
+    </div><!-- /page-content -->
+
+  </main>
+</div><!-- /app-layout -->
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/aluno/dashboard.js"></script>
+<script src="../js/aluno/push.js"></script>
+
+<!-- Sync the duplicated stat elements with JS-updated elements -->
+<script>
+  // Mirror stat values to quick-stat cards whenever the originals are updated
+  (function () {
+    function mirrorEl(srcId, destId, transform) {
+      const src = document.getElementById(srcId);
+      const dest = document.getElementById(destId);
+      if (!src || !dest) return;
+      const observer = new MutationObserver(() => {
+        dest.textContent = transform ? transform(src.textContent) : src.textContent;
+      });
+      observer.observe(src, { childList: true, subtree: true, characterData: true });
+    }
+
+    mirrorEl('student-level', 'stat-level');
+    mirrorEl('student-xp-label', 'stat-xp', (v) => v.split('/')[0].trim());
+    mirrorEl('pending-count',  'stat-pending');
+  })();
+</script>
+</body>
+</html>

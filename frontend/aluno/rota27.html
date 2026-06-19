@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROTA 27 - Explorador Geográfico | GeoEduca</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (for this specific page) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        corePlugins: {
+          preflight: false,
+        }
+      }
+    </script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- CSS Base do GeoEduca -->
+    <link rel="stylesheet" href="../css/tokens.css" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/animations.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
+    <link rel="stylesheet" href="../css/darkmode.css" />
+    
+    <!-- CSS Específico da Rota 27 -->
+    <link rel="stylesheet" href="../css/rota27.css" />
+</head>
+<body>
+
+<!-- Estrutura Principal -->
+<div class="app-layout" id="app-layout">
+    <!-- Sidebar injetada via JS -->
+    
+    <!-- Conteúdo Principal -->
+    <main class="app-main rota27-page">
+        <!-- Header da Página -->
+        <header class="app-header flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Abrir menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title" style="color: var(--navy)">
+                    <i class="fa-solid fa-earth-americas" style="color: var(--gold); margin-right: 8px;"></i> ROTA 27
+                </h1>
+            </div>
+            
+            <div class="user-profile relative cursor-pointer" id="profile-btn">
+                <div class="avatar" style="background-color: var(--navy)">
+                    <span id="user-initial">A</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section Rota 27 -->
+        <div class="dash-hero mb-8" style="background: var(--navy); border-radius: var(--radius-xl); padding: 40px; color: white; text-align: center; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -50%; left: -10%; opacity: 0.05; pointer-events: none;">
+                <i class="fa-solid fa-earth-americas" style="font-size: 300px;"></i>
+            </div>
+            
+            <h1 class="dash-hero-greeting mb-4" style="font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 16px;">
+                ROTA <span style="color: var(--gold);">27</span>
+            </h1>
+            <p class="dash-hero-sub mx-auto" style="font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 0 auto 32px auto;">
+                Seu Assistente de Inteligência Artificial para estudos avançados em Geografia. Explore temas, gere aulas, quizzes e mapas mentais em segundos.
+            </p>
+
+            <!-- Barra de Pesquisa Grande -->
+            <div class="mx-auto flex items-center rounded-2xl shadow-lg p-2 max-w-3xl border-4" style="background: var(--color-surface); border-color: var(--gold); transition: transform 0.2s ease;">
+                <span class="pl-4 pr-2 text-xl" style="color: var(--color-text-primary);">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                </span>
+                <input type="text" id="inputTema" placeholder="O que vamos explorar hoje? (Ex: Clima Semiárido, Tigres Asiáticos...)" 
+                       class="w-full px-3 py-3 outline-none text-lg font-bold" style="color: var(--color-text-primary); background: transparent; border: none; box-shadow: none;">
+            </div>
+
+            <!-- Container de Erro (Oculto por padrão) -->
+            <div id="errorContainer" class="hidden mt-4 mx-auto max-w-3xl p-4 rounded-xl border-2 flex items-center justify-center gap-3 font-bold text-base" style="background-color: var(--color-danger-light, #fee2e2); border-color: var(--color-danger, #ef4444); color: var(--color-danger, #b91c1c);">
+                <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                <span id="errorText"></span>
+            </div>
+        </div>
+
+        <!-- Corpo da Rota 27 (Cards Maiores) -->
+        <div class="max-w-7xl mx-auto">
+            
+            <!-- Linha 1: 3 Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Card 1 -->
+                <div class="dash-stat cursor-pointer hover:scale-105 transition-transform" onclick="buscarDados('/gerarestudo', renderizarEstudo)" style="flex-direction: column; align-items: flex-start; padding: 24px;">
+                    <div class="dash-stat-icon" style="background: rgba(11,10,50,.08); color: var(--navy); margin-bottom: 16px; width: 48px; height: 48px; font-size: 24px;">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div class="dash-stat-body w-full">
+                        <h2 class="dash-stat-label" style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 8px;">Aula Completa</h2>
+                        <p style="font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 20px; line-height: 1.4;">Material didático aprofundado, tópicos explicativos com exemplos práticos e resumo executivo do tema.</p>
+                        <button class="w-full font-bold py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2" style="background: var(--navy); color: white;">
+                            <i class="fa-solid fa-compass-drafting"></i> Gerar Aula
+                        </button>
+                    </div>
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--navy);"></div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="dash-stat cursor-pointer hover:scale-105 transition-transform" onclick="buscarDados('/gerarflashcards', renderizarFlashcards)" style="flex-direction: column; align-items: flex-start; padding: 24px;">
+                    <div class="dash-stat-icon" style="background: rgba(204,164,59,.12); color: var(--gold); margin-bottom: 16px; width: 48px; height: 48px; font-size: 24px;">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div class="dash-stat-body w-full">
+                        <h2 class="dash-stat-label" style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 8px;">Flashcards</h2>
+                        <p style="font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 20px; line-height: 1.4;">Gere até 12 cartões interativos de memorização contendo perguntas de revisão e respostas rápidas.</p>
+                        <button class="w-full font-bold py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2" style="background: var(--gold); color: white;">
+                            <i class="fa-solid fa-clone"></i> Criar Flashcards
+                        </button>
+                    </div>
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gold);"></div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="dash-stat cursor-pointer hover:scale-105 transition-transform" onclick="buscarDados('/gerarquiz', renderizarQuiz)" style="flex-direction: column; align-items: flex-start; padding: 24px;">
+                    <div class="dash-stat-icon" style="background: rgba(37,99,235,.12); color: #2563eb; margin-bottom: 16px; width: 48px; height: 48px; font-size: 24px;">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </div>
+                    <div class="dash-stat-body w-full">
+                        <h2 class="dash-stat-label" style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 8px;">Quiz de Revisão</h2>
+                        <p style="font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 20px; line-height: 1.4;">Teste seus conhecimentos com 5 questões inéditas de múltipla escolha focadas no tema escolhido.</p>
+                        <button class="w-full font-bold py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2" style="background: #2563eb; color: white;">
+                            <i class="fa-solid fa-list-check"></i> Iniciar Quiz
+                        </button>
+                    </div>
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #2563eb;"></div>
+                </div>
+            </div>
+
+            <!-- Linha 2: 2 Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-4xl mx-auto">
+                <!-- Card 4 -->
+                <div class="dash-stat cursor-pointer hover:scale-105 transition-transform" onclick="buscarDados('/gerarmapas', renderizarMapas)" style="flex-direction: column; align-items: flex-start; padding: 24px;">
+                    <div class="dash-stat-icon" style="background: rgba(225,29,72,.12); color: #e11d48; margin-bottom: 16px; width: 48px; height: 48px; font-size: 24px;">
+                        <i class="fa-solid fa-map"></i>
+                    </div>
+                    <div class="dash-stat-body w-full">
+                        <h2 class="dash-stat-label" style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 8px;">Mapas & Mídias</h2>
+                        <p style="font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 20px; line-height: 1.4;">Descubra os melhores termos de busca para mapas e cartografias em fontes oficiais estáveis na web.</p>
+                        <button class="w-full font-bold py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2" style="background: #e11d48; color: white;">
+                            <i class="fa-solid fa-search-location"></i> Explorar Mídias
+                        </button>
+                    </div>
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #e11d48;"></div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="dash-stat cursor-pointer hover:scale-105 transition-transform" onclick="buscarDados('/gerarvideos', renderizarVideos)" style="flex-direction: column; align-items: flex-start; padding: 24px;">
+                    <div class="dash-stat-icon" style="background: rgba(220,38,38,.12); color: #dc2626; margin-bottom: 16px; width: 48px; height: 48px; font-size: 24px;">
+                        <i class="fa-solid fa-video"></i>
+                    </div>
+                    <div class="dash-stat-body w-full">
+                        <h2 class="dash-stat-label" style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 8px;">Vídeos YouTube</h2>
+                        <p style="font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 20px; line-height: 1.4;">Receba uma curadoria automatizada com links prontos para vídeos confiáveis e aulas sobre o assunto.</p>
+                        <button class="w-full font-bold py-3 px-4 rounded-xl text-sm transition-colors flex items-center justify-center gap-2" style="background: #dc2626; color: white;">
+                            <i class="fa-brands fa-youtube"></i> Indicar Vídeos
+                        </button>
+                    </div>
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #dc2626;"></div>
+                </div>
+            </div>
+
+            <!-- Loader e Painel -->
+            <div id="loader" class="hidden max-w-7xl mx-auto flex flex-col items-center justify-center my-12 w-full text-center">
+                <div class="relative w-20 h-20 bg-white border-4 border-emerald-800 rounded-full flex items-center justify-center shadow-lg z-10 mx-auto">
+                    <span class="absolute top-0.5 text-[10px] font-black text-red-600">N</span>
+                    <span class="absolute bottom-0.5 text-[10px] font-black text-emerald-800">S</span>
+                    <div class="agulha-bussola w-1.5 h-16 relative flex flex-col justify-between items-center">
+                        <div class="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[32px] border-b-red-600"></div>
+                        <div class="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[32px] border-t-slate-400"></div>
+                    </div>
+                    <div class="absolute w-2.5 h-2.5 bg-emerald-900 rounded-full border border-white"></div>
+                </div>
+                <p class="text-emerald-900 font-bold mt-4 text-sm animate-pulse block w-full" style="color: var(--color-text-primary)">Cartografando respostas da IA... Aguarde!</p>
+                
+                <div class="w-full grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 opacity-40 animate-pulse px-4">
+                    <div class="h-32 bg-gray-300 rounded-xl"></div>
+                    <div class="h-32 bg-gray-300 rounded-xl"></div>
+                    <div class="h-32 bg-gray-300 rounded-xl"></div>
+                </div>
+            </div>
+
+            <section id="painelResultado" class="max-w-7xl mx-auto rounded-2xl p-6 shadow-md border hidden mb-10" style="background-color: var(--color-surface); border-color: var(--color-border);">
+                <div class="flex justify-between items-center border-b pb-3 mb-4" style="border-color: var(--color-border);">
+                    <h3 id="tituloResultado" class="text-xl font-bold flex items-center gap-2" style="color: var(--color-text-primary)">Resultado</h3>
+                    <button onclick="fecharPainel()" class="text-xl" style="color: var(--color-text-muted)"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="conteudoResultado" class="prose max-w-none" style="color: var(--color-text-primary)"></div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<!-- Scripts GeoEduca -->
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/darkmode.js"></script>
+
+<!-- Scripts Rota 27 -->
+<script src="../js/aluno/rota27.js"></script>
+
+</body>
+</html>
