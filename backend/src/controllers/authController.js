@@ -26,8 +26,8 @@ const loginProfessor = async (req, res) => {
 
         const token = jwt.sign(
             { id: professor.id, tipo: 'prof', email: professorData.email },
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN }
+            process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
+            { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
         );
 
         res.json({
@@ -64,8 +64,8 @@ const loginAluno = async (req, res) => {
 
         const token = jwt.sign(
             { id: aluno.id, tipo: 'aluno', rm: alunoData.rm },
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN }
+            process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
+            { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
         );
 
         res.json({
@@ -87,7 +87,7 @@ const verifyToken = async (req, res) => {
     if (!token) return res.status(401).json({ error: 'Token não fornecido' });
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026');
 
         if (decoded.tipo === 'prof') {
             const professor = await db.collection('professores').doc(decoded.id).get();

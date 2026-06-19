@@ -10,7 +10,7 @@ const authenticateToken = async (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026');
         
         // Verificar se o usuário ainda existe
         if (decoded.tipo === 'prof') {
