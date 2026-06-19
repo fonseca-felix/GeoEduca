@@ -56,9 +56,18 @@ app.use('/api/notificacoes', notificacaoRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/estudos', estudoRoutes);
 
-// Rota de teste
+// Rota de teste da API
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString(), database: 'Firebase Firestore' });
+});
+
+// Fallback: se a rota não for da API, serve o index.html (evita 'Cannot GET /')
+app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+        res.sendFile(path.join(frontendPath, 'index.html'));
+    } else {
+        res.status(404).json({ error: 'Endpoint não encontrado' });
+    }
 });
 
 // Inicialização - criar coleções padrão
