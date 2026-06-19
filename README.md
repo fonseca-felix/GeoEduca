@@ -30,13 +30,14 @@ O projeto foi arquitetado utilizando as tecnologias mais robustas do mercado par
 ---
 
 ## 📦 Estrutura do Projeto
-
+```text
 /src
 ├── app/            # Roteamento baseado em App Router
 ├── components/     # Componentes atômicos e reutilizáveis
 ├── hooks/          # Lógica de estado customizada
 ├── lib/            # Utilitários e configurações de terceiros
 └── types/          # Definições de tipos (TypeScript interfaces)
+```
 💻 Instalação e Execução
 Pré-requisitos: Node.js v18+ e npm/yarn/pnpm.
 
