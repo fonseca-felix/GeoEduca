@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bandeira e Estado – GeoEduca</title>
+  <meta name="description" content="Jogo de identificar o estado a partir de sua bandeira ou símbolo.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/game-pages.css">
+</head>
+<body>
+  <header class="animate">Bandeira e Estado</header>
+  <h1 id="active-game-title" style="display:none;"></h1>
+  <main id="game-container" class="animate"></main>
+  <a href="jogos.html" class="back-link">← Voltar ao Painel</a>
+  <script src="../js/aluno/game-common.js"></script>
+  <script src="../js/aluno/motor-jogos.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      window.abrirJogo(1, 'Bandeira e Estado');
+    });
+  </script>
+</body>
+</html>

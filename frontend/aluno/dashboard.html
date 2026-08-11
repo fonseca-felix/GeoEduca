@@ -314,7 +314,7 @@
     }
 
     .bg-card-banner::after {
-      content: '🗺️';
+      content: '<i class="fa-solid fa-map"></i>';
       position: absolute;
       right: -8px;
       bottom: -16px;
@@ -464,7 +464,7 @@
     .bg-card        { animation: fadeUp .5s .25s ease both; }
     .ranking-card   { animation: fadeUp .5s .3s ease both; }
   </style>
-</head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">\n</head>
 <body>
 <div class="app-layout" id="app-layout">
   <main class="app-main">
@@ -491,7 +491,7 @@
           <div class="dash-hero">
             <div class="dash-hero-content">
               <h2 class="dash-hero-greeting">
-                Olá, <span id="student-name">Aluno</span>! 👋
+                Olá, <span id="student-name">Aluno</span>! <i class="fa-solid fa-hand-wave"></i>
               </h2>
               <p class="dash-hero-sub">
                 <span id="hero-pending-text">Carregando suas tarefas...</span>
@@ -508,14 +508,14 @@
           <!-- Quick Stats -->
           <div class="dash-stats">
             <div class="dash-stat gold">
-              <div class="dash-stat-icon gold">⭐</div>
+              <div class="dash-stat-icon gold"><i class="fa-solid fa-star"></i></div>
               <div class="dash-stat-body">
                 <div class="dash-stat-value" id="stat-xp">–</div>
                 <div class="dash-stat-label">XP Total</div>
               </div>
             </div>
             <div class="dash-stat navy">
-              <div class="dash-stat-icon navy">🏆</div>
+              <div class="dash-stat-icon navy"><i class="fa-solid fa-trophy"></i></div>
               <div class="dash-stat-body">
                 <div class="dash-stat-value" id="stat-level">1</div>
                 <div class="dash-stat-label">Nível Atual</div>

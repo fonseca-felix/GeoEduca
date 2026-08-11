@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memória dos Biomas – GeoEduca</title>
+  <meta name="description" content="Jogo de memória onde você combina nomes de biomas com suas características." />
+  <link rel="stylesheet" href="css/game_pages.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+  <section class="hero">
+    <h1>Memória dos Biomas</h1>
+    <p>Encontre pares: nome do bioma e sua característica.</p>
+  </section>
+  <main class="game-container">
+    <div id="game-container"></div>
+    <div id="gfb"></div>
+  </main>
+  <script src="js/aluno/motor-jogos.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof window.initJogo4 === 'function') {
+        window.initJogo4();
+      }
+    });
+  </script>
+</body>
+</html>

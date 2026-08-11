@@ -10,16 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ---- Dados dos jogos ----
   const mockGames = [
-    { id: 1,  title: 'Bandeira e Estado',       type: 'identificacao', icon: '🏳️', desc: 'Associe o símbolo ao estado brasileiro. Quiz de identificação visual.', maxPts: 60 },
-    { id: 2,  title: 'Encontre a Capital',       type: 'capitais',      icon: '🏛️', desc: 'Identifique a capital correta para cada estado brasileiro.',           maxPts: 60 },
     { id: 3,  title: 'Quiz de Siglas',           type: 'quiz',          icon: '🔤', desc: 'Reconheça o estado pela sigla com sistema de combos.',                 maxPts: 60 },
-    { id: 4,  title: 'Memória dos Biomas',       type: 'memoria',       icon: '🌿', desc: 'Encontre pares entre biomas e suas características.',                  maxPts: 40 },
-    { id: 5,  title: 'Ordenando por Região',     type: 'regioes',       icon: '🗺️', desc: 'Classifique estados nas 5 regiões do Brasil.',                        maxPts: 60 },
+    { id: 4,  title: 'Memória dos Biomas',       type: 'memoria',       icon: '<i class="fa-solid fa-leaf"></i>', desc: 'Encontre pares entre biomas e suas características.',                  maxPts: 40 },
+    { id: 5,  title: 'Ordenando por Região',     type: 'regioes',       icon: '<i class="fa-solid fa-map"></i>', desc: 'Classifique estados nas 5 regiões do Brasil.',                        maxPts: 60 },
     { id: 6,  title: 'Hidrografias',             type: 'rios',          icon: '🌊', desc: 'Identifique rios pela extensão e características.',                   maxPts: 50 },
     { id: 7,  title: 'Desafio da Posição',       type: 'orientacao',    icon: '🧭', desc: 'Perguntas sobre localização geográfica dos estados.',                  maxPts: 50 },
     { id: 8,  title: 'Caça-Palavras',            type: 'vocabulario',   icon: '🔍', desc: 'Encontre capitais e estados na grade de letras.',                      maxPts: 50 },
-    { id: 9,  title: 'Complete a Capital',       type: 'digitacao',     icon: '✍️', desc: 'Complete o nome da capital com base nas lacunas exibidas.',            maxPts: 50 },
-    { id: 10, title: 'Fronteiras c/ Cronômetro', type: 'fronteiras',    icon: '⏱️', desc: 'Marque os estados vizinhos antes do tempo acabar.',                   maxPts: 60 }
+    { id: 9,  title: 'Complete a Capital',       type: 'digitacao',     icon: '<i class="fa-solid fa-pen-nib"></i>', desc: 'Complete o nome da capital com base nas lacunas exibidas.',            maxPts: 50 },
+    { id: 10, title: 'Fronteiras c/ Cronômetro', type: 'fronteiras',    icon: '<i class="fa-solid fa-stopwatch"></i>', desc: 'Marque os estados vizinhos antes do tempo acabar.',                   maxPts: 60 }
   ];
 
   // ---- Estatísticas gerais ----
@@ -251,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   </div>
                   <div>
                     <div style="font-weight:${a.isReal?'700':'500'};color:${a.isReal?'var(--gold)':'var(--color-text-primary)'}">
-                      ${a.nome} ${a.isReal ? '⭐' : ''}
+                      ${a.nome} ${a.isReal ? '<i class="fa-solid fa-star"></i>' : ''}
                     </div>
                     ${a.isReal ? '<div style="font-size:10px;color:var(--color-text-muted)">Resultado real</div>' : ''}
                   </div>
@@ -298,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 font-size:11px;font-weight:700;color:${i<3?'white':'var(--color-text-muted)'};">${i+1}</div>
               <div>
                 <div style="font-weight:${a.isReal?'700':'500'};color:${a.isReal?'var(--gold)':'var(--color-text-primary)'}">
-                  ${a.nome} ${a.isReal ? '⭐' : ''}
+                  ${a.nome} ${a.isReal ? '<i class="fa-solid fa-star"></i>' : ''}
                 </div>
                 ${a.isReal ? '<div style="font-size:10px;color:var(--gold)">Resultado real</div>' : ''}
               </div>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ordenando por Região – GeoEduca</title>
+  <meta name="description" content="Classifique os estados nas regiões do Brasil." />
+  <link rel="stylesheet" href="css/game_pages.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+  <section class="hero">
+    <h1>Ordenando por Região</h1>
+    <p>Classifique os estados nas 5 regiões do Brasil.</p>
+  </section>
+  <main class="game-container">
+    <div id="game-container"></div>
+    <div id="gfb"></div>
+  </main>
+  <script src="js/aluno/motor-jogos.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof window.initJogo5 === 'function') {
+        window.initJogo5();
+      }
+    });
+  </script>
+</body>
+</html>

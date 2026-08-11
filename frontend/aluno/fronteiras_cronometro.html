@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Fronteiras com Cronômetro — GeoEduca</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+  <!-- GeoEduca Core CSS -->
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+
+  <style>
+    .game-play-container {
+      width: 100%;
+      padding: 28px 32px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .game-card-body {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+    .game-card-header {
+      background: var(--navy);
+      color: white;
+      padding: 32px;
+      text-align: center;
+      position: relative;
+    }
+    .game-title {
+      font-family: var(--font-display, 'Space Grotesk', sans-serif);
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+    }
+    .game-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+    }
+    .game-content-panel {
+      padding: 32px;
+      text-align: center;
+    }
+    .btn-alt {
+      background: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-family: var(--font-display, 'Space Grotesk', sans-serif);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: var(--color-text-primary);
+      transition: all 0.18s;
+      text-transform: uppercase;
+    }
+    .btn-alt:hover:not(:disabled) {
+      border-color: var(--navy);
+      background: var(--color-bg);
+      transform: translateY(-2px);
+    }
+    .btn-alt.correct {
+      background: rgba(5,150,105,0.08);
+      border-color: #059669;
+      color: #059669;
+    }
+    .btn-alt.wrong {
+      background: rgba(220,38,38,0.08);
+      border-color: #dc2626;
+      color: #dc2626;
+    }
+    .btn-alt:disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout" id="app-layout">
+  <!-- Sidebar injetada via JS -->
+
+  <main class="app-main" style="padding: 0;">
+    <header class="app-header" style="display:flex; align-items:center; justify-content:space-between; padding: 20px 28px 0;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Abrir menu">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div>
+          <div style="font-size:0.65rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--color-text-muted); margin-bottom:1px;">Jogos Geográficos</div>
+          <h1 style="margin:0; font-size:1.2rem; font-weight:800; color:var(--color-text-primary); font-family:var(--font-display);">
+            Fronteiras com Cronômetro
+          </h1>
+        </div>
+      </div>
+      <a href="jogos.html" style="display:inline-flex; align-items:center; gap:7px; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--color-text-muted); text-decoration:none; padding:8px 14px; border:1px solid var(--color-border); border-radius:100px; transition:all 0.18s;"
+         onmouseover="this.style.borderColor='var(--navy)'; this.style.color='var(--navy)';"
+         onmouseout="this.style.borderColor='var(--color-border)'; this.style.color='var(--color-text-muted)';">
+        <i class="fa-solid fa-arrow-left"></i> Jogos
+      </a>
+    </header>
+
+    <div class="game-play-container">
+      <div class="game-card-body" id="game-body-card">
+        <!-- HEADER DENTRO DO JOGO -->
+        <div class="game-card-header" style="background:var(--navy);">
+          <div style="font-size: 2.2rem; color: var(--gold); margin-bottom: 6px;"><i class="fa-solid fa-stopwatch"></i></div>
+          <h2 class="game-title">CRONÔMETRO DAS FRONTEIRAS</h2>
+          <p style="margin:0; opacity:0.75; font-size:0.85rem; font-weight:500;">ENCONTRE OS VIZINHOS ANTES DO TEMPO ACABAR</p>
+        </div>
+
+        <!-- PLACAR E PROGRESSO -->
+        <div class="game-meta-bar">
+          <span><i class="fa-solid fa-trophy" style="color:var(--gold);"></i> Pontos: <strong id="game-score" style="color:var(--navy)">0</strong></span>
+          <span>Rodada: <strong id="game-round" style="color:var(--navy)">1</strong> / 6</span>
+          <span>Meta: 60 pts</span>
+        </div>
+
+        <!-- ÁREA DE JOGO DINÂMICA -->
+        <div class="game-content-panel" id="play-area">
+          <!-- Carregado via JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Scripts GeoEduca -->
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/darkmode.js"></script>
+
+<script>
+  const estadosBR = [
+    {nome:"Acre",          sigla:"AC", capital:"Rio Branco",       regiao:"Norte",        icon:"<i class='fa-solid fa-tree'></i>"},
+    {nome:"Alagoas",       sigla:"AL", capital:"Maceió",           regiao:"Nordeste",     icon:"<i class='fa-solid fa-umbrella-beach'></i>"},
+    {nome:"Amapá",         sigla:"AP", capital:"Macapá",           regiao:"Norte",        icon:"<i class='fa-solid fa-leaf'></i>"},
+    {nome:"Amazonas",      sigla:"AM", capital:"Manaus",           regiao:"Norte",        icon:"<i class='fa-solid fa-tree'></i>"},
+    {nome:"Bahia",         sigla:"BA", capital:"Salvador",         regiao:"Nordeste",     icon:"<i class='fa-solid fa-drum'></i>"},
+    {nome:"Ceará",         sigla:"CE", capital:"Fortaleza",        regiao:"Nordeste",     icon:"<i class='fa-solid fa-sun'></i>"},
+    {nome:"Espírito Santo",sigla:"ES", capital:"Vitória",          regiao:"Sudeste",      icon:"<i class='fa-solid fa-mug-hot'></i>"},
+    {nome:"Goiás",         sigla:"GO", capital:"Goiânia",          regiao:"Centro-Oeste", icon:"<i class='fa-solid fa-wheat-awn'></i>"},
+    {nome:"Maranhão",      sigla:"MA", capital:"São Luís",         regiao:"Nordeste",     icon:"<i class='fa-solid fa-house-chimney'></i>"},
+    {nome:"Mato Grosso",   sigla:"MT", capital:"Cuiabá",           regiao:"Centro-Oeste", icon:"<i class='fa-solid fa-fish'></i>"},
+    {nome:"Mato Grosso do Sul",sigla:"MS",capital:"Campo Grande",  regiao:"Centro-Oeste", icon:"<i class='fa-solid fa-feather'></i>"},
+    {nome:"Minas Gerais",  sigla:"MG", capital:"Belo Horizonte",   regiao:"Sudeste",      icon:"<i class='fa-solid fa-cheese'></i>"},
+    {nome:"Pará",          sigla:"PA", capital:"Belém",            regiao:"Norte",        icon:"<i class='fa-solid fa-cloud-showers-heavy'></i>"},
+    {nome:"Paraíba",       sigla:"PB", capital:"João Pessoa",      regiao:"Nordeste",     icon:"<i class='fa-solid fa-cloud-sun'></i>"},
+    {nome:"Paraná",        sigla:"PR", capital:"Curitiba",         regiao:"Sul",          icon:"<i class='fa-solid fa-tree'></i>"},
+    {nome:"Pernambuco",    sigla:"PE", capital:"Recife",           regiao:"Nordeste",     icon:"<i class='fa-solid fa-umbrella'></i>"},
+    {nome:"Piauí",         sigla:"PI", capital:"Teresina",         regiao:"Nordeste",     icon:"<i class='fa-solid fa-sun'></i>"},
+    {nome:"Rio de Janeiro",sigla:"RJ", capital:"Rio de Janeiro",   regiao:"Sudeste",      icon:"<i class='fa-solid fa-mountain'></i>"},
+    {nome:"Rio Grande do Norte",sigla:"RN",capital:"Natal",        regiao:"Nordeste",     icon:"<i class='fa-solid fa-umbrella-beach'></i>"},
+    {nome:"Rio Grande do Sul",sigla:"RS",capital:"Porto Alegre",   regiao:"Sul",          icon:"<i class='fa-solid fa-mug-hot'></i>"},
+    {nome:"Rondônia",      sigla:"RO", capital:"Porto Velho",      regiao:"Norte",        icon:"<i class='fa-solid fa-train'></i>"},
+    {nome:"Roraima",       sigla:"RR", capital:"Boa Vista",        regiao:"Norte",        icon:"<i class='fa-solid fa-mountain'></i>"},
+    {nome:"Santa Catarina",sigla:"SC", capital:"Florianópolis",    regiao:"Sul",          icon:"<i class='fa-solid fa-apple-whole'></i>"},
+    {nome:"São Paulo",     sigla:"SP", capital:"São Paulo",        regiao:"Sudeste",      icon:"<i class='fa-solid fa-city'></i>"},
+    {nome:"Sergipe",       sigla:"SE", capital:"Aracaju",          regiao:"Nordeste",     icon:"<i class='fa-solid fa-water'></i>"},
+    {nome:"Tocantins",     sigla:"TO", capital:"Palmas",           regiao:"Norte",        icon:"<i class='fa-solid fa-sun'></i>"},
+    {nome:"Distrito Federal",sigla:"DF",capital:"Brasília",        regiao:"Centro-Oeste", icon:"<i class='fa-solid fa-building-columns'></i>"}
+  ];
+
+  const fronteirasData = {
+    "MG": ["ES","RJ","SP","GO","MS","BA","PI","TO"],
+    "SP": ["RJ","MG","MS","PR"],
+    "RJ": ["SP","MG","ES"],
+    "PR": ["SP","SC","MS"],
+    "SC": ["PR","RS"],
+    "RS": ["SC"],
+    "MS": ["SP","PR","MG","MT","GO"],
+    "MT": ["AM","PA","RO","MS","GO","TO"],
+    "GO": ["MT","MS","MG","TO","BA","DF"],
+    "BA": ["SE","AL","PE","PI","TO","GO","MG","ES"],
+    "AM": ["RR","PA","MT","RO","AC"],
+    "PA": ["AP","AM","RR","MT","TO","MA"],
+    "PE": ["PB","CE","PI","BA","AL"],
+    "CE": ["RN","PB","PE","PI"],
+    "MA": ["PA","TO","PI"],
+    "PI": ["MA","CE","PE","PB","BA","TO"],
+    "RN": ["PB","CE"],
+    "PB": ["RN","PE","CE"],
+    "AL": ["SE","PE","BA"],
+    "SE": ["BA","AL"],
+    "ES": ["MG","RJ","BA"],
+    "TO": ["PA","MA","PI","BA","GO","MT"],
+    "DF": ["GO"],
+    "RO": ["AM","MT","AC"],
+    "AC": ["AM","RO"],
+    "RR": ["AM","PA"],
+    "AP": ["PA"]
+  };
+
+  let currentScore = 0;
+  let maxScore = 60;
+  let round = 0;
+  let stateIndex = 0;
+  let secondsElapsed = 0;
+  let totalTimerInterval = null;
+  let roundTimerInterval = null;
+  let roundActive = false;
+  let selectedStates = [];
+
+  function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+  function formatTime(s) {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+  }
+
+  function startTimer() {
+    if (totalTimerInterval) clearInterval(totalTimerInterval);
+    totalTimerInterval = setInterval(() => { secondsElapsed++; }, 1000);
+  }
+
+  function renderRound() {
+    const states = shuffle(Object.keys(fronteirasData));
+    
+    if (stateIndex >= states.length || round >= 6 || currentScore >= maxScore) {
+      finalizarJogo();
+      return;
+    }
+
+    document.getElementById('game-round').textContent = round + 1;
+    const sigla = states[stateIndex];
+    const est = estadosBR.find(e => e.sigla === sigla);
+    if (!est) { stateIndex++; renderRound(); return; }
+
+    const vizinhosCorretos = fronteirasData[sigla] || [];
+    let tempoRestante = 15;
+    let hits = 0;
+    let clicked = new Set();
+    roundActive = true;
+
+    const extras = shuffle(estadosBR.filter(e => e.sigla !== sigla && !vizinhosCorretos.includes(e.sigla))).slice(0, 6);
+    const pool = shuffle([...vizinhosCorretos.map(s => estadosBR.find(e => e.sigla === s)).filter(Boolean), ...extras]);
+
+    const playArea = document.getElementById('play-area');
+    playArea.innerHTML = `
+      <p style="color:var(--color-text-secondary);font-size:0.95rem;margin:0 0 16px 0;font-weight:600;">Clique em todos os estados que fazem <strong>fronteira</strong> com:</p>
+      <div style="background:linear-gradient(135deg,var(--navy),#1e293b);border-radius:16px;
+        padding:20px;color:white;text-align:center;box-shadow:inset 0 0 15px rgba(0,0,0,0.1);margin-bottom:16px;">
+        <div style="font-size:32px;margin-bottom:4px;color:var(--gold);">${est.icon}</div>
+        <div style="font-size:1.8rem;font-weight:900;font-family:var(--font-display)">${est.nome} (${sigla})</div>
+        <div style="font-size:0.8rem;opacity:0.75;margin-top:4px;">Encontre as ${vizinhosCorretos.length} fronteiras</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(220,38,38,0.06);
+        border:1px solid rgba(220,38,38,0.3);border-radius:12px;padding:12px 18px;margin-bottom:20px;">
+        <span style="color:#dc2626;font-weight:800;font-size:1.15rem;"><i class="fa-regular fa-clock"></i> <span id="round-tempo">${tempoRestante}</span>s</span>
+        <span style="font-size:0.85rem;color:#dc2626;font-weight:700;">Acertos: <span id="round-acertos">0</span> / ${vizinhosCorretos.length}</span>
+      </div>
+      <div id="opcoes" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:480px;margin:0 auto 16px;"></div>
+      <div id="feedback-msg" style="font-weight:700;font-size:0.95rem;min-height:24px;margin-top:12px;"></div>
+    `;
+
+    const optionsDiv = document.getElementById('opcoes');
+    pool.forEach(e => {
+      const btn = document.createElement('button');
+      btn.className = 'btn-alt';
+      btn.textContent = e.sigla;
+      btn.title = e.nome;
+      
+      btn.onclick = () => {
+        if (!roundActive || clicked.has(e.sigla)) return;
+        clicked.add(e.sigla);
+        btn.disabled = true;
+        
+        const feedbackMsg = document.getElementById('feedback-msg');
+
+        if (vizinhosCorretos.includes(e.sigla)) {
+          hits++;
+          btn.classList.add('correct');
+          currentScore += 5;
+          document.getElementById('game-score').textContent = currentScore;
+          document.getElementById('round-acertos').textContent = hits;
+          feedbackMsg.style.color = 'var(--color-success)';
+          feedbackMsg.innerHTML = `✓ ${e.nome} faz fronteira! +5 pontos`;
+
+          if (hits === vizinhosCorretos.length) {
+            roundActive = false;
+            clearInterval(roundTimerInterval);
+            currentScore += 10;
+            document.getElementById('game-score').textContent = currentScore;
+            feedbackMsg.innerHTML = `<i class="fa-solid fa-bullseye"></i> Todos os vizinhos encontrados! +10 bônus`;
+            
+            round++;
+            stateIndex++;
+            setTimeout(renderRound, 1200);
+          }
+        } else {
+          btn.classList.add('wrong');
+          feedbackMsg.style.color = 'var(--color-danger)';
+          feedbackMsg.innerHTML = `✗ ${e.nome} não faz fronteira!`;
+        }
+      };
+      optionsDiv.appendChild(btn);
+    });
+
+    if (roundTimerInterval) clearInterval(roundTimerInterval);
+    roundTimerInterval = setInterval(() => {
+      tempoRestante--;
+      const el = document.getElementById('round-tempo');
+      if (el) el.textContent = tempoRestante;
+
+      if (tempoRestante <= 0) {
+        clearInterval(roundTimerInterval);
+        roundActive = false;
+        const feedbackMsg = document.getElementById('feedback-msg');
+        feedbackMsg.style.color = 'var(--color-danger)';
+        feedbackMsg.innerHTML = `⏰ Tempo esgotado! Encontrou ${hits}/${vizinhosCorretos.length} vizinhos.`;
+        
+        round++;
+        stateIndex++;
+        setTimeout(renderRound, 1600);
+      }
+    }, 1000);
+  }
+
+  function finalizarJogo() {
+    clearInterval(totalTimerInterval);
+    clearInterval(roundTimerInterval);
+    const playArea = document.getElementById('play-area');
+    const tempo = formatTime(secondsElapsed);
+    const pct = Math.min(100, Math.round((currentScore / maxScore) * 100));
+    
+    let estrelas = '';
+    if (pct >= 85) estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+    else if (pct >= 50) estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+    else estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+
+    playArea.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:12px 0;">
+        <div style="font-size:2.8rem;display:flex;gap:6px;">${estrelas}</div>
+        <h2 style="color:var(--navy);font-family:var(--font-display);font-size:1.8rem;font-weight:900;margin:0;">Desafio Concluído!</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:340px;margin-bottom:12px;">
+          <div style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:2rem;font-weight:900;color:var(--color-success)">${currentScore}</div>
+            <div style="font-size:0.65rem;color:var(--color-text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Pontos</div>
+          </div>
+          <div style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:2rem;font-weight:900;color:var(--navy)">${tempo}</div>
+            <div style="font-size:0.65rem;color:var(--color-text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Tempo</div>
+          </div>
+        </div>
+        <a href="jogos.html" class="btn btn-primary" style="padding:12px 32px;border-radius:100px;text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:8px;">
+          <i class="fa-solid fa-house"></i> Voltar ao Menu
+        </a>
+      </div>
+    `;
+
+    salvarResultado(currentScore, tempo, pct);
+  }
+
+  function salvarResultado(pontos, tempo, pct) {
+    try {
+      const hist = JSON.parse(localStorage.getItem('geoeduca_results') || '[]');
+      const geoUser = JSON.parse(localStorage.getItem('geoeduca_user') || '{}');
+      const nome = geoUser.name || localStorage.getItem('geoeduca_user_name') || 'Aluno';
+      const sala = geoUser.sala || '';
+      
+      hist.push({
+        gameId: 10,
+        aluno: nome,
+        sala: sala,
+        pontuacao: pontos,
+        tempo: tempo,
+        data: new Date().toISOString(),
+        pct: pct
+      });
+      localStorage.setItem('geoeduca_results', JSON.stringify(hist));
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const appLayout = document.getElementById('app-layout');
+    if (appLayout && typeof buildAlunoSidebar === 'function') {
+      appLayout.insertAdjacentHTML('afterbegin', buildAlunoSidebar('../'));
+    }
+    initPage('aluno');
+    startTimer();
+    renderRound();
+  });
+</script>
+
+</body>
+</html>

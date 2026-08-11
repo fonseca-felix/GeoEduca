@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: a.titulo,
                 type: a.tipo,
                 deadline: a.dataLimite ? new Date(a.dataLimite + 'T00:00:00').toLocaleDateString('pt-BR') : 'Sem prazo',
-                icon: a.tipo === 'video' ? '🎬' : a.tipo === 'infografico' ? '🖼️' : a.tipo === 'site' ? '🌐' : '📝',
+                icon: a.tipo === 'video' ? '🎬' : a.tipo === 'infografico' ? '🖼️' : a.tipo === 'site' ? '<i class="fa-solid fa-globe"></i>' : '<i class="fa-solid fa-file-pen"></i>',
                 link: a.link || '#'
             }));
 
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <li style="display:flex; justify-content:space-between; align-items:center; padding: 10px 12px; background: ${r.voce ? 'rgba(204,164,59,.1)' : 'var(--color-surface-2)'}; border-radius: 8px; border: 1px solid ${r.voce ? 'rgba(204,164,59,.35)' : 'var(--color-border)'};">
                     <div style="display:flex; align-items:center; gap: 12px;">
                         <span style="font-weight:bold; color:${pos <= 3 ? 'var(--gold-dark)' : 'var(--color-text-muted)'}; width:24px; text-align:center; font-size:14px;">
-                            ${pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `#${pos}`}
+                            ${pos === 1 ? '<i class="fa-solid fa-medal" style="color:#FFD700"></i>' : pos === 2 ? '<i class="fa-solid fa-medal" style="color:#C0C0C0"></i>' : pos === 3 ? '<i class="fa-solid fa-medal" style="color:#CD7F32"></i>' : `#${pos}`}
                         </span>
                         <span style="font-weight:${r.voce ? '600' : '500'}; color:${r.voce ? 'var(--gold-dark)' : 'var(--color-text-primary)'};">${r.nome}${r.voce ? ' (Você)' : ''}</span>
                     </div>

@@ -45,6 +45,7 @@ const jogoRoutes = require('./src/routes/jogos');
 const notificacaoRoutes = require('./src/routes/notificacoes');
 const dashboardRoutes = require('./src/routes/dashboard');
 const estudoRoutes = require('./src/routes/estudo');
+const detetivedRoutes = require('./src/routes/detetive');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/alunos', alunoRoutes);
@@ -56,6 +57,7 @@ app.use('/api/jogos', jogoRoutes);
 app.use('/api/notificacoes', notificacaoRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/estudos', estudoRoutes);
+app.use('/api/detetive', detetivedRoutes);
 
 // Rota de teste da API
 app.get('/api/health', (req, res) => {

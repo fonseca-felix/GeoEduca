@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desafio da Posição – GeoEduca</title>
+  <meta name="description" content="Perguntas de localização geográfica dos estados brasileiros." />
+  <link rel="stylesheet" href="css/game_pages.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+  <section class="hero">
+    <h1>Desafio da Posição</h1>
+    <p>Responda perguntas sobre vizinhança e posição dos estados.</p>
+  </section>
+  <main class="game-container">
+    <div id="game-container"></div>
+    <div id="gfb"></div>
+  </main>
+  <script src="js/aluno/motor-jogos.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof window.initJogo7 === 'function') window.initJogo7();
+    });
+  </script>
+</body>
+</html>

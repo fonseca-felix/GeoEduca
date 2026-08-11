@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const TIPO_CONFIG = {
     video:       { emoji: '🎬', label: 'Vídeo',          badgeClass: 'badge-video',       iconClass: 'type-video' },
     infografico: { emoji: '🖼️', label: 'Infográfico',    badgeClass: 'badge-infografico', iconClass: 'type-infografico' },
-    site:        { emoji: '🌐', label: 'Site',            badgeClass: 'badge-site',        iconClass: 'type-site' },
-    tarefa:      { emoji: '📝', label: 'Tarefa',          badgeClass: 'badge-tarefa',      iconClass: 'type-tarefa' }
+    site:        { emoji: '<i class="fa-solid fa-globe"></i>', label: 'Site',            badgeClass: 'badge-site',        iconClass: 'type-site' },
+    tarefa:      { emoji: '<i class="fa-solid fa-file-pen"></i>', label: 'Tarefa',          badgeClass: 'badge-tarefa',      iconClass: 'type-tarefa' }
   };
 
   // ─── Carregamento inicial ───────────────────────────────────
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
       dateHtml = `
         <span class="activity-meta-item ${overdue ? 'date-overdue' : ''}">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          ${overdue ? '⚠️ ' : ''}Entrega: ${fmt}
+          ${overdue ? '<i class="fa-solid fa-triangle-exclamation"></i> ' : ''}Entrega: ${fmt}
         </span>`;
     }
 

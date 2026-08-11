@@ -7,8 +7,8 @@
 const TIPO_LABELS = {
   video:       { icon: '🎬', label: 'Vídeo' },
   infografico: { icon: '🖼️', label: 'Infográfico' },
-  site:        { icon: '🌐', label: 'Site' },
-  tarefa:      { icon: '📝', label: 'Tarefa' },
+  site:        { icon: '<i class="fa-solid fa-globe"></i>', label: 'Site' },
+  tarefa:      { icon: '<i class="fa-solid fa-file-pen"></i>', label: 'Tarefa' },
 };
 
 // ── Formata data ISO para "há X tempo" ──────────────────────────────────────
@@ -44,7 +44,7 @@ function renderStats(stats) {
     {
       label:    'Quizzes Criados',
       value:    stats.totalQuizzes,
-      icon:     '📝',
+      icon:     '<i class="fa-solid fa-file-pen"></i>',
       sub:      `${stats.totalRespostasQuiz} resposta${stats.totalRespostasQuiz !== 1 ? 's' : ''} enviada${stats.totalRespostasQuiz !== 1 ? 's' : ''}`,
       positive: true,
     },

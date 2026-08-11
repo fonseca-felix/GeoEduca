@@ -1,103 +1,387 @@
 /* ============================================================
-   ROTA 27 - ESTILOS CUSTOMIZADOS (GEOEDUCA THEME)
+   ROTA 27 — REDESIGN PREMIUM (GeoEduca Design System)
    ============================================================ */
 
-/* Wrapper da página Rota 27 */
+/* ── Página Base ─────────────────────────────────────────────── */
 .rota27-page {
-    min-height: calc(100vh - 60px);
-    padding: 24px;
+    min-height: 100vh;
+    padding: 28px 32px;
+    background: var(--color-bg);
 }
 
-/* ── Cards de Ação ─────────────────────────────────────────── */
-/* Definição base do geo-card usada nesta página */
-.geo-card {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg, 12px);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+/* ── Hero Section ────────────────────────────────────────────── */
+.r27-hero {
     position: relative;
+    overflow: hidden;
+    background: var(--navy);
+    border-radius: 20px;
+    padding: 52px 48px;
+    margin-bottom: 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
-.rota27-action-card {
+.r27-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 60% 70% at 80% 50%, rgba(204,164,59,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(255,255,255,0.04) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.r27-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(204,164,59,0.15);
+    border: 1px solid rgba(204,164,59,0.35);
+    color: var(--gold);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+}
+
+.r27-hero-title {
+    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+    font-weight: 900;
+    color: white;
+    line-height: 1.05;
+    margin: 0 0 14px 0;
+    letter-spacing: -0.03em;
+}
+
+.r27-hero-title span {
+    color: var(--gold);
+}
+
+.r27-hero-sub {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.65);
+    max-width: 560px;
+    line-height: 1.65;
+    margin: 0 auto 32px auto;
+    font-weight: 400;
+}
+
+/* ── Search Bar ──────────────────────────────────────────────── */
+.r27-search-wrap {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--color-surface);
+    border: 2px solid var(--gold);
+    border-radius: 14px;
+    padding: 6px 6px 6px 20px;
+    box-shadow: 0 0 0 6px rgba(204,164,59,0.08);
+    transition: box-shadow 0.2s;
+}
+
+.r27-search-wrap:focus-within {
+    box-shadow: 0 0 0 8px rgba(204,164,59,0.15);
+}
+
+.r27-search-icon {
+    color: var(--gold);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-right: 12px;
+}
+
+.r27-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-family: var(--font-body, 'Inter', sans-serif);
+    padding: 10px 0;
+}
+
+.r27-search-input::placeholder {
+    color: var(--color-text-muted);
+    font-weight: 400;
+}
+
+/* ── Error Container ─────────────────────────────────────────── */
+.r27-error {
+    display: none;
+    margin-top: 14px;
+    max-width: 680px;
+    padding: 12px 18px;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.4);
+    border-radius: 10px;
+    color: #ef4444;
+    font-size: 0.875rem;
+    font-weight: 600;
+    align-items: center;
+    gap: 8px;
+}
+
+.r27-error:not(.hidden) {
+    display: flex;
+}
+
+/* ── Section Label ───────────────────────────────────────────── */
+.r27-section-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.r27-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+}
+
+/* ── Cards Grid ──────────────────────────────────────────────── */
+.r27-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 36px;
+}
+
+/* ── Action Card ─────────────────────────────────────────────── */
+.r27-card {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    overflow: hidden;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
     padding: 0;
 }
 
-.rota27-action-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg, 0 10px 40px rgba(0,0,0,0.12));
+.r27-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--card-accent, var(--navy));
+    border-radius: 16px 16px 0 0;
 }
 
-.rota27-card-top {
-    height: 5px;
-    width: 100%;
-    flex-shrink: 0;
+.r27-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    border-color: var(--card-accent, var(--navy));
 }
 
-.rota27-card-body {
+.r27-card:active {
+    transform: translateY(-2px);
+}
+
+.r27-card-inner {
+    padding: 24px 20px 20px;
     display: flex;
     flex-direction: column;
-    gap: 0;
-    padding: 1.5rem;
     flex: 1;
+    gap: 12px;
 }
 
-.rota27-card-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: var(--radius-lg, 12px);
+.r27-card-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
+    font-size: 1.15rem;
+    background: var(--card-icon-bg, rgba(11,10,50,0.07));
+    color: var(--card-accent, var(--navy));
     flex-shrink: 0;
 }
 
-.rota27-card-title {
-    font-size: 1.15rem;
+.r27-card-title {
+    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    font-size: 1rem;
     font-weight: 800;
     color: var(--color-text-primary);
-    margin: 0 0 0.5rem 0;
-    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    margin: 0;
+    line-height: 1.2;
 }
 
-.rota27-card-desc {
-    font-size: 0.875rem;
+.r27-card-desc {
+    font-size: 0.8rem;
     color: var(--color-text-muted);
     line-height: 1.55;
-    margin: 0 0 1.25rem 0;
+    margin: 0;
     flex: 1;
 }
 
-.rota27-card-btn {
+.r27-card-footer {
+    padding: 0 20px 18px;
+    margin-top: auto;
+}
+
+.r27-card-cta {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
+    gap: 7px;
+    font-size: 0.78rem;
     font-weight: 700;
-    padding: 0.7rem 1rem;
+    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 9px 0;
+    border-radius: 9px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s, filter 0.15s;
+    color: white;
+    background: var(--card-accent, var(--navy));
 }
 
-/* ── Animação da Bússola de Carregamento ──────────────────── */
-@keyframes girarBussola {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-.agulha-bussola {
-    animation: girarBussola 1.5s linear infinite;
+.r27-card-cta:hover {
+    filter: brightness(1.1);
 }
 
-/* ── FLASHCARDS: Efeito Flip 3D (sem position:absolute para evitar bugs) ── */
+/* ── Loader ──────────────────────────────────────────────────── */
+.r27-loader {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 0;
+    gap: 20px;
+}
+
+.r27-loader:not(.hidden) {
+    display: flex;
+}
+
+.r27-spinner-ring {
+    width: 52px;
+    height: 52px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: r27spin 0.85s linear infinite;
+}
+
+@keyframes r27spin {
+    to { transform: rotate(360deg); }
+}
+
+.r27-loader-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    letter-spacing: 0.03em;
+}
+
+.r27-loader-skeletons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 600px;
+    opacity: 0.35;
+}
+
+.r27-skeleton {
+    height: 80px;
+    background: var(--color-border);
+    border-radius: 12px;
+    animation: r27pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes r27pulse {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 0.6; }
+}
+
+/* ── Result Panel ────────────────────────────────────────────── */
+.r27-result-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 36px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+
+.r27-result-panel.hidden {
+    display: none;
+}
+
+.r27-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface-2, var(--color-surface));
+}
+
+.r27-result-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.r27-result-close {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+.r27-result-close:hover {
+    background: var(--color-border);
+    color: var(--color-text-primary);
+}
+
+.r27-result-body {
+    padding: 24px;
+}
+
+/* ── FLASHCARDS: 3D Flip ─────────────────────────────────────── */
 .flashcard-container {
     perspective: 1200px;
-    /* Altura controlada pelo conteúdo */
 }
 
 .flashcard-inner {
@@ -105,28 +389,22 @@
     width: 100%;
     transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
     transform-style: preserve-3d;
-    /* SEM hover aqui — flip só ocorre via .flipped */
+    display: grid;
 }
 
-/* Flip só ativa quando a classe .flipped é adicionada via JS */
 .flashcard-container.flipped .flashcard-inner {
     transform: rotateY(180deg);
 }
 
-/* Frente e verso ocupam o mesmo espaço usando grid overlay */
-.flashcard-inner {
-    display: grid;
-}
-
 .flashcard-front,
 .flashcard-back {
-    grid-area: 1 / 1; /* mesma célula do grid */
+    grid-area: 1 / 1;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border-radius: var(--radius-lg, 12px);
+    border-radius: 14px;
     padding: 1.25rem;
     box-sizing: border-box;
     min-height: 200px;
@@ -135,12 +413,40 @@
 .flashcard-front {
     background: var(--color-surface);
     border: 1.5px solid var(--color-border);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 
 .flashcard-back {
     transform: rotateY(180deg);
     background: var(--color-surface-2, var(--color-surface));
     border: 1.5px solid var(--color-success, #10b981);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 2px 12px rgba(16,185,129,0.1);
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+    .r27-cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .rota27-page {
+        padding: 20px 16px;
+    }
+    .r27-hero {
+        padding: 36px 24px;
+    }
+    .r27-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .r27-loader-skeletons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .r27-cards-grid {
+        grid-template-columns: 1fr;
+    }
 }

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz de Siglas – GeoEduca</title>
+  <meta name="description" content="Desafio de reconhecer estados brasileiros pelas siglas com combos de acertos." />
+  <link rel="stylesheet" href="css/game_pages.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+  <section class="hero">
+    <h1>Quiz de Siglas</h1>
+    <p>Reconheça o estado pela sigla. Acertos em sequência aumentam a pontuação.</p>
+  </section>
+  <main class="game-container">
+    <div id="game-container"></div>
+    <div id="gfb"></div>
+  </main>
+  <script src="js/aluno/motor-jogos.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof window.initJogo3 === 'function') {
+        window.initJogo3();
+      }
+    });
+  </script>
+</body>
+</html>

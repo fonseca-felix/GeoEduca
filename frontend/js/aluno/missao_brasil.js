@@ -36,12 +36,12 @@ const biomasList = ["Amazônia", "Cerrado", "Mata Atlântica", "Caatinga", "Pant
 
 // Ícones para cada bioma
 const biomaIcons = {
-    "Amazônia": "🌳",
-    "Cerrado": "🌾",
-    "Mata Atlântica": "🌿",
-    "Caatinga": "🌵",
-    "Pantanal": "🐊",
-    "Pampa": "🌄"
+    "Amazônia": "<i class=\"fa-solid fa-tree\"></i>",
+    "Cerrado": "<i class=\"fa-solid fa-wheat-awn\"></i>",
+    "Mata Atlântica": "<i class=\"fa-solid fa-leaf\"></i>",
+    "Caatinga": "<i class=\"fa-solid fa-sun\"></i>",
+    "Pantanal": "<i class=\"fa-solid fa-water\"></i>",
+    "Pampa": "<i class=\"fa-solid fa-mountain-sun\"></i>"
 };
 
 // Cores para cada bioma
@@ -94,9 +94,9 @@ function atualizarRankingUI() {
         if (i < ranking.length && ranking[i]) {
             const item = ranking[i];
             let posicaoTexto = "";
-            if (i === 0) posicaoTexto = "🥇";
-            else if (i === 1) posicaoTexto = "🥈";
-            else if (i === 2) posicaoTexto = "🥉";
+            if (i === 0) posicaoTexto = "<i class='fa-solid fa-medal' style='color:#FFD700'></i>";
+            else if (i === 1) posicaoTexto = "<i class='fa-solid fa-medal' style='color:#C0C0C0'></i>";
+            else if (i === 2) posicaoTexto = "<i class='fa-solid fa-medal' style='color:#CD7F32'></i>";
             else posicaoTexto = `${i+1}º`;
             
             div.innerHTML = `
@@ -108,9 +108,9 @@ function atualizarRankingUI() {
         } else {
             div.classList.add("placeholder");
             let posicaoTexto = "";
-            if (i === 0) posicaoTexto = "🥇";
-            else if (i === 1) posicaoTexto = "🥈";
-            else if (i === 2) posicaoTexto = "🥉";
+            if (i === 0) posicaoTexto = "<i class='fa-solid fa-medal' style='color:#FFD700'></i>";
+            else if (i === 1) posicaoTexto = "<i class='fa-solid fa-medal' style='color:#C0C0C0'></i>";
+            else if (i === 2) posicaoTexto = "<i class='fa-solid fa-medal' style='color:#CD7F32'></i>";
             else posicaoTexto = `${i+1}º`;
             
             div.innerHTML = `
@@ -332,7 +332,7 @@ function desbloquearConquista(id, nome) {
     if (player.achievements[id]) return;
     player.achievements[id] = true;
     salvarLocal();
-    mostrarNotificacao(`🏆 CONQUISTA: ${nome}`, "info");
+    mostrarNotificacao(`<i class="fa-solid fa-trophy"></i> CONQUISTA: ${nome}`, "info");
 }
 
 function verificarConquistas() {
@@ -380,14 +380,14 @@ function atualizarUI() {
         btnAlbum.innerHTML = `<i class="fas fa-book"></i> ÁLBUM COMPLETO (<span id="albumBtnCount">${desbloq}</span>/27)`;
     } else {
         btnAlbum.classList.remove("locked");
-        btnAlbum.innerHTML = `<i class="fas fa-book"></i> ÁLBUM COMPLETO ✨`;
+        btnAlbum.innerHTML = `<i class="fas fa-book"></i> ÁLBUM COMPLETO <i class="fa-solid fa-sparkles"></i>`;
     }
     
     if (btnAlbumResultado) {
         if (desbloq < 27) {
             btnAlbumResultado.innerHTML = `<i class="fas fa-book"></i> VER ÁLBUM (${desbloq}/27)`;
         } else {
-            btnAlbumResultado.innerHTML = `<i class="fas fa-book"></i> VER ÁLBUM ✨`;
+            btnAlbumResultado.innerHTML = `<i class="fas fa-book"></i> VER ÁLBUM <i class="fa-solid fa-sparkles"></i>`;
         }
     }
     
@@ -444,12 +444,12 @@ function atualizarBiomaTracker() {
     if (!container) return;
     
     const biomaData = [
-        { nome: "Amazônia", icon: "🌳" },
-        { nome: "Cerrado", icon: "🌾" },
-        { nome: "Mata Atlântica", icon: "🌿" },
-        { nome: "Caatinga", icon: "🌵" },
-        { nome: "Pantanal", icon: "🐊" },
-        { nome: "Pampa", icon: "🌄" }
+        { nome: "Amazônia",      icon: '<i class="fa-solid fa-tree"></i>' },
+        { nome: "Cerrado",       icon: '<i class="fa-solid fa-wheat-awn"></i>' },
+        { nome: "Mata Atlântica",icon: '<i class="fa-solid fa-leaf"></i>' },
+        { nome: "Caatinga",      icon: '<i class="fa-solid fa-sun"></i>' },
+        { nome: "Pantanal",      icon: '<i class="fa-solid fa-water"></i>' },
+        { nome: "Pampa",         icon: '<i class="fa-solid fa-mountain-sun"></i>' }
     ];
     
     container.innerHTML = "";
@@ -635,15 +635,23 @@ function renderizarPergunta() {
     document.querySelectorAll(".neo-alt").forEach(card => card.classList.remove("disabled"));
     
     gameSession.tempoRestante = gameSession.tempoQuestao;
-    const timerSpan = document.getElementById("timerSegundos");
+    const timerSpan = document.getElementById('timerSegundos');
+    const timerBar  = document.getElementById('timerBar');
     timerSpan.innerText = gameSession.tempoRestante;
-    
+    if (timerBar) { timerBar.style.width = '100%'; timerBar.classList.remove('danger'); }
+
     if (gameSession.timerInterval) clearInterval(gameSession.timerInterval);
     gameSession.timerInterval = setInterval(() => {
         gameSession.secondsElapsed++;
         if (!gameSession.answered && gameSession.tempoRestante > 0) {
             gameSession.tempoRestante--;
             timerSpan.innerText = gameSession.tempoRestante;
+            const pct = (gameSession.tempoRestante / gameSession.tempoQuestao) * 100;
+            if (timerBar) {
+                timerBar.style.width = pct + '%';
+                if (pct <= 40) timerBar.classList.add('danger');
+                else timerBar.classList.remove('danger');
+            }
             if (gameSession.tempoRestante === 0) {
                 clearInterval(gameSession.timerInterval);
                 processarResposta(null);
@@ -686,14 +694,18 @@ function processarResposta(selecionada) {
     void containerImg.offsetWidth;
     
     if (correta) {
-        containerImg.classList.add("correct");
+        containerImg.classList.add('correct');
         gameSession.combo++;
         gameSession.sessionMaxCombo = Math.max(gameSession.sessionMaxCombo, gameSession.combo);
         player.maxCombo = Math.max(player.maxCombo, gameSession.sessionMaxCombo);
-        
+
+        // Flash combo HUD
+        const comboDisplay = document.getElementById('comboDisplay');
+        if (comboDisplay) { comboDisplay.classList.remove('active'); void comboDisplay.offsetWidth; comboDisplay.classList.add('active'); }
+
         const bonusCombo = Math.min(gameSession.combo * 2, 18);
         const xpGanho = 10 + bonusCombo;
-        
+
         gameSession.score += 10;
         adicionarXP(xpGanho);
         player.totalCorrect++;
@@ -713,26 +725,40 @@ function processarResposta(selecionada) {
         } else if (gameSession.modoJogo === "capitais") {
             respostaCorreta = `${estado.name} - ${estado.capital}`;
         } else {
-            respostaCorreta = `${biomaIcons[estado.bioma] || "🌿"} ${estado.bioma} (${estado.name})`;
+            respostaCorreta = `${biomaIcons[estado.bioma] || '<i class="fa-solid fa-leaf"></i>'} ${estado.bioma} (${estado.name})`;
         }
         mostrarNotificacao(`${respostaCorreta}!${msgDesbloqueio}`, "acerto", xpGanho);
         
         verificarConquistas();
         animarPonto();
+        // Highlight correct answer in green
+        document.querySelectorAll('.neo-alt').forEach(card => {
+            if (card.textContent.trim().toUpperCase().includes(pergunta.correta.toUpperCase()) ||
+                (card.querySelector('.bioma-name') && card.querySelector('.bioma-name').textContent.trim() === pergunta.correta)) {
+                card.classList.add('correct-ans');
+            }
+        });
     } else {
-        containerImg.classList.add("wrong");
+        containerImg.classList.add('wrong');
         gameSession.combo = 0;
         adicionarXP(2);
-        
-        let respostaCorreta = "";
-        if (gameSession.modoJogo === "bandeiras") {
+
+        // Highlight correct answer
+        document.querySelectorAll('.neo-alt').forEach(card => {
+            const txt = card.querySelector('.bioma-name') ? card.querySelector('.bioma-name').textContent.trim() : card.textContent.trim();
+            if (txt.toUpperCase() === pergunta.correta.toUpperCase()) card.classList.add('correct-ans');
+            else if (selecionada && txt.toUpperCase() === selecionada.toUpperCase()) card.classList.add('wrong-ans');
+        });
+
+        let respostaCorreta = '';
+        if (gameSession.modoJogo === 'bandeiras') {
             respostaCorreta = estado.name;
-        } else if (gameSession.modoJogo === "capitais") {
+        } else if (gameSession.modoJogo === 'capitais') {
             respostaCorreta = `${estado.capital} (${estado.name})`;
         } else {
-            respostaCorreta = `${biomaIcons[estado.bioma] || "🌿"} ${estado.bioma} (${estado.name})`;
+            respostaCorreta = `${estado.bioma} — ${estado.name}`;
         }
-        mostrarNotificacao(`❌ A RESPOSTA É ${respostaCorreta}. ${estado.curiosidade.substring(0, 80)}...`, "erro", 2);
+        mostrarNotificacao(`A resposta correta é: <strong>${respostaCorreta}</strong>. ${estado.curiosidade.substring(0, 80)}...`, 'erro', 2);
     }
     
     document.getElementById("comboAtual").innerText = gameSession.combo;
@@ -853,7 +879,7 @@ function abrirAlbum() {
     const desbloqueadas = player.unlockedStates.filter(u => u).length;
     
     if (desbloqueadas < 27) {
-        mostrarNotificacao(`🔒 DESBLOQUEIE TODAS AS 27 BANDEIRAS PARA VER O ÁLBUM COMPLETO! (${desbloqueadas}/27)`, "info");
+        mostrarNotificacao(`<i class="fa-solid fa-lock"></i> Desbloqueie todas as 27 bandeiras para ver o álbum! (${desbloqueadas}/27)`, 'info');
         return;
     }
     
@@ -894,31 +920,31 @@ function atualizarAlbumUI() {
 function abrirModalConquistas() {
     const lista = document.getElementById("listaConquistas");
     const conquistas = [
-        { id: "firstHit", title: "PRIMEIRO ACERTO", desc: "Acertar sua primeira pergunta", icon: "🎯" },
-        { id: "fiveCombo", title: "COMBO 5x", desc: "Acertar 5 perguntas seguidas", icon: "🔥" },
-        { id: "northComplete", title: "REGIÃO NORTE", desc: "Desbloquear todos os 7 estados do Norte", icon: "🌴" },
-        { id: "northeastComplete", title: "REGIÃO NORDESTE", desc: "Desbloquear todos os 9 estados do Nordeste", icon: "🏖️" },
-        { id: "centerwestComplete", title: "CENTRO-OESTE", desc: "Desbloquear todos os 4 estados", icon: "🏞️" },
-        { id: "southeastComplete", title: "SUDESTE", desc: "Desbloquear todos os 4 estados", icon: "🏙️" },
-        { id: "southComplete", title: "SUL", desc: "Desbloquear todos os 3 estados", icon: "❄️" },
-        { id: "allFlags", title: "COLEÇÃO COMPLETA", desc: "Desbloquear todos os 27 estados", icon: "👑" }
+        { id: 'firstHit',          title: 'PRIMEIRO ACERTO',   desc: 'Acertar sua primeira pergunta',               icon: '<i class="fa-solid fa-bullseye"></i>' },
+        { id: 'fiveCombo',         title: 'COMBO 5x',          desc: 'Acertar 5 perguntas seguidas',                icon: '<i class="fa-solid fa-fire"></i>' },
+        { id: 'northComplete',     title: 'REGIÃO NORTE',      desc: 'Desbloquear todos os 7 estados do Norte',     icon: '<i class="fa-solid fa-tree"></i>' },
+        { id: 'northeastComplete', title: 'REGIÃO NORDESTE',   desc: 'Desbloquear todos os 9 estados do Nordeste',  icon: '<i class="fa-solid fa-umbrella-beach"></i>' },
+        { id: 'centerwestComplete',title: 'CENTRO-OESTE',      desc: 'Desbloquear todos os 4 estados',              icon: '<i class="fa-solid fa-wheat-awn"></i>' },
+        { id: 'southeastComplete', title: 'SUDESTE',           desc: 'Desbloquear todos os 4 estados',              icon: '<i class="fa-solid fa-city"></i>' },
+        { id: 'southComplete',     title: 'SUL',               desc: 'Desbloquear todos os 3 estados',              icon: '<i class="fa-solid fa-snowflake"></i>' },
+        { id: 'allFlags',          title: 'COLEÇÃO COMPLETA',  desc: 'Desbloquear todos os 27 estados',             icon: '<i class="fa-solid fa-crown"></i>' }
     ];
-    
-    lista.innerHTML = "";
+
+    lista.innerHTML = '';
     conquistas.forEach(ach => {
         const unlocked = player.achievements[ach.id];
-        const div = document.createElement("div");
-        div.className = `achievement-item ${!unlocked ? 'locked' : ''}`;
+        const div = document.createElement('div');
+        div.className = `conquista-item ${unlocked ? 'unlocked' : 'locked'}`;
         div.innerHTML = `
-            <div class="achievement-icon">${ach.icon}</div>
-            <div class="achievement-info">
-                <div class="achievement-title">${unlocked ? '✓ ' : '🔒 '}${ach.title}</div>
-                <div class="achievement-desc">${ach.desc}</div>
+            <div class="conquista-icon">${ach.icon}</div>
+            <div>
+                <div class="conquista-nome">${unlocked ? '<i class="fa-solid fa-check" style="color:var(--success);margin-right:5px;"></i>' : '<i class="fa-solid fa-lock" style="margin-right:5px;"></i>'}${ach.title}</div>
+                <div class="conquista-desc">${ach.desc}</div>
             </div>
         `;
         lista.appendChild(div);
     });
-    document.getElementById("modalConquistas").classList.add("active");
+    document.getElementById('modalConquistas').classList.add('active');
 }
 
 function abrirModalReset() { document.getElementById("modalReset").classList.add("active"); }
@@ -928,10 +954,13 @@ function fecharModalReset() { document.getElementById("modalReset").classList.re
 // EVENTOS & INICIALIZAÇÃO
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
-    // Inject sidebar
-    document.getElementById('app-layout').insertAdjacentHTML('afterbegin', buildAlunoSidebar());
-    // Init page through Auth and Theme
-    const user = initPage('aluno');
+    // 1. Injeta sidebar ANTES do initPage (igual ao rota27)
+    const appLayout = document.getElementById('app-layout');
+    if (appLayout && typeof buildAlunoSidebar === 'function') {
+        appLayout.insertAdjacentHTML('afterbegin', buildAlunoSidebar('../'));
+    }
+    // 2. Inicializa auth, theme, sidebar
+    const user = (typeof initPage === 'function') ? initPage('aluno') : null;
     if (!user) return;
 
     // Sincroniza dados do player
@@ -953,11 +982,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById("telaResultado").classList.remove("active");
         iniciarJogo();
     });
-    document.getElementById("btnVerAlbum").addEventListener("click", () => {
-        document.getElementById("telaResultado").classList.remove("active");
+    document.getElementById('btnVerAlbum').addEventListener('click', () => {
+        document.getElementById('telaResultado').classList.remove('active');
         const desbloqueadas = player.unlockedStates.filter(u => u).length;
         if (desbloqueadas < 27) {
-            mostrarNotificacao(`🔒 COMPLETE TODAS AS 27 BANDEIRAS PARA VER O ÁLBUM! (${desbloqueadas}/27)`, "info");
+            mostrarNotificacao(`<i class="fa-solid fa-lock"></i> Complete todas as 27 bandeiras para ver o álbum! (${desbloqueadas}/27)`, 'info');
+            document.getElementById('telaInicial').classList.add('active');
             return;
         }
         abrirAlbum();

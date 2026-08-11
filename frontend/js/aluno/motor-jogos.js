@@ -8,19 +8,19 @@
 const estadosBR = [
   {nome:"Acre",          sigla:"AC", capital:"Rio Branco",       regiao:"Norte",        icon:"🟢"},
   {nome:"Alagoas",       sigla:"AL", capital:"Maceió",           regiao:"Nordeste",     icon:"🏖️"},
-  {nome:"Amapá",         sigla:"AP", capital:"Macapá",           regiao:"Norte",        icon:"🌿"},
+  {nome:"Amapá",         sigla:"AP", capital:"Macapá",           regiao:"Norte",        icon:'<i class="fa-solid fa-leaf"></i>'},
   {nome:"Amazonas",      sigla:"AM", capital:"Manaus",           regiao:"Norte",        icon:"🌳"},
   {nome:"Bahia",         sigla:"BA", capital:"Salvador",         regiao:"Nordeste",     icon:"🥁"},
   {nome:"Ceará",         sigla:"CE", capital:"Fortaleza",        regiao:"Nordeste",     icon:"🌞"},
   {nome:"Espírito Santo",sigla:"ES", capital:"Vitória",          regiao:"Sudeste",      icon:"☕"},
-  {nome:"Goiás",         sigla:"GO", capital:"Goiânia",          regiao:"Centro-Oeste", icon:"🌾"},
+  {nome:"Goiás",         sigla:"GO", capital:"Goiânia",          regiao:"Centro-Oeste", icon:'<i class="fa-solid fa-wheat-awn"></i>'},
   {nome:"Maranhão",      sigla:"MA", capital:"São Luís",         regiao:"Nordeste",     icon:"🏘️"},
   {nome:"Mato Grosso",   sigla:"MT", capital:"Cuiabá",           regiao:"Centro-Oeste", icon:"🐊"},
   {nome:"Mato Grosso do Sul",sigla:"MS",capital:"Campo Grande",  regiao:"Centro-Oeste", icon:"🦜"},
   {nome:"Minas Gerais",  sigla:"MG", capital:"Belo Horizonte",   regiao:"Sudeste",      icon:"🧀"},
   {nome:"Pará",          sigla:"PA", capital:"Belém",            regiao:"Norte",        icon:"🌧️"},
   {nome:"Paraíba",       sigla:"PB", capital:"João Pessoa",      regiao:"Nordeste",     icon:"🌅"},
-  {nome:"Paraná",        sigla:"PR", capital:"Curitiba",         regiao:"Sul",          icon:"🌲"},
+  {nome:"Paraná",        sigla:"PR", capital:"Curitiba",         regiao:"Sul",          icon:'<i class="fa-solid fa-tree"></i>'},
   {nome:"Pernambuco",    sigla:"PE", capital:"Recife",           regiao:"Nordeste",     icon:"🌂"},
   {nome:"Piauí",         sigla:"PI", capital:"Teresina",         regiao:"Nordeste",     icon:"🌵"},
   {nome:"Rio de Janeiro",sigla:"RJ", capital:"Rio de Janeiro",   regiao:"Sudeste",      icon:"🏔️"},
@@ -29,7 +29,7 @@ const estadosBR = [
   {nome:"Rondônia",      sigla:"RO", capital:"Porto Velho",      regiao:"Norte",        icon:"🚂"},
   {nome:"Roraima",       sigla:"RR", capital:"Boa Vista",        regiao:"Norte",        icon:"⛰️"},
   {nome:"Santa Catarina",sigla:"SC", capital:"Florianópolis",    regiao:"Sul",          icon:"🍎"},
-  {nome:"São Paulo",     sigla:"SP", capital:"São Paulo",        regiao:"Sudeste",      icon:"🏙️"},
+  {nome:"São Paulo",     sigla:"SP", capital:"São Paulo",        regiao:"Sudeste",      icon:'<i class="fa-solid fa-city"></i>'},
   {nome:"Sergipe",       sigla:"SE", capital:"Aracaju",          regiao:"Nordeste",     icon:"🦀"},
   {nome:"Tocantins",     sigla:"TO", capital:"Palmas",           regiao:"Norte",        icon:"🌻"},
   {nome:"Distrito Federal",sigla:"DF",capital:"Brasília",        regiao:"Centro-Oeste", icon:"🏛️"}
@@ -157,7 +157,7 @@ function renderHeader(pontoAtual, pontoAlvo, extra) {
     <div style="display:flex;justify-content:space-between;align-items:center;
       background:var(--color-surface-2);border:1px solid var(--color-border);
       border-radius:var(--radius-md);padding:10px 16px;font-size:13px;font-weight:600;color:var(--color-text-secondary);">
-      <span>🏆 Pontos: <strong id="p-score" style="color:var(--gold)">${pontoAtual}</strong></span>
+      <span><i class="fa-solid fa-trophy"></i> Pontos: <strong id="p-score" style="color:var(--gold)">${pontoAtual}</strong></span>
       <span>Meta: ${pontoAlvo} pts</span>
       ${extra || ''}
     </div>`;
@@ -169,7 +169,7 @@ function finalizarJogo(bonus) {
   const finalScore = currentScore + (bonus || 0);
   const tempo = formatTime(timeElapsed);
   const pct = Math.min(100, Math.round((finalScore / maxScore) * 100));
-  const estrelas = pct >= 80 ? '⭐⭐⭐' : pct >= 50 ? '⭐⭐' : '⭐';
+  const estrelas = pct >= 80 ? '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>' : pct >= 50 ? '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>' : '<i class="fa-solid fa-star"></i>';
 
   container.innerHTML = `
     <div style="padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:16px;">
@@ -322,7 +322,7 @@ window.initJogo3 = function() {
   const correto = alvos[0];
 
   container.innerHTML = `
-    ${renderHeader(currentScore, maxScore, `<span>🔥 Combo: <strong id="j3-combo" style="color:var(--color-danger)">${j3Combo}</strong></span>`)}
+    ${renderHeader(currentScore, maxScore, `<span><i class="fa-solid fa-fire"></i> Combo: <strong id="j3-combo" style="color:var(--color-danger)">${j3Combo}</strong></span>`)}
     <p style="color:var(--color-text-secondary);margin:0;font-size:14px;">De qual estado é esta sigla?</p>
     <div style="background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:var(--radius-lg);
       padding:28px;margin:8px 0;display:flex;align-items:center;justify-content:center;">
@@ -345,7 +345,7 @@ window.initJogo3 = function() {
         currentScore += 10 + (j3Combo > 2 ? 5 : 0);
         document.getElementById('p-score').textContent = currentScore;
         document.getElementById('j3-combo').textContent = j3Combo;
-        setFeedback(j3Combo > 1 ? `🔥 COMBO x${j3Combo}! +${10 + (j3Combo > 2 ? 5 : 0)} pontos` : '✓ Correto! +10 pontos', true);
+        setFeedback(j3Combo > 1 ? `<i class="fa-solid fa-fire"></i> COMBO x${j3Combo}! +${10 + (j3Combo > 2 ? 5 : 0)} pontos` : '✓ Correto! +10 pontos', true);
         if (currentScore >= maxScore) setTimeout(finalizarJogo, 900);
         else setTimeout(() => { initJogo3(); }, 900);
       } else {
@@ -692,7 +692,7 @@ window.initJogo9 = function() {
     </div>
     <div style="display:flex;gap:8px;max-width:340px;margin:0 auto;width:100%;">
       <button class="btn btn-primary" style="flex:1" onclick="j9Verificar()">Confirmar</button>
-      <button class="btn btn-secondary" onclick="j9Dica()" id="j9-dica-btn">💡 Dica (${tentativas})</button>
+      <button class="btn btn-secondary" onclick="j9Dica()" id="j9-dica-btn"><i class="fa-solid fa-lightbulb"></i> Dica (${tentativas})</button>
     </div>
     <div id="gfb" style="font-weight:600;font-size:15px;min-height:22px;margin:8px 0;"></div>`;
 
@@ -716,9 +716,9 @@ window.initJogo9 = function() {
   window.j9Dica = () => {
     if (tentativas <= 0) return;
     tentativas--;
-    document.getElementById('j9-dica-btn').textContent = `💡 Dica (${tentativas})`;
+    document.getElementById('j9-dica-btn').textContent = `<i class="fa-solid fa-lightbulb"></i> Dica (${tentativas})`;
     document.getElementById('j9-input').value = nome.substring(0, Math.ceil(nome.length / 2));
-    setFeedback(`💡 Dica: começa com "${nome.substring(0, 3)}"`, true);
+    setFeedback(`<i class="fa-solid fa-lightbulb"></i> Dica: começa com "${nome.substring(0, 3)}"`, true);
   };
 };
 
@@ -787,7 +787,7 @@ window.initJogo10 = function() {
           if (acertos === vizinhosCorretos.length) {
             j10Ativo = false;
             clearInterval(j10Timer);
-            setFeedback(`🎯 Todos os vizinhos encontrados! +10 bônus`, true);
+            setFeedback(`<i class="fa-solid fa-bullseye"></i> Todos os vizinhos encontrados! +10 bônus`, true);
             currentScore += 10;
             document.getElementById('p-score').textContent = currentScore;
             rodadas++;

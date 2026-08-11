@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GeoEduca - Jogos Educativos</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/tokens.css" />
   <link rel="stylesheet" href="../css/base.css" />
   <link rel="stylesheet" href="../css/components.css" />
@@ -190,30 +191,12 @@
 
 <!-- Modal / Toast logic handled by JS directly via Toast.success for games usually -->
 
-<!-- Game Active Modal -->
-<div class="modal-overlay" id="game-modal-overlay">
-  <div class="modal modal-lg" id="game-modal" style="max-height: 92vh; max-width: 680px;">
-      <div class="modal-header">
-          <div>
-              <h3 id="active-game-title">Título do Jogo</h3>
-          </div>
-          <button class="modal-close" onclick="fecharJogo()">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-      </div>
-      <div class="modal-body" id="game-container" style="padding: 24px; text-align: center; display: flex; flex-direction: column; gap: 16px; background: var(--color-surface-2);">
-          <!-- Game UI will be injected here by motor-jogos.js -->
-      </div>
-  </div>
-</div>
-
 <script src="../js/api.js"></script>
 <script src="../js/auth.js"></script>
 <script src="../js/theme.js"></script>
 <script src="../js/ui.js"></script>
 <script src="../js/sidebar.js"></script>
-<script src="../js/aluno/motor-jogos.js"></script>
-<script src="../js/aluno/jogos.js"></script>
+<script src="../js/aluno/jogos.js?v=3"></script>
 <script src="../js/aluno/push.js"></script>
 </body>
 </html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Desafio da Posição — GeoEduca</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+  <!-- GeoEduca Core CSS -->
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+
+  <style>
+    .game-play-container {
+      width: 100%;
+      padding: 28px 32px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .game-card-body {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+    .game-card-header {
+      background: var(--navy);
+      color: white;
+      padding: 32px;
+      text-align: center;
+      position: relative;
+    }
+    .game-title {
+      font-family: var(--font-display, 'Space Grotesk', sans-serif);
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+    }
+    .game-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+    }
+    .game-content-panel {
+      padding: 32px;
+      text-align: center;
+    }
+    .btn-alt {
+      background: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: 12px;
+      padding: 16px;
+      font-family: var(--font-display, 'Space Grotesk', sans-serif);
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      color: var(--color-text-primary);
+      transition: all 0.18s;
+      text-transform: uppercase;
+    }
+    .btn-alt:hover {
+      border-color: var(--navy);
+      background: var(--color-bg);
+      transform: translateY(-2px);
+    }
+    .btn-alt.correct {
+      background: rgba(5,150,105,0.08);
+      border-color: #059669;
+      color: #059669;
+    }
+    .btn-alt.wrong {
+      background: rgba(220,38,38,0.08);
+      border-color: #dc2626;
+      color: #dc2626;
+    }
+    .btn-alt:disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout" id="app-layout">
+  <!-- Sidebar injetada via JS -->
+
+  <main class="app-main" style="padding: 0;">
+    <header class="app-header" style="display:flex; align-items:center; justify-content:space-between; padding: 20px 28px 0;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Abrir menu">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div>
+          <div style="font-size:0.65rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--color-text-muted); margin-bottom:1px;">Jogos Geográficos</div>
+          <h1 style="margin:0; font-size:1.2rem; font-weight:800; color:var(--color-text-primary); font-family:var(--font-display);">
+            Desafio da Posição
+          </h1>
+        </div>
+      </div>
+      <a href="jogos.html" style="display:inline-flex; align-items:center; gap:7px; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--color-text-muted); text-decoration:none; padding:8px 14px; border:1px solid var(--color-border); border-radius:100px; transition:all 0.18s;"
+         onmouseover="this.style.borderColor='var(--navy)'; this.style.color='var(--navy)';"
+         onmouseout="this.style.borderColor='var(--color-border)'; this.style.color='var(--color-text-muted)';">
+        <i class="fa-solid fa-arrow-left"></i> Jogos
+      </a>
+    </header>
+
+    <div class="game-play-container">
+      <div class="game-card-body" id="game-body-card">
+        <!-- HEADER DENTRO DO JOGO -->
+        <div class="game-card-header" style="background:var(--navy);">
+          <div style="font-size: 2.2rem; color: var(--gold); margin-bottom: 6px;"><i class="fa-regular fa-compass"></i></div>
+          <h2 class="game-title">DESAFIO DA POSIÇÃO</h2>
+          <p style="margin:0; opacity:0.75; font-size:0.85rem; font-weight:500;">TESTE SEUS CONHECIMENTOS DE LOCALIZAÇÃO GEOGRÁFICA</p>
+        </div>
+
+        <!-- PLACAR E PROGRESSO -->
+        <div class="game-meta-bar">
+          <span><i class="fa-solid fa-trophy" style="color:var(--gold);"></i> Pontos: <strong id="game-score" style="color:var(--navy)">0</strong></span>
+          <span>Progresso: <strong id="game-progress" style="color:var(--navy)">1</strong> / 5</span>
+          <span>Meta: 50 pts</span>
+        </div>
+
+        <!-- ÁREA DE JOGO DINÂMICA -->
+        <div class="game-content-panel" id="play-area">
+          <!-- Carregado via JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Scripts GeoEduca -->
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/darkmode.js"></script>
+
+<script>
+  const perguntasPositivoData = [
+    {p:"Qual estado fica ao norte de Santa Catarina?",   r:"Paraná",        err:["Rio Grande do Sul","São Paulo","Mato Grosso"]},
+    {p:"Qual estado fica ao sul do Pará?",               r:"Mato Grosso",   err:["Tocantins","Maranhão","Amazonas"]},
+    {p:"Qual estado fica mais a oeste do Brasil?",        r:"Acre",          err:["Rondônia","Amazonas","Roraima"]},
+    {p:"Qual estado fica ao norte do Maranhão?",         r:"Pará",          err:["Ceará","Piauí","Tocantins"]},
+    {p:"Qual estado não possui litoral?",                r:"Minas Gerais",  err:["Espírito Santo","Rio de Janeiro","Bahia"]},
+    {p:"Qual estado é cortado pela Linha do Equador?",   r:"Amapá",         err:["Pará","Roraima","Maranhão"]},
+    {p:"Qual estado fica ao leste de Mato Grosso?",      r:"Goiás",         err:["Mato Grosso do Sul","Tocantins","Rondônia"]},
+    {p:"Qual estado fica ao sul do Amazonas?",           r:"Rondônia",      err:["Acre","Mato Grosso","Roraima"]},
+    {p:"Qual estado faz fronteira com o Uruguai?",       r:"Rio Grande do Sul",err:["Santa Catarina","Paraná","Mato Grosso do Sul"]},
+    {p:"Qual estado fica entre Pará e Maranhão?",        r:"Tocantins",     err:["Goiás","Piauí","Bahia"]}
+  ];
+
+  let currentScore = 0;
+  let maxScore = 50;
+  let questionIndex = 0;
+  let secondsElapsed = 0;
+  let timerInterval = null;
+  let shuffledQuestions = [];
+
+  function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+  function formatTime(s) {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+  }
+
+  function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => { secondsElapsed++; }, 1000);
+  }
+
+  function renderQuestion() {
+    if (questionIndex >= shuffledQuestions.length || currentScore >= maxScore) {
+      finalizarJogo();
+      return;
+    }
+
+    document.getElementById('game-progress').textContent = Math.min(5, questionIndex + 1);
+    const q = shuffledQuestions[questionIndex];
+    const alvos = shuffle([q.r, ...q.err]);
+    const playArea = document.getElementById('play-area');
+
+    playArea.innerHTML = `
+      <div style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:16px;
+        padding:28px 24px;font-size:1.15rem;font-weight:700;color:var(--color-text-primary);line-height:1.5;text-align:left;margin-bottom:24px;box-shadow:inset 0 0 15px rgba(0,0,0,0.03)">
+        <i class="fa-regular fa-compass" style="color:var(--gold);margin-right:8px;"></i> ${q.p}
+      </div>
+      <div id="opcoes" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:480px;margin:0 auto 16px;"></div>
+      <div id="feedback-msg" style="font-weight:700;font-size:0.95rem;min-height:24px;margin-top:12px;"></div>
+    `;
+
+    const optionsDiv = document.getElementById('opcoes');
+    alvos.forEach(o => {
+      const btn = document.createElement('button');
+      btn.className = 'btn-alt';
+      btn.textContent = o;
+      btn.onclick = () => {
+        Array.from(optionsDiv.children).forEach(b => b.disabled = true);
+        const feedbackMsg = document.getElementById('feedback-msg');
+        
+        if (o === q.r) {
+          btn.classList.add('correct');
+          currentScore += 10;
+          document.getElementById('game-score').textContent = currentScore;
+
+          feedbackMsg.style.color = 'var(--color-success)';
+          feedbackMsg.innerHTML = `✓ Correto! +10 pontos`;
+          
+          questionIndex++;
+          setTimeout(renderQuestion, 1000);
+        } else {
+          btn.classList.add('wrong');
+          feedbackMsg.style.color = 'var(--color-danger)';
+          feedbackMsg.innerHTML = `✗ Incorreto! A resposta correta era: <strong>${q.r}</strong>`;
+          
+          questionIndex++;
+          setTimeout(renderQuestion, 1400);
+        }
+      };
+      optionsDiv.appendChild(btn);
+    });
+  }
+
+  function finalizarJogo() {
+    clearInterval(timerInterval);
+    const playArea = document.getElementById('play-area');
+    const tempo = formatTime(secondsElapsed);
+    const pct = Math.min(100, Math.round((currentScore / maxScore) * 100));
+    
+    let estrelas = '';
+    if (pct >= 85) estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+    else if (pct >= 50) estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+    else estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+
+    playArea.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:12px 0;">
+        <div style="font-size:2.8rem;display:flex;gap:6px;">${estrelas}</div>
+        <h2 style="color:var(--navy);font-family:var(--font-display);font-size:1.8rem;font-weight:900;margin:0;">Desafio Concluído!</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:340px;margin-bottom:12px;">
+          <div style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:2rem;font-weight:900;color:var(--color-success)">${currentScore}</div>
+            <div style="font-size:0.65rem;color:var(--color-text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Pontos</div>
+          </div>
+          <div style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:2rem;font-weight:900;color:var(--navy)">${tempo}</div>
+            <div style="font-size:0.65rem;color:var(--color-text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Tempo</div>
+          </div>
+        </div>
+        <a href="jogos.html" class="btn btn-primary" style="padding:12px 32px;border-radius:100px;text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:8px;">
+          <i class="fa-solid fa-house"></i> Voltar ao Menu
+        </a>
+      </div>
+    `;
+
+    salvarResultado(currentScore, tempo, pct);
+  }
+
+  function salvarResultado(pontos, tempo, pct) {
+    try {
+      const hist = JSON.parse(localStorage.getItem('geoeduca_results') || '[]');
+      const geoUser = JSON.parse(localStorage.getItem('geoeduca_user') || '{}');
+      const nome = geoUser.name || localStorage.getItem('geoeduca_user_name') || 'Aluno';
+      const sala = geoUser.sala || '';
+      
+      hist.push({
+        gameId: 7,
+        aluno: nome,
+        sala: sala,
+        pontuacao: pontos,
+        tempo: tempo,
+        data: new Date().toISOString(),
+        pct: pct
+      });
+      localStorage.setItem('geoeduca_results', JSON.stringify(hist));
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const appLayout = document.getElementById('app-layout');
+    if (appLayout && typeof buildAlunoSidebar === 'function') {
+      appLayout.insertAdjacentHTML('afterbegin', buildAlunoSidebar('../'));
+    }
+    initPage('aluno');
+    shuffledQuestions = shuffle([...perguntasPositivoData]);
+    startTimer();
+    renderQuestion();
+  });
+</script>
+
+</body>
+</html>

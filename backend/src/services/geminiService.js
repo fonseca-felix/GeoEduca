@@ -191,10 +191,119 @@ async function gerarVideosYoutubeService(tema) {
     return await _chamarGeminiJson(prompt);
 }
 
+async function gerarCasoDetetive() {
+    const prompt = `
+Você é roteirista de um jogo educativo brasileiro estilo Carmen Sandiego chamado "Detetive do Brasil".
+Crie um caso policial onde o criminoso roubou um patrimônio histórico/cultural e fugiu por 5 estados brasileiros.
+
+REGRAS OBRIGATÓRIAS:
+1. A rota tem EXATAMENTE 5 objetos no array "rota" (estado inicial + 3 intermediários + estado final)
+2. Apenas o último objeto tem "ehEstadoFinal": true
+3. O último objeto tem "proximoEstado": null
+4. Cada NPC deve falar com SOTAQUE/GÍRIAS AUTÊNTICAS do estado onde está (carioca, gaúcho, nordestino, etc.)
+5. As dicas devem ser COMPLETAMENTE INDIRETAS: mencionar culinária local, clima, cultura, economia, natureza — NUNCA mencionar o nome ou sigla do próximo estado
+6. Cada estado deve ter EXATAMENTE 3 NPCs
+7. Use estados de REGIÕES DIFERENTES para tornar o jogo interessante geograficamente
+8. O campo iconClass dos NPCs deve conter UMA classe da biblioteca FontAwesome v6 referente a pessoas ou profissões (ex: "fa-solid fa-user-tie", "fa-solid fa-user-nurse", "fa-solid fa-user-graduate", "fa-solid fa-user-astronaut"). NUNCA USE EMOJIS.
+
+Retorne ESTRITAMENTE este JSON (sem markdown, sem texto adicional, sem \`\`\`):
+{
+  "patrimonioRoubado": "Nome específico do patrimônio histórico ou cultural roubado (ex: O Maracatu Nação Elefante de Ouro)",
+  "descricaoRoubo": "Uma frase descrevendo o crime cometido",
+  "ultimaLocalizacaoConhecida": "Nome completo do primeiro estado",
+  "ultimaLocalizacaoSigla": "sigla do primeiro estado em maiúsculas",
+  "criminoso": {
+    "nome": "Nome fictício completo",
+    "apelido": "Apelido marcante e criativo",
+    "descricao": "Descrição física em uma frase (roupa, traço marcante)",
+    "motivacao": "Por que roubou o patrimônio, em uma frase"
+  },
+  "rota": [
+    {
+      "estadoAtual": "SIGLA_UF",
+      "nomeEstado": "Nome completo do estado",
+      "proximoEstado": "SIGLA_UF_PROXIMO",
+      "ehEstadoFinal": false,
+      "npcs": [
+        {
+          "nome": "Nome do NPC",
+          "profissao": "Profissão típica da região",
+          "dica": "Dica indireta de pelo menos 3 frases com sotaque regional autêntico. Mencione algo específico da culinária, clima ou cultura do próximo estado SEM dizer o nome.",
+          "iconClass": "fa-solid fa-user-tie"
+        },
+        {
+          "nome": "Nome do NPC 2",
+          "profissao": "Outra profissão típica",
+          "dica": "Dica indireta com referência diferente (clima, economia, natureza) do próximo estado, com sotaque local.",
+          "iconClass": "fa-solid fa-user-nurse"
+        },
+        {
+          "nome": "Nome do NPC 3",
+          "profissao": "Terceira profissão típica",
+          "dica": "Dica indireta com referência histórica ou cultural do próximo estado, com sotaque local.",
+          "iconClass": "fa-solid fa-user-graduate"
+        }
+      ]
+    },
+    {
+      "estadoAtual": "SIGLA_INTERMEDIARIO_1",
+      "nomeEstado": "Nome completo",
+      "proximoEstado": "SIGLA_PROXIMO",
+      "ehEstadoFinal": false,
+      "npcs": [{"nome":"","profissao":"","dica":"","emojiFace":""}]
+    },
+    {
+      "estadoAtual": "SIGLA_INTERMEDIARIO_2",
+      "nomeEstado": "Nome completo",
+      "proximoEstado": "SIGLA_PROXIMO",
+      "ehEstadoFinal": false,
+      "npcs": [{"nome":"","profissao":"","dica":"","emojiFace":""}]
+    },
+    {
+      "estadoAtual": "SIGLA_INTERMEDIARIO_3",
+      "nomeEstado": "Nome completo",
+      "proximoEstado": "SIGLA_FINAL",
+      "ehEstadoFinal": false,
+      "npcs": [{"nome":"","profissao":"","dica":"","emojiFace":""}]
+    },
+    {
+      "estadoAtual": "SIGLA_FINAL",
+      "nomeEstado": "Nome completo",
+      "proximoEstado": null,
+      "ehEstadoFinal": true,
+      "npcs": [
+        {
+          "nome": "Testemunha ocular",
+          "profissao": "Profissão",
+          "dica": "Testemunha confirma que viu o suspeito escondido neste estado, descreve onde ele está se escondendo (bairro/ponto turístico específico do estado).",
+          "emojiFace": "👁️"
+        },
+        {
+          "nome": "NPC 2 do estado final",
+          "profissao": "Profissão",
+          "dica": "Dica adicional confirmando presença do criminoso, com sotaque local.",
+          "emojiFace": "👮"
+        },
+        {
+          "nome": "NPC 3 do estado final",
+          "profissao": "Profissão",
+          "dica": "Informação sobre o esconderijo com detalhes regionais.",
+          "emojiFace": "🏪"
+        }
+      ]
+    }
+  ]
+}
+Responda apenas com o JSON válido. Sem markdown, sem explicações externas.
+    `;
+    return await _chamarGeminiJson(prompt);
+}
+
 module.exports = {
     gerarConteudoEstudo,
     gerarFlashcardsService,
     gerarQuizService,
     gerarMidiaMapasService,
-    gerarVideosYoutubeService
+    gerarVideosYoutubeService,
+    gerarCasoDetetive
 };

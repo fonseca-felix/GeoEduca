@@ -42,7 +42,7 @@
   input[type="text"] { padding: 10px; border-radius: 8px; border: 2px solid var(--primary); font-size: 16px; width: 80%; max-width: 300px; text-transform: uppercase; text-align: center; letter-spacing: 2px; }
 </style>
 <link rel="stylesheet" href="css/wordsearch.css" />
-</head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">\n</head>
 <body>
 
 <h1>🌎 Explorador Brasil</h1>
@@ -59,6 +59,7 @@
   <button onclick="mudarJogo(8)">8. Caça-Palavras</button>
   <button onclick="mudarJogo(9)">9. Município</button>
   <button onclick="mudarJogo(10)">10. Fronteiras</button>
+  <button onclick="window.location.href='detetive-brasil.html'" style="background: #152030; color: #ffd700; border: 1px solid #ffd700;">🕵️ 11. Detetive</button>
   <button onclick="jogoAleatorio()" style="background: var(--accent); color: var(--secondary);">🎲 Surpresa</button>
 </div>
 
@@ -170,19 +171,19 @@
 const estados = [
   {nome: "Acre", sigla: "AC", capital: "Rio Branco", regiao: "Norte", icon: "🟢"},
   {nome: "Alagoas", sigla: "AL", capital: "Maceió", regiao: "Nordeste", icon: "🏖️"},
-  {nome: "Amapá", sigla: "AP", capital: "Macapá", regiao: "Norte", icon: "🌐"},
+  {nome: "Amapá", sigla: "AP", capital: "Macapá", regiao: "Norte", icon: "<i class="fa-solid fa-globe"></i>"},
   {nome: "Amazonas", sigla: "AM", capital: "Manaus", regiao: "Norte", icon: "🌳"},
   {nome: "Bahia", sigla: "BA", capital: "Salvador", regiao: "Nordeste", icon: "🥁"},
   {nome: "Ceará", sigla: "CE", capital: "Fortaleza", regiao: "Nordeste", icon: "🌞"},
   {nome: "Espírito Santo", sigla: "ES", capital: "Vitória", regiao: "Sudeste", icon: "☕"},
   {nome: "Goiás", sigla: "GO", capital: "Goiânia", regiao: "Centro-Oeste", icon: "🎸"},
   {nome: "Maranhão", sigla: "MA", capital: "São Luís", regiao: "Nordeste", icon: "🏘️"},
-  {nome: "Mato Grosso", sigla: "MT", capital: "Cuiabá", regiao: "Centro-Oeste", icon: "🌾"},
+  {nome: "Mato Grosso", sigla: "MT", capital: "Cuiabá", regiao: "Centro-Oeste", icon: "<i class="fa-solid fa-wheat-awn"></i>"},
   {nome: "Mato Grosso do Sul", sigla: "MS", capital: "Campo Grande", regiao: "Centro-Oeste", icon: "🦜"},
   {nome: "Minas Gerais", sigla: "MG", capital: "Belo Horizonte", regiao: "Sudeste", icon: "🧀"},
   {nome: "Pará", sigla: "PA", capital: "Belém", regiao: "Norte", icon: "🌧️"},
   {nome: "Paraíba", sigla: "PB", capital: "João Pessoa", regiao: "Nordeste", icon: "🌅"},
-  {nome: "Paraná", sigla: "PR", capital: "Curitiba", regiao: "Sul", icon: "🌲"},
+  {nome: "Paraná", sigla: "PR", capital: "Curitiba", regiao: "Sul", icon: "<i class="fa-solid fa-tree"></i>"},
   {nome: "Pernambuco", sigla: "PE", capital: "Recife", regiao: "Nordeste", icon: "🌂"},
   {nome: "Piauí", sigla: "PI", capital: "Teresina", regiao: "Nordeste", icon: "🌵"},
   {nome: "Rio de Janeiro", sigla: "RJ", capital: "Rio de Janeiro", regiao: "Sudeste", icon: "🗽"},
@@ -191,7 +192,7 @@ const estados = [
   {nome: "Rondônia", sigla: "RO", capital: "Porto Velho", regiao: "Norte", icon: "🚂"},
   {nome: "Roraima", sigla: "RR", capital: "Boa Vista", regiao: "Norte", icon: "⛰️"},
   {nome: "Santa Catarina", sigla: "SC", capital: "Florianópolis", regiao: "Sul", icon: "🍎"},
-  {nome: "São Paulo", sigla: "SP", capital: "São Paulo", regiao: "Sudeste", icon: "🏙️"},
+  {nome: "São Paulo", sigla: "SP", capital: "São Paulo", regiao: "Sudeste", icon: "<i class="fa-solid fa-city"></i>"},
   {nome: "Sergipe", sigla: "SE", capital: "Aracaju", regiao: "Nordeste", icon: "🦀"},
   {nome: "Tocantins", sigla: "TO", capital: "Palmas", regiao: "Norte", icon: "🌻"}
 ];

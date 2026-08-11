@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const typeIcon = (tipo) => {
-        if (tipo === 'atividade') return '📝';
+        if (tipo === 'atividade') return '<i class="fa-solid fa-file-pen"></i>';
         if (tipo === 'prova')     return '📋';
         if (tipo === 'quiz')      return '🎮';
         return '🔔';
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             list.innerHTML = `
                 <li>
                     <div class="notif-empty">
-                        <div class="notif-empty-icon">🎉</div>
+                        <div class="notif-empty-icon"><i class="fa-solid fa-party-horn"></i></div>
                         <h3>Tudo em dia!</h3>
                         <p>${activeFilter === 'todas'
                             ? 'Você não tem notificações no momento.'

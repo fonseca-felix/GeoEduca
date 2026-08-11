@@ -80,7 +80,7 @@ const PushNotificacoes = {
     }
 
     const mapIcons = {
-      'atividade': '📝',
+      'atividade': '<i class="fa-solid fa-file-pen"></i>',
       'prova': '📋',
       'quiz': '🎮',
       'sistema': '🔔'
