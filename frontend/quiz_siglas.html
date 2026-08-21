@@ -20,6 +20,11 @@
   <script src="js/aluno/motor-jogos.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Initialize globals required by motor-jogos.js
+      container = document.getElementById('game-container');
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => timeElapsed++, 1000);
+      
       if (typeof window.initJogo3 === 'function') {
         window.initJogo3();
       }

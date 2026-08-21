@@ -20,7 +20,13 @@
   <script src="js/aluno/motor-jogos.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      if (typeof window.initJogo6 === 'function') window.initJogo6();
+      container = document.getElementById('game-container');
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => timeElapsed++, 1000);
+      
+      if (typeof window.initJogo6 === 'function') {
+        window.initJogo6();
+      }
     });
   </script>
 </body>
