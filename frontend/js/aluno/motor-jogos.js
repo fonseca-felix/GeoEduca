@@ -110,7 +110,10 @@ let maxScore = 60;
 
 // -------- CONTROLE DO MODAL --------
 window.fecharJogo = function() {
-  document.getElementById('game-modal-overlay').classList.remove('open');
+  const overlay = document.getElementById('game-modal-overlay');
+  if (overlay) overlay.classList.remove('open');
+  else window.location.href = 'jogos.html'; // Standalone page redirect
+  
   if (timerInterval) clearInterval(timerInterval);
 };
 
