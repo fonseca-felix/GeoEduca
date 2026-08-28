@@ -111,7 +111,10 @@ let maxScore = 60;
 // -------- CONTROLE DO MODAL --------
 window.fecharJogo = function() {
   const overlay = document.getElementById('game-modal-overlay');
-  if (overlay) overlay.classList.remove('open');
+  if (overlay) {
+    overlay.classList.remove('open');
+    document.body.style.overflow = ''; // Restore body scroll
+  }
   else window.location.href = 'jogos.html'; // Standalone page redirect
   
   if (timerInterval) clearInterval(timerInterval);
@@ -140,7 +143,11 @@ window.abrirJogo = function(gameId, title) {
   container = document.getElementById('game-container');
   container.innerHTML = '';
 
-  document.getElementById('game-modal-overlay').classList.add('open');
+  const overlay = document.getElementById('game-modal-overlay');
+  if (overlay) {
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden'; // Prevent body scroll when modal is open
+  }
   if (timerInterval) clearInterval(timerInterval);
 
   // Show character with instructions first

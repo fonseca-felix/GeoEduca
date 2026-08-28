@@ -106,12 +106,17 @@ const GeoCharacter = (() => {
       style.id = 'geo-char-styles';
       style.textContent = `
         #geo-char-widget {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          z-index: 9999;
+          pointer-events: none;
           display: flex;
+          flex-direction: row-reverse;
           align-items: flex-end;
           gap: 8px;
-          padding: 12px 16px;
-          margin-bottom: 12px;
-          min-height: 80px;
+          padding: 0;
+          margin: 0;
         }
         #geo-char-img {
           width: 72px;
@@ -144,7 +149,7 @@ const GeoCharacter = (() => {
           color: var(--color-text-primary, #0B0A32);
           border: 1px solid var(--color-border, #E0DDD8);
           border-radius: 12px;
-          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
           padding: 10px 14px;
           font-size: 0.8rem;
           line-height: 1.4;
@@ -252,7 +257,6 @@ const GeoCharacter = (() => {
     if (window.location.pathname.includes('.html') && !window.location.pathname.includes('jogos.html') && !window.location.pathname.includes('ranking.html') && document.querySelector('.app-main')) {
       const main = document.querySelector('.app-main');
       const charWrapper = document.createElement('div');
-      charWrapper.style.padding = '0 28px';
       charWrapper.id = 'geo-char-wrapper';
       const header = main.querySelector('header');
       if (header) {
