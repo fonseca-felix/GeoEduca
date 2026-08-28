@@ -54,6 +54,20 @@ const GeoCharacter = (() => {
     ]
   };
 
+  const PAGE_INSTRUCTIONS = {
+    'memoria_biomas.html': 'Jogo da memória! Vire as cartas e encontre os pares: bioma com a sua característica correspondente.',
+    'ordenando_regioes.html': 'Arraste e solte os estados para as regiões corretas do Brasil.',
+    'caca_palavras.html': 'Encontre as palavras escondidas nessa sopa de letras! Procure na horizontal e vertical.',
+    'bandeira_estado.html': 'Olhe para a bandeira e adivinhe qual é o estado correto.',
+    'complete_capital.html': 'Complete a lacuna com a capital certa do estado. Digite ou escolha a correta!',
+    'desafio_posicao.html': 'Clique na região correta do mapa onde o estado se localiza.',
+    'fronteiras_cronometro.html': 'Rápido! Adivinhe quais estados fazem fronteira antes que o tempo acabe.',
+    'hidrografias.html': 'Responda as perguntas sobre os rios e hidrografia do Brasil.',
+    'missao_brasil.html': 'Uma missão completa pelo Brasil! Siga as instruções e cumpra as tarefas.',
+    'rota27.html': 'Trace a rota correta de viagem passando por todos os estados.',
+    'quiz.html': 'Teste seus conhecimentos em um Quiz de Geografia. Escolha a alternativa correta.'
+  };
+
   function getCharId() {
     return localStorage.getItem('geoeduca_character') || 'maloka';
   }
@@ -70,7 +84,7 @@ const GeoCharacter = (() => {
   }
 
   // Inject the character widget into a container
-  function mount(parentSelector) {
+  function mount(parentSelector, customInstruction) {
     const parent = document.querySelector(parentSelector);
     if (!parent) return;
 
@@ -150,7 +164,7 @@ const GeoCharacter = (() => {
     }
 
     // Show welcome message
-    react('welcome');
+    react('welcome', customInstruction);
   }
 
   function react(type, customMsg) {
@@ -246,7 +260,10 @@ const GeoCharacter = (() => {
       } else {
         main.prepend(charWrapper);
       }
-      mount('#geo-char-wrapper');
+      
+      const fileName = window.location.pathname.split('/').pop();
+      const instruction = PAGE_INSTRUCTIONS[fileName] || null;
+      mount('#geo-char-wrapper', instruction);
     }
   });
 
