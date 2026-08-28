@@ -460,9 +460,14 @@
     metalness: 0.2
   });
   
-  const sphere = new THREE.Mesh(geometry, material);
+    const sphere = new THREE.Mesh(geometry, material);
   // Tilt the earth a bit
   sphere.rotation.z = 0.3;
+  
+  // Set initial position facing away from Brazil
+  sphere.rotation.y = 2.5; 
+  window.earthSphere = sphere;
+  
   scene.add(sphere);
   
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
@@ -478,29 +483,8 @@
   
   camera.position.z = 12;
   
-  window.globeConfig = {
-    autoSpin: true,
-    brazilAngle: -1.0 // Ajuste este valor (entre -3 e 3) para centralizar o Brasil exatamente
-  };
-
-  function animateGlobe() {
+    function animateGlobe() {
     requestAnimationFrame(animateGlobe);
-    
-    if (window.globeConfig.autoSpin) {
-      sphere.rotation.y += 0.003; // Spinning map!
-    } else {
-      // Interpola suavemente para o ângulo do Brasil
-      let current = sphere.rotation.y;
-      let target = window.globeConfig.brazilAngle;
-      
-      // Encontra a rotação equivalente mais próxima (para não dar giros desnecessários)
-      let diff = (target - current) % (Math.PI * 2);
-      if (diff > Math.PI) diff -= Math.PI * 2;
-      if (diff < -Math.PI) diff += Math.PI * 2;
-      
-      sphere.rotation.y += diff * 0.04; // Velocidade da suavização
-    }
-    
     renderer.render(scene, camera);
   }
   
@@ -524,6 +508,17 @@
     mm.add("(min-width: 800px)", () => {
       // Desktop Animations
       
+            // Global rotation linked to scroll
+      gsap.to(window.earthSphere.rotation, {
+        scrollTrigger: {
+          trigger: '.scroll-content',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1
+        },
+        y: -1.0 // Brazil target angle
+      });
+
       // Hero section globe animation (Globe moves up and right)
       gsap.to('#hero-globe', {
         scrollTrigger: {
@@ -561,13 +556,12 @@
           start: 'top bottom',
           end: 'center center',
           scrub: 1,
-          onEnter: () => { window.globeConfig.autoSpin = false; },
-          onLeaveBack: () => { window.globeConfig.autoSpin = true; }
+          
         },
         y: '0',
         x: '0',
         scale: 1,
-        opacity: 0.15
+        opacity: 0.4
       });
     });
 
