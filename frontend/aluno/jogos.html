@@ -94,8 +94,8 @@
     }
     .play-btn svg { width: 18px; height: 18px; fill: white; margin-left: 2px; }
 
-    /* Leaderboard Sidebar */
-    .leaderboard-panel {
+    /* Character Sidebar */
+    .character-panel {
       background: var(--color-surface);
       border-radius: var(--radius-lg);
       border: 1px solid var(--color-border);
@@ -104,54 +104,92 @@
       top: 2rem;
       box-shadow: var(--shadow-sm);
     }
-    .leaderboard-title {
+    .character-title {
       font-family: var(--font-display);
       font-size: 1rem;
       font-weight: 700;
       color: var(--color-text-primary);
-      margin-bottom: 1.25rem;
+      margin-bottom: 0.5rem;
       display: flex; align-items: center; gap: 0.5rem;
     }
-
-    .rank-list { display: flex; flex-direction: column; gap: 0.75rem; }
-    .rank-item {
-      display: flex; align-items: center; gap: 0.75rem;
-      padding: 0.65rem 0.75rem;
-      border-radius: var(--radius-md);
-      background: var(--color-surface-2);
-      border: 1px solid var(--color-border);
-      transition: transform 0.2s, background 0.2s;
-    }
-    .rank-item:hover { transform: translateX(3px); }
-    .rank-pos {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 1.1rem;
-      width: 28px;
-      text-align: center;
-      color: var(--color-text-muted);
-      flex-shrink: 0;
-    }
-    .rank-avatar {
-      width: 36px; height: 36px;
-      border-radius: var(--radius-sm);
-      background: var(--color-border);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700;
+    .character-desc {
       font-size: 0.8rem;
       color: var(--color-text-secondary);
-      flex-shrink: 0;
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
     }
-    .rank-info { flex: 1; min-width: 0; }
-    .rank-name {
+    .character-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .char-option {
+      background: var(--color-surface-2);
+      border: 2px solid transparent;
+      border-radius: var(--radius-md);
+      padding: 0.5rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .char-option img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+    .char-option span {
+      font-size: 0.65rem;
       font-weight: 600;
-      color: var(--color-text-primary);
-      font-size: 0.85rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      margin-top: 0.25rem;
+      color: var(--color-text-muted);
+      text-transform: capitalize;
     }
-    .rank-score { font-size: 0.75rem; color: var(--color-text-muted); }
+    .char-option:hover {
+      background: rgba(204, 164, 59, 0.1);
+    }
+    .char-option.selected {
+      border-color: var(--gold);
+      background: rgba(204, 164, 59, 0.15);
+    }
+    .char-option.selected span {
+      color: var(--gold);
+    }
+    .character-preview {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--color-surface-2);
+      padding: 1rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+    }
+    .character-preview img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+      animation: floatChar 3s ease-in-out infinite;
+    }
+    @keyframes floatChar {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .char-speech {
+      font-size: 0.75rem;
+      color: var(--color-text-primary);
+      background: var(--color-surface);
+      padding: 0.75rem;
+      border-radius: 12px;
+      border-top-left-radius: 0;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+      flex: 1;
+      font-weight: 500;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
@@ -173,14 +211,18 @@
           </div>
         </div>
 
-        <!-- Leaderboard Section -->
-        <aside class="leaderboard-panel">
-          <h3 class="leaderboard-title">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"></path></svg>
-            Ranking da Turma
+        <!-- Character Section -->
+        <aside class="character-panel">
+          <h3 class="character-title">
+            <i class="fa-solid fa-user-astronaut"></i> Seu Ajudante
           </h3>
-          <div class="rank-list" id="leaderboard-list">
+          <p class="character-desc">Escolha um personagem para te acompanhar e dar dicas durante os jogos!</p>
+          <div class="character-grid" id="character-grid">
             <!-- Injected via JS -->
+          </div>
+          <div id="character-preview" class="character-preview" style="display:none;">
+            <img id="char-img" src="" alt="Personagem" />
+            <div id="char-speech" class="char-speech">Estou pronto para a aventura! Vamos nessa!</div>
           </div>
         </aside>
       </div>
@@ -196,6 +238,7 @@
 <script src="../js/theme.js"></script>
 <script src="../js/ui.js"></script>
 <script src="../js/sidebar.js"></script>
+<script src="../js/aluno/character.js"></script>
 <script src="../js/aluno/jogos.js?v=3"></script>
 <script src="../js/aluno/push.js"></script>
 </body>

@@ -130,6 +130,11 @@ window.abrirJogo = function(gameId, title) {
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = setInterval(() => timeElapsed++, 1000);
 
+  // Mount character helper
+  if (window.GeoCharacter) {
+    GeoCharacter.mount('#game-container');
+  }
+
   const fn = window['initJogo' + gameId];
   if (fn) fn();
   else container.innerHTML = '<p style="color:var(--color-text-secondary)">Jogo não implementado.</p>';
@@ -152,6 +157,11 @@ function setFeedback(msg, ok) {
   }
   fb.style.color = ok ? 'var(--color-success)' : 'var(--color-danger)';
   fb.textContent = msg;
+
+  // Character reacts
+  if (window.GeoCharacter) {
+    GeoCharacter.react(ok ? 'correct' : 'wrong');
+  }
 }
 
 // -------- HEADER PADRÃO --------
@@ -173,6 +183,11 @@ function finalizarJogo(bonus) {
   const tempo = formatTime(timeElapsed);
   const pct = Math.min(100, Math.round((finalScore / maxScore) * 100));
   const estrelas = pct >= 80 ? '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>' : pct >= 50 ? '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>' : '<i class="fa-solid fa-star"></i>';
+
+  // Character reacts to finish
+  if (window.GeoCharacter) {
+    GeoCharacter.react('finish');
+  }
 
   container.innerHTML = `
     <div style="padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:16px;">

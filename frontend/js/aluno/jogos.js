@@ -140,53 +140,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }).join('');
   }
 
-  async function renderLeaderboard() {
-    const list = document.getElementById('leaderboard-list');
-    if (!list) return;
+  function renderCharacterSelector() {
+    const grid = document.getElementById('character-grid');
+    const preview = document.getElementById('character-preview');
+    const charImg = document.getElementById('char-img');
+    
+    if (!grid) return;
 
-    const nomeUsuario = user.nome || 'Aluno';
-    const medalhas = ['<i class="fa-solid fa-medal" style="color:#FFD700"></i>', '<i class="fa-solid fa-medal" style="color:#C0C0C0"></i>', '<i class="fa-solid fa-medal" style="color:#CD7F32"></i>'];
+    const chars = [
+      { id: 'maloka', name: 'Maloka' },
+      { id: 'escot', name: 'Escoteiro' },
+      { id: 'terno', name: 'Terno' },
+      { id: 'brasa', name: 'Brasil' },
+      { id: 'classic', name: 'Clássico' },
+      { id: 'bone', name: 'Boné' }
+    ];
+    
+    // Load saved character or default
+    let selectedChar = localStorage.getItem('geoeduca_character') || 'maloka';
 
-    try {
-      let ranking = await api.get('/alunos/ranking/turma');
-      if (!Array.isArray(ranking)) ranking = [];
+    function updatePreview(id) {
+      charImg.src = `../assets/personagens/${id}_1.webp`;
+      preview.style.display = 'flex';
+      
+      // Update UI selection
+      document.querySelectorAll('.char-option').forEach(el => {
+        el.classList.toggle('selected', el.dataset.id === id);
+      });
+    }
 
-      const ptsLocal = pontosJogosLocal(nomeUsuario);
-      if (ptsLocal > 0) {
-        const eu = ranking.find(r => r.voce);
-        if (eu) eu.pontos += ptsLocal;
-        else ranking.push({ nome: nomeUsuario, pontos: ptsLocal, voce: true, salaNome: user.salaNome || '' });
-        ranking.sort((a, b) => b.pontos - a.pontos);
-        ranking = ranking.slice(0, 6);
-      }
+    grid.innerHTML = chars.map(c => `
+      <div class="char-option ${c.id === selectedChar ? 'selected' : ''}" data-id="${c.id}">
+        <img src="../assets/personagens/${c.id}_1.webp" alt="${c.name}" />
+        <span>${c.name}</span>
+      </div>
+    `).join('');
 
-      if (ranking.length === 0) {
-        list.innerHTML = `
-          <div style="padding:1rem;text-align:center;color:var(--color-text-muted);font-size:0.85rem;line-height:1.5;">
-            <i class="fa-solid fa-trophy" style="font-size:1.5rem;opacity:0.3;margin-bottom:8px;display:block"></i>
-            Nenhuma pontuação na turma ainda. Jogue e responda quizzes para aparecer aqui.
-          </div>`;
-        return;
-      }
+    // Attach click events
+    document.querySelectorAll('.char-option').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = el.dataset.id;
+        selectedChar = id;
+        localStorage.setItem('geoeduca_character', id);
+        updatePreview(id);
+      });
+    });
 
-      list.innerHTML = ranking.map((u, i) => {
-        const initials = (u.nome || '?').split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase();
-        return `
-      <div class="rank-item" style="${u.voce ? 'background:rgba(204,164,59,.08);border:1px solid rgba(204,164,59,.25);' : ''}">
-        <div class="rank-pos">${medalhas[i] || (i + 1)}</div>
-        <div class="rank-avatar" style="${u.voce ? 'background:var(--gold);color:var(--navy);' : ''}">${initials}</div>
-        <div class="rank-info">
-          <div class="rank-name" style="${u.voce ? 'color:var(--gold);font-weight:700;' : ''}">${u.nome}${u.voce ? ' ← você' : ''}</div>
-          <div class="rank-score">${u.pontos.toLocaleString('pt-BR')} pts${u.salaNome ? ` · ${u.salaNome}` : ''}</div>
-        </div>
-      </div>`;
-      }).join('');
-    } catch (err) {
-      console.error(err);
-      list.innerHTML = `
-        <div style="padding:1rem;text-align:center;color:var(--color-text-muted);font-size:0.85rem;">
-          Não foi possível carregar o ranking.
-        </div>`;
+    // Initial preview
+    if (selectedChar) {
+      updatePreview(selectedChar);
     }
   }
 
@@ -238,10 +240,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (orig) {
     window.fecharJogo = function () {
       orig();
-      renderLeaderboard();
+      renderCharacterSelector();
     };
   }
 
   renderGames();
-  renderLeaderboard();
+  renderCharacterSelector();
 });
