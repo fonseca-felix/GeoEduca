@@ -117,6 +117,20 @@ window.fecharJogo = function() {
   if (timerInterval) clearInterval(timerInterval);
 };
 
+// -------- INSTRUÇÕES POR JOGO --------
+const gameInstructions = {
+  1: 'Olha só! Vai aparecer um símbolo e uma sigla de um estado. Você precisa clicar no nome certo do estado. Bora lá!',
+  2: 'Nesse jogo vai aparecer o nome de um estado brasileiro. Sua missão é descobrir qual é a capital dele! Foca aí!',
+  3: 'Aqui é velocidade pura! Vai aparecer uma sigla e você tem que dizer de qual estado ela é. Se acertar em sequência, faz COMBO e ganha mais pontos!',
+  4: 'Esse é o jogo da memória! Vire as cartas e encontre os pares: o nome do bioma com a sua característica. Tenta lembrar onde cada uma tá!',
+  5: 'As regiões do Brasil vão aparecer fora de ordem. Arraste elas para colocar na posição correta. Manda ver!',
+  6: 'Você vai ver uma pergunta sobre os rios do Brasil. Escolha a resposta certa! Hidrografia é show!',
+  7: 'Tem palavras escondidas nessa sopa de letras! Encontre todos os termos de geografia. Olho vivo!',
+  8: 'Vai aparecer uma bandeira de estado. Você precisa descobrir de qual estado ela é. Conhece todas?',
+  9: 'Complete a frase com a capital certa! Eu sei que você sabe, vai com tudo!',
+  10: 'Desafio de posição! Identifique onde fica cada estado no mapa do Brasil. Mostra que você é fera!'
+};
+
 window.abrirJogo = function(gameId, title) {
   currentGameId = gameId;
   currentScore  = 0;
@@ -128,16 +142,49 @@ window.abrirJogo = function(gameId, title) {
 
   document.getElementById('game-modal-overlay').classList.add('open');
   if (timerInterval) clearInterval(timerInterval);
-  timerInterval = setInterval(() => timeElapsed++, 1000);
 
-  // Mount character helper
+  // Show character with instructions first
   if (window.GeoCharacter) {
-    GeoCharacter.mount('#game-container');
-  }
+    const charId = GeoCharacter.getCharId();
+    const instruction = gameInstructions[gameId] || 'Bora jogar! Eu vou te ajudar!';
+    
+    container.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;gap:20px;min-height:300px;">
+        <img src="../assets/personagens/${charId === 'maloka' ? 'maloka' : charId === 'escot' ? 'escot' : charId === 'terno' ? 'terno' : charId === 'brasa' ? 'brasa' : charId === 'classic' ? 'classic' : 'bone'}_1.webp" 
+             alt="Personagem" 
+             style="width:120px;height:120px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));animation:floatChar 3s ease-in-out infinite;" />
+        <div style="background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:16px;padding:20px 24px;max-width:380px;text-align:center;">
+          <p style="font-size:0.95rem;line-height:1.6;color:var(--color-text-primary);margin:0;font-weight:500;">${instruction}</p>
+        </div>
+        <button id="btn-start-game" class="btn btn-primary" style="padding:14px 40px;font-size:1rem;font-weight:700;border-radius:50px;background:var(--gold);color:var(--navy);border:none;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;">
+          <i class="fa-solid fa-play" style="margin-right:8px;"></i> Começar!
+        </button>
+      </div>
+    `;
 
-  const fn = window['initJogo' + gameId];
-  if (fn) fn();
-  else container.innerHTML = '<p style="color:var(--color-text-secondary)">Jogo não implementado.</p>';
+    document.getElementById('btn-start-game').addEventListener('click', () => {
+      container.innerHTML = '';
+      timerInterval = setInterval(() => timeElapsed++, 1000);
+      
+      // Mount character widget at top of game
+      GeoCharacter.mount('#game-container');
+      
+      // Create sub-container for game content so character persists
+      const gameContent = document.createElement('div');
+      gameContent.id = 'game-content';
+      container.appendChild(gameContent);
+      container = gameContent;
+      
+      const fn = window['initJogo' + gameId];
+      if (fn) fn();
+      else container.innerHTML = '<p style="color:var(--color-text-secondary)">Jogo não implementado.</p>';
+    });
+  } else {
+    timerInterval = setInterval(() => timeElapsed++, 1000);
+    const fn = window['initJogo' + gameId];
+    if (fn) fn();
+    else container.innerHTML = '<p style="color:var(--color-text-secondary)">Jogo não implementado.</p>';
+  }
 };
 
 function formatTime(s) {

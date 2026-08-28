@@ -207,6 +207,49 @@ const GeoCharacter = (() => {
     });
   }
 
+  // Hook into Toast globally if it exists, to automatically react to success/error messages
+  const originalToast = window.Toast ? window.Toast.fire : null;
+  if (originalToast) {
+    window.Toast.fire = function(options) {
+      if (options && options.icon === 'success') react('correct');
+      if (options && options.icon === 'error') react('wrong');
+      return originalToast.apply(this, arguments);
+    };
+  }
+
+  // Hook into generic functions if available (some standalone games use feedback-msg element)
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.target.id === 'feedback-msg' || mutation.target.id === 'gfb') {
+        const text = mutation.target.textContent.toLowerCase();
+        if (text.includes('correto') || text.includes('parab') || text.includes('acertou')) {
+          react('correct');
+        } else if (text.includes('incorreto') || text.includes('errado') || text.includes('errou')) {
+          react('wrong');
+        }
+      }
+    });
+  });
+
+  window.addEventListener('load', () => {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    
+    // Auto mount on standalone game pages
+    if (window.location.pathname.includes('.html') && !window.location.pathname.includes('jogos.html') && !window.location.pathname.includes('ranking.html') && document.querySelector('.app-main')) {
+      const main = document.querySelector('.app-main');
+      const charWrapper = document.createElement('div');
+      charWrapper.style.padding = '0 28px';
+      charWrapper.id = 'geo-char-wrapper';
+      const header = main.querySelector('header');
+      if (header) {
+        header.insertAdjacentElement('afterend', charWrapper);
+      } else {
+        main.prepend(charWrapper);
+      }
+      mount('#geo-char-wrapper');
+    }
+  });
+
   return { mount, react, getCharId, getImagePath };
 })();
 
