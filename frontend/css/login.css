@@ -46,11 +46,6 @@ body {
   max-width: 800px;
   max-height: 800px;
   z-index: 1;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: inset -20px -20px 50px rgba(0,0,0,0.9),
-              inset 10px 10px 30px rgba(255,255,255,0.1),
-              0 0 50px rgba(204,164,59,0.2);
   pointer-events: none;
 }
 
@@ -482,3 +477,5 @@ section {
     width: 100vw;
   }
 }
+
+#globe-3d { width: 100%; height: 100%; display: block; outline: none; }
