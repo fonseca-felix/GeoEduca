@@ -478,9 +478,29 @@
   
   camera.position.z = 12;
   
+  window.globeConfig = {
+    autoSpin: true,
+    brazilAngle: -1.0 // Ajuste este valor (entre -3 e 3) para centralizar o Brasil exatamente
+  };
+
   function animateGlobe() {
     requestAnimationFrame(animateGlobe);
-    sphere.rotation.y += 0.003; // Spinning map!
+    
+    if (window.globeConfig.autoSpin) {
+      sphere.rotation.y += 0.003; // Spinning map!
+    } else {
+      // Interpola suavemente para o ângulo do Brasil
+      let current = sphere.rotation.y;
+      let target = window.globeConfig.brazilAngle;
+      
+      // Encontra a rotação equivalente mais próxima (para não dar giros desnecessários)
+      let diff = (target - current) % (Math.PI * 2);
+      if (diff > Math.PI) diff -= Math.PI * 2;
+      if (diff < -Math.PI) diff += Math.PI * 2;
+      
+      sphere.rotation.y += diff * 0.04; // Velocidade da suavização
+    }
+    
     renderer.render(scene, camera);
   }
   
@@ -540,7 +560,9 @@
           trigger: '.sec-login',
           start: 'top bottom',
           end: 'center center',
-          scrub: 1
+          scrub: 1,
+          onEnter: () => { window.globeConfig.autoSpin = false; },
+          onLeaveBack: () => { window.globeConfig.autoSpin = true; }
         },
         y: '0',
         x: '0',
