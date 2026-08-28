@@ -16,13 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch (e) { /* ignore */ }
 
   const games = [
-    {
-      id: 3, title: 'Quiz de Siglas', category: 'Quiz',
-      icon: '<i class="fa-solid fa-font"></i>',
-      gradient: 'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)',
-      desc: 'Reconheça o estado pela sigla. Crie combos de acertos para ganhar pontos extras!',
-      dificuldade: 'Fácil', tempoMedio: '2 min'
-    },
+    
     {
       id: 4, title: 'Memória dos Biomas', category: 'Memória',
       icon: '<i class="fa-solid fa-leaf"></i>',
@@ -197,10 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   window.playGame = (id, title) => {
-    if (id === 3) {
-      window.location.href = 'quiz_siglas.html';
-      return;
-    }
+    
     if (id === 4) {
       window.location.href = 'memoria_biomas.html';
       return;
