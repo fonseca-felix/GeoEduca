@@ -44,12 +44,13 @@
   
   <!-- Fixed Background -->
   <div class="bg-fixed">
-    <!-- Starry background using the existing canvas logic -->
+    <div style="position:absolute;inset:0;background:url('assets/fundo.jfif') center/cover no-repeat; opacity:0.4;"></div>
     <canvas id="bg-canvas"></canvas>
     
-    <!-- The Globe Image -->
+    <!-- The Spinning Globe -->
     <div id="hero-globe">
-      <img src="assets/earth.png" alt="Globo Terrestre">
+      <div class="globe-texture"></div>
+      <div class="globe-overlay"></div>
     </div>
   </div>
 
@@ -436,7 +437,7 @@
     gsap.registerPlugin(ScrollTrigger);
 
     // Setup initial state
-    gsap.set('#hero-globe img', { scale: 1 });
+    gsap.set('#hero-globe', { scale: 1 });
     gsap.set('.f-card', { opacity: 0, x: -50 }); // Cards start hidden and offset
 
     // Define mm for responsiveness
