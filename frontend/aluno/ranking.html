@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca – Ranking</title>
+  <meta name="description" content="Ranking de alunos do GeoEduca." />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    .ranking-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .ranking-header {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+      padding: 32px;
+      text-align: center;
+      position: relative;
+    }
+
+    .ranking-header::after {
+      content: '🏆';
+      position: absolute;
+      right: 20px;
+      bottom: -20px;
+      font-size: 100px;
+      opacity: 0.1;
+      transform: rotate(15deg);
+      pointer-events: none;
+    }
+
+    .ranking-header h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .ranking-header p {
+      color: rgba(255,255,255,0.8);
+      font-size: var(--text-base);
+    }
+
+    .ranking-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-surface-2);
+    }
+
+    .ranking-tab {
+      flex: 1;
+      padding: 16px;
+      text-align: center;
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all var(--transition-fast);
+    }
+
+    .ranking-tab:hover {
+      color: var(--color-text-primary);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .ranking-tab.active {
+      color: var(--gold-dark);
+      border-bottom-color: var(--gold-dark);
+      background: var(--color-surface);
+    }
+
+    .ranking-body {
+      padding: 24px;
+    }
+
+    .ranking-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .ranking-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ranking-item.is-me {
+      background: rgba(204,164,59,0.08);
+      border-color: rgba(204,164,59,0.3);
+    }
+
+    .ranking-item.top-1 { border-left: 4px solid #FFD700; }
+    .ranking-item.top-2 { border-left: 4px solid #C0C0C0; }
+    .ranking-item.top-3 { border-left: 4px solid #CD7F32; }
+
+    .rank-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .rank-position {
+      width: 32px;
+      text-align: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--color-text-muted);
+    }
+
+    .rank-position.medal {
+      font-size: 1.5rem;
+    }
+
+    .rank-details h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+
+    .rank-details p {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .rank-points {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      background: rgba(0,0,0,0.1);
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+    }
+
+    .dark-mode .rank-points {
+      background: rgba(255,255,255,0.05);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    
+    .loading-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--color-text-muted);
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+
+    <!-- ── Page Header ── -->
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Ranking</h1>
+        <p class="page-subtitle">Veja quem são os maiores exploradores do GeoEduca!</p>
+      </div>
+    </header>
+
+    <!-- ── Page Content ── -->
+    <div class="page-content">
+      
+      <div class="ranking-container">
+        <div class="ranking-header">
+          <h2>Quadro de Líderes</h2>
+          <p>Compita com seus colegas e alcance o topo!</p>
+        </div>
+        
+        <div class="ranking-tabs">
+          <div class="ranking-tab active" data-target="turma">Minha Turma</div>
+          <div class="ranking-tab" data-target="geral">Global (Escola)</div>
+        </div>
+        
+        <div class="ranking-body">
+          <ul class="ranking-list" id="ranking-list">
+            <!-- Ranking items will be injected here via JS -->
+            <div class="loading-state">
+               <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i>
+               <p style="margin-top: 16px;">Carregando ranking...</p>
+            </div>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+
+  </main>
+</div><!-- /app-layout -->
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/aluno/ranking.js"></script>
+<script src="../js/aluno/push.js"></script>
+
+</body>
+</html>

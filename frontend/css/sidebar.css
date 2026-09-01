@@ -14,7 +14,7 @@
   flex-direction: column;
   z-index: var(--z-sidebar);
   transition: width var(--transition-slow);
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 2px 0 20px rgba(0, 0, 0, 0.25);
 }
 

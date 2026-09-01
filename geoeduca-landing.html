@@ -1,8 +1,6 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
-
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>GeoEduca — Explorando o mundo através da geografia</title>
@@ -83,13 +81,6 @@ form{margin-top:28px;display:grid;gap:20px}
 label>span{font-family:var(--font-display);font-size:.875rem;font-weight:500}
 .field{margin-top:8px;display:flex;align-items:center;gap:12px;border-radius:12px;border:1px solid var(--border);background:var(--input);padding:12px 16px}
 .field input{width:100%;background:transparent;border:0;outline:none;color:inherit;font:inherit;font-size:.875rem}
-.field input:-webkit-autofill,
-.field input:-webkit-autofill:hover, 
-.field input:-webkit-autofill:focus, 
-.field input:-webkit-autofill:active{
-    -webkit-transition: color 9999s ease-out, background-color 9999s ease-out;
-    -webkit-transition-delay: 9999s;
-}
 .field button{background:none;border:0;color:var(--muted-foreground);cursor:pointer;display:grid}
 .submit{width:100%;border:0;border-radius:12px;background:var(--primary);color:var(--primary-foreground);padding:14px 16px;font-family:var(--font-display);font-weight:600;font-size:.875rem;cursor:pointer;transition:transform .2s}
 .submit:hover{transform:scale(1.02)}
@@ -161,22 +152,21 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
         </button>
       </div>
       <form id="login-form">
-        <label id="login-label"><span id="login-field-label">Nome</span>
+        <label><span>E-mail</span>
           <div class="field">
-            <svg viewBox="0 0 24 24" width="16" height="16" style="color:var(--muted-foreground)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            <input id="login-input" name="username" type="text" required placeholder="Seu nome" autocomplete="username" />
+            <svg viewBox="0 0 24 24" width="16" height="16" style="color:var(--muted-foreground)"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+            <input type="email" required placeholder="seu@email.com" />
           </div>
         </label>
         <label><span>Senha</span>
           <div class="field">
             <svg viewBox="0 0 24 24" width="16" height="16" style="color:var(--muted-foreground)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input id="pwd" name="password" type="password" required placeholder="••••••••" autocomplete="current-password" />
+            <input id="pwd" type="password" required placeholder="••••••••" />
             <button id="toggle-pwd" type="button" aria-label="Mostrar senha">
               <svg viewBox="0 0 24 24" width="16" height="16"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
         </label>
-        <p id="login-error" style="color:#ef4444;font-size:.85rem;margin:0;display:none"></p>
         <button class="submit gold-glow" type="submit" id="submit-btn">Entrar como Professor</button>
       </form>
     </div>
@@ -188,16 +178,14 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
   <span class="hud">session secure · enc aes-256</span>
 </footer>
 
-<script src="js/api.js"></script>
-<script src="js/auth.js"></script>
 <script>
 (function () {
   /* ---- globo controlado pelo scroll ---- */
-  var BRAZIL_LON = -50;
+  var BRAZIL_LON = -50;                                   // longitude que deve ficar de frente
   var BRAZIL_POS = 100 * (2 * ((BRAZIL_LON + 180) / 360) - 0.5);
-  var TURNS = 2.5;
+  var TURNS = 2.5;                                        // voltas antes de travar no Brasil
   var START_POS = BRAZIL_POS + TURNS * 200;
-  var LOCK_AT = 0.82;
+  var LOCK_AT = 0.82;                                     // % do scroll onde a rotação termina
 
   var planet = document.getElementById('planet');
   var wrap = document.getElementById('planet-wrap');
@@ -231,36 +219,14 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
 
   /* ---- login: perfil + senha ---- */
   var role = 'professor';
-  var loginInput = document.getElementById('login-input');
-  var loginFieldLabel = document.getElementById('login-field-label');
-  var submitBtn = document.getElementById('submit-btn');
-  var loginError = document.getElementById('login-error');
-
-  function updateFormForRole(r) {
-    role = r;
-    if (role === 'professor') {
-      loginFieldLabel.textContent = 'Nome';
-      loginInput.type = 'text';
-      loginInput.placeholder = 'Seu nome';
-      loginInput.removeAttribute('pattern');
-      submitBtn.textContent = 'Entrar como Professor';
-    } else {
-      loginFieldLabel.textContent = 'RM';
-      loginInput.type = 'text';
-      loginInput.placeholder = 'Seu RM (ex: 1234)';
-      loginInput.removeAttribute('pattern');
-      submitBtn.textContent = 'Entrar como Aluno';
-    }
-    loginInput.value = '';
-    loginError.style.display = 'none';
-  }
-
   document.querySelectorAll('.role').forEach(function (btn) {
     btn.addEventListener('click', function () {
+      role = btn.dataset.role;
       document.querySelectorAll('.role').forEach(function (b) {
         b.setAttribute('aria-pressed', String(b === btn));
       });
-      updateFormForRole(btn.dataset.role);
+      document.getElementById('submit-btn').textContent =
+        'Entrar como ' + (role === 'professor' ? 'Professor' : 'Aluno');
     });
   });
 
@@ -271,62 +237,12 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
     this.setAttribute('aria-label', showing ? 'Mostrar senha' : 'Ocultar senha');
   });
 
-  document.getElementById('login-form').addEventListener('submit', async function (e) {
+  document.getElementById('login-form').addEventListener('submit', function (e) {
     e.preventDefault();
-    loginError.style.display = 'none';
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Entrando...';
-
-    var credential = loginInput.value.trim();
-    var senha = pwd.value;
-
-    if (!credential || !senha) {
-      loginError.textContent = 'Preencha todos os campos.';
-      loginError.style.display = 'block';
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Entrar como ' + (role === 'professor' ? 'Professor' : 'Aluno');
-      return;
-    }
-
-    try {
-      var endpoint, body;
-
-      if (role === 'professor') {
-        endpoint = '/auth/login/professor';
-        body = { nome: credential, senha: senha };
-      } else {
-        endpoint = '/auth/login/aluno';
-        body = { rm: credential, senha: senha };
-      }
-
-      var data = await api.post(endpoint, body);
-
-      Auth.save(data.token, data.usuario);
-
-      if (data.usuario.tipo === 'prof') {
-        window.location.href = '/professor/dashboard.html';
-      } else {
-        window.location.href = '/aluno/dashboard.html';
-      }
-    } catch (err) {
-      loginError.textContent = err.message || 'Erro ao fazer login. Tente novamente.';
-      loginError.style.display = 'block';
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Entrar como ' + (role === 'professor' ? 'Professor' : 'Aluno');
-    }
+    // TODO: conectar com seu backend de autenticação
+    console.log('login', role);
   });
-
-  // If user is already logged in, redirect to dashboard
-  if (Auth.isLoggedIn()) {
-    var user = Auth.getUser();
-    if (user && user.tipo === 'prof') {
-      window.location.href = '/professor/dashboard.html';
-    } else if (user && user.tipo === 'aluno') {
-      window.location.href = '/aluno/dashboard.html';
-    }
-  }
 })();
 </script>
 </body>
 </html>
-

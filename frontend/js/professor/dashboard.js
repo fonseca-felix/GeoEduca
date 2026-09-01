@@ -5,8 +5,8 @@
 
 // ── Tipo de atividade → rótulo legível ──────────────────────────────────────
 const TIPO_LABELS = {
-  video:       { icon: '🎬', label: 'Vídeo' },
-  infografico: { icon: '🖼️', label: 'Infográfico' },
+  video:       { icon: '<i class="fa-solid fa-film"></i>', label: 'Vídeo' },
+  infografico: { icon: '<i class="fa-solid fa-image"></i>', label: 'Infográfico' },
   site:        { icon: '<i class="fa-solid fa-globe"></i>', label: 'Site' },
   tarefa:      { icon: '<i class="fa-solid fa-file-pen"></i>', label: 'Tarefa' },
 };
@@ -30,14 +30,14 @@ function renderStats(stats) {
     {
       label:    'Total de Alunos',
       value:    stats.totalAlunos,
-      icon:     '👨‍🎓',
+      icon:     '<i class="fa-solid fa-user-graduate"></i>',
       sub:      `em ${stats.totalSalas} sala${stats.totalSalas !== 1 ? 's' : ''}`,
       positive: true,
     },
     {
       label:    'Salas Ativas',
       value:    stats.totalSalas,
-      icon:     '🏫',
+      icon:     '<i class="fa-solid fa-school"></i>',
       sub:      'turmas cadastradas',
       positive: true,
     },
@@ -51,7 +51,7 @@ function renderStats(stats) {
     {
       label:    'Atividades',
       value:    stats.totalAtividades,
-      icon:     '📚',
+      icon:     '<i class="fa-solid fa-book-open"></i>',
       sub:      `${stats.totalProvas} prova${stats.totalProvas !== 1 ? 's' : ''} criada${stats.totalProvas !== 1 ? 's' : ''}`,
       positive: true,
     },
@@ -73,7 +73,7 @@ function renderStats(stats) {
         </div>
       </div>
       <div class="stat-change ${!s.positive ? 'negative' : ''}">
-        ${s.positive ? '↑' : '↓'} ${s.sub}
+        ${s.positive ? '<i class="fa-solid fa-arrow-up"></i>' : '<i class="fa-solid fa-arrow-down"></i>'} ${s.sub}
       </div>
     </div>
   `).join('');
@@ -97,7 +97,7 @@ function renderAtividades(atividades) {
   if (!atividades || atividades.length === 0) {
     container.innerHTML = `
       <div style="text-align: center; padding: 2rem; color: var(--text-muted, #6b7280);">
-        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📭</div>
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-inbox"></i></div>
         <p style="margin: 0;">Nenhuma atividade criada ainda.</p>
         <a href="atividades.html" style="font-size: 0.875rem; color: var(--color-primary, #3b82f6); margin-top: 0.5rem; display: inline-block;">
           Criar primeira atividade →
@@ -107,7 +107,7 @@ function renderAtividades(atividades) {
   }
 
   container.innerHTML = atividades.map(a => {
-    const t = TIPO_LABELS[a.tipo] || { icon: '📄', label: a.tipo };
+    const t = TIPO_LABELS[a.tipo] || { icon: '<i class="fa-solid fa-file"></i>', label: a.tipo };
     return `
       <div class="activity-item">
         <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--bg-muted, #f3f4f6);
@@ -139,7 +139,7 @@ function renderTopSalas(salas) {
   if (!salas || salas.length === 0) {
     container.innerHTML = `
       <div style="text-align: center; padding: 2rem; color: var(--text-muted, #6b7280);">
-        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏫</div>
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-school"></i></div>
         <p style="margin: 0;">Nenhuma sala encontrada.</p>
       </div>`;
     return;

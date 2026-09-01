@@ -28,6 +28,9 @@ const NAV_ICONS = {
   moon:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`,
   sobre:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><path d="M11 12h1v4h1"/></svg>`,
   dev:       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6M12 9v6"/></svg>`,
+  ranking:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M8 21h8M12 17v4M7 4h10M5 4h14v3a6 6 0 01-6 6H11a6 6 0 01-6-6V4z"/></svg>`,
+  brazilguessr: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>`,
+  rota27:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`,
 };
 
 function buildProfessorSidebar(basePath = '../') {
@@ -146,6 +149,11 @@ function buildAlunoSidebar(basePath = '../') {
         <span class="sidebar-nav-text">Notificações</span>
       </a>
 
+      <a class="sidebar-nav-item" href="${basePath}aluno/ranking.html" data-tooltip="Ranking">
+        <span class="sidebar-nav-icon">${NAV_ICONS.ranking}</span>
+        <span class="sidebar-nav-text">Ranking</span>
+      </a>
+
       <span class="sidebar-nav-label">Aprender</span>
       <a class="sidebar-nav-item" href="${basePath}aluno/atividades.html" data-tooltip="Atividades">
         <span class="sidebar-nav-icon">${NAV_ICONS.atividades}</span>
@@ -163,8 +171,12 @@ function buildAlunoSidebar(basePath = '../') {
         <span class="sidebar-nav-icon">${NAV_ICONS.jogos}</span>
         <span class="sidebar-nav-text">Jogos</span>
       </a>
+      <a class="sidebar-nav-item" href="${basePath}aluno/hub_brazilguessr.html" data-tooltip="BrazilGuessr">
+        <span class="sidebar-nav-icon">${NAV_ICONS.brazilguessr}</span>
+        <span class="sidebar-nav-text">BrazilGuessr</span>
+      </a>
       <a class="sidebar-nav-item" href="${basePath}aluno/rota27.html" data-tooltip="Rota 27 (IA)">
-        <span class="sidebar-nav-icon"><i class="fa-solid fa-earth-americas"></i></span>
+        <span class="sidebar-nav-icon">${NAV_ICONS.rota27}</span>
         <span class="sidebar-nav-text">Rota 27 (IA)</span>
       </a>
     </nav>

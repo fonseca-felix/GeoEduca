@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: a.titulo,
                 type: a.tipo,
                 deadline: a.dataLimite ? new Date(a.dataLimite + 'T00:00:00').toLocaleDateString('pt-BR') : 'Sem prazo',
-                icon: a.tipo === 'video' ? '🎬' : a.tipo === 'infografico' ? '🖼️' : a.tipo === 'site' ? '<i class="fa-solid fa-globe"></i>' : '<i class="fa-solid fa-file-pen"></i>',
+                icon: a.tipo === 'video' ? '<i class="fa-solid fa-video"></i>' : a.tipo === 'infografico' ? '<i class="fa-solid fa-image"></i>' : a.tipo === 'site' ? '<i class="fa-solid fa-globe"></i>' : '<i class="fa-solid fa-file-pen"></i>',
                 link: a.link || '#'
             }));
 
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: p.titulo,
                 type: 'Prova',
                 deadline: p.dataLimite ? new Date(p.dataLimite + 'T00:00:00').toLocaleDateString('pt-BR') : 'Sem prazo',
-                icon: '📋',
+                icon: '<i class="fa-solid fa-clipboard-list"></i>',
                 link: '/aluno/prova.html'
             }));
 
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: q.titulo,
                 type: 'Quiz',
                 deadline: q.dataLimite ? new Date(q.dataLimite + 'T00:00:00').toLocaleDateString('pt-BR') : 'Sem prazo',
-                icon: '🎮',
+                icon: '<i class="fa-solid fa-gamepad"></i>',
                 link: '/aluno/quiz.html'
             }));
 
@@ -96,13 +96,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <span style="font-size:20px;">${g.icon}</span>
                                     <span style="font-size:12px; font-weight:600; color:var(--text-secondary); text-transform:uppercase;">${g.type}</span>
                                 </div>
-                                <span class="badge badge-warning" style="font-size:11px;">${g.deadline}</span>
+                                <span style="font-size:10px; padding: 4px 8px; border-radius: 4px; font-weight: 800; background-color: #fcf8ee; color: #b78a38; border: 1px solid #e8d7ab; text-transform: uppercase; letter-spacing: 0.05em;">${g.deadline}</span>
                             </div>
                             <h4 style="font-size:18px; margin-bottom:8px;">${g.title}</h4>
                             <div style="margin-top:auto; padding-top:16px;">
-                                <a href="${g.link}" ${g.link !== '#' && !g.link.startsWith('/') ? 'target="_blank"' : ''} class="btn btn-primary" style="width:100%; display:flex; justify-content:center; gap:8px; text-decoration:none;">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                    Acessar
+                                <a href="${g.link}" ${g.link !== '#' && !g.link.startsWith('/') ? 'target="_blank"' : ''} class="btn" style="width:100%; display:flex; justify-content:center; text-decoration:none; background-color: var(--color-surface-2, #f1f5f9); color: var(--color-text-primary, #0369a1); font-weight: 600; border: none; padding: 12px; border-radius: 8px;">
+                                    Visualizar / Responder
                                 </a>
                             </div>
                         </div>

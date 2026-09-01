@@ -1,4 +1,5 @@
 const express = require('express');
+// csrfProtection import removido; não é necessário aqui
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -8,6 +9,9 @@ const path = require('path');
 dotenv.config();
 
 const app = express();
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+const { generateCsrfToken } = require('./middleware/csrf');
 
 // Middlewares
 app.use(helmet({
@@ -49,7 +53,11 @@ const dashboardRoutes = require('./src/routes/dashboard');
 const estudoRoutes = require('./src/routes/estudo');
 const detetivedRoutes = require('./src/routes/detetive');
 
+// Rotas de CSRF
+const loginRoutes = require('./src/routes/login');
+app.get('/api/csrf-token', generateCsrfToken);
 app.use('/api/auth', authRoutes);
+app.use('/api/login', loginRoutes);
 app.use('/api/alunos', alunoRoutes);
 app.use('/api/salas', salaRoutes);
 app.use('/api/atividades', atividadeRoutes);
@@ -277,4 +285,5 @@ async function startServer() {
 
 startServer();
 
-module.exports = app;
+
+

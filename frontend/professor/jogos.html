@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GeoEduca - Meus Jogos</title>
@@ -40,6 +42,75 @@
         display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px;
     }
     .student-row:last-child { border-bottom: none; }
+    
+    /* Estilos do filtro (mais arredondado e dourado) */
+    .filters-bar .form-control {
+        border-radius: 999px !important;
+        border: 2px solid #cca43b !important;
+        padding: 10px 20px !important;
+        outline: none !important;
+        background-color: var(--color-surface) !important;
+        color: var(--color-text-primary) !important;
+        transition: all 0.2s ease-in-out;
+    }
+    .filters-bar .form-control:focus {
+        box-shadow: 0 0 0 4px rgba(204, 164, 59, 0.25) !important;
+        border-color: #cca43b !important;
+    }
+    
+    /* Custom Select */
+    .custom-select-wrapper {
+        position: relative;
+        min-width: 200px;
+        user-select: none;
+    }
+    .custom-select {
+        display: flex; justify-content: space-between; align-items: center;
+        cursor: pointer;
+    }
+    .custom-select-options {
+        position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        z-index: 100;
+        max-height: 280px; overflow-y: auto;
+        opacity: 0; visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        padding: 6px;
+    }
+    .custom-select-wrapper.open .custom-select-options {
+        opacity: 1; visibility: visible; transform: translateY(0);
+    }
+    .custom-select-wrapper.open .custom-select {
+        box-shadow: 0 0 0 4px rgba(204, 164, 59, 0.25) !important;
+        border-color: #cca43b !important;
+    }
+    .custom-option {
+        padding: 10px 16px;
+        font-size: 14px;
+        color: var(--color-text-primary);
+        cursor: pointer;
+        border-radius: 10px;
+        transition: 0.2s;
+        margin-bottom: 2px;
+    }
+    .custom-option:last-child { margin-bottom: 0; }
+    .custom-option:hover {
+        background: #cca43b;
+        color: white;
+    }
+    .custom-option.selected {
+        background: rgba(204, 164, 59, 0.1);
+        color: #cca43b;
+        font-weight: 600;
+    }
+    .custom-option.selected:hover {
+        background: #cca43b;
+        color: white;
+    }
   </style>
 </head>
 <body>
@@ -58,12 +129,17 @@
       
         <div class="filters-bar" style="display:flex; gap:16px; margin-bottom: 24px; flex-wrap: wrap;">
             <input type="text" id="search-games" class="input form-control" placeholder="Buscar jogos por título..." style="flex:1; min-width: 250px;" />
-            <select id="filter-type" class="select form-control" style="min-width: 150px;">
-                <option value="">Todos os tipos</option>
-                <option value="quiz">Quiz</option>
-                <option value="mapa">Mapa Interativo</option>
-                <option value="memoria">Memória</option>
-            </select>
+            
+            <div class="custom-select-wrapper" id="custom-select-wrapper">
+                <div class="custom-select form-control" id="custom-select-display" tabindex="0">
+                    <span id="custom-select-text">Todos os tipos</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 12px; color: var(--color-text-muted);"></i>
+                </div>
+                <div class="custom-select-options" id="custom-select-options">
+                    <!-- JS populates this -->
+                </div>
+            </div>
+            <input type="hidden" id="filter-type" value="" />
         </div>
         
         <div class="games-grid" id="games-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;">

@@ -220,13 +220,15 @@ section {
 }
 
 .login-box-wrapper {
-  background: var(--color-surface, #FFFFFF);
-  border-radius: var(--radius-xl, 12px);
+  background: var(--color-surface, #0a0a0a);
+  border-radius: 2px;
   padding: 48px;
   width: 100%;
-  max-width: 480px;
-  box-shadow: var(--shadow-xl, 0 16px 48px rgba(11, 10, 50, 0.18));
-  position: relative;
+  max-width: 380px;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+  position: absolute;
+  bottom: 8%;
+  right: 5%;
   z-index: 10;
 }
 
@@ -275,9 +277,9 @@ section {
 }
 
 .role-option.selected {
-  background: var(--gold, #CCA43B);
-  border-color: var(--gold, #CCA43B);
-  box-shadow: 0 4px 12px rgba(204, 164, 59, 0.2);
+  background: #ff6a00; /* Signal Orange */
+  border-color: #ff6a00;
+  box-shadow: 0 4px 12px rgba(255, 106, 0, 0.3);
 }
 
 .role-option-icon {
@@ -383,19 +385,18 @@ section {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  background: var(--navy, #0B0A32);
-  color: var(--gold, #CCA43B);
+  background: #ff6a00; /* Signal Orange */
+  color: #0a0a0a; /* Dark text */
   border: none;
-  border-radius: var(--radius-md, 4px);
+  border-radius: 2px;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.3s ease, background 0.3s ease;
 }
-
 .login-submit-btn:hover {
-  background: var(--navy-light, #15144a);
-  transform: translateY(-1px);
+  background: #e65c00; /* Darker orange */
+  transform: scale(1.03);
 }
 
 .login-submit-btn.loading {

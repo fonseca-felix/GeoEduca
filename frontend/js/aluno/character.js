@@ -64,7 +64,7 @@ const GeoCharacter = (() => {
     'fronteiras_cronometro.html': 'Rápido! Adivinhe quais estados fazem fronteira antes que o tempo acabe.',
     'hidrografias.html': 'Responda as perguntas sobre os rios e hidrografia do Brasil.',
     'missao_brasil.html': 'Uma missão completa pelo Brasil! Siga as instruções e cumpra as tarefas.',
-    'rota27.html': 'Trace a rota correta de viagem passando por todos os estados.',
+    'rota27.html': 'A Rota 27 é uma IA para você estudar Geografia. Escolha uma das ferramentas abaixo para começar!',
     'quiz.html': 'Teste seus conhecimentos em um Quiz de Geografia. Escolha a alternativa correta.'
   };
 

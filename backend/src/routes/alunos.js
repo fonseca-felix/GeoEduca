@@ -93,6 +93,32 @@ router.get('/ranking/turma', authenticateToken, requireAluno, async (req, res) =
     }
 });
 
+// GET - Ranking geral (toda a escola)
+router.get('/ranking/geral', authenticateToken, requireAluno, async (req, res) => {
+    try {
+        const alunoId = req.user.id;
+        const alunosSnap = await db.collection('alunos').get();
+        const ranking = [];
+
+        for (const alunoDoc of alunosSnap.docs) {
+            const pontos = await somarPontosAluno(alunoDoc.id);
+            ranking.push({
+                alunoId: alunoDoc.id,
+                nome: alunoDoc.data().nome,
+                salaNome: alunoDoc.data().salaNome || '',
+                pontos,
+                voce: alunoDoc.id === alunoId
+            });
+        }
+
+        ranking.sort((a, b) => b.pontos - a.pontos);
+        res.json(ranking.filter(r => r.pontos > 0).slice(0, 20));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao carregar ranking geral' });
+    }
+});
+
 // GET - Listar todos os alunos (apenas professor)
 router.get('/', authenticateToken, requireProfessor, async (req, res) => {
     try {

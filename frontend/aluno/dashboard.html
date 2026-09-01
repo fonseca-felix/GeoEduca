@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GeoEduca – Dashboard do Aluno</title>
@@ -36,7 +38,9 @@
     }
 
     .dash-hero::after {
-      content: '🌍';
+      content: '\f0ac';
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
       position: absolute;
       right: -16px;
       bottom: -32px;
@@ -370,37 +374,6 @@
       color: var(--navy);
     }
 
-    /* ── Ranking Card ────────────────────────────────────── */
-    .ranking-card {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-xl);
-    }
-
-    .ranking-card-header {
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--color-border);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .ranking-card-header h4 {
-      font-family: var(--font-display);
-      font-size: var(--text-sm);
-      font-weight: 700;
-      color: var(--color-text-primary);
-      letter-spacing: -0.01em;
-    }
-
-    #ranking-list {
-      list-style: none;
-      padding: 12px;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
 
     /* ── Main Grid Layout ────────────────────────────────── */
     .dash-grid {
@@ -462,7 +435,7 @@
     .dash-stat:nth-child(3) { animation-delay: .15s; }
     .profile-card   { animation: fadeUp .5s .2s ease both; }
     .bg-card        { animation: fadeUp .5s .25s ease both; }
-    .ranking-card   { animation: fadeUp .5s .3s ease both; }
+
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">\n</head>
 <body>
@@ -522,7 +495,7 @@
               </div>
             </div>
             <div class="dash-stat forest">
-              <div class="dash-stat-icon forest">📚</div>
+              <div class="dash-stat-icon forest"><i class="fa-solid fa-book"></i></div>
               <div class="dash-stat-body">
                 <div class="dash-stat-value" id="stat-pending">–</div>
                 <div class="dash-stat-label">Pendências</div>
@@ -547,7 +520,7 @@
           <!-- Profile / Level Card -->
           <div class="profile-card">
             <div class="profile-card-header">
-              <div class="profile-avatar">🎓</div>
+              <div class="profile-avatar"><i class="fa-solid fa-graduation-cap"></i></div>
             </div>
             <div class="profile-card-body">
               <div class="profile-level-badge">
@@ -569,7 +542,7 @@
           <!-- BrazilGuessr Card -->
           <div class="bg-card">
             <div class="bg-card-banner">
-              <h4>🌎 BrazilGuessr</h4>
+              <h4><i class="fa-solid fa-earth-americas"></i> BrazilGuessr</h4>
               <p>Descubra o Brasil com geografias!</p>
             </div>
             <div class="bg-card-body">
@@ -587,16 +560,6 @@
             </div>
           </div>
 
-          <!-- Ranking Card -->
-          <div class="ranking-card">
-            <div class="ranking-card-header">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-              </svg>
-              <h4>Top da Turma</h4>
-            </div>
-            <ul id="ranking-list"></ul>
-          </div>
 
         </div><!-- /dash-side-col -->
 

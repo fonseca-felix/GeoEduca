@@ -10,14 +10,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ---- Dados dos jogos ----
   const mockGames = [
-    { id: 3,  title: 'Quiz de Siglas',           type: 'quiz',          icon: '🔤', desc: 'Reconheça o estado pela sigla com sistema de combos.',                 maxPts: 60 },
+    { id: 3,  title: 'Quiz de Siglas',           type: 'quiz',          icon: '<i class="fa-solid fa-a"></i>', desc: 'Reconheça o estado pela sigla com sistema de combos.',                 maxPts: 60 },
     { id: 4,  title: 'Memória dos Biomas',       type: 'memoria',       icon: '<i class="fa-solid fa-leaf"></i>', desc: 'Encontre pares entre biomas e suas características.',                  maxPts: 40 },
     { id: 5,  title: 'Ordenando por Região',     type: 'regioes',       icon: '<i class="fa-solid fa-map"></i>', desc: 'Classifique estados nas 5 regiões do Brasil.',                        maxPts: 60 },
-    { id: 6,  title: 'Hidrografias',             type: 'rios',          icon: '🌊', desc: 'Identifique rios pela extensão e características.',                   maxPts: 50 },
-    { id: 7,  title: 'Desafio da Posição',       type: 'orientacao',    icon: '🧭', desc: 'Perguntas sobre localização geográfica dos estados.',                  maxPts: 50 },
-    { id: 8,  title: 'Caça-Palavras',            type: 'vocabulario',   icon: '🔍', desc: 'Encontre capitais e estados na grade de letras.',                      maxPts: 50 },
+    { id: 6,  title: 'Hidrografias',             type: 'rios',          icon: '<i class="fa-solid fa-water"></i>', desc: 'Identifique rios pela extensão e características.',                   maxPts: 50 },
+    { id: 7,  title: 'Desafio da Posição',       type: 'orientacao',    icon: '<i class="fa-regular fa-compass"></i>', desc: 'Perguntas sobre localização geográfica dos estados.',                  maxPts: 50 },
+    { id: 8,  title: 'Caça-Palavras',            type: 'vocabulario',   icon: '<i class="fa-solid fa-magnifying-glass"></i>', desc: 'Encontre capitais e estados na grade de letras.',                      maxPts: 50 },
     { id: 9,  title: 'Complete a Capital',       type: 'digitacao',     icon: '<i class="fa-solid fa-pen-nib"></i>', desc: 'Complete o nome da capital com base nas lacunas exibidas.',            maxPts: 50 },
-    { id: 10, title: 'Fronteiras c/ Cronômetro', type: 'fronteiras',    icon: '<i class="fa-solid fa-stopwatch"></i>', desc: 'Marque os estados vizinhos antes do tempo acabar.',                   maxPts: 60 }
+    { id: 10, title: 'Fronteiras c/ Cronômetro', type: 'fronteiras',    icon: '<i class="fa-solid fa-stopwatch"></i>', desc: 'Marque os estados vizinhos antes do tempo acabar.',                   maxPts: 60 },
+    { id: 'missao_brasil', title: 'Missão Brasil', type: 'geografia',    icon: '<i class="fa-solid fa-earth-americas"></i>', desc: 'Aprenda bandeiras, capitais e biomas dos 27 estados.',                   maxPts: 100 },
+    { id: 'detetive_brasil', title: 'Detetive do Brasil', type: 'geografia',    icon: '<i class="fa-solid fa-user-secret"></i>', desc: 'Persiga um criminoso pelo Brasil usando pistas culturais e geográficas!',                   maxPts: 100 },
+    { id: 'brazilguessr', title: 'BrazilGuessr', type: 'geografia',    icon: '<i class="fa-solid fa-location-dot"></i>', desc: 'Adivinhe o estado com base na imagem do Google Street View.',                   maxPts: 100 }
   ];
 
   // ---- Estatísticas gerais ----
@@ -49,13 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
     identificacao:'Identificação', capitais:'Capitais', quiz:'Quiz',
     memoria:'Memória', regioes:'Regiões', rios:'Rios',
     orientacao:'Orientação', vocabulario:'Vocabulário',
-    digitacao:'Digitação', fronteiras:'Fronteiras'
+    digitacao:'Digitação', fronteiras:'Fronteiras', geografia: 'Geografia'
   };
   const typeColors = {
     identificacao:'badge-forest', capitais:'badge-navy', quiz:'badge-gold',
     memoria:'badge-forest', regioes:'badge-navy', rios:'badge-navy',
     orientacao:'badge-gold', vocabulario:'badge-forest',
-    digitacao:'badge-gold', fronteiras:'badge-danger'
+    digitacao:'badge-gold', fronteiras:'badge-danger', geografia: 'badge-primary'
   };
 
   function getTotaisJogo(gameId, jogo) {
@@ -100,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
               </svg>
               Pontuação máxima: <strong style="color:var(--gold)">${g.maxPts} pts</strong>
             </div>
-            <button class="btn btn-primary" style="width:100%;margin-top:auto;" onclick="abrirRelatorioJogo(${g.id})">
+            <button class="btn btn-primary" style="width:100%;margin-top:auto;" onclick="abrirRelatorioJogo('${g.id}')">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
                 <line x1="6" y1="20" x2="6" y2="14"/>
@@ -115,8 +118,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---- Filtros ----
   const allTypes = [...new Set(mockGames.map(g => g.type))];
   const typeSelect = document.getElementById('filter-type');
-  typeSelect.innerHTML = `<option value="">Todos os tipos</option>` +
-    allTypes.map(t => `<option value="${t}">${typeLabels[t] || t}</option>`).join('');
+  const customOptionsContainer = document.getElementById('custom-select-options');
+  
+  if (customOptionsContainer) {
+    let optionsHtml = `<div class="custom-option selected" data-value="">Todos os tipos</div>`;
+    optionsHtml += allTypes.map(t => `<div class="custom-option" data-value="${t}">${typeLabels[t] || t}</div>`).join('');
+    customOptionsContainer.innerHTML = optionsHtml;
+
+    const wrapper = document.getElementById('custom-select-wrapper');
+    const display = document.getElementById('custom-select-display');
+    const displayText = document.getElementById('custom-select-text');
+
+    display.addEventListener('click', () => {
+      wrapper.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!wrapper.contains(e.target)) wrapper.classList.remove('open');
+    });
+
+    customOptionsContainer.querySelectorAll('.custom-option').forEach(opt => {
+      opt.addEventListener('click', function() {
+        customOptionsContainer.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        typeSelect.value = this.dataset.value;
+        displayText.textContent = this.textContent;
+        wrapper.classList.remove('open');
+        
+        applyFilters();
+      });
+    });
+  }
 
   function applyFilters() {
     const q = document.getElementById('search-games').value.toLowerCase();
@@ -127,12 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }));
   }
   document.getElementById('search-games').addEventListener('input', applyFilters);
-  typeSelect.addEventListener('change', applyFilters);
   renderGames(mockGames);
 
   // ---- RELATÓRIOS ----
   window.abrirRelatorioJogo = function(gameId) {
-    const jogo = mockGames.find(g => g.id === gameId);
+    const jogo = mockGames.find(g => String(g.id) === String(gameId));
     if (!jogo) return;
 
     const todos     = getEstatisticasGerais(gameId);

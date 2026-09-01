@@ -66,13 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
       desc: 'Marque todos os estados vizinhos antes do tempo acabar!',
       dificuldade: 'Difícil', tempoMedio: '5 min'
     },
-    {
-      id: "'brazilguessr'", title: 'BrazilGuessr', category: 'Geografia',
-      icon: '<i class="fa-solid fa-location-dot"></i>',
-      gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
-      desc: 'Explore o Street View e adivinhe em qual local do Brasil você está. Jogo imersivo com mapa interativo!',
-      dificuldade: 'Médio', tempoMedio: '2 min/rodada'
-    },
+
     {
       id: "'missao_brasil'", title: 'Missão Brasil', category: 'Geografia',
       icon: '<i class="fa-solid fa-earth-americas"></i>',
@@ -222,10 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = 'fronteiras_cronometro.html';
       return;
     }
-    if (id === 'brazilguessr') {
-      window.location.href = 'hub_brazilguessr.html';
-      return;
-    }
+
     if (id === 'missao_brasil') {
       window.location.href = 'missao_brasil.html';
       return;

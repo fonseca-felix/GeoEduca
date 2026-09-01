@@ -3,6 +3,17 @@
    Toast, Modal, Confirm, Sidebar, Reveal
    ============================================= */
 
+// Injeta o Favicon (ícone da aba do navegador) globalmente
+(function() {
+  document.querySelectorAll("link[rel*='icon']").forEach(e => e.remove()); // Remove qualquer ícone antigo
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23cca43b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`;
+  const link = document.createElement('link');
+  link.rel = 'icon';
+  link.type = 'image/svg+xml';
+  link.href = `data:image/svg+xml,${svg}`;
+  document.head.appendChild(link);
+})();
+
 /* ---- Toast ---- */
 const Toast = {
   container: null,

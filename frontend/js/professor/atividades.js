@@ -27,10 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ─── Config por tipo ────────────────────────────────────────
   const TIPO_CONFIG = {
-    video:       { emoji: '🎬', label: 'Vídeo',          badgeClass: 'badge-video',       iconClass: 'type-video' },
-    infografico: { emoji: '🖼️', label: 'Infográfico',    badgeClass: 'badge-infografico', iconClass: 'type-infografico' },
+    video:       { emoji: '<i class="fa-solid fa-film"></i>', label: 'Vídeo',          badgeClass: 'badge-video',       iconClass: 'type-video' },
+    infografico: { emoji: '<i class="fa-solid fa-image"></i>', label: 'Infográfico',    badgeClass: 'badge-infografico', iconClass: 'type-infografico' },
     site:        { emoji: '<i class="fa-solid fa-globe"></i>', label: 'Site',            badgeClass: 'badge-site',        iconClass: 'type-site' },
     tarefa:      { emoji: '<i class="fa-solid fa-file-pen"></i>', label: 'Tarefa',          badgeClass: 'badge-tarefa',      iconClass: 'type-tarefa' }
   };
@@ -92,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filtered.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">📋</div>
+          <div class="empty-icon" style="font-size: 3rem;"><i class="fa-solid fa-clipboard-list"></i></div>
           <h3>Nenhuma atividade encontrada</h3>
           <p>Crie a primeira atividade clicando em "Nova Atividade".</p>
         </div>`;

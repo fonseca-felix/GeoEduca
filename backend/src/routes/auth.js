@@ -5,17 +5,29 @@ const { db } = require('../../firebase/firebase-admin');
 
 const router = express.Router();
 
-// Login de professor
+// Login de professor (busca por nome)
 router.post('/login/professor', async (req, res) => {
     try {
-        const { email, senha } = req.body;
+        const { nome, email, senha } = req.body;
+        const identificador = nome || email;
         
-        if (!email || !senha) {
-            return res.status(400).json({ error: 'Email e senha são obrigatórios' });
+        if (!identificador || !senha) {
+            return res.status(400).json({ error: 'Nome e senha são obrigatórios' });
         }
         
         const professoresRef = db.collection('professores');
-        const snapshot = await professoresRef.where('email', '==', email).limit(1).get();
+        
+        // Tenta buscar por nome primeiro, depois por email
+        let snapshot = await professoresRef.where('nome', '==', identificador).limit(1).get();
+        
+        if (snapshot.empty) {
+            snapshot = await professoresRef.where('email', '==', identificador).limit(1).get();
+        }
+        
+        // Tenta case-insensitive (nome em minúsculo)
+        if (snapshot.empty) {
+            snapshot = await professoresRef.where('nome', '==', identificador.charAt(0).toUpperCase() + identificador.slice(1).toLowerCase()).limit(1).get();
+        }
         
         if (snapshot.empty) {
             return res.status(401).json({ error: 'Credenciais inválidas' });
