@@ -17,7 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
       1: 'Bandeira e Estado', 2: 'Encontre a Capital', 3: 'Quiz de Siglas',
       4: 'Memória dos Biomas', 5: 'Ordenando por Região', 6: 'Hidrografias',
       7: 'Desafio da Posição', 8: 'Caça-Palavras', 9: 'Complete a Capital',
-      10: 'Fronteiras c/ Cronômetro'
+      10: 'Fronteiras c/ Cronômetro',
+      'missao_brasil': 'Missão Brasil',
+      'detetive_brasil': 'Detetive do Brasil',
+      'brazilguessr': 'BrazilGuessr'
     };
 
     let realResults = [];

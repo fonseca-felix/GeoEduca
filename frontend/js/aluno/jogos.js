@@ -80,6 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
       gradient: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
       desc: 'Persiga um criminoso pelo Brasil usando pistas culturais e geográficas!',
       dificuldade: 'Médio', tempoMedio: '10 min'
+    },
+    {
+      id: "'rosa_ventos'", title: 'Desafio da Rosa dos Ventos', category: 'Orientação',
+      icon: '<i class="fa-regular fa-compass"></i>',
+      gradient: 'linear-gradient(135deg, #cca43b 0%, #a3822d 100%)',
+      desc: 'Treine seus reflexos e conhecimento geográfico encontrando as direções na Rosa dos Ventos!',
+      dificuldade: 'Fácil', tempoMedio: '2 min'
     }
   ];
 
@@ -223,6 +230,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (id === 'detetive_brasil') {
       window.location.href = '../detetive-brasil.html';
+      return;
+    }
+    if (id === 'rosa_ventos') {
+      window.location.href = 'jogo_rosa_ventos.html';
       return;
     }
   };

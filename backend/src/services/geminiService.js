@@ -69,6 +69,13 @@ async function _chamarGeminiJson(prompt) {
                 }
 
                 const dados = JSON.parse(texto);
+                
+                // Intercepta recusa de temas não-geográficos
+                if (dados.erro_geografia) {
+                    console.warn(`⚠️ IA Recusou o tema (Não é geografia):`, dados.erro_geografia);
+                    return { sucesso: false, erro: dados.erro_geografia };
+                }
+
                 console.log(`✅ Gemini OK: modelo=${nomeModelo}`);
                 return { sucesso: true, dados };
 
@@ -97,7 +104,12 @@ async function _chamarGeminiJson(prompt) {
 async function gerarConteudoEstudo(tema) {
     const prompt = `
     Atue como a professora Jesiane, especialista em Geografia para o Ensino Fundamental II (11 a 15 anos).
-    Gere um plano de estudos super didático sobre o tema "${tema}".
+    
+    REGRA CRÍTICA DE SEGURANÇA: Você foi programada para responder EXCLUSIVAMENTE sobre Geografia, Ciências da Terra, Geopolítica e Meio Ambiente.
+    Se o tema "${tema}" NÃO tiver relação estrita com Geografia (ex: desenhos animados, filmes, Ben 10, programação, matemática, jogos, etc.), você DEVE ABORTAR a geração e retornar APENAS este JSON exato:
+    { "erro_geografia": "O tema '${tema}' não faz parte da minha especialidade. Por favor, me pergunte algo sobre Geografia, como mapas, relevo ou clima!" }
+    
+    Caso seja Geografia válida, gere um plano de estudos super didático sobre o tema "${tema}".
     O retorno deve ser estritamente em formato JSON, obedecendo a seguinte estrutura:
     {
         "tema": "${tema}",
@@ -115,6 +127,10 @@ async function gerarConteudoEstudo(tema) {
 
 async function gerarFlashcardsService(tema) {
     const prompt = `
+    REGRA CRÍTICA DE SEGURANÇA: Você só responde sobre Geografia, Ciências da Terra, Geopolítica e Meio Ambiente. 
+    Se "${tema}" NÃO for de Geografia (ex: Ben 10, filmes, etc.), retorne APENAS:
+    { "erro_geografia": "Ops! Eu não crio flashcards sobre isso. Tente perguntar sobre um tema de Geografia!" }
+    
     Gere exatamente 12 flashcards de revisão sobre o tema de Geografia: "${tema}".
     Foco em alunos de 11 a 15 anos.
     O retorno deve ser estritamente em formato JSON, obedecendo a seguinte estrutura:
@@ -130,7 +146,11 @@ async function gerarFlashcardsService(tema) {
 
 async function gerarQuizService(tema) {
     const prompt = `
-    Gere exatamente 5 perguntas de múltipla escolha (Quiz) desafiadoras mas adequadas sobre o tema: "${tema}".
+    REGRA CRÍTICA DE SEGURANÇA: Você só pode gerar quizzes de Geografia, Ciências da Terra, Geopolítica e Meio Ambiente.
+    Se "${tema}" NÃO for de Geografia, ABORTE e retorne APENAS o JSON de erro:
+    { "erro_geografia": "Não posso gerar quiz sobre '${tema}'. Escolha um assunto geográfico!" }
+    
+    Gere exatamente 5 perguntas de múltipla escolha (Quiz) desafiadoras mas adequadas sobre o tema de Geografia: "${tema}".
     O retorno deve ser estritamente em formato JSON, obedecendo a seguinte estrutura:
     {
         "quiz": [
@@ -154,7 +174,10 @@ async function gerarQuizService(tema) {
 
 async function gerarMidiaMapasService(tema) {
     const prompt = `
-    Você deve sugerir termos de busca altamente precisos e URLs conceituais para Mapas, Infográficos ou Imagens Reais sobre o tema "${tema}".
+    REGRA CRÍTICA DE SEGURANÇA: Se "${tema}" NÃO for um tema de Geografia, ABORTE e retorne APENAS:
+    { "erro_geografia": "Só consigo sugerir mapas para temas geográficos!" }
+    
+    Você deve sugerir termos de busca altamente precisos e URLs conceituais para Mapas, Infográficos ou Imagens Reais sobre o tema geográfico "${tema}".
     Monte uma estrutura JSON com termos de busca ideais para o Google Imagens e sugestões estáveis (ex: Wikimedia Commons, IBGE).
     Estrutura do JSON:
     {
@@ -174,6 +197,9 @@ async function gerarMidiaMapasService(tema) {
 
 async function gerarVideosYoutubeService(tema) {
     const prompt = `
+    REGRA CRÍTICA DE SEGURANÇA: Se "${tema}" NÃO for um tema de Geografia, ABORTE e retorne APENAS:
+    { "erro_geografia": "Só consigo recomendar vídeos sobre Geografia e Ciências!" }
+    
     Atue como curador de conteúdo educativo de Geografia. Sugira títulos de vídeos e canais recomendados no YouTube para o tema "${tema}".
     Gere links de buscas prontos ou canais consolidados (Ex: Nostalgia Ciência, Manual do Mundo, Khan Academy, GeoBrasil).
     Estrutura do JSON:

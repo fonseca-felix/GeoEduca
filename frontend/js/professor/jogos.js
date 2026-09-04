@@ -20,7 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 10, title: 'Fronteiras c/ Cronômetro', type: 'fronteiras',    icon: '<i class="fa-solid fa-stopwatch"></i>', desc: 'Marque os estados vizinhos antes do tempo acabar.',                   maxPts: 60 },
     { id: 'missao_brasil', title: 'Missão Brasil', type: 'geografia',    icon: '<i class="fa-solid fa-earth-americas"></i>', desc: 'Aprenda bandeiras, capitais e biomas dos 27 estados.',                   maxPts: 100 },
     { id: 'detetive_brasil', title: 'Detetive do Brasil', type: 'geografia',    icon: '<i class="fa-solid fa-user-secret"></i>', desc: 'Persiga um criminoso pelo Brasil usando pistas culturais e geográficas!',                   maxPts: 100 },
-    { id: 'brazilguessr', title: 'BrazilGuessr', type: 'geografia',    icon: '<i class="fa-solid fa-location-dot"></i>', desc: 'Adivinhe o estado com base na imagem do Google Street View.',                   maxPts: 100 }
+    { id: 'brazilguessr', title: 'BrazilGuessr', type: 'geografia',    icon: '<i class="fa-solid fa-location-dot"></i>', desc: 'Adivinhe o estado com base na imagem do Google Street View.',                   maxPts: 100 },
+    { id: 'rosa_ventos', title: 'Desafio da Rosa dos Ventos', type: 'orientacao', icon: '<i class="fa-regular fa-compass"></i>', desc: 'Treine seus reflexos e conhecimento geográfico encontrando as direções na Rosa dos Ventos!', maxPts: 1000 }
   ];
 
   // ---- Estatísticas gerais ----

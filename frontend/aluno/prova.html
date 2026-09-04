@@ -130,9 +130,11 @@
     <h2 class="modal-title" id="exam-taking-title">Prova</h2>
     <div style="color:#64748b;font-size:0.9rem;margin-bottom:1rem;" id="exam-taking-subtitle"></div>
     <div id="exam-taking-body" style="max-height: 60vh; overflow: auto; padding-right: 0.5rem;"></div>
-    <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+    <div style="display:flex; gap:1rem; margin-top:1.5rem;" id="exam-footer">
       <button class="btn-exam outline" style="flex:1;" onclick="closeModal('exam-taking-modal')">Cancelar</button>
-      <button class="btn-exam primary" style="flex:1;" id="btn-submit-prova">Enviar Respostas</button>
+      <button class="btn-exam outline" style="flex:1; display:none;" id="btn-prev-questao">Anterior</button>
+      <button class="btn-exam primary" style="flex:1;" id="btn-next-questao">Próxima</button>
+      <button class="btn-exam primary" style="flex:1; display:none;" id="btn-submit-prova">Enviar Respostas</button>
     </div>
   </div>
 </div>

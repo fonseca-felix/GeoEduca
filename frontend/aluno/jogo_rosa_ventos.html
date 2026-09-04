@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Desafio da Rosa dos Ventos — GeoEduca</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+  <!-- GeoEduca Core CSS -->
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+
+  <style>
+    .game-play-container {
+      width: 100%;
+      padding: 28px 32px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .game-card-body {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+    .game-card-header {
+      background: var(--navy);
+      color: white;
+      padding: 32px;
+      text-align: center;
+      position: relative;
+    }
+    .game-title {
+      font-family: var(--font-display, 'Space Grotesk', sans-serif);
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+    }
+    .game-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+    }
+    .game-content-panel {
+      padding: 32px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .target-direction {
+      font-size: 2.5rem;
+      font-family: var(--font-display);
+      color: var(--gold);
+      margin: 1rem 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .compass-wrapper {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      margin: 0 auto;
+    }
+
+    .compass-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 15px rgba(204, 164, 59, 0.2));
+      transition: transform 0.5s ease;
+    }
+
+    /* SVG Points Styling */
+    .compass-point {
+      cursor: pointer;
+      fill: transparent;
+      transition: all 0.2s;
+    }
+    .compass-point:hover {
+      fill: rgba(204, 164, 59, 0.3);
+    }
+    
+    .compass-center {
+      fill: var(--color-surface);
+      stroke: var(--gold);
+      stroke-width: 2;
+    }
+
+    .compass-star-main { fill: var(--gold); }
+    .compass-star-shadow { fill: #a3822d; }
+    .compass-star-minor { fill: #8b99a6; }
+    .compass-star-minor-shadow { fill: #5b6672; }
+
+    /* Feedback Animations */
+    .feedback-correct { animation: pulseCorrect 0.5s ease; }
+    .feedback-wrong { animation: shakeWrong 0.5s ease; }
+
+    @keyframes pulseCorrect {
+      0% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.5)); }
+      50% { transform: scale(1.05); filter: drop-shadow(0 0 30px rgba(16, 185, 129, 1)); }
+      100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(204, 164, 59, 0.2)); }
+    }
+
+    @keyframes shakeWrong {
+      0% { transform: translateX(0); filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.5)); }
+      25% { transform: translateX(-10px); }
+      50% { transform: translateX(10px); filter: drop-shadow(0 0 30px rgba(239, 68, 68, 1)); }
+      75% { transform: translateX(-10px); }
+      100% { transform: translateX(0); filter: drop-shadow(0 0 15px rgba(204, 164, 59, 0.2)); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout" id="app-layout">
+  <!-- Sidebar injetada via JS -->
+
+  <main class="app-main" style="padding: 0;">
+    <header class="app-header" style="display:flex; align-items:center; justify-content:space-between; padding: 20px 28px 0;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Abrir menu">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div>
+          <div style="font-size:0.65rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--color-text-muted); margin-bottom:1px;">Jogos Geográficos</div>
+          <h1 style="margin:0; font-size:1.2rem; font-weight:800; color:var(--color-text-primary); font-family:var(--font-display);">
+            Desafio da Rosa dos Ventos
+          </h1>
+        </div>
+      </div>
+      <a href="jogos.html" style="display:inline-flex; align-items:center; gap:7px; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--color-text-muted); text-decoration:none; padding:8px 14px; border:1px solid var(--color-border); border-radius:100px; transition:all 0.18s;"
+         onmouseover="this.style.borderColor='var(--navy)'; this.style.color='var(--navy)';"
+         onmouseout="this.style.borderColor='var(--color-border)'; this.style.color='var(--color-text-muted)';">
+        <i class="fa-solid fa-arrow-left"></i> Jogos
+      </a>
+    </header>
+
+    <div class="game-play-container">
+      <div class="game-card-body" id="game-body-card">
+        
+        <!-- HEADER DENTRO DO JOGO -->
+        <div class="game-card-header">
+          <div style="font-size: 2.2rem; color: var(--gold); margin-bottom: 6px;"><i class="fa-regular fa-compass"></i></div>
+          <h2 class="game-title">ROSA DOS VENTOS</h2>
+          <p style="margin:0; opacity:0.75; font-size:0.85rem; font-weight:500;">ENCONTRE A DIREÇÃO CORRETA ANTES DO TEMPO ACABAR</p>
+        </div>
+
+        <!-- PLACAR E PROGRESSO (Oculto na tela inicial) -->
+        <div class="game-meta-bar" id="game-meta-bar" style="display: none;">
+          <span><i class="fa-solid fa-trophy" style="color:var(--gold);"></i> Pontos: <strong id="score-display" style="color:var(--navy)">0</strong></span>
+          <span>Rodada: <strong id="round-display" style="color:var(--color-success)">1/10</strong></span>
+          <span>Tempo: <strong id="timer-display" style="color:var(--gold)">10s</strong></span>
+        </div>
+
+        <!-- ÁREA DE JOGO DINÂMICA -->
+        <div class="game-content-panel" id="play-area">
+          
+          <div id="start-screen">
+            <h2 style="font-family: var(--font-display); font-size: 1.8rem; margin-bottom: 1rem;">Pronto para navegar?</h2>
+            <p style="color: var(--color-text-secondary); max-width: 500px; margin: 0 auto 2rem; line-height: 1.6;">
+              O jogo dirá um ponto cardeal ou colateral e você deve clicar na ponta correta da Rosa dos Ventos o mais rápido possível. 
+              Cuidado para não errar a direção!
+            </p>
+            <button class="btn btn-primary" style="font-size: 1.1rem; padding: 0.8rem 2rem; border-radius: 100px; background: var(--navy); border-color: var(--navy); color: white;" onclick="startGame()">Começar Desafio</button>
+          </div>
+
+          <div id="game-screen" style="display: none; width: 100%;">
+            <div style="font-size: 1.1rem; color: var(--color-text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Encontre a direção:</div>
+            <div class="target-direction" id="target-direction">NORTE (N)</div>
+            
+            <div id="feedback-msg" style="height: 30px; font-weight: 700; font-size: 1.2rem; margin-bottom: 1rem; transition: color 0.3s;"></div>
+
+            <div class="compass-wrapper">
+              <svg class="compass-svg" id="compass-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Outer Circle -->
+                <circle cx="100" cy="100" r="90" fill="none" stroke="var(--color-border)" stroke-width="2" stroke-dasharray="4 4" />
+                <circle cx="100" cy="100" r="85" fill="none" stroke="var(--gold)" stroke-width="1" opacity="0.3" />
+                
+                <!-- Minor Stars (Colaterais: NE, SE, SW, NW) -->
+                <polygon points="100,100 110,90 160,40 120,80" class="compass-star-minor" />
+                <polygon points="100,100 120,80 160,40 130,90" class="compass-star-minor-shadow" />
+                <polygon points="100,100 130,110 160,160 120,120" class="compass-star-minor" />
+                <polygon points="100,100 120,120 160,160 110,130" class="compass-star-minor-shadow" />
+                <polygon points="100,100 90,110 40,160 80,120" class="compass-star-minor" />
+                <polygon points="100,100 80,120 40,160 70,110" class="compass-star-minor-shadow" />
+                <polygon points="100,100 70,90 40,40 80,80" class="compass-star-minor" />
+                <polygon points="100,100 80,80 40,40 90,70" class="compass-star-minor-shadow" />
+
+                <!-- Main Stars (Cardeais: N, E, S, W) -->
+                <polygon points="100,100 90,90 100,10 110,90" class="compass-star-main" />
+                <polygon points="100,100 100,10 110,90" class="compass-star-shadow" />
+                <polygon points="100,100 110,90 190,100 110,110" class="compass-star-main" />
+                <polygon points="100,100 190,100 110,110" class="compass-star-shadow" />
+                <polygon points="100,100 110,110 100,190 90,110" class="compass-star-main" />
+                <polygon points="100,100 100,190 90,110" class="compass-star-shadow" />
+                <polygon points="100,100 90,110 10,100 90,90" class="compass-star-main" />
+                <polygon points="100,100 10,100 90,90" class="compass-star-shadow" />
+
+                <circle cx="100" cy="100" r="10" class="compass-center" />
+
+                <!-- Clickable Areas (Transparent overlays) -->
+                <path d="M70,10 L130,10 L100,70 Z" class="compass-point" onclick="handleDirectionClick('N')" />
+                <path d="M130,10 L190,70 L130,100 Z" class="compass-point" onclick="handleDirectionClick('NE')" />
+                <path d="M190,70 L190,130 L130,100 Z" class="compass-point" onclick="handleDirectionClick('L')" />
+                <path d="M190,130 L130,190 L130,100 Z" class="compass-point" onclick="handleDirectionClick('SE')" />
+                <path d="M130,190 L70,190 L100,130 Z" class="compass-point" onclick="handleDirectionClick('S')" />
+                <path d="M70,190 L10,130 L70,100 Z" class="compass-point" onclick="handleDirectionClick('SO')" />
+                <path d="M10,130 L10,70 L70,100 Z" class="compass-point" onclick="handleDirectionClick('O')" />
+                <path d="M10,70 L70,10 L70,100 Z" class="compass-point" onclick="handleDirectionClick('NO')" />
+              </svg>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/aluno/character.js"></script>
+<script src="../js/darkmode.js"></script>
+
+<script>
+  // Game Logic Localizada
+  const DIRECTIONS = [
+    { id: 'N', label: 'NORTE (N)', hint: 'O Norte fica apontado para o topo!' }, 
+    { id: 'S', label: 'SUL (S)', hint: 'O Sul fica na parte de baixo, oposto ao Norte!' },
+    { id: 'L', label: 'LESTE (L)', hint: 'O Leste fica à direita, é onde o sol nasce!' }, 
+    { id: 'O', label: 'OESTE (O)', hint: 'O Oeste fica à esquerda, onde o sol se põe!' },
+    { id: 'NE', label: 'NORDESTE (NE)', hint: 'O Nordeste fica no meio, entre o Norte e o Leste!' }, 
+    { id: 'NO', label: 'NOROESTE (NO)', hint: 'O Noroeste fica no meio, entre o Norte e o Oeste!' },
+    { id: 'SE', label: 'SUDESTE (SE)', hint: 'O Sudeste fica no meio, entre o Sul e o Leste!' }, 
+    { id: 'SO', label: 'SUDOESTE (SO)', hint: 'O Sudoeste fica no meio, entre o Sul e o Oeste!' }
+  ];
+
+  const TOTAL_ROUNDS = 10;
+  const ROUND_TIME = 10; // seconds
+
+  let currentRound = 0;
+  let score = 0;
+  let currentTarget = null;
+  let timerInterval = null;
+  let timeLeft = 0;
+  let isAnimating = false;
+  
+  // Deck mechanism for no-repeats
+  let deck = [];
+
+  function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+  }
+
+  function formatTime(s) {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+  }
+
+  window.startGame = function() {
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'block';
+    document.getElementById('game-meta-bar').style.display = 'flex';
+    document.getElementById('feedback-msg').textContent = '';
+    
+    currentRound = 0;
+    score = 0;
+    deck = []; // Reset deck
+    updateStats();
+    nextRound();
+  };
+
+  function nextRound() {
+    if (currentRound >= TOTAL_ROUNDS) {
+      endGame();
+      return;
+    }
+    
+    currentRound++;
+    isAnimating = false;
+    document.getElementById('feedback-msg').textContent = ''; // Clear previous feedback
+    
+    if (deck.length === 0) {
+      deck = shuffle([...DIRECTIONS]);
+    }
+    
+    currentTarget = deck.pop();
+    document.getElementById('target-direction').textContent = currentTarget.label;
+    
+    // Mascot Hint
+    if (window.GeoCharacter) {
+      window.GeoCharacter.react('hint', `Ache o ${currentTarget.label}! ${currentTarget.hint}`);
+    }
+
+    startTimer();
+    updateStats();
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timeLeft = ROUND_TIME;
+    updateTimerDisplay();
+    
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        handleDirectionClick(null, true);
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    const display = document.getElementById('timer-display');
+    display.textContent = `${timeLeft}s`;
+    display.style.color = timeLeft <= 3 ? 'var(--color-danger)' : 'var(--gold)';
+  }
+
+  function updateStats() {
+    document.getElementById('round-display').textContent = `${currentRound}/${TOTAL_ROUNDS}`;
+    document.getElementById('score-display').textContent = score;
+  }
+
+  window.handleDirectionClick = function(clickedId, isTimeout = false) {
+    if (isAnimating) return;
+    clearInterval(timerInterval);
+    isAnimating = true;
+    
+    const svg = document.getElementById('compass-svg');
+    const feedbackMsg = document.getElementById('feedback-msg');
+    
+    if (isTimeout || clickedId !== currentTarget.id) {
+      svg.classList.add('feedback-wrong');
+      feedbackMsg.style.color = 'var(--color-danger)';
+      feedbackMsg.innerHTML = isTimeout ? 'Tempo esgotado!' : `Direção Incorreta! O correto era ${currentTarget.label}.`;
+      if (window.GeoCharacter) window.GeoCharacter.react('wrong');
+    } else {
+      svg.classList.add('feedback-correct');
+      let points = 50 + Math.floor((timeLeft / ROUND_TIME) * 50);
+      score += points;
+      feedbackMsg.style.color = 'var(--color-success)';
+      feedbackMsg.innerHTML = `✓ Correto! +${points} pontos`;
+      if (window.GeoCharacter) window.GeoCharacter.react('correct');
+    }
+    
+    updateStats();
+    setTimeout(() => {
+      svg.classList.remove('feedback-wrong');
+      svg.classList.remove('feedback-correct');
+      nextRound();
+    }, 1200); // 1.2s delay for next round so they can read mascot reaction
+  };
+
+  function endGame() {
+    clearInterval(timerInterval);
+    if (window.GeoCharacter) window.GeoCharacter.react('finish', 'Incrível! Terminamos o desafio da bússola!');
+    const playArea = document.getElementById('play-area');
+    const maxPossible = TOTAL_ROUNDS * 100;
+    const pct = Math.min(100, Math.round((score / maxPossible) * 100));
+    
+    let estrelas = '';
+    if (pct >= 85) estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+    else if (pct >= 50) estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+    else estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+
+    document.getElementById('game-meta-bar').style.display = 'none';
+
+    playArea.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:12px 0;">
+        <div style="font-size:2.8rem;display:flex;gap:6px;">${estrelas}</div>
+        <h2 style="color:var(--navy);font-family:var(--font-display);font-size:1.8rem;font-weight:900;margin:0;">Desafio Concluído!</h2>
+        <div style="display:grid;grid-template-columns:1fr;gap:12px;width:100%;max-width:200px;margin-bottom:12px;">
+          <div style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:2rem;font-weight:900;color:var(--color-success)">${score}</div>
+            <div style="font-size:0.65rem;color:var(--color-text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Pontos Totais</div>
+          </div>
+        </div>
+        <a href="jogos.html" class="btn btn-primary" style="padding:12px 32px;border-radius:100px;text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:8px; background: var(--navy); border-color: var(--navy); color: white;">
+          <i class="fa-solid fa-house"></i> Voltar ao Menu
+        </a>
+      </div>
+    `;
+
+    salvarResultado(score, pct);
+  }
+
+  function salvarResultado(pontos, pct) {
+    try {
+      const hist = JSON.parse(localStorage.getItem('geoeduca_results') || '[]');
+      const geoUser = JSON.parse(localStorage.getItem('geoeduca_user') || '{}');
+      const nome = geoUser.name || localStorage.getItem('geoeduca_user_name') || 'Aluno';
+      const sala = geoUser.sala || '';
+      
+      hist.push({
+        gameId: 'rosa_ventos',
+        aluno: nome,
+        sala: sala,
+        pontuacao: pontos,
+        tempo: formatTime(TOTAL_ROUNDS * ROUND_TIME), // Mock time
+        data: new Date().toISOString(),
+        pct: pct
+      });
+      localStorage.setItem('geoeduca_results', JSON.stringify(hist));
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const appLayout = document.getElementById('app-layout');
+    if (appLayout && typeof buildAlunoSidebar === 'function') {
+      appLayout.insertAdjacentHTML('afterbegin', buildAlunoSidebar('../'));
+    }
+    initPage('aluno');
+    
+    // Specific welcome hint for this game
+    setTimeout(() => {
+      if (window.GeoCharacter) {
+        window.GeoCharacter.react('welcome', 'Bem-vindo ao Desafio da Rosa dos Ventos! Cuidado com o cronômetro!');
+      }
+    }, 500);
+  });
+</script>
+
+</body>
+</html>

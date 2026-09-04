@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let provas = [];
   let currentProva = null;
+  let isTakingExam = false;
+  let currentQuestionIndex = 0;
 
   const availableEl = document.getElementById('available-exams');
   const scheduledEl = document.getElementById('scheduled-exams');
@@ -60,12 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!questoes.length) return '<div style="color:#6b7280;">Esta prova não tem questões.</div>';
 
     const html = questoes.map((q, idx) => {
+      const displayStyle = idx === 0 ? 'block' : 'none';
       if (q.tipo === 'alternativa') {
         const options = q.opcoes || [];
         return `
-          <div style="margin-bottom:1.5rem; padding:1rem; border:1px solid var(--border-color, #e2e8f0); border-radius:12px; background:#fff;">
+          <div class="question-step" id="q-step-${idx}" style="display:${displayStyle}; margin-bottom:1.5rem; padding:1rem; border:1px solid var(--border-color, #e2e8f0); border-radius:12px; background:#fff;">
             <div style="font-weight:700; color:#0f172a; margin-bottom:0.75rem;">
-              ${idx + 1}. ${escapeHtml(q.texto)}
+              Questão ${idx + 1} de ${questoes.length}: ${escapeHtml(q.texto)}
             </div>
             <div style="display:flex;flex-direction:column;gap:0.5rem;">
               ${options.map((opt) => `
@@ -81,9 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // descritiva
       return `
-        <div style="margin-bottom:1.5rem; padding:1rem; border:1px solid var(--border-color, #e2e8f0); border-radius:12px; background:#fff;">
+        <div class="question-step" id="q-step-${idx}" style="display:${displayStyle}; margin-bottom:1.5rem; padding:1rem; border:1px solid var(--border-color, #e2e8f0); border-radius:12px; background:#fff;">
           <div style="font-weight:700; color:#0f172a; margin-bottom:0.75rem;">
-            ${idx + 1}. ${escapeHtml(q.texto)}
+            Questão ${idx + 1} de ${questoes.length}: ${escapeHtml(q.texto)}
           </div>
           <textarea id="q-${q.id}" style="width:100%; min-height:120px; padding:0.75rem; border:1px solid #d1d5db; border-radius:10px; font-family:Inter, sans-serif; outline:none; box-sizing:border-box;"></textarea>
         </div>
@@ -97,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = document.getElementById(id);
     if (!el) return;
     el.classList.remove('active');
+    if (id === 'exam-taking-modal') isTakingExam = false;
   };
 
   window.confirmExam = (id) => {
@@ -120,13 +124,69 @@ document.addEventListener('DOMContentLoaded', () => {
       if (subtitle) subtitle.textContent = exam.rubrica ? exam.rubrica : '—';
       document.getElementById('exam-taking-body').innerHTML = buildProvaTakingBody(exam);
 
+      currentQuestionIndex = 0;
+      updatePaginationButtons();
+
       modal.classList.add('active');
+      isTakingExam = true;
     };
 
     document.getElementById('exam-modal').classList.add('active');
   };
 
-  async function submitProva() {
+  document.addEventListener('visibilitychange', () => {
+    if (isTakingExam && document.visibilityState === 'hidden') {
+      isTakingExam = false;
+      Toast.error('Violação!', 'Você mudou de aba. A prova foi encerrada automaticamente.');
+      submitProva(true);
+    }
+  });
+
+  function updatePaginationButtons() {
+    if (!currentProva || !currentProva.questoes) return;
+    const total = currentProva.questoes.length;
+    
+    const btnPrev = document.getElementById('btn-prev-questao');
+    const btnNext = document.getElementById('btn-next-questao');
+    const btnSubmit = document.getElementById('btn-submit-prova');
+
+    if (btnPrev) btnPrev.style.display = currentQuestionIndex > 0 ? 'block' : 'none';
+    
+    if (currentQuestionIndex < total - 1) {
+      if (btnNext) btnNext.style.display = 'block';
+      if (btnSubmit) btnSubmit.style.display = 'none';
+    } else {
+      if (btnNext) btnNext.style.display = 'none';
+      if (btnSubmit) btnSubmit.style.display = 'block';
+    }
+  }
+
+  function changeQuestion(direction) {
+    if (!currentProva || !currentProva.questoes) return;
+    const total = currentProva.questoes.length;
+    
+    const currentStep = document.getElementById(`q-step-${currentQuestionIndex}`);
+    if (currentStep) currentStep.style.display = 'none';
+
+    currentQuestionIndex += direction;
+    if (currentQuestionIndex < 0) currentQuestionIndex = 0;
+    if (currentQuestionIndex >= total) currentQuestionIndex = total - 1;
+
+    const nextStep = document.getElementById(`q-step-${currentQuestionIndex}`);
+    if (nextStep) nextStep.style.display = 'block';
+
+    updatePaginationButtons();
+  }
+
+  const btnPrev = document.getElementById('btn-prev-questao');
+  const btnNext = document.getElementById('btn-next-questao');
+  if (btnPrev) btnPrev.addEventListener('click', () => changeQuestion(-1));
+  if (btnNext) btnNext.addEventListener('click', () => changeQuestion(1));
+
+  async function submitProva(isForced = false) {
+    // Treat as event if called directly from button click
+    if (isForced instanceof Event) isForced = false;
+    
     if (!currentProva) return;
 
     const btn = document.getElementById('btn-submit-prova');
@@ -154,26 +214,30 @@ document.addEventListener('DOMContentLoaded', () => {
         };
       });
 
-      // Validação mínima (objetivas precisam ser respondidas)
-      for (const r of respostas) {
-        const q = questoes.find(x => x.id === r.questaoId);
-        if (q && q.tipo === 'alternativa' && (r.respostaSelecionada === null || r.respostaSelecionada === undefined)) {
-          throw new Error('Responda todas as questões objetivas antes de enviar.');
+      // Validação mínima (objetivas precisam ser respondidas) - Pula validação se for forçado (saída da aba)
+      if (!isForced) {
+        for (const r of respostas) {
+          const q = questoes.find(x => x.id === r.questaoId);
+          if (q && q.tipo === 'alternativa' && (r.respostaSelecionada === null || r.respostaSelecionada === undefined)) {
+            throw new Error('Responda todas as questões objetivas antes de enviar.');
+          }
         }
       }
 
       await api.post(`/provas/${currentProva.id}/responder`, {
         respostas,
-        saidasAba: 0
+        saidasAba: isForced ? 1 : 0
       });
 
-      if (window.Toast) window.Toast.success('Prova enviada com sucesso!');
+      isTakingExam = false;
+      if (!isForced) {
+        Toast.success('Sucesso!', 'Prova enviada com sucesso!');
+      }
       closeModal('exam-taking-modal');
       await loadProvas();
     } catch (err) {
       btn.disabled = false;
-      if (window.Toast) window.Toast.error('Erro ao enviar', err.message || 'Tente novamente.');
-      else alert(err.message || 'Tente novamente.');
+      Toast.error('Erro ao enviar', err.message || 'Tente novamente.');
     }
   }
 

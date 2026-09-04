@@ -396,27 +396,42 @@ document.addEventListener('DOMContentLoaded', () => {
       const r = s.resposta;
       const penalidades = (r.saidasAba || 0) * 0.5;
       
-      // Filtrar apenas respostas a questões discursivas para a professora corrigir
-      const discursivasHtml = r.respostas.filter(resp => resp.tipo === 'descritiva').map(resp => {
+      // Renderizar todas as respostas (objetivas e discursivas)
+      const respostasHtml = r.respostas.map(resp => {
         // Encontrar a questão para saber o valor máximo
         const qData = currentProvaQuestoes.find(q => q.id === resp.questaoId);
         const valorMax = qData ? qData.valor : 10;
-        const textoQ = qData ? qData.texto : 'Questão Discursiva';
-
-        return `
-          <div class="correction-item">
-            <div class="correction-q-text">${textoQ} (Max: ${valorMax} pts)</div>
-            <div class="correction-a-text">${resp.respostaTexto || 'Em branco'}</div>
-            <div class="grading-row">
-              <label style="font-size:0.875rem; font-weight:600;">Nota atribuída:</label>
-              <input type="number" step="0.5" min="0" max="${valorMax}" class="grading-input" 
-                     id="grade-${r.id}-${resp.questaoId}" placeholder="Ex: ${valorMax}" />
+        const textoQ = qData ? qData.texto : 'Questão Desconhecida';
+        
+        if (resp.tipo === 'descritiva') {
+          return `
+            <div class="correction-item">
+              <div class="correction-q-text">${textoQ} (Max: ${valorMax} pts)</div>
+              <div class="correction-a-text">${resp.respostaTexto || 'Em branco'}</div>
+              <div class="grading-row">
+                <label style="font-size:0.875rem; font-weight:600;">Nota atribuída:</label>
+                <input type="number" step="0.5" min="0" max="${valorMax}" class="grading-input" 
+                       id="grade-${r.id}-${resp.questaoId}" placeholder="Ex: ${valorMax}" />
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          // Objetiva (alternativa)
+          const isCorrect = resp.acertou;
+          return `
+            <div class="correction-item" style="border-left: 4px solid ${isCorrect ? 'var(--success)' : 'var(--error)'};">
+              <div class="correction-q-text">${textoQ} (Max: ${valorMax} pts)</div>
+              <div class="correction-a-text" style="color: ${isCorrect ? 'var(--success)' : 'var(--error)'};">
+                <strong>Selecionou:</strong> ${resp.respostaSelecionada || 'Nenhuma'} 
+                ${isCorrect ? '✅ Acertou' : '❌ Errou'}
+              </div>
+            </div>
+          `;
+        }
       }).join('');
 
-      const hasDiscursivas = discursivasHtml.length > 0;
+      const hasRespostas = respostasHtml.length > 0;
+      const hasDiscursivas = r.respostas.some(resp => resp.tipo === 'descritiva');
       
       // Se já estiver corrigida, mostrar a nota final. Se não, mostrar botão de salvar.
       const statusBadge = r.status === 'corrigida' 
@@ -435,16 +450,16 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           
           <div class="student-body">
-            ${hasDiscursivas ? discursivasHtml : '<div style="color:#6b7280; font-size:0.875rem; margin-bottom:1rem;">Nenhuma questão discursiva para corrigir.</div>'}
+            ${hasRespostas ? respostasHtml : '<div style="color:#6b7280; font-size:0.875rem; margin-bottom:1rem;">Nenhuma resposta registrada.</div>'}
             
             ${r.status !== 'corrigida' ? `
               <div class="final-grade-box">
                 <div>
-                  <strong>Correção Manual:</strong> Some as notas das questões acima e insira o total manual aqui.
+                  <strong>Correção Manual:</strong> ${hasDiscursivas ? 'Some as notas das discursivas e insira o total manual aqui (a nota final somará com a automática).' : 'A prova é apenas objetiva. Clique em Finalizar Correção para confirmar a nota automática.'}
                 </div>
                 <div style="display:flex; gap:0.5rem;">
-                  <input type="number" step="0.5" min="0" id="manualTotal-${r.id}" class="form-control" style="width:100px;" placeholder="Total pts" />
-                  <button class="btn btn-primary" onclick="submitGrade('${r.id}')">Salvar Nota</button>
+                  ${hasDiscursivas ? `<input type="number" step="0.5" min="0" id="manualTotal-${r.id}" class="form-control" style="width:100px;" placeholder="Total pts" />` : `<input type="hidden" id="manualTotal-${r.id}" value="0" />`}
+                  <button class="btn btn-primary" onclick="submitGrade('${r.id}')">${hasDiscursivas ? 'Salvar Nota' : 'Finalizar Correção'}</button>
                 </div>
               </div>
             ` : ''}
