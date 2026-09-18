@@ -71,10 +71,17 @@
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           <input type="text" id="searchInput" placeholder="Buscar aluno por nome ou matrícula..." />
         </div>
-        <select id="filterRoom" class="filter-select">
-          <option value="">Todas as Salas</option>
-          <!-- Injected via JS -->
-        </select>
+        <div class="custom-select-wrapper" id="custom-select-wrapper" style="min-width: 250px;">
+            <div class="custom-select form-control" id="custom-select-display" tabindex="0">
+                <span id="custom-select-text">Todas as Salas</span>
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="custom-select-options" id="custom-select-options">
+                <div class="custom-option selected" data-value="">Todas as Salas</div>
+                <!-- Injected via JS -->
+            </div>
+        </div>
+        <input type="hidden" id="filterRoom" value="" />
       </div>
 
       <div class="table-container">

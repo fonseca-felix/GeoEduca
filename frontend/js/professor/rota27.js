@@ -5,13 +5,13 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Injeta o HTML do sidebar no layout ANTES de qualquer init
     const appLayout = document.getElementById('app-layout');
-    if (appLayout && typeof buildAlunoSidebar === 'function') {
-        appLayout.insertAdjacentHTML('afterbegin', buildAlunoSidebar('../'));
+    if (appLayout && typeof buildProfessorSidebar === 'function') {
+        appLayout.insertAdjacentHTML('afterbegin', buildProfessorSidebar('../'));
     }
 
     // 2. Inicializa página (checa auth, popula user, inicia Theme/Sidebar/Reveal)
     if (typeof initPage === 'function') {
-        initPage('aluno');
+        initPage('prof');
     } else {
         // Fallback manual caso ui.js não carregue
         const user = Auth && Auth.getUser ? Auth.getUser() : null;

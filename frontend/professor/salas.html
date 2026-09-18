@@ -109,6 +109,38 @@
   </div>
 </div>
 
+<!-- Modal Editar Sala -->
+<div id="editRoomModal" class="modal-overlay">
+  <div class="modal-content">
+    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Space Grotesk', sans-serif;">Editar Sala</h2>
+    <p style="color: var(--text-muted, #6b7280); font-size: 0.875rem; margin-bottom: 1.5rem;">Atualize as informações da turma.</p>
+    
+    <form id="editRoomForm">
+      <input type="hidden" id="editRoomId" />
+      <div class="form-group">
+        <label class="form-label">Nome da Sala *</label>
+        <input type="text" id="editRoomName" class="form-control" required placeholder="Ex: 6º Ano A" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Série *</label>
+        <input type="text" id="editRoomSerie" class="form-control" required placeholder="Ex: 6º Ano" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Turma *</label>
+        <input type="text" id="editRoomTurma" class="form-control" required placeholder="Ex: A" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assunto Principal</label>
+        <input type="text" id="editRoomSubject" class="form-control" placeholder="Ex: Cartografia, Relevo, etc." />
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+        <button type="button" class="btn btn-outline" onclick="Modal.close('editRoomModal')">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="updateRoomBtn">Salvar Alterações</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="../js/api.js"></script>
 <script src="../js/auth.js"></script>
 <script src="../js/theme.js"></script>

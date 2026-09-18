@@ -61,9 +61,40 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function populateSalasSelects() {
-    if (filterRoom) {
-      filterRoom.innerHTML = '<option value="">Todas as Salas</option>' + 
-        salasData.map(s => `<option value="${s.id}">${s.nome}</option>`).join('');
+    const customOptions = document.getElementById('custom-select-options');
+    const filterRoomInput = document.getElementById('filterRoom'); // now it's a hidden input
+    if (customOptions) {
+      customOptions.innerHTML = '<div class="custom-option selected" data-value="">Todas as Salas</div>' + 
+        salasData.map(s => `<div class="custom-option" data-value="${s.id}">${s.nome}</div>`).join('');
+        
+      const wrapper = document.getElementById('custom-select-wrapper');
+      const display = document.getElementById('custom-select-display');
+      const displayText = document.getElementById('custom-select-text');
+
+      // Cleanup old listeners if any
+      const newDisplay = display.cloneNode(true);
+      display.parentNode.replaceChild(newDisplay, display);
+      
+      newDisplay.addEventListener('click', () => {
+        wrapper.classList.toggle('open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) wrapper.classList.remove('open');
+      });
+
+      customOptions.querySelectorAll('.custom-option').forEach(opt => {
+        opt.addEventListener('click', function() {
+          customOptions.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+          this.classList.add('selected');
+          
+          filterRoomInput.value = this.dataset.value;
+          displayText.textContent = this.textContent;
+          wrapper.classList.remove('open');
+          
+          renderTable();
+        });
+      });
     }
     
     const studentRoom = document.getElementById('studentRoom');

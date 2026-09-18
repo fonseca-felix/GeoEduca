@@ -91,8 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
     roomsContainer.innerHTML = filtered.map(s => `
       <div class="room-card">
         <div class="room-header" style="background: ${s.cor};">
-          <div style="position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); padding: 0.25rem; border-radius: 8px; backdrop-filter: blur(4px);">
-            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+          <div style="position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); padding: 0.25rem; border-radius: 8px; backdrop-filter: blur(4px); cursor: pointer; transition: background 0.2s;" class="edit-room-btn" onclick="window.openEditRoom('${s.id}')" title="Editar Sala">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
           </div>
           <h3 class="room-title">${s.nome}</h3>
           <p class="room-subtitle">${s.assunto}</p>
@@ -180,6 +180,64 @@ document.addEventListener('DOMContentLoaded', () => {
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = 'Criar Sala';
+      }
+    });
+  }
+
+  window.openEditRoom = function(id) {
+    const sala = salas.find(s => s.id === id);
+    if (!sala) return;
+    
+    document.getElementById('editRoomId').value = sala.id;
+    document.getElementById('editRoomName').value = sala.nome;
+    
+    // Attempt to extract serie and turma from name if not stored separately
+    // The API returns the raw object, but in JS we mapped it differently.
+    // Wait, we mapped it in loadSalas but didn't keep serie/turma. We need to fetch it or guess it.
+    // It's better to fetch the exact sala data from API.
+    
+    api.get(`/salas/${id}`).then(fullSala => {
+      document.getElementById('editRoomSerie').value = fullSala.serie || '';
+      document.getElementById('editRoomTurma').value = fullSala.turma || '';
+      document.getElementById('editRoomSubject').value = fullSala.assunto || '';
+      Modal.open('editRoomModal');
+    }).catch(err => {
+      console.error(err);
+      Toast.error('Erro ao buscar sala', 'Não foi possível carregar os dados.');
+    });
+  };
+
+  const editRoomForm = document.getElementById('editRoomForm');
+  if (editRoomForm) {
+    editRoomForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('editRoomId').value;
+      const nome = document.getElementById('editRoomName').value.trim();
+      const serie = document.getElementById('editRoomSerie').value.trim();
+      const turma = document.getElementById('editRoomTurma').value.trim();
+      const assunto = document.getElementById('editRoomSubject').value.trim();
+      
+      if (!nome || !serie || !turma) {
+        Toast.error('Campos obrigatórios', 'Preencha Nome, Série e Turma.');
+        return;
+      }
+      
+      const updateBtn = document.getElementById('updateRoomBtn');
+      updateBtn.disabled = true;
+      updateBtn.textContent = 'Salvando...';
+      
+      try {
+        await api.put(`/salas/${id}`, { nome, serie, turma, assunto });
+        Modal.close('editRoomModal');
+        await loadSalas();
+        Toast.success('Sala atualizada!', `"${nome}" modificada com sucesso.`);
+      } catch (err) {
+        console.error(err);
+        Toast.error('Erro ao atualizar', err.message || 'Verifique o servidor.');
+      } finally {
+        updateBtn.disabled = false;
+        updateBtn.textContent = 'Salvar Alterações';
       }
     });
   }

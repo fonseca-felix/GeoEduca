@@ -56,15 +56,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function setupCustomSelect(wrapperId, inputId) {
+    const wrapper = document.getElementById(wrapperId);
+    if (!wrapper) return;
+    const display = wrapper.querySelector('.custom-select');
+    const displayText = wrapper.querySelector('span');
+    const optionsContainer = wrapper.querySelector('.custom-select-options');
+    const hiddenInput = document.getElementById(inputId);
+
+    // Remove old event listeners
+    const newDisplay = display.cloneNode(true);
+    display.parentNode.replaceChild(newDisplay, display);
+
+    newDisplay.addEventListener('click', () => {
+      wrapper.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!wrapper.contains(e.target)) wrapper.classList.remove('open');
+    });
+
+    optionsContainer.querySelectorAll('.custom-option').forEach(opt => {
+      opt.addEventListener('click', function() {
+        optionsContainer.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        hiddenInput.value = this.dataset.value;
+        displayText.textContent = this.textContent;
+        wrapper.classList.remove('open');
+        
+        renderAtividades();
+      });
+    });
+  }
+
   function populateSalaSelects() {
-    // Filtro
-    const filterSala = document.getElementById('filterSala');
-    if (filterSala) {
-      filterSala.innerHTML =
-        '<option value="">Todas as Salas</option>' +
-        salas.map(s => `<option value="${s.id}">${s.nome}</option>`).join('');
+    // Filtro Sala
+    const customOptionsSala = document.getElementById('custom-select-sala-options');
+    if (customOptionsSala) {
+      customOptionsSala.innerHTML =
+        '<div class="custom-option selected" data-value="">Todas as Salas</div>' +
+        salas.map(s => `<div class="custom-option" data-value="${s.id}">${s.nome}</div>`).join('');
+      setupCustomSelect('custom-select-sala', 'filterSala');
     }
-    // Modal select
+
+    // Setup Filtro Tipo (options are static in HTML)
+    setupCustomSelect('custom-select-tipo', 'filterTipo');
+
+    // Modal select (keep as native for simplicity inside forms)
     const actSala = document.getElementById('actSala');
     if (actSala) {
       actSala.innerHTML =

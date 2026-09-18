@@ -3,6 +3,99 @@
    Buttons, Cards, Inputs, Tables, Modals, etc.
    ============================================= */
 
+/* Unificação dos filtros e barras de pesquisa (Estilo Professora) */
+.search-bar .search-input-wrapper input,
+.search-bar .filter-select,
+.filters-bar .form-control,
+.filter-bar .search-wrap input,
+.filter-bar .filter-select {
+    border-radius: 999px !important;
+    border: 2px solid #cca43b !important;
+    padding: 10px 20px !important;
+    outline: none !important;
+    background-color: var(--color-surface) !important;
+    color: var(--color-text-primary) !important;
+    transition: all 0.2s ease-in-out !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.search-bar .search-input-wrapper input:focus,
+.search-bar .filter-select:focus,
+.filters-bar .form-control:focus,
+.filter-bar .search-wrap input:focus,
+.filter-bar .filter-select:focus,
+.custom-select-wrapper.open .custom-select {
+    box-shadow: 0 0 0 4px rgba(204, 164, 59, 0.25) !important;
+    border-color: #cca43b !important;
+}
+
+.search-bar .search-input-wrapper svg,
+.filter-bar .search-wrap svg {
+    left: 1.25rem !important;
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: var(--color-text-muted) !important;
+}
+.search-bar .search-input-wrapper input,
+.filter-bar .search-wrap input {
+    padding-left: 3rem !important;
+}
+
+/* Custom Select (Dropdowns Estilo Professora) */
+.custom-select-wrapper {
+    position: relative;
+    min-width: 200px;
+    user-select: none;
+}
+.custom-select {
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer;
+}
+.custom-select-options {
+    position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-height: 280px; overflow-y: auto;
+    opacity: 0; visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 6px;
+}
+.custom-select-wrapper.open .custom-select-options {
+    opacity: 1; visibility: visible; transform: translateY(0);
+}
+.custom-option {
+    padding: 10px 16px;
+    font-size: 14px;
+    color: var(--color-text-primary, #374151);
+    cursor: pointer;
+    border-radius: 10px;
+    transition: 0.2s;
+    margin-bottom: 2px;
+}
+.custom-option:last-child { margin-bottom: 0; }
+.custom-option:hover {
+    background: #cca43b;
+    color: white;
+}
+.custom-option.selected {
+    background: rgba(204, 164, 59, 0.1);
+    color: #cca43b;
+    font-weight: 600;
+}
+.custom-option.selected:hover {
+    background: #cca43b;
+    color: white;
+}
+
+
+
 /* ============ Buttons ============ */
 .btn {
   display: inline-flex;

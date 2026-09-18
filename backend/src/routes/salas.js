@@ -92,7 +92,7 @@ router.post('/', authenticateToken, requireProfessor, async (req, res) => {
 router.put('/:id', authenticateToken, requireProfessor, async (req, res) => {
     try {
         const { id } = req.params;
-        const { nome, serie, turma } = req.body;
+        const { nome, serie, turma, assunto } = req.body;
         
         const salaRef = db.collection('salas').doc(id);
         const sala = await salaRef.get();
@@ -102,9 +102,10 @@ router.put('/:id', authenticateToken, requireProfessor, async (req, res) => {
         }
         
         const updates = {};
-        if (nome) updates.nome = nome;
-        if (serie) updates.serie = serie;
-        if (turma) updates.turma = turma;
+        if (nome !== undefined) updates.nome = nome;
+        if (serie !== undefined) updates.serie = serie;
+        if (turma !== undefined) updates.turma = turma;
+        if (assunto !== undefined) updates.assunto = assunto;
         
         await salaRef.update(updates);
         

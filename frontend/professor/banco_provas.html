@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca - Provas Físicas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <!-- PDFMake CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    .exams-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .exam-card {
+      background: var(--color-surface, #fff);
+      border: 1px solid var(--color-border, #e5e7eb);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .exam-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      border-color: var(--gold);
+    }
+    .exam-body {
+      padding: 1.25rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .exam-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--color-text-primary, #111827);
+    }
+    .exam-stats {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary, #6b7280);
+      margin-top: auto;
+    }
+    .exam-footer {
+      border-top: 1px solid var(--color-border, #f3f4f6);
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      align-items: center;
+      background: var(--color-surface-2, #f9fafb);
+    }
+
+    /* Modais */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(17,24,39,0.6);
+      backdrop-filter: blur(4px); align-items: center; justify-content: center;
+      z-index: 100; opacity: 0; transition: opacity 0.3s; padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; opacity: 1; }
+    .modal-content {
+      background: var(--color-surface, #fff); border-radius: 16px;
+      width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+      transform: translateY(20px); transition: transform 0.3s;
+    }
+    .modal-overlay.open .modal-content { transform: translateY(0); }
+    .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--color-border, #f3f4f6); display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; }
+    .modal-body { padding: 1.5rem; }
+    .modal-footer { padding: 1.5rem; border-top: 1px solid var(--color-border, #f3f4f6); display: flex; justify-content: flex-end; gap: 1rem; }
+    .btn-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-text-secondary); }
+    .btn-close:hover { color: var(--color-text-primary); }
+
+    /* Formulários */
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--color-text-primary); }
+    .form-control { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--color-border); border-radius: 8px; font-family: 'Inter', sans-serif; outline: none; box-sizing: border-box; background: var(--color-surface); color: var(--color-text-primary); }
+    .form-control:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(204,164,59,0.1); }
+    
+    /* Dropdown customizado */
+    .custom-select-wrapper { position: relative; user-select: none; width: 100%; }
+    .custom-select {
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer;
+    }
+    .custom-select-options {
+      position: absolute; top: calc(100% + 5px); left: 0; right: 0;
+      background: var(--color-surface, #fff); border: 1px solid var(--color-border, #e5e7eb);
+      border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      z-index: 50; display: none; max-height: 200px; overflow-y: auto;
+    }
+    .custom-select-options.open { display: block; }
+    .custom-option {
+      padding: 0.75rem 1rem; cursor: pointer; transition: background 0.2s; font-size: 0.875rem; color: var(--color-text-primary);
+    }
+    .custom-option:hover { background: var(--color-surface-2, #f9fafb); color: var(--gold); }
+    .custom-option.selected { font-weight: 600; color: var(--gold); background: var(--color-surface-2, #f9fafb); }
+  </style>
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+  <main class="app-main">
+    <header class="page-header">
+      <div class="page-header-left">
+        <h1 class="page-title">Provas Físicas com IA</h1>
+        <p class="page-subtitle">Gere e gerencie provas de Geografia prontas para impressão em PDF.</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" onclick="openGerarModal()">
+          <i class="fa-solid fa-wand-magic-sparkles" style="margin-right: 8px;"></i>
+          Gerar Nova Prova
+        </button>
+      </div>
+    </header>
+    
+    <div class="page-content">
+      <div id="loadingProvas" style="text-align:center; padding: 2rem; color: var(--color-text-secondary);">Carregando banco de provas...</div>
+      <div class="exams-grid" id="provas-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Gerar Prova -->
+<div class="modal-overlay" id="modalGerar">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Gerar Prova com IA</h2>
+      <button class="btn-close" onclick="closeModal('modalGerar')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 1.5rem;">A inteligência artificial elaborará uma prova de geografia baseada no seu tema.</p>
+      
+      <div class="form-group">
+        <label class="form-label">Tema(s) da Prova</label>
+        <textarea id="inputTema" class="form-control" rows="3" placeholder="Ex: Clima e Relevo Brasileiro, Domínios Morfoclimáticos, Bacias Hidrográficas..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nível / Ano da Turma</label>
+        <div class="custom-select-wrapper" id="custom-select-nivel">
+            <div class="custom-select form-control" id="custom-select-nivel-display" tabindex="0" onclick="window.toggleNivelDropdown()">
+                <span id="custom-select-nivel-text">6º Ano do Ensino Fundamental</span>
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="custom-select-options" id="custom-select-nivel-options">
+                <div class="custom-option selected" onclick="window.selectNivelOption(this, '6º Ano do Ensino Fundamental')">6º Ano do Ensino Fundamental</div>
+                <div class="custom-option" onclick="window.selectNivelOption(this, '7º Ano do Ensino Fundamental')">7º Ano do Ensino Fundamental</div>
+                <div class="custom-option" onclick="window.selectNivelOption(this, '8º Ano do Ensino Fundamental')">8º Ano do Ensino Fundamental</div>
+                <div class="custom-option" onclick="window.selectNivelOption(this, '9º Ano do Ensino Fundamental')">9º Ano do Ensino Fundamental</div>
+                <div class="custom-option" onclick="window.selectNivelOption(this, '1º Ano do Ensino Médio')">1º Ano do Ensino Médio</div>
+                <div class="custom-option" onclick="window.selectNivelOption(this, '2º Ano do Ensino Médio')">2º Ano do Ensino Médio</div>
+                <div class="custom-option" onclick="window.selectNivelOption(this, '3º Ano do Ensino Médio')">3º Ano do Ensino Médio</div>
+            </div>
+        </div>
+        <input type="hidden" id="inputNivel" value="6º Ano do Ensino Fundamental" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Quantidade de Questões</label>
+        <input type="number" id="inputQtd" class="form-control" value="5" min="1" max="50" />
+      </div>
+
+      <div id="gerarLoading" style="display:none; text-align: center; padding: 1rem; color: var(--color-text-secondary);">
+        <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="color: var(--gold); margin-bottom: 10px;"></i>
+        <p>A IA está elaborando sua prova...<br>Isso pode levar alguns segundos.</p>
+      </div>
+    </div>
+    <div class="modal-footer" id="gerarFooter">
+      <button class="btn btn-secondary" onclick="closeModal('modalGerar')">Cancelar</button>
+      <button class="btn btn-primary" onclick="gerarProva()">Gerar Prova</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js?v=2"></script>
+<script src="../js/auth.js?v=2"></script>
+<script src="../js/theme.js?v=2"></script>
+<script src="../js/ui.js?v=2"></script>
+<script src="../js/sidebar.js?v=2"></script>
+<script src="../js/professor/banco_provas.js?v=2"></script>
+</body>
+</html>
