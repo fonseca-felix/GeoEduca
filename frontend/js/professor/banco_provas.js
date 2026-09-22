@@ -3,41 +3,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const user = initPage('prof');
     if (!user) return;
     loadProvas();
-
-    // Fechar dropdown ao clicar fora
-    document.addEventListener('click', (e) => {
-        const nivelWrapper = document.getElementById('custom-select-nivel');
-        const nivelOptions = document.getElementById('custom-select-nivel-options');
-        if (nivelWrapper && nivelOptions && !nivelWrapper.contains(e.target)) {
-            nivelOptions.style.display = 'none';
-        }
-    });
+    setupCustomSelect();
 });
 
-window.toggleNivelDropdown = function() {
-    const e = window.event;
-    if(e) e.stopPropagation();
-    const opts = document.getElementById('custom-select-nivel-options');
-    if(opts) {
-        opts.style.display = (opts.style.display === 'block') ? 'none' : 'block';
-    }
-};
+function setupCustomSelect() {
+    const wrapper = document.getElementById('custom-select-nivel');
+    if (!wrapper) return;
+    const display = document.getElementById('custom-select-nivel-display');
+    const optionsContainer = document.getElementById('custom-select-nivel-options');
+    const hiddenInput = document.getElementById('inputNivel');
+    const displayText = document.getElementById('custom-select-nivel-text');
 
-window.selectNivelOption = function(element, value) {
-    const opts = document.getElementById('custom-select-nivel-options');
-    const text = document.getElementById('custom-select-nivel-text');
-    const input = document.getElementById('inputNivel');
-    
-    // Remove class from all
-    opts.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
-    // Add to clicked
-    element.classList.add('selected');
-    
-    // Update value
-    text.textContent = element.textContent;
-    input.value = value;
-    opts.style.display = 'none';
-};
+    // Remove old event listeners by cloning
+    const newDisplay = display.cloneNode(true);
+    display.parentNode.replaceChild(newDisplay, display);
+
+    newDisplay.addEventListener('click', () => {
+      wrapper.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!wrapper.contains(e.target)) wrapper.classList.remove('open');
+    });
+
+    optionsContainer.querySelectorAll('.custom-option').forEach(opt => {
+      opt.addEventListener('click', function() {
+        optionsContainer.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        hiddenInput.value = this.dataset.value;
+        displayText.textContent = this.textContent;
+        wrapper.classList.remove('open');
+      });
+    });
+}
 
 let provasData = [];
 

@@ -105,7 +105,7 @@
       border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       z-index: 50; display: none; max-height: 200px; overflow-y: auto;
     }
-    .custom-select-options.open { display: block; }
+    .custom-select-wrapper.open .custom-select-options { display: block; }
     .custom-option {
       padding: 0.75rem 1rem; cursor: pointer; transition: background 0.2s; font-size: 0.875rem; color: var(--color-text-primary);
     }
@@ -156,18 +156,18 @@
       <div class="form-group">
         <label class="form-label">Nível / Ano da Turma</label>
         <div class="custom-select-wrapper" id="custom-select-nivel">
-            <div class="custom-select form-control" id="custom-select-nivel-display" tabindex="0" onclick="window.toggleNivelDropdown()">
+            <div class="custom-select form-control" id="custom-select-nivel-display" tabindex="0">
                 <span id="custom-select-nivel-text">6º Ano do Ensino Fundamental</span>
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </div>
             <div class="custom-select-options" id="custom-select-nivel-options">
-                <div class="custom-option selected" onclick="window.selectNivelOption(this, '6º Ano do Ensino Fundamental')">6º Ano do Ensino Fundamental</div>
-                <div class="custom-option" onclick="window.selectNivelOption(this, '7º Ano do Ensino Fundamental')">7º Ano do Ensino Fundamental</div>
-                <div class="custom-option" onclick="window.selectNivelOption(this, '8º Ano do Ensino Fundamental')">8º Ano do Ensino Fundamental</div>
-                <div class="custom-option" onclick="window.selectNivelOption(this, '9º Ano do Ensino Fundamental')">9º Ano do Ensino Fundamental</div>
-                <div class="custom-option" onclick="window.selectNivelOption(this, '1º Ano do Ensino Médio')">1º Ano do Ensino Médio</div>
-                <div class="custom-option" onclick="window.selectNivelOption(this, '2º Ano do Ensino Médio')">2º Ano do Ensino Médio</div>
-                <div class="custom-option" onclick="window.selectNivelOption(this, '3º Ano do Ensino Médio')">3º Ano do Ensino Médio</div>
+                <div class="custom-option selected" data-value="6º Ano do Ensino Fundamental">6º Ano do Ensino Fundamental</div>
+                <div class="custom-option" data-value="7º Ano do Ensino Fundamental">7º Ano do Ensino Fundamental</div>
+                <div class="custom-option" data-value="8º Ano do Ensino Fundamental">8º Ano do Ensino Fundamental</div>
+                <div class="custom-option" data-value="9º Ano do Ensino Fundamental">9º Ano do Ensino Fundamental</div>
+                <div class="custom-option" data-value="1º Ano do Ensino Médio">1º Ano do Ensino Médio</div>
+                <div class="custom-option" data-value="2º Ano do Ensino Médio">2º Ano do Ensino Médio</div>
+                <div class="custom-option" data-value="3º Ano do Ensino Médio">3º Ano do Ensino Médio</div>
             </div>
         </div>
         <input type="hidden" id="inputNivel" value="6º Ano do Ensino Fundamental" />
