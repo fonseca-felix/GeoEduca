@@ -165,65 +165,129 @@ function baixarPdf(provaId) {
     const prova = provasData.find(p => p.id === provaId);
     if (!prova) return Toast.error('Erro', 'Prova não encontrada localmente.');
 
-    // Construir o docDefinition para o pdfmake
     const content = [];
 
-    // CABEÇALHO
-    content.push({ text: 'COLÉGIO GEOEDUCA', style: 'header', alignment: 'center' });
-    content.push({ text: 'Avaliação de Geografia', style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] });
-    
-    // CAMPOS DE ALUNO
+    // CABEÇALHO INSTITUCIONAL
+    content.push({ text: 'GEOEDUCA - REDE DE ENSINO', style: 'schoolName', margin: [0, 0, 0, 10] });
+
+    // DADOS DO ALUNO E DISCIPLINA
     content.push({
-        columns: [
-            { text: 'Aluno(a): _________________________________________________', width: '*' },
-            { text: 'Turma: _________', width: 100 }
-        ],
+        table: {
+            widths: ['*', 60],
+            body: [
+                [
+                    { text: 'Nome: ____________________________________________________________________', border: [false, false, false, false], margin: [0, 0, 0, 5] },
+                    { text: 'Nº: ______', alignment: 'right', border: [false, false, false, false], margin: [0, 0, 0, 5] }
+                ]
+            ]
+        },
+        margin: [0, 0, 0, 0]
+    });
+
+    content.push({
+        table: {
+            widths: ['*', '*', '*'],
+            body: [
+                [
+                    { text: `Ano/Turma: ${prova.nivel || '___________________'}`, border: [false, false, false, false], margin: [0, 0, 0, 5] },
+                    { text: 'Componente Curricular: GEOGRAFIA', border: [false, false, false, false], alignment: 'center', bold: true, margin: [0, 0, 0, 5] },
+                    { text: 'Bimestre: _________', border: [false, false, false, false], alignment: 'right', margin: [0, 0, 0, 5] }
+                ],
+                [
+                    { text: 'Professor(a): ___________________', border: [false, false, false, false] },
+                    { text: 'Data: ___/___/20__', border: [false, false, false, false], alignment: 'center' },
+                    { text: 'Nota: _________', border: [false, false, false, false], alignment: 'right' }
+                ]
+            ]
+        },
         margin: [0, 0, 0, 10]
     });
+
+    // TÍTULO DA PROVA
     content.push({
-        columns: [
-            { text: 'Data: ___/___/20__', width: 150 },
-            { text: 'Professor(a): ________________________', width: '*' },
-            { text: 'Nota: _______', width: 100 }
-        ],
-        margin: [0, 0, 0, 20]
+        text: 'ATIVIDADE AVALIATIVA DE GEOGRAFIA',
+        style: 'examTitle',
+        alignment: 'center',
+        margin: [0, 10, 0, 10]
     });
 
-    // TÍTULO DA PROVA E DESCRIÇÃO
-    content.push({ text: prova.titulo.toUpperCase(), style: 'examTitle', margin: [0, 10, 0, 5] });
-    content.push({ text: prova.descricao, italics: true, margin: [0, 0, 0, 20], color: '#4b5563' });
+    // TABELA DE CRITÉRIOS DE AVALIAÇÃO
+    content.push({
+        table: {
+            headerRows: 1,
+            widths: ['*', 'auto', 20, 20, 20],
+            body: [
+                [
+                    { text: 'O QUE SERÁ AVALIADO?\nHABILIDADES / CRITÉRIOS DE AVALIAÇÃO', style: 'tableHeader', fillColor: '#f3f4f6' },
+                    { text: 'QUESTÕES', style: 'tableHeader', alignment: 'center', fillColor: '#f3f4f6' },
+                    { text: 'AT', style: 'tableHeader', alignment: 'center', fillColor: '#f3f4f6' },
+                    { text: 'AP', style: 'tableHeader', alignment: 'center', fillColor: '#f3f4f6' },
+                    { text: 'NA', style: 'tableHeader', alignment: 'center', fillColor: '#f3f4f6' }
+                ],
+                [
+                    { text: `Compreender e analisar os principais conceitos e processos geográficos relacionados a: ${prova.tema}`, fontSize: 10, margin: [0, 5, 0, 5] },
+                    { text: `01 a ${String(prova.questoes.length).padStart(2, '0')}`, alignment: 'center', fontSize: 10, margin: [0, 5, 0, 5] },
+                    { text: '' }, { text: '' }, { text: '' }
+                ]
+            ]
+        },
+        margin: [0, 5, 0, 10]
+    });
+
+    // ASSINATURA E REGRAS
+    content.push({ text: 'ASSINATURA DA FAMÍLIA/RESPONSÁVEL: __________________________________________________________', bold: true, fontSize: 10, margin: [0, 15, 0, 10] });
+    
+    content.push({
+        text: [
+            { text: 'Critério de correção:\n', bold: true },
+            'A avaliação valerá até 10 pontos || utilizar caneta azul ou preta || não é permitido o uso de corretivos, evitar rasuras.'
+        ],
+        fontSize: 9,
+        color: '#444444',
+        margin: [0, 0, 0, 15]
+    });
+
+    // LINHA SEPARADORA
+    content.push({ canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1, lineColor: '#000000' }], margin: [0, 0, 0, 20] });
 
     // QUESTÕES
+    const ptsPorQuestao = (10 / prova.questoes.length).toFixed(1).replace('.', ',');
     prova.questoes.forEach((q, index) => {
-        const num = index + 1;
+        const num = String(index + 1).padStart(2, '0');
+        
         content.push({
-            text: `${num}) ${q.enunciado}`,
+            text: [
+                { text: `QUESTÃO ${num} – Vale ${ptsPorQuestao}`, style: 'questionHeader' }
+            ],
+            margin: [0, 0, 0, 5]
+        });
+
+        content.push({
+            text: q.enunciado,
             style: 'questionText'
         });
 
-        // Alternativas
-        const letters = ['A', 'B', 'C', 'D'];
+        const letters = ['A', 'B', 'C', 'D', 'E'];
         letters.forEach(letra => {
-            if (q.alternativas[letra]) {
+            if (q.alternativas && q.alternativas[letra]) {
                 content.push({
-                    text: `(  ) ${letra}) ${q.alternativas[letra]}`,
+                    text: `${letra}) ${q.alternativas[letra]}`,
                     style: 'alternativeText'
                 });
             }
         });
         
-        content.push({ text: '', margin: [0, 0, 0, 15] }); // Espaçamento
+        content.push({ text: '', margin: [0, 0, 0, 20] });
     });
 
-    // QUEBRA DE PÁGINA PARA O GABARITO (OPCIONAL/SÓ PARA O PROFESSOR)
+    // GABARITO (Página Opcional)
     content.push({ text: '', pageBreak: 'before' });
-    content.push({ text: 'GABARITO DO PROFESSOR', style: 'header', alignment: 'center', margin: [0,0,0,20] });
-    content.push({ text: prova.titulo, style: 'subheader', alignment: 'center', margin: [0,0,0,20] });
+    content.push({ text: 'GABARITO DO PROFESSOR', style: 'examTitle', alignment: 'center', margin: [0,0,0,20] });
     
     const gabaritoBody = [];
     prova.questoes.forEach((q, index) => {
         gabaritoBody.push([
-            { text: `Questão ${index + 1}`, bold: true },
+            { text: `Questão ${String(index + 1).padStart(2, '0')}`, bold: true },
             { text: q.correta, bold: true, color: 'blue' }
         ]);
     });
@@ -240,42 +304,48 @@ function baixarPdf(provaId) {
         layout: 'lightHorizontalLines'
     });
 
-
     // DEFINIÇÃO DE ESTILOS
     const docDefinition = {
         content: content,
         styles: {
-            header: {
+            schoolName: {
                 fontSize: 18,
                 bold: true,
-                color: '#111827'
-            },
-            subheader: {
-                fontSize: 14,
-                color: '#6b7280'
+                color: '#111827',
+                fontFamily: 'Helvetica'
             },
             examTitle: {
-                fontSize: 16,
+                fontSize: 14,
                 bold: true,
-                color: '#cca43b' // Dourado do GeoEduca
-            },
-            questionText: {
-                fontSize: 11,
-                bold: true,
-                margin: [0, 5, 0, 5],
-                alignment: 'justify'
-            },
-            alternativeText: {
-                fontSize: 11,
-                margin: [15, 3, 0, 3]
+                color: '#111827',
+                background: '#e5e7eb'
             },
             tableHeader: {
                 bold: true,
+                fontSize: 10,
+                color: '#111827'
+            },
+            questionHeader: {
                 fontSize: 12,
-                color: 'black'
+                bold: true,
+                color: '#111827',
+                background: '#f3f4f6'
+            },
+            questionText: {
+                fontSize: 11,
+                color: '#1f2937',
+                margin: [0, 5, 0, 10],
+                lineHeight: 1.3
+            },
+            alternativeText: {
+                fontSize: 11,
+                color: '#374151',
+                margin: [15, 3, 0, 3]
             }
         },
         defaultStyle: {
+            fontFamily: 'Helvetica',
+            fontSize: 11,
             columnGap: 20
         }
     };
