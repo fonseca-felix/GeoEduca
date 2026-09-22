@@ -274,15 +274,16 @@ async function initFirestore() {
 async function startServer() {
     try {
         await initFirestore();
-        const PORT = process.env.PORT || 3000;
-        app.listen(PORT, () => {
-            console.log(`🚀 Servidor rodando na porta ${PORT}`);
-            console.log(`📝 API disponível em http://localhost:${PORT}/api`);
-            console.log(`🔥 Firebase Firestore conectado`);
-        });
+        console.log(`🔥 Firebase Firestore conectado e inicializado`);
     } catch (error) {
-        console.error('❌ Erro ao iniciar servidor:', error);
+        console.error('⚠️ Aviso: Erro ao inicializar Firestore (pode ser limite de cota). O servidor continuará rodando, mas o banco pode estar indisponível:', error.message);
     }
+
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`🚀 Servidor rodando na porta ${PORT}`);
+        console.log(`📝 API e Frontend disponíveis em http://localhost:${PORT}`);
+    });
 }
 
 startServer();
