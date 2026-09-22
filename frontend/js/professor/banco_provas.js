@@ -17,7 +17,7 @@ function setupCustomSelect() {
     const newDisplay = display.cloneNode(true);
     display.parentNode.replaceChild(newDisplay, display);
 
-    const displayText = document.getElementById('custom-select-nivel-text');
+    const displayText = newDisplay.querySelector('#custom-select-nivel-text');
 
     newDisplay.addEventListener('click', () => {
       wrapper.classList.toggle('open');
