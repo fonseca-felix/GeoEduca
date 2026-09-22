@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nivelWrapper = document.getElementById('custom-select-nivel');
         const nivelOptions = document.getElementById('custom-select-nivel-options');
         if (nivelWrapper && nivelOptions && !nivelWrapper.contains(e.target)) {
-            nivelOptions.classList.remove('open');
+            nivelOptions.style.display = 'none';
         }
     });
 });
@@ -18,7 +18,9 @@ window.toggleNivelDropdown = function() {
     const e = window.event;
     if(e) e.stopPropagation();
     const opts = document.getElementById('custom-select-nivel-options');
-    if(opts) opts.classList.toggle('open');
+    if(opts) {
+        opts.style.display = (opts.style.display === 'block') ? 'none' : 'block';
+    }
 };
 
 window.selectNivelOption = function(element, value) {
@@ -34,7 +36,7 @@ window.selectNivelOption = function(element, value) {
     // Update value
     text.textContent = element.textContent;
     input.value = value;
-    opts.classList.remove('open');
+    opts.style.display = 'none';
 };
 
 let provasData = [];
