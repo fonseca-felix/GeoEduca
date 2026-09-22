@@ -76,13 +76,14 @@
     .modal-overlay.open { display: flex; opacity: 1; }
     .modal-content {
       background: var(--color-surface, #fff); border-radius: 16px;
-      width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+      width: 100%; max-width: 500px; max-height: 90vh;
+      display: flex; flex-direction: column;
       transform: translateY(20px); transition: transform 0.3s;
     }
     .modal-overlay.open .modal-content { transform: translateY(0); }
     .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--color-border, #f3f4f6); display: flex; justify-content: space-between; align-items: center; }
     .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; }
-    .modal-body { padding: 1.5rem; }
+    .modal-body { padding: 1.5rem; overflow-y: auto; flex: 1; }
     .modal-footer { padding: 1.5rem; border-top: 1px solid var(--color-border, #f3f4f6); display: flex; justify-content: flex-end; gap: 1rem; }
     .btn-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-text-secondary); }
     .btn-close:hover { color: var(--color-text-primary); }
