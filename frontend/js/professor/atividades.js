@@ -104,14 +104,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup Filtro Tipo (options are static in HTML)
     setupCustomSelect('custom-select-tipo', 'filterTipo');
 
-    // Modal select (keep as native for simplicity inside forms)
-    const actSala = document.getElementById('actSala');
-    if (actSala) {
-      actSala.innerHTML =
-        '<option value="" disabled selected>Selecione...</option>' +
-        salas.map(s => `<option value="${s.id}">${s.nome}</option>`).join('');
+    // Modal select
+    const actSalaOptions = document.getElementById('custom-select-act-sala-options');
+    if (actSalaOptions) {
+      actSalaOptions.innerHTML = '<div class="custom-option selected" data-value="">Selecione...</div>' + 
+        salas.map(s => `<div class="custom-option" data-value="${s.id}">${s.nome}</div>`).join('');
+      setupCustomSelect('custom-select-act-sala', 'actSala');
     }
   }
+
+  window.filterActStudents = function() {
+    const term = (document.getElementById('actSearchInput')?.value || '').toLowerCase();
+    const items = document.querySelectorAll('#actAlunosList .act-student-item');
+    items.forEach(el => {
+      if (el.dataset.nome.includes(term)) {
+        el.style.display = 'flex';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  };
 
   // ─── Render cards ───────────────────────────────────────────
   function renderAtividades() {
@@ -209,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     list.innerHTML = alunos.map(a => `
-      <label style="display:flex;gap:0.6rem;align-items:center;margin-bottom:0.75rem;cursor:pointer;">
+      <label class="act-student-item" style="display:flex;gap:0.6rem;align-items:center;margin-bottom:0.75rem;cursor:pointer;" data-nome="${a.nome.toLowerCase()}">
         <input type="checkbox" data-aluno-id="${a.id}" />
         <div>
           <div style="font-weight:600;color:#111827;">${a.nome}</div>

@@ -420,16 +420,27 @@
 
         <div id="actDestinoSalaBlock">
           <div class="form-group">
-            <label class="form-label" for="actSala">Sala <span>*</span></label>
-            <select id="actSala" class="form-control">
-              <option value="" disabled selected>Selecione...</option>
-            </select>
+            <label class="form-label">Sala <span>*</span></label>
+            <div class="custom-select-wrapper" id="custom-select-act-sala">
+              <div class="custom-select form-control" id="custom-select-act-sala-display" tabindex="0">
+                  <span id="custom-select-act-sala-text">Selecione a sala...</span>
+                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+              <div class="custom-select-options" id="custom-select-act-sala-options">
+                  <!-- Injected via JS -->
+              </div>
+            </div>
+            <input type="hidden" id="actSala" value="" />
           </div>
         </div>
 
         <div id="actDestinoAlunosBlock" style="display:none;">
           <div class="form-group">
             <label class="form-label">Alunos</label>
+            <div style="margin-bottom: 0.5rem; position: relative;">
+              <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+              <input type="text" id="actSearchInput" class="form-control" placeholder="Buscar aluno por nome..." style="padding-left: 36px; border-radius: 8px; width: 100%; border: 1px solid #d1d5db;" onkeyup="filterActStudents()" />
+            </div>
             <div id="actAlunosList" style="max-height:200px;overflow:auto;padding:0.75rem;border:1px solid #e5e7eb;border-radius:10px;background:#fff;">
               <div style="color:#6b7280;">Carregando alunos...</div>
             </div>

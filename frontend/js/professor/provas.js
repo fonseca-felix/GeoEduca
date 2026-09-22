@@ -237,29 +237,69 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
 
+  function setupCustomSelect(wrapperId, inputId, onChangeCallback) {
+    const wrapper = document.getElementById(wrapperId);
+    if (!wrapper) return;
+    const display = wrapper.querySelector('.custom-select');
+    const optionsContainer = wrapper.querySelector('.custom-select-options');
+    const hiddenInput = document.getElementById(inputId);
+
+    const newDisplay = display.cloneNode(true);
+    display.parentNode.replaceChild(newDisplay, display);
+    const displayText = newDisplay.querySelector('span');
+
+    newDisplay.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.custom-select-wrapper.open').forEach(w => {
+        if (w !== wrapper) w.classList.remove('open');
+      });
+      wrapper.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!wrapper.contains(e.target)) wrapper.classList.remove('open');
+    });
+
+    optionsContainer.addEventListener('click', (e) => {
+      const opt = e.target.closest('.custom-option');
+      if (!opt) return;
+      optionsContainer.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      
+      const val = opt.dataset.value;
+      hiddenInput.value = val;
+      displayText.textContent = opt.textContent;
+      wrapper.classList.remove('open');
+      
+      if(onChangeCallback) onChangeCallback(val);
+    });
+  }
+
+  function renderCustomSelectOptions(containerId, items) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    if (!items || items.length === 0) {
+      container.innerHTML = '<div class="custom-option" data-value="">Nenhuma sala encontrada</div>';
+      return;
+    }
+    container.innerHTML = '<div class="custom-option selected" data-value="">Selecione...</div>' + 
+      items.map(s => `<div class="custom-option" data-value="${s.id}">${s.nome}</div>`).join('');
+  }
+
   /* ========================================================
      CORREÇÃO DA PROVA
   ======================================================== */
   function populateGradingSalas() {
-    const sel = document.getElementById('gradeSalaSelect');
-    if(salas.length === 0) {
-      sel.innerHTML = '<option value="">Nenhuma sala encontrada</option>';
-      return;
-    }
-    sel.innerHTML = '<option value="">Selecione...</option>' + salas.map(s => `<option value="${s.id}">${s.nome}</option>`).join('');
+    renderCustomSelectOptions('custom-select-grade-sala-options', salas);
+    setupCustomSelect('custom-select-grade-sala', 'gradeSalaSelect', () => window.loadGradingData());
   }
 
   // ─────────────────────────────────────────────────────────
   // Enviar Prova (Sala ou múltiplos alunos)
   // ─────────────────────────────────────────────────────────
   function populateSendProvaSalasSelect() {
-    const sel = document.getElementById('sendProvaSalaSelect');
-    if (!sel) return;
-    if (!salas || salas.length === 0) {
-      sel.innerHTML = '<option value="">Nenhuma sala encontrada</option>';
-      return;
-    }
-    sel.innerHTML = '<option value="">Selecione...</option>' + salas.map(s => `<option value="${s.id}">${s.nome}</option>`).join('');
+    renderCustomSelectOptions('custom-select-send-sala-options', salas);
+    setupCustomSelect('custom-select-send-sala', 'sendProvaSalaSelect');
   }
 
   function renderSendProvaAlunosList() {
@@ -271,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     list.innerHTML = alunos.map(a => `
-      <label style="display:flex; gap:0.6rem; align-items:center; margin-bottom:0.75rem; cursor:pointer;">
+      <label class="send-student-item" style="display:flex; gap:0.6rem; align-items:center; margin-bottom:0.75rem; cursor:pointer;" data-nome="${a.nome.toLowerCase()}">
         <input type="checkbox" data-aluno-id="${a.id}" />
         <div style="display:flex; flex-direction:column;">
           <span style="font-weight:600;color:#0f172a;">${a.nome}</span>
@@ -280,6 +320,31 @@ document.addEventListener('DOMContentLoaded', () => {
       </label>
     `).join('');
   }
+
+  window.filterSendStudents = function() {
+    const term = (document.getElementById('sendSearchInput')?.value || '').toLowerCase();
+    const items = document.querySelectorAll('#sendProvaAlunosList .send-student-item');
+    items.forEach(el => {
+      if (el.dataset.nome.includes(term)) {
+        el.style.display = 'flex';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  };
+
+  window.filterGradingStudents = function() {
+    const term = (document.getElementById('gradeSearchInput')?.value || '').toLowerCase();
+    const items = document.querySelectorAll('#students-list-container .student-item');
+    items.forEach(el => {
+      const nome = el.querySelector('.student-header')?.textContent.toLowerCase() || '';
+      if (nome.includes(term)) {
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  };
 
   function syncSendProvaBlocks() {
     const type = document.querySelector('input[name="sendProvaTargetType"]:checked')?.value || 'sala';
