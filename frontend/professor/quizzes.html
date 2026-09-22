@@ -270,12 +270,12 @@
 
 <!-- Modal Enviar Quiz -->
 <div class="modal-overlay" id="modal-send-quiz">
-  <div class="modal-content" style="max-width: 650px;">
+  <div class="modal-content" style="max-width: 650px; display: flex; flex-direction: column; max-height: 90vh;">
     <div class="modal-header">
       <h2 class="modal-title">Enviar Quiz</h2>
       <button class="btn-close" onclick="Modal.close('modal-send-quiz')">&times;</button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="overflow-y: auto; flex: 1; min-height: 200px;">
       <div class="form-group">
         <label class="form-label">Destino</label>
         <div style="display:flex; gap:1rem; flex-wrap:wrap;">
