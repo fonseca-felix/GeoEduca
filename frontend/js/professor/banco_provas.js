@@ -77,12 +77,15 @@ async function loadProvas() {
                         <span><i class="fa-regular fa-calendar"></i> ${dataStr}</span>
                     </div>
                 </div>
-                <div class="exam-footer">
-                    <button class="btn btn-outline" onclick="excluirProva('${prova.id}')" style="padding: 0.4rem 0.6rem; color: #ef4444; border-color: #ef4444;">
+                <div class="exam-footer" style="display:flex; justify-content:flex-end; gap:0.5rem; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="excluirProva('${prova.id}')" style="padding: 0.4rem 0.6rem; color: #ef4444; border-color: #ef4444;" title="Excluir">
                         <i class="fa-solid fa-trash"></i>
                     </button>
-                    <button class="btn btn-primary" onclick="baixarPdf('${prova.id}')" style="padding: 0.4rem 1rem;">
-                        <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+                    <button class="btn btn-outline" onclick="baixarPdfGabarito('${prova.id}')" style="padding: 0.4rem 1rem;" title="Gabarito">
+                        <i class="fa-solid fa-key"></i> Gabarito
+                    </button>
+                    <button class="btn btn-primary" onclick="baixarPdfProva('${prova.id}')" style="padding: 0.4rem 1rem;" title="Baixar Prova">
+                        <i class="fa-solid fa-file-pdf"></i> Prova
                     </button>
                 </div>
             `;
@@ -161,7 +164,50 @@ async function excluirProva(id) {
 // GERAÇÃO DE PDF (PDFMAKE)
 // ==========================
 
-function baixarPdf(provaId) {
+const pdfStyles = {
+    schoolName: {
+        fontSize: 18,
+        bold: true,
+        color: '#111827',
+        fontFamily: 'Helvetica'
+    },
+    examTitle: {
+        fontSize: 14,
+        bold: true,
+        color: '#111827',
+        background: '#e5e7eb'
+    },
+    tableHeader: {
+        bold: true,
+        fontSize: 10,
+        color: '#111827'
+    },
+    questionHeader: {
+        fontSize: 12,
+        bold: true,
+        color: '#111827',
+        background: '#f3f4f6'
+    },
+    questionText: {
+        fontSize: 11,
+        color: '#1f2937',
+        margin: [0, 5, 0, 10],
+        lineHeight: 1.3
+    },
+    alternativeText: {
+        fontSize: 11,
+        color: '#374151',
+        margin: [15, 3, 0, 3]
+    }
+};
+
+const pdfDefaultStyle = {
+    fontFamily: 'Helvetica',
+    fontSize: 11,
+    columnGap: 20
+};
+
+function baixarPdfProva(provaId) {
     const prova = provasData.find(p => p.id === provaId);
     if (!prova) return Toast.error('Erro', 'Prova não encontrada localmente.');
 
@@ -280,9 +326,31 @@ function baixarPdf(provaId) {
         content.push({ text: '', margin: [0, 0, 0, 20] });
     });
 
+    // DEFINIÇÃO DE ESTILOS E GERAÇÃO
+    const docDefinition = {
+        content: content,
+        styles: pdfStyles,
+        defaultStyle: pdfDefaultStyle
+    };
+
+    try {
+        pdfMake.createPdf(docDefinition).download(`Prova_${prova.titulo.replace(/\s+/g, '_')}.pdf`);
+    } catch (e) {
+        console.error(e);
+        Toast.error("Erro", "Não foi possível gerar a Prova.");
+    }
+}
+
+function baixarPdfGabarito(provaId) {
+    const prova = provasData.find(p => p.id === provaId);
+    if (!prova) return Toast.error('Erro', 'Prova não encontrada localmente.');
+
+    const content = [];
+
     // GABARITO (Página Opcional)
-    content.push({ text: '', pageBreak: 'before' });
+    content.push({ text: 'GEOEDUCA - REDE DE ENSINO', style: 'schoolName', margin: [0, 0, 0, 10], alignment: 'center' });
     content.push({ text: 'GABARITO DO PROFESSOR', style: 'examTitle', alignment: 'center', margin: [0,0,0,20] });
+    content.push({ text: `Prova: ${prova.titulo}`, alignment: 'center', margin: [0,0,0,20], bold: true });
     
     const gabaritoBody = [];
     prova.questoes.forEach((q, index) => {
@@ -304,57 +372,16 @@ function baixarPdf(provaId) {
         layout: 'lightHorizontalLines'
     });
 
-    // DEFINIÇÃO DE ESTILOS
     const docDefinition = {
         content: content,
-        styles: {
-            schoolName: {
-                fontSize: 18,
-                bold: true,
-                color: '#111827',
-                fontFamily: 'Helvetica'
-            },
-            examTitle: {
-                fontSize: 14,
-                bold: true,
-                color: '#111827',
-                background: '#e5e7eb'
-            },
-            tableHeader: {
-                bold: true,
-                fontSize: 10,
-                color: '#111827'
-            },
-            questionHeader: {
-                fontSize: 12,
-                bold: true,
-                color: '#111827',
-                background: '#f3f4f6'
-            },
-            questionText: {
-                fontSize: 11,
-                color: '#1f2937',
-                margin: [0, 5, 0, 10],
-                lineHeight: 1.3
-            },
-            alternativeText: {
-                fontSize: 11,
-                color: '#374151',
-                margin: [15, 3, 0, 3]
-            }
-        },
-        defaultStyle: {
-            fontFamily: 'Helvetica',
-            fontSize: 11,
-            columnGap: 20
-        }
+        styles: pdfStyles,
+        defaultStyle: pdfDefaultStyle
     };
 
-    // GERAR E BAIXAR
     try {
-        pdfMake.createPdf(docDefinition).download(`Prova_${prova.titulo.replace(/\s+/g, '_')}.pdf`);
+        pdfMake.createPdf(docDefinition).download(`Gabarito_${prova.titulo.replace(/\s+/g, '_')}.pdf`);
     } catch (e) {
         console.error(e);
-        Toast.error("Erro", "Não foi possível gerar o PDF.");
+        Toast.error("Erro", "Não foi possível gerar o Gabarito.");
     }
 }
