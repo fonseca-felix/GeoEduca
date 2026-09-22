@@ -227,9 +227,16 @@
       
       <div class="report-sala-selector">
         <label style="font-weight:600; font-size:0.875rem;">Selecione a Sala:</label>
-        <select id="reportSalaSelect" class="form-control" style="max-width: 300px;" onchange="loadReportData()">
-          <option value="">Carregando salas...</option>
-        </select>
+        <div class="custom-select-wrapper" id="custom-select-report-sala" style="flex: 1; max-width: 300px;">
+            <div class="custom-select form-control" id="custom-select-report-sala-display" tabindex="0">
+                <span id="custom-select-report-sala-text">Selecione a sala...</span>
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="custom-select-options" id="custom-select-report-sala-options">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+        <input type="hidden" id="reportSalaSelect" value="" />
       </div>
 
       <div id="report-content" style="display:none;">
@@ -285,16 +292,27 @@
 
       <div id="sendQuizSalaBlock">
         <div class="form-group">
-          <label class="form-label" for="sendQuizSalaSelect">Selecione a sala</label>
-          <select id="sendQuizSalaSelect" class="form-control">
-            <option value="">Carregando salas...</option>
-          </select>
+          <label class="form-label">Selecione a sala</label>
+          <div class="custom-select-wrapper" id="custom-select-send-quiz-sala">
+            <div class="custom-select form-control" id="custom-select-send-quiz-sala-display" tabindex="0">
+                <span id="custom-select-send-quiz-sala-text">Selecione a sala...</span>
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="custom-select-options" id="custom-select-send-quiz-sala-options">
+                <!-- Injected via JS -->
+            </div>
+          </div>
+          <input type="hidden" id="sendQuizSalaSelect" value="" />
         </div>
       </div>
 
       <div id="sendQuizAlunosBlock" style="display:none;">
         <div class="form-group">
           <label class="form-label">Selecione os alunos</label>
+          <div style="margin-bottom: 0.5rem; position: relative;">
+            <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+            <input type="text" id="sendQuizSearchInput" class="form-control" placeholder="Buscar aluno por nome..." style="padding-left: 36px; border-radius: 8px; width: 100%; border: 1px solid #d1d5db;" onkeyup="filterSendQuizStudents()" />
+          </div>
           <div id="sendQuizAlunosList" style="max-height: 260px; overflow:auto; padding:0.75rem; border:1px solid #e5e7eb; border-radius: 10px; background:#fff;">
             <div style="color:#6b7280;">Carregando alunos...</div>
           </div>
