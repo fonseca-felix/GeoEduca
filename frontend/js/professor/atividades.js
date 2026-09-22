@@ -60,13 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const wrapper = document.getElementById(wrapperId);
     if (!wrapper) return;
     const display = wrapper.querySelector('.custom-select');
-    const displayText = wrapper.querySelector('span');
     const optionsContainer = wrapper.querySelector('.custom-select-options');
     const hiddenInput = document.getElementById(inputId);
 
     // Remove old event listeners
     const newDisplay = display.cloneNode(true);
     display.parentNode.replaceChild(newDisplay, display);
+    
+    const displayText = wrapper.querySelector('span');
 
     newDisplay.addEventListener('click', () => {
       wrapper.classList.toggle('open');

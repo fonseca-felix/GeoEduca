@@ -12,11 +12,12 @@ function setupCustomSelect() {
     const display = document.getElementById('custom-select-nivel-display');
     const optionsContainer = document.getElementById('custom-select-nivel-options');
     const hiddenInput = document.getElementById('inputNivel');
-    const displayText = document.getElementById('custom-select-nivel-text');
 
     // Remove old event listeners by cloning
     const newDisplay = display.cloneNode(true);
     display.parentNode.replaceChild(newDisplay, display);
+
+    const displayText = document.getElementById('custom-select-nivel-text');
 
     newDisplay.addEventListener('click', () => {
       wrapper.classList.toggle('open');
