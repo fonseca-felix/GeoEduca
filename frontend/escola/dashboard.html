@@ -68,7 +68,7 @@
       if (!user) return;
 
       // Inject Sidebar
-      document.body.insertAdjacentHTML('afterbegin', buildEscolaSidebar());
+      document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildEscolaSidebar());
       document.getElementById('escola-nome').textContent = user.nome;
 
       // Theme toggle (if sidebar handles it)

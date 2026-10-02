@@ -84,7 +84,7 @@
       if (!user) return;
 
       // Inject Sidebar
-      document.body.insertAdjacentHTML('afterbegin', buildMasterSidebar());
+      document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildMasterSidebar());
       
       // Theme toggle (if sidebar handles it)
       const themeBtn = document.querySelector('[data-action="toggle-theme"]');

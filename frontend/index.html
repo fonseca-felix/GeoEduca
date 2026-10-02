@@ -486,15 +486,17 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
   });
 
   // If user is already logged in, redirect to dashboard
+  /*
   if (Auth.isLoggedIn()) {
     var user = Auth.getUser();
     if (user) {
-      if (user.tipo === 'master') window.location.href = '/master/dashboard.html';
-      else if (user.tipo === 'escola') window.location.href = '/escola/dashboard.html';
-      else if (user.tipo === 'prof') window.location.href = '/professor/dashboard.html';
-      else if (user.tipo === 'aluno') window.location.href = '/aluno/dashboard.html';
+      if (user.tipo === 'master') window.location.href = './master/dashboard.html';
+      else if (user.tipo === 'escola') window.location.href = './escola/dashboard.html';
+      else if (user.tipo === 'prof') window.location.href = './professor/dashboard.html';
+      else if (user.tipo === 'aluno') window.location.href = './aluno/dashboard.html';
     }
   }
+  */
 })();
 </script>
 </body>
