@@ -160,11 +160,24 @@
 
 <!-- Modal: Fazer Prova (Tela Cheia) -->
 <div class="exam-fullscreen-overlay" id="exam-taking-modal">
-  <div class="exam-header-bar">
-    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.125rem; font-weight: 600; color: #1e293b;" id="exam-taking-title">Prova</div>
-    <div style="color: #64748b; font-size: 0.875rem;" id="exam-taking-subtitle"></div>
-    <div class="exam-nav-grid" id="exam-nav-grid">
-      <!-- Injetado via JS -->
+  <div class="exam-header-bar" style="flex-direction: row; justify-content: space-between; align-items: center;">
+    <!-- Logo -->
+    <div style="display: flex; align-items: center; gap: 0.5rem; flex: 1;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#cca43b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="32" height="32"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; color: #1e293b;">GeoEduca</div>
+    </div>
+    
+    <!-- Centro -->
+    <div style="display: flex; flex-direction: column; align-items: center; flex: 2;">
+      <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.125rem; font-weight: 600; color: #1e293b;" id="exam-taking-title">Prova</div>
+      <div class="exam-nav-grid" id="exam-nav-grid" style="margin-top: 0.5rem;">
+        <!-- Injetado via JS -->
+      </div>
+    </div>
+    
+    <!-- Botão de Enviar -->
+    <div style="display: flex; justify-content: flex-end; flex: 1;">
+      <button class="btn-exam primary" style="padding: 0.6rem 1.5rem; opacity: 0.5; transition: all 0.3s;" id="btn-submit-prova" disabled>Enviar Prova</button>
     </div>
   </div>
   
@@ -186,10 +199,6 @@
       
       <div id="exam-taking-body">
         <!-- Injetado via JS -->
-      </div>
-      
-      <div style="display:flex; justify-content:flex-end; margin-top:2rem;">
-        <button class="btn-exam primary" style="display:none; padding: 0.75rem 2rem;" id="btn-submit-prova">Finalizar e Enviar Respostas</button>
       </div>
     </div>
   </div>

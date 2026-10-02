@@ -125,7 +125,33 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (isAnswered) dot.classList.add('answered');
     else dot.classList.remove('answered');
+    
+    checkAllAnswered();
   };
+
+  function checkAllAnswered() {
+    if (!currentProva || !currentProva.questoes) return;
+    const total = currentProva.questoes.length;
+    let answeredCount = 0;
+    for (let i = 0; i < total; i++) {
+      const dot = document.getElementById(`nav-dot-${i}`);
+      if (dot && (dot.classList.contains('answered') || dot.classList.contains('penalized'))) {
+        answeredCount++;
+      }
+    }
+    const btnSubmit = document.getElementById('btn-submit-prova');
+    if (btnSubmit) {
+      if (answeredCount === total) {
+        btnSubmit.disabled = false;
+        btnSubmit.style.opacity = '1';
+        btnSubmit.style.cursor = 'pointer';
+      } else {
+        btnSubmit.disabled = true;
+        btnSubmit.style.opacity = '0.5';
+        btnSubmit.style.cursor = 'not-allowed';
+      }
+    }
+  }
 
   window.jumpToQuestion = (idx) => {
     if (idx === currentQuestionIndex) return;
@@ -217,20 +243,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnPrev = document.getElementById('btn-prev-questao');
     const btnNext = document.getElementById('btn-next-questao');
-    const btnSubmit = document.getElementById('btn-submit-prova');
 
     if (btnPrev) {
       btnPrev.disabled = currentQuestionIndex === 0;
       btnPrev.style.opacity = currentQuestionIndex === 0 ? '0.5' : '1';
     }
     
-    if (currentQuestionIndex < total - 1) {
-      if (btnNext) btnNext.style.display = 'flex';
-      if (btnSubmit) btnSubmit.style.display = 'none';
-    } else {
-      if (btnNext) btnNext.style.display = 'none';
-      if (btnSubmit) btnSubmit.style.display = 'block';
+    if (btnNext) {
+      if (currentQuestionIndex < total - 1) {
+        btnNext.style.display = 'flex';
+      } else {
+        btnNext.style.display = 'none';
+      }
     }
+    
+    checkAllAnswered();
   }
 
   function changeQuestion(direction) {
@@ -306,10 +333,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       isTakingExam = false;
       if (!isForced) {
-        Toast.success('Sucesso!', 'Prova enviada com sucesso!');
+        Toast.success('Sucesso!', 'Prova enviada com sucesso! Redirecionando...');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1500);
+      } else {
+        closeModal('exam-taking-modal');
+        await loadProvas();
       }
-      closeModal('exam-taking-modal');
-      await loadProvas();
     } catch (err) {
       btn.disabled = false;
       Toast.error('Erro ao enviar', err.message || 'Tente novamente.');
