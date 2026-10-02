@@ -45,15 +45,23 @@ const Auth = {
     localStorage.setItem('geo_user', JSON.stringify(user));
   },
 
+  getLoginUrl() {
+    const p = window.location.pathname;
+    if (p.includes('/aluno/') || p.includes('/professor/') || p.includes('/escola/') || p.includes('/master/')) {
+      return '../index.html';
+    }
+    return './index.html';
+  },
+
   logout() {
     localStorage.removeItem('geo_token');
     localStorage.removeItem('geo_user');
-    window.location.href = '/index.html';
+    window.location.href = this.getLoginUrl();
   },
 
   requireAuth(expectedTipo) {
     if (!this.isLoggedIn()) {
-      window.location.href = '/index.html';
+      window.location.href = this.getLoginUrl();
       return null;
     }
     const user = this.getUser();

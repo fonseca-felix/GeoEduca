@@ -26,6 +26,19 @@ const login = async (req, res) => {
             });
         }
 
+        // 1.5. Conta ADM Escola Mock
+        if (identificador === 'CE399 SESI' && senha === 'SesiCE399') {
+            const token = jwt.sign(
+                { id: 'escola_ce399', tipo: 'escola', email: 'ce399@sesi' },
+                process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
+                { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+            );
+            return res.json({
+                token,
+                usuario: { id: 'escola_ce399', nome: 'CE399 SESI', email: 'ce399@sesi', tipo: 'escola' }
+            });
+        }
+
         // 2. É um email? Checar Escolas e Professores
         if (identificador.includes('@')) {
             // Tentar na coleção escolas
@@ -107,6 +120,9 @@ const verifyToken = async (req, res) => {
         }
 
         if (decoded.tipo === 'escola') {
+            if (decoded.id === 'escola_ce399') {
+                return res.json({ valido: true, usuario: { id: 'escola_ce399', nome: 'CE399 SESI', email: 'ce399@sesi', tipo: 'escola' } });
+            }
             const escola = await db.collection('escolas').doc(decoded.id).get();
             if (!escola.exists) return res.status(401).json({ error: 'Escola não encontrada' });
             const d = escola.data();

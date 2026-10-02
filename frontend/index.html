@@ -87,8 +87,9 @@ label>span{font-family:var(--font-display);font-size:.875rem;font-weight:500}
 .field input:-webkit-autofill:hover, 
 .field input:-webkit-autofill:focus, 
 .field input:-webkit-autofill:active{
-    -webkit-transition: color 9999s ease-out, background-color 9999s ease-out;
-    -webkit-transition-delay: 9999s;
+    -webkit-box-shadow: 0 0 0px 1000px #242538 inset !important;
+    -webkit-text-fill-color: var(--foreground) !important;
+    caret-color: white;
 }
 .field button{background:none;border:0;color:var(--muted-foreground);cursor:pointer;display:grid}
 .submit{width:100%;border:0;border-radius:12px;background:var(--primary);color:var(--primary-foreground);padding:14px 16px;font-family:var(--font-display);font-weight:600;font-size:.875rem;cursor:pointer;transition:transform .2s}
@@ -335,13 +336,13 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
       Auth.save(data.token, data.usuario);
 
       if (data.usuario.tipo === 'master') {
-        window.location.href = '/master/dashboard.html';
+        window.location.href = './master/dashboard.html';
       } else if (data.usuario.tipo === 'escola') {
-        window.location.href = '/escola/dashboard.html';
+        window.location.href = './escola/dashboard.html';
       } else if (data.usuario.tipo === 'prof') {
-        window.location.href = '/professor/dashboard.html';
+        window.location.href = './professor/dashboard.html';
       } else {
-        window.location.href = '/aluno/dashboard.html';
+        window.location.href = './aluno/dashboard.html';
       }
     } catch (err) {
       errEl.textContent = err.message || 'Erro ao fazer login. Tente novamente.';
@@ -418,13 +419,13 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
       Auth.save(data.token, data.usuario);
 
       if (data.usuario.tipo === 'master') {
-        window.location.href = '/master/dashboard.html';
+        window.location.href = './master/dashboard.html';
       } else if (data.usuario.tipo === 'escola') {
-        window.location.href = '/escola/dashboard.html';
+        window.location.href = './escola/dashboard.html';
       } else if (data.usuario.tipo === 'prof') {
-        window.location.href = '/professor/dashboard.html';
+        window.location.href = './professor/dashboard.html';
       } else {
-        window.location.href = '/aluno/dashboard.html';
+        window.location.href = './aluno/dashboard.html';
       }
     } catch (err) {
       errEl.textContent = err.message || 'Erro ao fazer login. Tente novamente.';
@@ -468,13 +469,13 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
       Auth.save(data.token, data.usuario);
 
       if (data.usuario.tipo === 'master') {
-        window.location.href = '/master/dashboard.html';
+        window.location.href = './master/dashboard.html';
       } else if (data.usuario.tipo === 'escola') {
-        window.location.href = '/escola/dashboard.html';
+        window.location.href = './escola/dashboard.html';
       } else if (data.usuario.tipo === 'prof') {
-        window.location.href = '/professor/dashboard.html';
+        window.location.href = './professor/dashboard.html';
       } else {
-        window.location.href = '/aluno/dashboard.html';
+        window.location.href = './aluno/dashboard.html';
       }
     } catch (err) {
       loginError.textContent = err.message || 'Erro ao fazer login. Tente novamente.';

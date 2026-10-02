@@ -6,7 +6,20 @@
   <title>Master Admin | GeoEduca</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
   <style>
-    :root {
+        :root {
+      --background: oklch(0.98 0.01 275);
+      --foreground: oklch(0.16 0.045 275);
+      --card: oklch(1 0 0);
+      --primary: oklch(0.82 0.14 88);
+      --primary-foreground: oklch(1 0 0);
+      --secondary: oklch(0.95 0.02 273);
+      --muted-foreground: oklch(0.5 0.025 265);
+      --border: oklch(0 0 0 / 12%);
+      --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+      --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    }
+
+    :root[data-theme="dark"] {
       --background: oklch(0.16 0.045 275);
       --foreground: oklch(0.97 0.005 260);
       --card: oklch(0.21 0.048 274);
@@ -15,8 +28,6 @@
       --secondary: oklch(0.26 0.05 273);
       --muted-foreground: oklch(0.72 0.025 265);
       --border: oklch(1 0 0 / 12%);
-      --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-      --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
@@ -65,6 +76,7 @@
 
   <script src="../js/api.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/theme.js"></script>
   <script src="../js/sidebar.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
@@ -76,7 +88,7 @@
       
       // Theme toggle (if sidebar handles it)
       const themeBtn = document.querySelector('[data-action="toggle-theme"]');
-      if(themeBtn) themeBtn.addEventListener('click', () => alert('Tema'));
+      if(themeBtn) themeBtn.addEventListener('click', () => Theme.toggle());
       const logoutBtn = document.querySelector('[data-action="logout"]');
       if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
 
