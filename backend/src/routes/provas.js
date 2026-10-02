@@ -274,11 +274,13 @@ router.post('/:id/responder', authenticateToken, requireAluno, async (req, res) 
     try {
         const { id } = req.params;
         const alunoId = req.user.id;
-        const { respostas, saidasAba } = req.body;
+        const { respostas, questoesPenalizadas } = req.body;
 
         if (!respostas || !Array.isArray(respostas)) {
             return res.status(400).json({ error: 'Respostas são obrigatórias' });
         }
+
+        const penalizadasArray = Array.isArray(questoesPenalizadas) ? questoesPenalizadas : [];
 
         // Só permite responder provas que foram enviadas para este aluno
         const envioSnap = await db.collection('provas_enviadas')
@@ -320,9 +322,10 @@ router.post('/:id/responder', authenticateToken, requireAluno, async (req, res) 
         const respostasDetalhadas = respostas.map(r => {
             const questao = questoesMap[r.questaoId];
             let acertou = false;
+            const isPenalized = penalizadasArray.includes(r.questaoId);
             
             // Só calcula nota automática para questões objetivas/alternativa
-            if (questao && questao.tipo === 'alternativa') {
+            if (questao && questao.tipo === 'alternativa' && !isPenalized) {
                 let correta = false;
                 // Suporte a dados antigos onde "correta" pode ser índice (number) ou texto (string).
                 if (typeof questao.correta === 'number') {
@@ -348,15 +351,16 @@ router.post('/:id/responder', authenticateToken, requireAluno, async (req, res) 
             
             return {
                 questaoId: r.questaoId,
-                respostaTexto: r.respostaTexto || null,
-                respostaSelecionada: r.respostaSelecionada !== undefined ? r.respostaSelecionada : null,
-                acertou,
+                respostaTexto: isPenalized ? null : (r.respostaTexto || null),
+                respostaSelecionada: isPenalized ? null : (r.respostaSelecionada !== undefined ? r.respostaSelecionada : null),
+                acertou: isPenalized ? false : acertou,
+                anulada: isPenalized,
                 tipo: questao ? questao.tipo : 'desconhecido'
             };
         });
 
-        // Aplicar penalidade anti-cola (0.5 por saída de aba)
-        const penalidade = (saidasAba || 0) * 0.5;
+        // Aplicar penalidade anti-cola (0.25 por questão penalizada)
+        const penalidade = penalizadasArray.length * 0.25;
         notaAutomatica -= penalidade;
         
         // Impedir nota negativa na correção automática
@@ -366,7 +370,8 @@ router.post('/:id/responder', authenticateToken, requireAluno, async (req, res) 
             provaId: id,
             alunoId,
             respostas: respostasDetalhadas,
-            saidasAba: saidasAba || 0,
+            questoesPenalizadas: penalizadasArray,
+            penalidadeAntiCola: penalidade,
             notaAutomatica,
             notaManual: null,
             status: 'pendente',

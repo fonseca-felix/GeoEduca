@@ -55,6 +55,40 @@
     .warning-list { list-style: none; padding: 0; margin: 0 0 1.5rem 0; color: #475569; font-size: 0.9rem; display: flex; flex-direction: column; gap: 0.75rem; }
     .warning-list li { display: flex; align-items: flex-start; gap: 0.5rem; }
     .warning-list li svg { color: #ef4444; flex-shrink: 0; margin-top: 0.125rem; }
+    /* Full-screen Exam Layout */
+    .exam-fullscreen-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f8fafc; z-index: 9999; display: none; flex-direction: column; opacity: 0; transition: opacity 0.3s; overflow-y: auto; }
+    .exam-fullscreen-overlay.active { display: flex; opacity: 1; pointer-events: auto; }
+    
+    .exam-header-bar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 1.5rem 2rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .exam-nav-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; max-width: 1000px; }
+    .nav-dot { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600; color: #475569; cursor: pointer; transition: all 0.2s; background: #fff; }
+    .nav-dot:hover { background: #f1f5f9; }
+    .nav-dot.active { border-color: #4361ee; background: #eff6ff; color: #4361ee; }
+    .nav-dot.answered { border-color: #10b981; color: #10b981; background: #f0fdf4; }
+    .nav-dot.penalized { border-color: #ef4444; background: #fee2e2; color: #ef4444; text-decoration: line-through; cursor: not-allowed; }
+    
+    .exam-main-container { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 2rem; }
+    .exam-question-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; width: 100%; max-width: 900px; padding: 2.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative; overflow: hidden; }
+    
+    .exam-card-header { display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; color: #64748b; font-size: 0.95rem; font-weight: 500; position: relative; }
+    .exam-card-header-center { display: flex; align-items: center; gap: 2rem; }
+    .exam-nav-btn { background: none; border: none; color: #4361ee; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 6px; transition: background 0.2s; }
+    .exam-nav-btn:hover { background: #eff6ff; }
+    .exam-nav-btn:disabled { color: #94a3b8; cursor: not-allowed; background: none; }
+    
+    .exam-option-label { display: flex; gap: 1rem; align-items: center; padding: 1rem 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s; margin-bottom: 1rem; background: #fff; }
+    .exam-option-label:hover { border-color: #cbd5e1; background: #f8fafc; }
+    .exam-option-label input[type="radio"] { display: none; }
+    .exam-option-indicator { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: #64748b; flex-shrink: 0; }
+    
+    .exam-option-label:has(input:checked) { border-color: #10b981; background: #ecfdf5; }
+    .exam-option-label:has(input:checked) .exam-option-indicator { background: #10b981; border-color: #10b981; color: #fff; }
+    
+    .exam-question-text { font-size: 1.125rem; color: #1e293b; line-height: 1.6; margin-bottom: 2rem; font-weight: 500; }
+    
+    .penalized-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); backdrop-filter: blur(2px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; display: none; }
+    .penalized-overlay.active { display: flex; }
+    .penalized-msg { background: #fee2e2; color: #ef4444; padding: 1.5rem 2rem; border-radius: 8px; font-weight: 700; text-align: center; border: 1px solid #fca5a5; max-width: 80%; display: flex; flex-direction: column; gap: 0.5rem; align-items: center; }
   </style>
 </head>
 <body>
@@ -124,16 +158,39 @@
   </div>
 </div>
 
-<!-- Modal: Fazer Prova -->
-<div class="modal-overlay" id="exam-taking-modal">
-  <div class="modal-content" style="max-width: 860px;">
-    <h2 class="modal-title" id="exam-taking-title">Prova</h2>
-    <div style="color:#64748b;font-size:0.9rem;margin-bottom:1rem;" id="exam-taking-subtitle"></div>
-    <div id="exam-taking-body" style="max-height: 60vh; overflow: auto; padding-right: 0.5rem;"></div>
-    <div style="display:flex; gap:1rem; margin-top:1.5rem;" id="exam-footer">
-      <button class="btn-exam outline" style="flex:1; display:none;" id="btn-prev-questao">Anterior</button>
-      <button class="btn-exam primary" style="flex:1;" id="btn-next-questao">Próxima</button>
-      <button class="btn-exam primary" style="flex:1; display:none;" id="btn-submit-prova">Enviar Respostas</button>
+<!-- Modal: Fazer Prova (Tela Cheia) -->
+<div class="exam-fullscreen-overlay" id="exam-taking-modal">
+  <div class="exam-header-bar">
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.125rem; font-weight: 600; color: #1e293b;" id="exam-taking-title">Prova</div>
+    <div style="color: #64748b; font-size: 0.875rem;" id="exam-taking-subtitle"></div>
+    <div class="exam-nav-grid" id="exam-nav-grid">
+      <!-- Injetado via JS -->
+    </div>
+  </div>
+  
+  <div class="exam-main-container">
+    <div class="exam-question-card">
+      <div class="penalized-overlay" id="penalized-overlay">
+        <div class="penalized-msg">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <div>Você saiu da página!</div>
+          <div style="font-size: 0.95rem; font-weight: 500;">Esta questão foi anulada (-0,25 pt). Prossiga para as demais.</div>
+        </div>
+      </div>
+      
+      <div class="exam-card-header">
+        <button class="exam-nav-btn" id="btn-prev-questao"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Anterior</button>
+        <span id="exam-question-counter" style="color: #0f172a; font-weight: 600;">Questão 1 de 10</span>
+        <button class="exam-nav-btn" id="btn-next-questao">Próxima <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
+      </div>
+      
+      <div id="exam-taking-body">
+        <!-- Injetado via JS -->
+      </div>
+      
+      <div style="display:flex; justify-content:flex-end; margin-top:2rem;">
+        <button class="btn-exam primary" style="display:none; padding: 0.75rem 2rem;" id="btn-submit-prova">Finalizar e Enviar Respostas</button>
+      </div>
     </div>
   </div>
 </div>
