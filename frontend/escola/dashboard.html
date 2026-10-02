@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel da Escola | GeoEduca</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: oklch(0.16 0.045 275);
+      --foreground: oklch(0.97 0.005 260);
+      --card: oklch(0.21 0.048 274);
+      --primary: oklch(0.82 0.14 88);
+      --primary-foreground: oklch(0.17 0.045 275);
+      --secondary: oklch(0.26 0.05 273);
+      --muted-foreground: oklch(0.72 0.025 265);
+      --border: oklch(1 0 0 / 12%);
+      --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+      --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+    .layout { display: flex; min-height: 100vh; }
+    .main-content { flex: 1; margin-left: 260px; padding: 40px; }
+    
+    h1 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 24px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+    .stat-title { color: var(--muted-foreground); font-size: 0.875rem; margin-bottom: 8px; }
+    .stat-value { font-family: var(--font-display); font-size: 2.5rem; font-weight: 700; color: var(--primary); }
+    
+    /* Sidebar Styles Import */
+    @import url('../css/sidebar.css');
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar injected via JS -->
+    
+    <main class="main-content">
+      <h1>Bem-vindo, <span id="escola-nome">...</span></h1>
+      <p style="color: var(--muted-foreground); margin-bottom: 32px;">Aqui está o resumo geral da sua escola no GeoEduca.</p>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Total de Professores</div>
+          <div class="stat-value" id="stat-professores">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Alunos Cadastrados</div>
+          <div class="stat-value" id="stat-alunos">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Provas Realizadas</div>
+          <div class="stat-value" id="stat-provas">-</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/sidebar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = Auth.requireAuth('escola');
+      if (!user) return;
+
+      // Inject Sidebar
+      document.body.insertAdjacentHTML('afterbegin', buildEscolaSidebar());
+      document.getElementById('escola-nome').textContent = user.nome;
+
+      // Theme toggle (if sidebar handles it)
+      const themeBtn = document.querySelector('[data-action="toggle-theme"]');
+      if(themeBtn) themeBtn.addEventListener('click', () => alert('Tema'));
+      const logoutBtn = document.querySelector('[data-action="logout"]');
+      if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
+
+      // Fetch Stats
+      try {
+        const stats = await api.get('/escola/stats');
+        document.getElementById('stat-professores').textContent = stats.totalProfessores;
+        document.getElementById('stat-alunos').textContent = stats.totalAlunos;
+        document.getElementById('stat-provas').textContent = stats.totalProvas;
+      } catch (err) {
+        console.error('Erro ao carregar estatísticas', err);
+      }
+    });
+  </script>
+</body>
+</html>

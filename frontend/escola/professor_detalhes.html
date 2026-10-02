@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detalhes do Professor | GeoEduca</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: oklch(0.16 0.045 275);
+      --foreground: oklch(0.97 0.005 260);
+      --card: oklch(0.21 0.048 274);
+      --primary: oklch(0.82 0.14 88);
+      --primary-foreground: oklch(0.17 0.045 275);
+      --secondary: oklch(0.26 0.05 273);
+      --muted-foreground: oklch(0.72 0.025 265);
+      --border: oklch(1 0 0 / 12%);
+      --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+      --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+    .layout { display: flex; min-height: 100vh; }
+    .main-content { flex: 1; margin-left: 260px; padding: 40px; }
+    
+    .back-link { display: inline-block; color: var(--primary); text-decoration: none; font-weight: 500; margin-bottom: 24px; }
+    .back-link:hover { text-decoration: underline; }
+
+    h1 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 8px; }
+    .subtitle { color: var(--muted-foreground); margin-bottom: 32px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+    .stat-title { color: var(--muted-foreground); font-size: 0.875rem; margin-bottom: 8px; }
+    .stat-value { font-family: var(--font-display); font-size: 2.5rem; font-weight: 700; color: var(--primary); }
+    
+    .section-title { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 16px; margin-top: 32px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    
+    .list-container { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 32px;}
+    .list-item { padding: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .list-item:last-child { border-bottom: none; }
+    
+    /* Sidebar Styles Import */
+    @import url('../css/sidebar.css');
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <main class="main-content">
+      <a href="professores.html" class="back-link">&larr; Voltar para Professores</a>
+      
+      <h1 id="prof-nome">Carregando...</h1>
+      <p class="subtitle" id="prof-email">...</p>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Alunos</div>
+          <div class="stat-value" id="stat-alunos">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Provas</div>
+          <div class="stat-value" id="stat-provas">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Atividades/Quiz</div>
+          <div class="stat-value" id="stat-atividades">-</div>
+        </div>
+      </div>
+      
+      <h2 class="section-title">Turmas/Salas</h2>
+      <div class="list-container" id="list-salas">
+        <div class="list-item" style="color:var(--muted-foreground)">Carregando salas...</div>
+      </div>
+      
+    </main>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/sidebar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = Auth.requireAuth('escola');
+      if (!user) return;
+      document.body.insertAdjacentHTML('afterbegin', buildEscolaSidebar());
+      
+      const logoutBtn = document.querySelector('[data-action="logout"]');
+      if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const profId = urlParams.get('id');
+
+      if (!profId) {
+        alert('ID do professor não fornecido');
+        window.location.href = 'professores.html';
+        return;
+      }
+
+      try {
+        const data = await api.get('/escola/professores/' + profId);
+        
+        document.getElementById('prof-nome').textContent = data.nome;
+        document.getElementById('prof-email').textContent = data.email;
+        document.getElementById('stat-alunos').textContent = data.totalAlunos || 0;
+        document.getElementById('stat-provas').textContent = data.totalProvas || 0;
+        document.getElementById('stat-atividades').textContent = data.totalAtividades || 0;
+        
+        const salasList = document.getElementById('list-salas');
+        if (data.salas && data.salas.length > 0) {
+          salasList.innerHTML = data.salas.map(s => `
+            <div class="list-item">
+              <div>
+                <strong style="color:white">${s.nome}</strong>
+              </div>
+              <div style="color:var(--muted-foreground)">
+                ID: ${s.id}
+              </div>
+            </div>
+          `).join('');
+        } else {
+          salasList.innerHTML = '<div class="list-item" style="color:var(--muted-foreground)">Nenhuma sala cadastrada por este professor.</div>';
+        }
+        
+      } catch (err) {
+        alert(err.message || 'Erro ao carregar detalhes');
+      }
+    });
+  </script>
+</body>
+</html>

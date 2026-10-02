@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Professores da Escola | GeoEduca</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: oklch(0.16 0.045 275);
+      --foreground: oklch(0.97 0.005 260);
+      --card: oklch(0.21 0.048 274);
+      --primary: oklch(0.82 0.14 88);
+      --primary-foreground: oklch(0.17 0.045 275);
+      --secondary: oklch(0.26 0.05 273);
+      --muted-foreground: oklch(0.72 0.025 265);
+      --border: oklch(1 0 0 / 12%);
+      --input: oklch(1 0 0 / 10%);
+      --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+      --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+    .layout { display: flex; min-height: 100vh; }
+    .main-content { flex: 1; margin-left: 260px; padding: 40px; }
+    
+    h1 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 24px; }
+    
+    .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .btn { background: var(--primary); color: var(--primary-foreground); padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    
+    .prof-list { display: grid; gap: 16px; }
+    .prof-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;}
+    .prof-card:hover { border-color: var(--primary); }
+    
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: var(--background); border: 1px solid var(--border); padding: 32px; border-radius: 12px; width: 100%; max-width: 400px; }
+    .modal h2 { font-family: var(--font-display); margin-bottom: 16px; }
+    
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 0.875rem; margin-bottom: 8px; color: var(--muted-foreground); }
+    .field input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--input); color: white; }
+    
+    /* Sidebar Styles Import */
+    @import url('../css/sidebar.css');
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <main class="main-content">
+      <div class="header-actions">
+        <h1>Professores</h1>
+        <button class="btn" onclick="document.getElementById('modal-add').classList.add('active')">+ Novo Professor</button>
+      </div>
+      
+      <div class="prof-list" id="prof-list">
+        Carregando...
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Adicionar -->
+  <div class="modal" id="modal-add">
+    <div class="modal-content">
+      <h2>Cadastrar Professor</h2>
+      <form id="form-add">
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" id="prof-nome" required>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="prof-email" required>
+        </div>
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="prof-senha" required>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:flex-end">
+          <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-add').classList.remove('active')">Cancelar</button>
+          <button type="submit" class="btn">Cadastrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/sidebar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Auth.requireAuth('escola');
+      if (!user) return;
+      document.body.insertAdjacentHTML('afterbegin', buildEscolaSidebar());
+      
+      const logoutBtn = document.querySelector('[data-action="logout"]');
+      if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
+
+      loadProfessores();
+
+      document.getElementById('form-add').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome = document.getElementById('prof-nome').value;
+        const email = document.getElementById('prof-email').value;
+        const senha = document.getElementById('prof-senha').value;
+
+        try {
+          await api.post('/escola/professor', { nome, email, senha });
+          alert('Professor cadastrado com sucesso!');
+          document.getElementById('modal-add').classList.remove('active');
+          document.getElementById('form-add').reset();
+          loadProfessores();
+        } catch (err) {
+          alert(err.message || 'Erro ao cadastrar');
+        }
+      });
+    });
+
+    async function loadProfessores() {
+      const list = document.getElementById('prof-list');
+      try {
+        const profs = await api.get('/escola/professores');
+        if (profs.length === 0) {
+          list.innerHTML = '<p style="color:var(--muted-foreground)">Nenhum professor cadastrado ainda.</p>';
+          return;
+        }
+
+        list.innerHTML = profs.map(p => `
+          <div class="prof-card" onclick="verDetalhes('${p.id}')">
+            <div>
+              <h3 style="font-family:var(--font-display);color:var(--primary)">${p.nome}</h3>
+              <p style="font-size:0.875rem;color:var(--muted-foreground)">${p.email}</p>
+            </div>
+            <div style="text-align:right">
+              <span style="display:inline-block;margin-right:16px"><strong style="color:white">${p.totalAlunos}</strong> Alunos</span>
+              <span><strong style="color:white">${p.totalProvas}</strong> Provas</span>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        list.innerHTML = '<p style="color:red">Erro ao carregar lista</p>';
+      }
+    }
+
+    function verDetalhes(id) {
+        window.location.href = 'professor_detalhes.html?id=' + id;
+    }
+  </script>
+</body>
+</html>

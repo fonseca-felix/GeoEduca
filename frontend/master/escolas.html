@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Escolas | Master Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: oklch(0.16 0.045 275);
+      --foreground: oklch(0.97 0.005 260);
+      --card: oklch(0.21 0.048 274);
+      --primary: oklch(0.82 0.14 88);
+      --primary-foreground: oklch(0.17 0.045 275);
+      --secondary: oklch(0.26 0.05 273);
+      --muted-foreground: oklch(0.72 0.025 265);
+      --border: oklch(1 0 0 / 12%);
+      --input: oklch(1 0 0 / 10%);
+      --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+      --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+    .layout { display: flex; min-height: 100vh; }
+    .main-content { flex: 1; margin-left: 260px; padding: 40px; }
+    
+    h1 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 24px; }
+    
+    .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .btn { background: var(--primary); color: var(--primary-foreground); padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    
+    .escola-list { display: grid; gap: 16px; }
+    .escola-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .escola-card:hover { border-color: var(--primary); }
+    
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: var(--background); border: 1px solid var(--border); padding: 32px; border-radius: 12px; width: 100%; max-width: 400px; }
+    .modal h2 { font-family: var(--font-display); margin-bottom: 16px; }
+    
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 0.875rem; margin-bottom: 8px; color: var(--muted-foreground); }
+    .field input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--input); color: white; }
+    
+    /* Sidebar Styles Import */
+    @import url('../css/sidebar.css');
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <main class="main-content">
+      <div class="header-actions">
+        <h1>Escolas Cadastradas</h1>
+        <button class="btn" onclick="document.getElementById('modal-add').classList.add('active')">+ Nova Escola</button>
+      </div>
+      
+      <div class="escola-list" id="escola-list">
+        Carregando...
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Adicionar -->
+  <div class="modal" id="modal-add">
+    <div class="modal-content">
+      <h2>Cadastrar Escola</h2>
+      <form id="form-add">
+        <div class="field">
+          <label>Nome da Escola</label>
+          <input type="text" id="escola-nome" required>
+        </div>
+        <div class="field">
+          <label>Email de Acesso</label>
+          <input type="email" id="escola-email" required>
+        </div>
+        <div class="field">
+          <label>Senha Provisória</label>
+          <input type="password" id="escola-senha" required>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:flex-end">
+          <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-add').classList.remove('active')">Cancelar</button>
+          <button type="submit" class="btn">Cadastrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/sidebar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Auth.requireAuth('master');
+      if (!user) return;
+      document.body.insertAdjacentHTML('afterbegin', buildMasterSidebar());
+      
+      const logoutBtn = document.querySelector('[data-action="logout"]');
+      if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
+
+      loadEscolas();
+
+      document.getElementById('form-add').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome = document.getElementById('escola-nome').value;
+        const email = document.getElementById('escola-email').value;
+        const senha = document.getElementById('escola-senha').value;
+
+        try {
+          await api.post('/master/escola', { nome, email, senha });
+          alert('Escola cadastrada com sucesso!');
+          document.getElementById('modal-add').classList.remove('active');
+          document.getElementById('form-add').reset();
+          loadEscolas();
+        } catch (err) {
+          alert(err.message || 'Erro ao cadastrar escola');
+        }
+      });
+    });
+
+    async function loadEscolas() {
+      const list = document.getElementById('escola-list');
+      try {
+        const escolas = await api.get('/master/escolas');
+        if (escolas.length === 0) {
+          list.innerHTML = '<p style="color:var(--muted-foreground)">Nenhuma escola cadastrada ainda.</p>';
+          return;
+        }
+
+        list.innerHTML = escolas.map(e => `
+          <div class="escola-card">
+            <div>
+              <h3 style="font-family:var(--font-display);color:var(--primary)">${e.nome}</h3>
+              <p style="font-size:0.875rem;color:var(--muted-foreground)">${e.email}</p>
+            </div>
+            <div style="text-align:right">
+              <span style="font-size:0.75rem;color:var(--muted-foreground)">ID: ${e.id}</span>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        list.innerHTML = '<p style="color:red">Erro ao carregar escolas</p>';
+      }
+    }
+  </script>
+</body>
+</html>

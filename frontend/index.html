@@ -150,21 +150,11 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
     <div class="login glass">
       <h2>Bem-vindo de volta</h2>
       <p>Selecione seu perfil para continuar</p>
-      <div class="roles">
-        <button class="role" type="button" data-role="professor" aria-pressed="true">
-          <i><svg viewBox="0 0 24 24" width="20" height="20"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></i>
-          <b>Professor</b>
-        </button>
-        <button class="role" type="button" data-role="aluno" aria-pressed="false">
-          <i><svg viewBox="0 0 24 24" width="20" height="20"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg></i>
-          <b>Aluno</b>
-        </button>
-      </div>
       <form id="login-form">
-        <label id="login-label"><span id="login-field-label">Nome</span>
+        <label id="login-label"><span id="login-field-label">Email ou RM</span>
           <div class="field">
             <svg viewBox="0 0 24 24" width="16" height="16" style="color:var(--muted-foreground)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            <input id="login-input" name="username" type="text" required placeholder="Seu nome" autocomplete="username" />
+            <input id="login-input" name="username" type="text" required placeholder="Identificador (Email, Nome, RM)" autocomplete="username" />
           </div>
         </label>
         <label><span>Senha</span>
@@ -177,8 +167,58 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
           </div>
         </label>
         <p id="login-error" style="color:#ef4444;font-size:.85rem;margin:0;display:none"></p>
-        <button class="submit gold-glow" type="submit" id="submit-btn">Entrar como Professor</button>
+        <button class="submit gold-glow" type="submit" id="submit-btn">Entrar na Plataforma</button>
       </form>
+
+      <div style="text-align: center; margin-top: 16px;">
+        <a href="#" id="show-admin-form" style="color: var(--muted-foreground); text-decoration: underline; font-size: 0.85rem;">Acesso Administrativo</a>
+      </div>
+    </div>
+
+    <!-- Admin Form -->
+    <div class="login glass" id="admin-login-box" style="display:none;">
+      <h2>Acesso Administrativo</h2>
+      <p>Selecione seu perfil administrativo</p>
+      
+      <style>
+        .admin-profiles { display: flex; gap: 8px; margin-bottom: 24px; }
+        .admin-profile { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted-foreground); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 0.2s; }
+        .admin-profile.active { border-color: var(--primary); background: color-mix(in oklab, var(--primary) 10%, transparent); color: var(--foreground); }
+      </style>
+
+      <div class="admin-profiles">
+        <button type="button" class="admin-profile active" data-type="escola">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span style="font-weight:600; font-size: 0.9rem;">Escola</span>
+        </button>
+        <button type="button" class="admin-profile" data-type="master">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4v6c0 5.5-3.8 10.7-9 12-5.2-1.3-9-6.5-9-12V6l9-4z"></path></svg>
+          <span style="font-weight:600; font-size: 0.9rem;">Master</span>
+        </button>
+      </div>
+
+      <form id="admin-login-form">
+        <label id="admin-login-label"><span id="admin-login-field-label">Email Institucional</span>
+          <div class="field">
+            <svg viewBox="0 0 24 24" width="16" height="16" style="color:var(--muted-foreground)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <input id="admin-login-input" type="text" required placeholder="Email Institucional" />
+          </div>
+        </label>
+        <label><span>Senha</span>
+          <div class="field">
+            <svg viewBox="0 0 24 24" width="16" height="16" style="color:var(--muted-foreground)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input id="admin-pwd" type="password" required placeholder="••••••••" />
+            <button id="toggle-admin-pwd" type="button" aria-label="Mostrar senha">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </label>
+        <p id="admin-login-error" style="color:#ef4444;font-size:.85rem;margin:0;display:none"></p>
+        <button class="submit gold-glow" type="submit" id="admin-submit-btn" style="background:var(--primary); color:white;">Entrar como Escola</button>
+      </form>
+      <div style="text-align: center; margin-top: 16px;">
+        <a href="#" id="hide-admin-form" style="color: var(--muted-foreground); text-decoration: underline; font-size: 0.85rem;">Voltar para Acesso Aluno/Professor</a>
+      </div>
     </div>
   </section>
 </main>
@@ -229,40 +269,174 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
 
-  /* ---- login: perfil + senha ---- */
-  var role = 'professor';
-  var loginInput = document.getElementById('login-input');
-  var loginFieldLabel = document.getElementById('login-field-label');
-  var submitBtn = document.getElementById('submit-btn');
-  var loginError = document.getElementById('login-error');
+  /* ---- admin toggle logic ---- */
+  document.getElementById('show-admin-form').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('main-login-box').style.display = 'none';
+    document.getElementById('admin-login-box').style.display = 'block';
+  });
+  document.getElementById('hide-admin-form').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('admin-login-box').style.display = 'none';
+    document.getElementById('main-login-box').style.display = 'block';
+  });
 
-  function updateFormForRole(r) {
-    role = r;
-    if (role === 'professor') {
-      loginFieldLabel.textContent = 'Nome';
-      loginInput.type = 'text';
-      loginInput.placeholder = 'Seu nome';
-      loginInput.removeAttribute('pattern');
-      submitBtn.textContent = 'Entrar como Professor';
-    } else {
-      loginFieldLabel.textContent = 'RM';
-      loginInput.type = 'text';
-      loginInput.placeholder = 'Seu RM (ex: 1234)';
-      loginInput.removeAttribute('pattern');
-      submitBtn.textContent = 'Entrar como Aluno';
-    }
-    loginInput.value = '';
-    loginError.style.display = 'none';
-  }
+  var adminType = 'escola';
+  var adminProfiles = document.querySelectorAll('.admin-profile');
+  var adminLoginLabel = document.getElementById('admin-login-field-label');
+  var adminLoginInput = document.getElementById('admin-login-input');
+  var adminSubmitBtn = document.getElementById('admin-submit-btn');
 
-  document.querySelectorAll('.role').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      document.querySelectorAll('.role').forEach(function (b) {
-        b.setAttribute('aria-pressed', String(b === btn));
-      });
-      updateFormForRole(btn.dataset.role);
+  adminProfiles.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      adminProfiles.forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      adminType = this.getAttribute('data-type');
+      if (adminType === 'master') {
+        adminLoginLabel.textContent = 'Identificador Master';
+        adminLoginInput.placeholder = 'Identificador Master';
+        adminSubmitBtn.textContent = 'Entrar como Master';
+      } else {
+        adminLoginLabel.textContent = 'Email Institucional';
+        adminLoginInput.placeholder = 'Email Institucional';
+        adminSubmitBtn.textContent = 'Entrar como Escola';
+      }
     });
   });
+
+  var adminPwd = document.getElementById('admin-pwd');
+  document.getElementById('toggle-admin-pwd').addEventListener('click', function () {
+    var showing = adminPwd.type === 'text';
+    adminPwd.type = showing ? 'password' : 'text';
+    this.setAttribute('aria-label', showing ? 'Mostrar senha' : 'Ocultar senha');
+  });
+
+  document.getElementById('admin-login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errEl = document.getElementById('admin-login-error');
+    errEl.style.display = 'none';
+    adminSubmitBtn.disabled = true;
+    var originalText = adminSubmitBtn.textContent;
+    adminSubmitBtn.textContent = 'Entrando...';
+
+    var credential = adminLoginInput.value.trim();
+    var senha = adminPwd.value;
+
+    if (!credential || !senha) {
+      errEl.textContent = 'Preencha todos os campos.';
+      errEl.style.display = 'block';
+      adminSubmitBtn.disabled = false;
+      adminSubmitBtn.textContent = originalText;
+      return;
+    }
+
+    try {
+      var data = await api.post('/auth/login', { identificador: credential, senha: senha });
+      Auth.save(data.token, data.usuario);
+
+      if (data.usuario.tipo === 'master') {
+        window.location.href = '/master/dashboard.html';
+      } else if (data.usuario.tipo === 'escola') {
+        window.location.href = '/escola/dashboard.html';
+      } else if (data.usuario.tipo === 'prof') {
+        window.location.href = '/professor/dashboard.html';
+      } else {
+        window.location.href = '/aluno/dashboard.html';
+      }
+    } catch (err) {
+      errEl.textContent = err.message || 'Erro ao fazer login. Tente novamente.';
+      errEl.style.display = 'block';
+      adminSubmitBtn.disabled = false;
+      adminSubmitBtn.textContent = originalText;
+    }
+  });
+
+  
+  /* ---- admin toggle logic ---- */
+  document.getElementById('show-admin-form').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelector('.login.glass').style.display = 'none';
+    document.getElementById('admin-login-box').style.display = 'block';
+  });
+  document.getElementById('hide-admin-form').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('admin-login-box').style.display = 'none';
+    document.querySelector('.login.glass').style.display = 'block';
+  });
+
+  var adminType = 'escola';
+  var adminProfiles = document.querySelectorAll('.admin-profile');
+  var adminLoginLabel = document.getElementById('admin-login-field-label');
+  var adminLoginInput = document.getElementById('admin-login-input');
+  var adminSubmitBtn = document.getElementById('admin-submit-btn');
+
+  adminProfiles.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      adminProfiles.forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      adminType = this.getAttribute('data-type');
+      if (adminType === 'master') {
+        adminLoginLabel.textContent = 'Identificador Master';
+        adminLoginInput.placeholder = 'Identificador Master';
+        adminSubmitBtn.textContent = 'Entrar como Master';
+      } else {
+        adminLoginLabel.textContent = 'Email Institucional';
+        adminLoginInput.placeholder = 'Email Institucional';
+        adminSubmitBtn.textContent = 'Entrar como Escola';
+      }
+    });
+  });
+
+  var adminPwd = document.getElementById('admin-pwd');
+  document.getElementById('toggle-admin-pwd').addEventListener('click', function () {
+    var showing = adminPwd.type === 'text';
+    adminPwd.type = showing ? 'password' : 'text';
+    this.setAttribute('aria-label', showing ? 'Mostrar senha' : 'Ocultar senha');
+  });
+
+  document.getElementById('admin-login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errEl = document.getElementById('admin-login-error');
+    errEl.style.display = 'none';
+    adminSubmitBtn.disabled = true;
+    var originalText = adminSubmitBtn.textContent;
+    adminSubmitBtn.textContent = 'Entrando...';
+
+    var credential = adminLoginInput.value.trim();
+    var senha = adminPwd.value;
+
+    if (!credential || !senha) {
+      errEl.textContent = 'Preencha todos os campos.';
+      errEl.style.display = 'block';
+      adminSubmitBtn.disabled = false;
+      adminSubmitBtn.textContent = originalText;
+      return;
+    }
+
+    try {
+      var data = await api.post('/auth/login', { identificador: credential, senha: senha });
+      Auth.save(data.token, data.usuario);
+
+      if (data.usuario.tipo === 'master') {
+        window.location.href = '/master/dashboard.html';
+      } else if (data.usuario.tipo === 'escola') {
+        window.location.href = '/escola/dashboard.html';
+      } else if (data.usuario.tipo === 'prof') {
+        window.location.href = '/professor/dashboard.html';
+      } else {
+        window.location.href = '/aluno/dashboard.html';
+      }
+    } catch (err) {
+      errEl.textContent = err.message || 'Erro ao fazer login. Tente novamente.';
+      errEl.style.display = 'block';
+      adminSubmitBtn.disabled = false;
+      adminSubmitBtn.textContent = originalText;
+    }
+  });
+
+  /* ---- login: perfil + senha ---- */
+
+  var loginInput = document.getElementById('login-input');
 
   var pwd = document.getElementById('pwd');
   document.getElementById('toggle-pwd').addEventListener('click', function () {
@@ -284,26 +458,20 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
       loginError.textContent = 'Preencha todos os campos.';
       loginError.style.display = 'block';
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Entrar como ' + (role === 'professor' ? 'Professor' : 'Aluno');
+      submitBtn.textContent = 'Entrar na Plataforma';
       return;
     }
 
     try {
-      var endpoint, body;
-
-      if (role === 'professor') {
-        endpoint = '/auth/login/professor';
-        body = { nome: credential, senha: senha };
-      } else {
-        endpoint = '/auth/login/aluno';
-        body = { rm: credential, senha: senha };
-      }
-
-      var data = await api.post(endpoint, body);
+      var data = await api.post('/auth/login', { identificador: credential, senha: senha });
 
       Auth.save(data.token, data.usuario);
 
-      if (data.usuario.tipo === 'prof') {
+      if (data.usuario.tipo === 'master') {
+        window.location.href = '/master/dashboard.html';
+      } else if (data.usuario.tipo === 'escola') {
+        window.location.href = '/escola/dashboard.html';
+      } else if (data.usuario.tipo === 'prof') {
         window.location.href = '/professor/dashboard.html';
       } else {
         window.location.href = '/aluno/dashboard.html';
@@ -312,17 +480,18 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
       loginError.textContent = err.message || 'Erro ao fazer login. Tente novamente.';
       loginError.style.display = 'block';
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Entrar como ' + (role === 'professor' ? 'Professor' : 'Aluno');
+      submitBtn.textContent = 'Entrar na Plataforma';
     }
   });
 
   // If user is already logged in, redirect to dashboard
   if (Auth.isLoggedIn()) {
     var user = Auth.getUser();
-    if (user && user.tipo === 'prof') {
-      window.location.href = '/professor/dashboard.html';
-    } else if (user && user.tipo === 'aluno') {
-      window.location.href = '/aluno/dashboard.html';
+    if (user) {
+      if (user.tipo === 'master') window.location.href = '/master/dashboard.html';
+      else if (user.tipo === 'escola') window.location.href = '/escola/dashboard.html';
+      else if (user.tipo === 'prof') window.location.href = '/professor/dashboard.html';
+      else if (user.tipo === 'aluno') window.location.href = '/aluno/dashboard.html';
     }
   }
 })();

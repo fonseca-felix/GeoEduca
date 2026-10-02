@@ -30,6 +30,16 @@ const Auth = {
     return user?.tipo === 'aluno';
   },
 
+  isEscola() {
+    const user = this.getUser();
+    return user?.tipo === 'escola';
+  },
+
+  isMaster() {
+    const user = this.getUser();
+    return user?.tipo === 'master';
+  },
+
   save(token, user) {
     localStorage.setItem('geo_token', token);
     localStorage.setItem('geo_user', JSON.stringify(user));

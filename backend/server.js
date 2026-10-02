@@ -53,6 +53,8 @@ const dashboardRoutes = require('./src/routes/dashboard');
 const estudoRoutes = require('./src/routes/estudo');
 const detetivedRoutes = require('./src/routes/detetive');
 const bancoProvasRoutes = require('./src/routes/banco_provas');
+const masterRoutes = require('./src/routes/master');
+const escolaRoutes = require('./src/routes/escola');
 
 // Rotas de CSRF
 const loginRoutes = require('./src/routes/login');
@@ -70,6 +72,8 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/estudos', estudoRoutes);
 app.use('/api/detetive', detetivedRoutes);
 app.use('/api/banco_provas', bancoProvasRoutes);
+app.use('/api/master', masterRoutes);
+app.use('/api/escola', escolaRoutes);
 
 // Rota de teste da API
 app.get('/api/health', (req, res) => {
