@@ -11,13 +11,21 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../frontend/react_dist/vulcao',
-    emptyOutDir: true,
+    outDir: '../frontend/react_dist',
+    emptyOutDir: false,
     rollupOptions: {
-      input: 'src/main.tsx',
+      input: {
+        vulcao: 'src/main.tsx',
+        placas: 'src/main-placas.tsx'
+      },
       output: {
-        entryFileNames: 'app.js',
-        assetFileNames: 'style.css',
+        entryFileNames: '[name]/app.js',
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+            return 'style.css';
+          }
+          return 'assets/[name]-[hash][extname]';
+        },
       },
     },
   },
