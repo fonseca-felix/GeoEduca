@@ -473,9 +473,10 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
 
   /* ---- login: perfil + senha ---- */
 
-  var loginInput = document.getElementById('login-input');
-
   var pwd = document.getElementById('pwd');
+  var submitBtn = document.getElementById('submit-btn');
+  var loginError = document.getElementById('login-error');
+
   document.getElementById('toggle-pwd').addEventListener('click', function () {
     var showing = pwd.type === 'text';
     pwd.type = showing ? 'password' : 'text';
