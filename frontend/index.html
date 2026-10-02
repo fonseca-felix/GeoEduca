@@ -445,6 +445,32 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
     }
   });
 
+  /* ---- roles selection ---- */
+  var roleBtns = document.querySelectorAll('.role');
+  var loginLabel = document.getElementById('login-field-label');
+  var loginInput = document.getElementById('login-input');
+  
+  if (roleBtns.length > 0) {
+    roleBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        roleBtns.forEach(function(b) {
+            b.classList.remove('active');
+            b.setAttribute('aria-pressed', 'false');
+        });
+        this.classList.add('active');
+        this.setAttribute('aria-pressed', 'true');
+        
+        if (this.dataset.role === 'prof') {
+            loginLabel.textContent = 'Email do Professor';
+            loginInput.placeholder = 'professor@escola.com';
+        } else {
+            loginLabel.textContent = 'Email ou RM';
+            loginInput.placeholder = 'Identificador (Email, Nome, RM)';
+        }
+      });
+    });
+  }
+
   /* ---- login: perfil + senha ---- */
 
   var loginInput = document.getElementById('login-input');

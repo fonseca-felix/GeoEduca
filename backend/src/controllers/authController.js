@@ -39,6 +39,18 @@ const login = async (req, res) => {
             });
         }
 
+        // Mock Prof
+        if (identificador === 'prof123' && senha === 'prof123') {
+            const token = jwt.sign({ id: 'prof_123', tipo: 'prof', email: 'prof123@mock', escolaId: 'escola_ce399' }, process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026', { expiresIn: '7d' });
+            return res.json({ token, usuario: { id: 'prof_123', nome: 'Professor Teste', email: 'prof123@mock', escolaId: 'escola_ce399', tipo: 'prof' } });
+        }
+
+        // Mock Aluno
+        if (identificador === 'aluno123' && senha === 'aluno123') {
+            const token = jwt.sign({ id: 'aluno_123', tipo: 'aluno', rm: 'aluno123' }, process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026', { expiresIn: '7d' });
+            return res.json({ token, usuario: { id: 'aluno_123', rm: 'aluno123', nome: 'Aluno Teste', tipo: 'aluno' } });
+        }
+
         // 2. É um email? Checar Escolas e Professores
         if (identificador.includes('@')) {
             // Tentar na coleção escolas
@@ -117,6 +129,13 @@ const verifyToken = async (req, res) => {
 
         if (decoded.tipo === 'master') {
             return res.json({ valido: true, usuario: { id: 'master_admin', nome: 'Admin Master', email: decoded.email, tipo: 'master' } });
+        }
+
+        if (decoded.tipo === 'prof' && decoded.id === 'prof_123') {
+            return res.json({ valido: true, usuario: { id: 'prof_123', nome: 'Professor Teste', email: 'prof123@mock', tipo: 'prof' } });
+        }
+        if (decoded.tipo === 'aluno' && decoded.id === 'aluno_123') {
+            return res.json({ valido: true, usuario: { id: 'aluno_123', rm: 'aluno123', nome: 'Aluno Teste', tipo: 'aluno' } });
         }
 
         if (decoded.tipo === 'escola') {
