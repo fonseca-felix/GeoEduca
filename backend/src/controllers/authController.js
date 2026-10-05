@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
 const { db } = require('../../firebase/firebase-admin');
 
 // Nova função unificada de Login
@@ -19,7 +18,8 @@ const login = async (req, res) => {
                 return res.status(400).json({ error: 'Validação de reCAPTCHA é obrigatória' });
             }
             const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecret}&response=${recaptchaResponse}`;
-            const { data: recaptchaData } = await axios.post(verifyUrl);
+            const response = await fetch(verifyUrl, { method: 'POST' });
+            const recaptchaData = await response.json();
             if (!recaptchaData.success) {
                 return res.status(400).json({ error: 'Falha na validação do reCAPTCHA' });
             }
