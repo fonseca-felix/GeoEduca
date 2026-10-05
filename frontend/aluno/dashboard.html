@@ -5,7 +5,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GeoEduca – Dashboard do Aluno</title>
+  <title>GeoEduca  Dashboard do Aluno</title>
   <meta name="description" content="Acompanhe seu progresso, atividades pendentes e ranking da turma no GeoEduca." />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/tokens.css" />
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../css/darkmode.css" />
 
   <style>
-    /* ── Hero Card ───────────────────────────────────────── */
+    /* -- Hero Card ----------------------------------------- */
     .dash-hero {
       background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 60%, #1a1960 100%);
       color: #fff;
@@ -95,10 +95,10 @@
       height: 14px;
     }
 
-    /* ── Quick Stats Row ─────────────────────────────────── */
+    /* -- Quick Stats Row ----------------------------------- */
     .dash-stats {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: rePeçat(3, 1fr);
       gap: 16px;
     }
 
@@ -167,7 +167,7 @@
       margin-top: 3px;
     }
 
-    /* ── Section Title ───────────────────────────────────── */
+    /* -- Section Title ------------------------------------- */
     .section-header {
       display: flex;
       justify-content: space-between;
@@ -192,14 +192,14 @@
 
     .section-link:hover { color: var(--gold); }
 
-    /* ── Activity Cards (injected by JS) ─────────────────── */
+    /* -- Activity Cards (injected by JS) ------------------- */
     #student-games {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: rePeçat(auto-fill, minmax(260px, 1fr));
       gap: 16px;
     }
 
-    /* ── Profile Card ────────────────────────────────────── */
+    /* -- Profile Card -------------------------------------- */
     .profile-card {
       background: var(--color-surface);
       border: 1px solid var(--color-border);
@@ -302,7 +302,7 @@
 
     .xp-meta span:last-child { color: var(--gold-dark); }
 
-    /* ── BrazilGuessr Card ───────────────────────────────── */
+    /* -- BrazilGuessr Card --------------------------------- */
     .bg-card {
       background: var(--color-surface);
       border: 1px solid var(--color-border);
@@ -375,7 +375,7 @@
     }
 
 
-    /* ── Main Grid Layout ────────────────────────────────── */
+    /* -- Main Grid Layout ---------------------------------- */
     .dash-grid {
       display: grid;
       grid-template-columns: 1fr 300px;
@@ -397,7 +397,7 @@
       top: 80px;
     }
 
-    /* ── Responsive ──────────────────────────────────────── */
+    /* -- Responsive ---------------------------------------- */
     @media (max-width: 1100px) {
       .dash-grid {
         grid-template-columns: 1fr;
@@ -407,7 +407,7 @@
         order: -1;
       }
       .dash-stats {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: rePeçat(3, 1fr);
       }
     }
 
@@ -422,7 +422,7 @@
       .dash-stats { grid-template-columns: 1fr; }
     }
 
-    /* ── Animations ──────────────────────────────────────── */
+    /* -- Animations ---------------------------------------- */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(18px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -442,22 +442,22 @@
 <div class="app-layout" id="app-layout">
   <main class="app-main">
 
-    <!-- ── Page Header ── -->
+    <!-- -- Page Header -- -->
     <header class="page-header">
       <div class="page-header-left">
         <h1 class="page-title">Dashboard</h1>
         <p class="page-subtitle">Bem-vindo de volta ao GeoEduca!</p>
       </div>
       <div class="page-header-right">
-        <button class="btn btn-primary" onclick="window.Modal.open('joinRoomModal')"><i class="fa-solid fa-users"></i> Entrar em uma Turma</button>
+        <button class="btn btn-primary" onclick="Modal.open('joinRoomModal')"><i class="fa-solid fa-users"></i> Entrar em uma Turma</button>
       </div>
     </header>
 
-    <!-- ── Page Content ── -->
+    <!-- -- Page Content -- -->
     <div class="page-content">
       <div class="dash-grid">
 
-        <!-- ════════════ COLUNA PRINCIPAL ════════════ -->
+        <!-- ------------ COLUNA PRINCIPAL ------------ -->
         <div class="dash-main-col">
 
           <!-- Hero -->
@@ -483,7 +483,7 @@
             <div class="dash-stat gold">
               <div class="dash-stat-icon gold"><i class="fa-solid fa-star"></i></div>
               <div class="dash-stat-body">
-                <div class="dash-stat-value" id="stat-xp">–</div>
+                <div class="dash-stat-value" id="stat-xp"></div>
                 <div class="dash-stat-label">XP Total</div>
               </div>
             </div>
@@ -497,7 +497,7 @@
             <div class="dash-stat forest">
               <div class="dash-stat-icon forest"><i class="fa-solid fa-book"></i></div>
               <div class="dash-stat-body">
-                <div class="dash-stat-value" id="stat-pending">–</div>
+                <div class="dash-stat-value" id="stat-pending"></div>
                 <div class="dash-stat-label">Pendências</div>
               </div>
             </div>
@@ -507,14 +507,14 @@
           <div>
             <div class="section-header">
               <span class="section-title">Atividades Recomendadas</span>
-              <a href="atividades.html" class="section-link">Ver todas →</a>
+              <a href="atividades.html" class="section-link">Ver todas ?</a>
             </div>
             <div id="student-games"></div>
           </div>
 
         </div><!-- /dash-main-col -->
 
-        <!-- ════════════ COLUNA LATERAL ════════════ -->
+        <!-- ------------ COLUNA LATERAL ------------ -->
         <div class="dash-side-col">
 
           <!-- Profile / Level Card -->
@@ -548,7 +548,7 @@
             <div class="bg-card-body">
               <div class="bg-attempts">
                 <span class="bg-attempts-label">Tentativas hoje</span>
-                <span class="bg-attempts-value" id="dashboard-bg-tentativas">–</span>
+                <span class="bg-attempts-value" id="dashboard-bg-tentativas"></span>
               </div>
               <a href="hub_brazilguessr.html" class="btn btn-secondary btn-sm" style="width:100%; justify-content:center; margin-bottom:8px;">
                 Ver Hub
@@ -609,7 +609,7 @@
     </div>
     
     <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-      <button type="button" class="btn btn-outline" style="flex: 1;" onclick="window.Modal.close('joinRoomModal')">Cancelar</button>
+      <button type="button" class="btn btn-outline" style="flex: 1;" onclick="Modal.close('joinRoomModal')">Cancelar</button>
       <button type="button" class="btn btn-primary" style="flex: 1;" onclick="joinRoom()">Entrar</button>
     </div>
   </div>
@@ -619,7 +619,7 @@
 async function joinRoom() {
     const code = document.getElementById('roomCodeInput').value.trim().toUpperCase();
     if(code.length !== 6) {
-        if(window.Toast) Toast.error('O código deve ter 6 caracteres');
+        Toast.error('O código deve ter 6 caracteres');
         return;
     }
     
@@ -634,13 +634,13 @@ async function joinRoom() {
         
         if(!res.ok) throw new Error(data.error || 'Erro ao entrar na turma');
         
-        if(window.Toast) Toast.success(data.message);
+        Toast.success(data.message);
         
         // Atualizar o nome da sala no painel (mock: apenas reload)
         setTimeout(() => window.location.reload(), 1500);
         
     } catch(err) {
-        if(window.Toast) Toast.error(err.message);
+        Toast.error(err.message);
         console.error(err);
     }
 }
