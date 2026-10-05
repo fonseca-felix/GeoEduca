@@ -42,7 +42,15 @@ router.get('/:id', authenticateToken, async (req, res) => {
             return res.status(404).json({ error: 'Sala não encontrada' });
         }
         
-        const data = sala.data();
+        let data = sala.data();
+        
+        // Se a sala for antiga e não tiver código, gera um agora
+        if (!data.codigo) {
+            const novoCodigo = Math.random().toString(36).substring(2, 8).toUpperCase();
+            await salaRef.update({ codigo: novoCodigo });
+            data.codigo = novoCodigo;
+        }
+        
         res.json({
             id: sala.id,
             nome: data.nome,
