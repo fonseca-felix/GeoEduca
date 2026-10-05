@@ -1,14 +1,14 @@
-const { db } = require('../../firebase/firebase-admin');
+const { supabase } = require('../../supabase/client');
 
 const listarQuizzes = async (req, res) => {
     try {
-        const snapshot = await db.collection('quizzes').get();
+        const { data: quizzesDb, error } = await supabase.from('quizzes').select('*');
+        if (error) throw error;
+        
         const quizzes = [];
-        for (const doc of snapshot.docs) {
-            const d = doc.data();
-            const perguntasSnapshot = await db.collection('quiz_perguntas').where('quizId', '==', doc.id).get();
-            const perguntas = perguntasSnapshot.docs.map(pDoc => ({ id: pDoc.id, ...pDoc.data() }));
-            quizzes.push({ id: doc.id, titulo: d.titulo, imagem: d.imagem, perguntas, createdAt: d.createdAt });
+        for (const doc of (quizzesDb || [])) {
+            const { data: perguntas } = await supabase.from('quiz_perguntas').select('*').eq('quizId', doc.id);
+            quizzes.push({ ...doc, perguntas: perguntas || [] });
         }
         res.json(quizzes);
     } catch (error) {
@@ -20,22 +20,22 @@ const listarQuizzes = async (req, res) => {
 const listarQuizzesDisponiveis = async (req, res) => {
     try {
         const alunoId = req.user.id;
-        const snapshot = await db.collection('quizzes').get();
+        const { data: quizzesDb, error } = await supabase.from('quizzes').select('*');
+        if (error) throw error;
+        
         const quizzes = [];
 
-        for (const doc of snapshot.docs) {
-            const d = doc.data();
-            const respostaExistente = await db.collection('quiz_respostas')
-                .where('quizId', '==', doc.id).where('alunoId', '==', alunoId).limit(1).get();
-            const perguntasSnapshot = await db.collection('quiz_perguntas').where('quizId', '==', doc.id).get();
-            const perguntas = perguntasSnapshot.docs.map(pDoc => {
-                const pd = pDoc.data();
-                return { id: pDoc.id, texto: pd.texto, opcoes: pd.opcoes, valor: pd.valor };
-            });
+        for (const doc of (quizzesDb || [])) {
+            const { data: respostaExistente } = await supabase.from('quiz_respostas')
+                .select('pontuacao').eq('quizId', doc.id).eq('alunoId', alunoId).limit(1);
+                
+            const { data: perguntasDb } = await supabase.from('quiz_perguntas').select('id, texto, opcoes, valor').eq('quizId', doc.id);
+            
             quizzes.push({
-                id: doc.id, titulo: d.titulo, imagem: d.imagem, perguntas,
-                realizado: !respostaExistente.empty,
-                pontuacao: respostaExistente.empty ? null : respostaExistente.docs[0].data().pontuacao
+                ...doc,
+                perguntas: perguntasDb || [],
+                realizado: respostaExistente && respostaExistente.length > 0,
+                pontuacao: (respostaExistente && respostaExistente.length > 0) ? respostaExistente[0].pontuacao : null
             });
         }
         res.json(quizzes);
@@ -51,11 +51,17 @@ const criarQuiz = async (req, res) => {
         if (!titulo || !perguntas?.length) {
             return res.status(400).json({ error: 'Título e perguntas são obrigatórios' });
         }
-        const novoQuiz = { titulo, imagem: imagem || 'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg', createdAt: new Date().toISOString() };
-        const quizRef = await db.collection('quizzes').add(novoQuiz);
-        for (const p of perguntas) {
-            await db.collection('quiz_perguntas').add({ quizId: quizRef.id, texto: p.texto, opcoes: p.opcoes, correta: p.correta, valor: p.valor || 1 });
-        }
+        const novoQuiz = { titulo, imagem: imagem || 'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg' };
+        
+        const { data: quizRef, error } = await supabase.from('quizzes').insert([novoQuiz]).select().single();
+        if (error) throw error;
+        
+        const perguntasData = perguntas.map(p => ({
+            quizId: quizRef.id, texto: p.texto, opcoes: p.opcoes, correta: p.correta, valor: p.valor || 1
+        }));
+        
+        await supabase.from('quiz_perguntas').insert(perguntasData);
+        
         res.status(201).json({ id: quizRef.id, ...novoQuiz, perguntas });
     } catch (error) {
         console.error(error);
@@ -71,20 +77,22 @@ const responderQuiz = async (req, res) => {
 
         if (!respostas || !Array.isArray(respostas)) return res.status(400).json({ error: 'Respostas são obrigatórias' });
 
-        const quiz = await db.collection('quizzes').doc(id).get();
-        if (!quiz.exists) return res.status(404).json({ error: 'Quiz não encontrado' });
+        const { data: quiz, error: quizErr } = await supabase.from('quizzes').select('id').eq('id', id).single();
+        if (quizErr || !quiz) return res.status(404).json({ error: 'Quiz não encontrado' });
 
-        const respostaExistente = await db.collection('quiz_respostas')
-            .where('quizId', '==', id).where('alunoId', '==', alunoId).limit(1).get();
-        if (!respostaExistente.empty) return res.status(400).json({ error: 'Quiz já respondido' });
+        const { data: respostaExistente } = await supabase.from('quiz_respostas')
+            .select('id').eq('quizId', id).eq('alunoId', alunoId).limit(1);
+            
+        if (respostaExistente && respostaExistente.length > 0) return res.status(400).json({ error: 'Quiz já respondido' });
 
-        const perguntasSnapshot = await db.collection('quiz_perguntas').where('quizId', '==', id).get();
+        const { data: perguntasSnapshot } = await supabase.from('quiz_perguntas').select('*').eq('quizId', id);
+        
         let pontuacaoTotal = 0, pontuacaoMaxima = 0;
         const perguntasMap = {};
-        perguntasSnapshot.forEach(pDoc => {
-            perguntasMap[pDoc.id] = pDoc.data();
-            pontuacaoMaxima += pDoc.data().valor || 1;
-        });
+        for (const p of (perguntasSnapshot || [])) {
+            perguntasMap[p.id] = p;
+            pontuacaoMaxima += p.valor || 1;
+        }
 
         const respostasDetalhadas = respostas.map(r => {
             const pergunta = perguntasMap[r.perguntaId];
@@ -93,10 +101,10 @@ const responderQuiz = async (req, res) => {
             return { perguntaId: r.perguntaId, opcaoSelecionada: r.opcaoSelecionada, correta };
         });
 
-        await db.collection('quiz_respostas').add({
+        await supabase.from('quiz_respostas').insert([{
             quizId: id, alunoId, respostas: respostasDetalhadas,
-            pontuacao: pontuacaoTotal, pontuacaoMaxima, dataResposta: new Date().toISOString()
-        });
+            pontuacao: pontuacaoTotal, pontuacaoMaxima
+        }]);
 
         res.status(201).json({
             message: 'Quiz respondido com sucesso!', pontuacao: pontuacaoTotal, pontuacaoMaxima,
