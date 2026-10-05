@@ -65,64 +65,61 @@ const login = async (req, res) => {
             return res.json({ token, usuario: { id: 'aluno_123', rm: 'aluno123', nome: 'Aluno Teste', tipo: 'aluno' } });
         }
 
-        // 2. É um email? Checar Escolas e Professores
-        if (identificador.includes('@')) {
-            // Tentar na coleção escolas
-            const escolaSnap = await db.collection('escolas').where('email', '==', identificador).limit(1).get();
-            if (!escolaSnap.empty) {
-                const escola = escolaSnap.docs[0];
-                const escolaData = escola.data();
-                const senhaValida = await bcrypt.compare(senha, escolaData.senha);
-                if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas' });
-                
-                const token = jwt.sign(
-                    { id: escola.id, tipo: 'escola', email: escolaData.email },
-                    process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
-                    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
-                );
-                return res.json({
-                    token,
-                    usuario: { id: escola.id, nome: escolaData.nome, email: escolaData.email, tipo: 'escola' }
-                });
-            }
+        // 2. Tentar na coleção escolas
+        const escolaSnap = await db.collection('escolas').where('email', '==', identificador).limit(1).get();
+        if (!escolaSnap.empty) {
+            const escola = escolaSnap.docs[0];
+            const escolaData = escola.data();
+            const senhaValida = await bcrypt.compare(senha, escolaData.senha);
+            if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas' });
+            
+            const token = jwt.sign(
+                { id: escola.id, tipo: 'escola', email: escolaData.email },
+                process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
+                { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+            );
+            return res.json({
+                token,
+                usuario: { id: escola.id, nome: escolaData.nome, email: escolaData.email, tipo: 'escola' }
+            });
+        }
 
-            // Tentar na coleção professores
-            const profSnap = await db.collection('professores').where('email', '==', identificador).limit(1).get();
-            if (!profSnap.empty) {
-                const prof = profSnap.docs[0];
-                const profData = prof.data();
-                const senhaValida = await bcrypt.compare(senha, profData.senha);
-                if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas' });
-                
-                const token = jwt.sign(
-                    { id: prof.id, tipo: 'prof', email: profData.email, escolaId: profData.escolaId },
-                    process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
-                    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
-                );
-                return res.json({
-                    token,
-                    usuario: { id: prof.id, nome: profData.nome, email: profData.email, escolaId: profData.escolaId, tipo: 'prof' }
-                });
-            }
-        } else {
-            // 3. Não tem '@', é RM (Aluno)
-            const alunoSnap = await db.collection('alunos').where('rm', '==', identificador).limit(1).get();
-            if (!alunoSnap.empty) {
-                const aluno = alunoSnap.docs[0];
-                const alunoData = aluno.data();
-                const senhaValida = await bcrypt.compare(senha, alunoData.senha);
-                if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas' });
-                
-                const token = jwt.sign(
-                    { id: aluno.id, tipo: 'aluno', rm: alunoData.rm },
-                    process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
-                    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
-                );
-                return res.json({
-                    token,
-                    usuario: { id: aluno.id, rm: alunoData.rm, nome: alunoData.nome, salaId: alunoData.salaId, salaNome: alunoData.salaNome, tipo: 'aluno' }
-                });
-            }
+        // 3. Tentar na coleção professores
+        const profSnap = await db.collection('professores').where('email', '==', identificador).limit(1).get();
+        if (!profSnap.empty) {
+            const prof = profSnap.docs[0];
+            const profData = prof.data();
+            const senhaValida = await bcrypt.compare(senha, profData.senha);
+            if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas' });
+            
+            const token = jwt.sign(
+                { id: prof.id, tipo: 'prof', email: profData.email, escolaId: profData.escolaId },
+                process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
+                { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+            );
+            return res.json({
+                token,
+                usuario: { id: prof.id, nome: profData.nome, email: profData.email, escolaId: profData.escolaId, tipo: 'prof' }
+            });
+        }
+
+        // 4. Tentar na coleção alunos (RM)
+        const alunoSnap = await db.collection('alunos').where('rm', '==', identificador).limit(1).get();
+        if (!alunoSnap.empty) {
+            const aluno = alunoSnap.docs[0];
+            const alunoData = aluno.data();
+            const senhaValida = await bcrypt.compare(senha, alunoData.senha);
+            if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas' });
+            
+            const token = jwt.sign(
+                { id: aluno.id, tipo: 'aluno', rm: alunoData.rm },
+                process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
+                { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+            );
+            return res.json({
+                token,
+                usuario: { id: aluno.id, rm: alunoData.rm, nome: alunoData.nome, salaId: alunoData.salaId, salaNome: alunoData.salaNome, tipo: 'aluno' }
+            });
         }
 
         return res.status(401).json({ error: 'Credenciais inválidas ou usuário não encontrado' });
