@@ -184,27 +184,19 @@
                 
                 const pct = metricas.total > 0 ? Math.round((metricas.respondidas / metricas.total) * 100) : 0;
                 
-                listEl.innerHTML += \`
-                    <div class="student-row">
-                        <div class="student-info">
-                            <div class="student-avatar">\${initial}</div>
-                            <div>
-                                <h4 style="margin:0; font-size:1rem;">\${aluno.nome}</h4>
-                                <div style="font-size:0.8rem; color: var(--color-text-secondary); margin-top: 0.25rem;">RM: \${aluno.rm} \${statusBadge}</div>
-                            </div>
-                        </div>
-                        <div class="metrics">
-                            <div class="metric-item">
-                                <div class="metric-label">Atividades/Provas</div>
-                                <div class="metric-value">\${metricas.total}</div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-label">Entregues</div>
-                                <div class="metric-value" style="color: \${pct === 100 ? '#10b981' : (pct > 0 ? '#f59e0b' : 'var(--color-text)')}">\${metricas.respondidas}</div>
-                            </div>
-                        </div>
-                    </div>
-                \`;
+                // USANDO REPLACE EM VEZ DE TEMPLATE STRING PARA EVITAR BUGS DE ESCAPE NO MEU LADO
+                const htmlStr = '<div class="student-row"><div class="student-info"><div class="student-avatar">@@initial@@</div><div><h4 style="margin:0; font-size:1rem;">@@nome@@</h4><div style="font-size:0.8rem; color: var(--color-text-secondary); margin-top: 0.25rem;">RM: @@rm@@ @@statusBadge@@</div></div></div><div class="metrics"><div class="metric-item"><div class="metric-label">Atividades/Provas</div><div class="metric-value">@@total@@</div></div><div class="metric-item"><div class="metric-label">Entregues</div><div class="metric-value" style="color: @@pctColor@@">@@respondidas@@</div></div></div></div>';
+                
+                const finalHtml = htmlStr
+                  .replace('@@initial@@', initial)
+                  .replace('@@nome@@', aluno.nome)
+                  .replace('@@rm@@', aluno.rm)
+                  .replace('@@statusBadge@@', statusBadge)
+                  .replace('@@total@@', metricas.total)
+                  .replace('@@pctColor@@', pct === 100 ? '#10b981' : (pct > 0 ? '#f59e0b' : 'var(--color-text)'))
+                  .replace('@@respondidas@@', metricas.respondidas);
+
+                listEl.innerHTML += finalHtml;
             });
             
             // Calculo dos stats globais
