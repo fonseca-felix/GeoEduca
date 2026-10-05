@@ -34,6 +34,7 @@ const NAV_ICONS = {
   brazilguessr: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>`,
   rota27:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`,
   banco_provas: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/><path d="M9 11h6"/><path d="M9 19h4"/></svg>`,
+  leitor: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>`,
   escolas:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
   professores:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>`,
 };
@@ -88,6 +89,10 @@ function buildProfessorSidebar(basePath = '../') {
       <a class="sidebar-nav-item" href="${basePath}professor/banco_provas.html" data-tooltip="Provas Físicas">
         <span class="sidebar-nav-icon">${NAV_ICONS.banco_provas}</span>
         <span class="sidebar-nav-text">Provas Físicas</span>
+      </a>
+      <a class="sidebar-nav-item" href="${basePath}professor/leitor_prova.html" data-tooltip="Leitor de Provas">
+        <span class="sidebar-nav-icon">${NAV_ICONS.leitor}</span>
+        <span class="sidebar-nav-text">Leitor de Provas</span>
       </a>
       <a class="sidebar-nav-item" href="${basePath}professor/jogos.html" data-tooltip="Jogos">
         <span class="sidebar-nav-icon">${NAV_ICONS.jogos}</span>

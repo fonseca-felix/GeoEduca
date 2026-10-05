@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoEduca - Leitor de Provas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    .upload-area {
+      border: 2px dashed var(--color-border);
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      text-align: center;
+      background: var(--color-surface);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--gold);
+      background: rgba(204, 164, 59, 0.05);
+    }
+    .upload-icon {
+      font-size: 3rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .result-container {
+      margin-top: 2rem;
+      display: none;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .result-score {
+      font-size: 2.5rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .question-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .question-item {
+      padding: 1rem;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.02);
+      border-left: 4px solid var(--color-border);
+    }
+    .question-item.correct { border-left-color: #22c55e; }
+    .question-item.incorrect { border-left-color: #ef4444; }
+    .loading-state {
+      display: none;
+      text-align: center;
+      padding: 3rem;
+    }
+    .spinner {
+      animation: spin 1s linear infinite;
+      font-size: 2rem;
+      color: var(--gold);
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="dark-mode">
+
+  <div id="sidebar-container"></div>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <header class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Leitor de Provas Físicas</h1>
+          <p class="page-subtitle">Faça o upload da foto da prova do aluno e deixe a IA corrigir automaticamente baseada no gabarito.</p>
+        </div>
+      </header>
+      
+      <div class="page-content">
+        <div class="card" style="max-width: 800px; margin: 0 auto;">
+          <div class="form-group">
+            <label>1. Selecione a Prova Oficial</label>
+            <div class="select-wrapper">
+              <select id="prova-select" required>
+                <option value="">Carregando provas...</option>
+              </select>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <span class="field-hint">A IA usará o gabarito desta prova para correção.</span>
+          </div>
+
+          <div class="form-group" style="margin-top: 1.5rem;">
+            <label>2. Envie a Foto da Prova</label>
+            <input type="file" id="file-input" accept="image/*" style="display: none;" />
+            <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+              <i class="fa-solid fa-camera upload-icon"></i>
+              <h3>Clique para tirar foto ou fazer upload</h3>
+              <p class="field-hint">Formatos suportados: JPG, PNG. (Tente tirar uma foto nítida e bem iluminada)</p>
+              <p id="file-name" style="margin-top: 10px; font-weight: bold; color: var(--gold);"></p>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin-top: 2rem;">
+            <button id="btn-corrigir" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1.1rem;" disabled>
+              <i class="fa-solid fa-robot" style="margin-right: 8px;"></i> Escanear e Corrigir
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div id="loading" class="loading-state">
+            <i class="fa-solid fa-circle-notch spinner"></i>
+            <h3 style="margin-top: 1rem;">A IA está lendo a prova...</h3>
+            <p class="field-hint">Isso pode levar de 5 a 15 segundos dependendo da legibilidade da imagem.</p>
+          </div>
+
+          <!-- Results -->
+          <div id="result-container" class="result-container">
+            <div class="result-score">Nota: <span id="nota-final">0</span> / <span id="nota-maxima">10</span></div>
+            <div class="question-list" id="question-list">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/sidebar.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      Auth.requireAuth('prof');
+      await carregarProvas();
+      
+      const fileInput = document.getElementById('file-input');
+      const uploadArea = document.getElementById('upload-area');
+      const fileName = document.getElementById('file-name');
+      const btnCorrigir = document.getElementById('btn-corrigir');
+
+      // Drag and drop behavior
+      uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+      uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+      uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+          fileInput.files = e.dataTransfer.files;
+          fileName.textContent = e.dataTransfer.files[0].name;
+          verificarCampos();
+        }
+      });
+
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) {
+          fileName.textContent = fileInput.files[0].name;
+          verificarCampos();
+        }
+      });
+
+      document.getElementById('prova-select').addEventListener('change', verificarCampos);
+
+      function verificarCampos() {
+        const provaId = document.getElementById('prova-select').value;
+        const file = fileInput.files[0];
+        btnCorrigir.disabled = !(provaId && file);
+      }
+
+      btnCorrigir.addEventListener('click', enviarParaCorrecao);
+    });
+
+    async function carregarProvas() {
+      const select = document.getElementById('prova-select');
+      try {
+        const provas = await api.get('/provas');
+        select.innerHTML = '<option value="">Selecione a prova base...</option>';
+        provas.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = p.titulo;
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        select.innerHTML = '<option value="">Erro ao carregar provas</option>';
+      }
+    }
+
+    async function enviarParaCorrecao() {
+      const provaId = document.getElementById('prova-select').value;
+      const fileInput = document.getElementById('file-input');
+      const file = fileInput.files[0];
+
+      if (!provaId || !file) return;
+
+      const btnCorrigir = document.getElementById('btn-corrigir');
+      const loading = document.getElementById('loading');
+      const resultContainer = document.getElementById('result-container');
+      const questionList = document.getElementById('question-list');
+
+      btnCorrigir.style.display = 'none';
+      resultContainer.style.display = 'none';
+      loading.style.display = 'block';
+      questionList.innerHTML = '';
+
+      const formData = new FormData();
+      formData.append('provaId', provaId);
+      formData.append('imagem', file);
+
+      try {
+        const token = Auth.getToken();
+        const response = await fetch(`${window.APP_CONFIG.API_BASE_URL}/leitor/corrigir`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Erro ao processar correção');
+        }
+
+        renderResultados(data);
+
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao corrigir prova: ' + error.message);
+        btnCorrigir.style.display = 'inline-block';
+      } finally {
+        loading.style.display = 'none';
+      }
+    }
+
+    function renderResultados(data) {
+      const resultContainer = document.getElementById('result-container');
+      const btnCorrigir = document.getElementById('btn-corrigir');
+      const list = document.getElementById('question-list');
+
+      document.getElementById('nota-final').textContent = data.notaTotal;
+      document.getElementById('nota-maxima').textContent = data.notaMaxima;
+
+      if (data.respostas && Array.isArray(data.respostas)) {
+        data.respostas.forEach(r => {
+          const item = document.createElement('div');
+          item.className = `question-item ${r.correta ? 'correct' : 'incorrect'}`;
+          item.innerHTML = `
+            <div style="display:flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <strong style="color:var(--color-text)">${r.questao}</strong>
+              <span style="color:var(--gold); font-weight:bold;">${r.pontuacao} pts</span>
+            </div>
+            <div style="font-size:0.9rem; color:var(--muted-foreground)">
+              <i class="fa-solid fa-reply fa-rotate-180" style="margin-right:4px;"></i> 
+              Lido da imagem: <strong>${r.respostaAluno || 'Não lido/Em branco'}</strong>
+            </div>
+          `;
+          list.appendChild(item);
+        });
+      }
+
+      resultContainer.style.display = 'block';
+      
+      // Mudar botão para permitir nova leitura
+      btnCorrigir.innerHTML = '<i class="fa-solid fa-redo"></i> Corrigir Outra';
+      btnCorrigir.style.display = 'inline-block';
+      btnCorrigir.onclick = () => {
+        document.getElementById('file-input').value = '';
+        document.getElementById('file-name').textContent = '';
+        btnCorrigir.disabled = true;
+        btnCorrigir.innerHTML = '<i class="fa-solid fa-robot" style="margin-right: 8px;"></i> Escanear e Corrigir';
+        btnCorrigir.removeEventListener('click', btnCorrigir.onclick);
+        btnCorrigir.addEventListener('click', enviarParaCorrecao);
+        resultContainer.style.display = 'none';
+      };
+    }
+  </script>
+</body>
+</html>
