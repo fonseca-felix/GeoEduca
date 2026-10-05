@@ -1,11 +1,10 @@
 -- Script de Criação de Tabelas para Supabase (PostgreSQL)
--- Cole este script no SQL Editor do Supabase e execute.
-
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- Alterado de UUID para TEXT para manter a compatibilidade com os IDs antigos do Firebase Firestore.
+-- Cole este script no SQL Editor do Supabase e execute (se você já tiver executado o anterior, apague as tabelas primeiro).
 
 -- Escolas
 CREATE TABLE escolas (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT PRIMARY KEY,
     nome TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     senha TEXT NOT NULL,
@@ -14,41 +13,41 @@ CREATE TABLE escolas (
 
 -- Professores
 CREATE TABLE professores (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT PRIMARY KEY,
     nome TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     senha TEXT NOT NULL,
     tipo TEXT DEFAULT 'prof',
-    "escolaId" UUID REFERENCES escolas(id) ON DELETE CASCADE,
+    "escolaId" TEXT REFERENCES escolas(id) ON DELETE CASCADE,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     "criadoEm" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Salas
 CREATE TABLE salas (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT PRIMARY KEY,
     nome TEXT NOT NULL,
     serie TEXT,
     turma TEXT,
-    "profId" UUID REFERENCES professores(id) ON DELETE CASCADE,
+    "profId" TEXT REFERENCES professores(id) ON DELETE CASCADE,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Alunos
 CREATE TABLE alunos (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT PRIMARY KEY,
     rm TEXT UNIQUE NOT NULL,
     nome TEXT NOT NULL,
     senha TEXT NOT NULL,
-    "salaId" UUID REFERENCES salas(id) ON DELETE CASCADE,
+    "salaId" TEXT REFERENCES salas(id) ON DELETE CASCADE,
     "salaNome" TEXT,
-    "profId" UUID REFERENCES professores(id) ON DELETE CASCADE,
+    "profId" TEXT REFERENCES professores(id) ON DELETE CASCADE,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Atividades
 CREATE TABLE atividades (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT PRIMARY KEY,
     titulo TEXT NOT NULL,
     tipo TEXT NOT NULL,
     imagem TEXT,
@@ -59,26 +58,26 @@ CREATE TABLE atividades (
 
 -- Atividades Enviadas
 CREATE TABLE atividades_enviadas (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "salaId" UUID REFERENCES salas(id) ON DELETE CASCADE,
-    "atividadeId" UUID REFERENCES atividades(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY,
+    "salaId" TEXT REFERENCES salas(id) ON DELETE CASCADE,
+    "atividadeId" TEXT REFERENCES atividades(id) ON DELETE CASCADE,
     "dataLimite" TEXT,
-    "professorId" UUID REFERENCES professores(id) ON DELETE CASCADE,
+    "professorId" TEXT REFERENCES professores(id) ON DELETE CASCADE,
     visualizado BOOLEAN DEFAULT FALSE,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Visualizações Atividades
 CREATE TABLE visualizacoes_atividades (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "atividadeEnviadaId" UUID REFERENCES atividades_enviadas(id) ON DELETE CASCADE,
-    "alunoId" UUID REFERENCES alunos(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY,
+    "atividadeEnviadaId" TEXT REFERENCES atividades_enviadas(id) ON DELETE CASCADE,
+    "alunoId" TEXT REFERENCES alunos(id) ON DELETE CASCADE,
     "dataVisualizacao" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Quizzes
 CREATE TABLE quizzes (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT PRIMARY KEY,
     titulo TEXT NOT NULL,
     imagem TEXT,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -86,8 +85,8 @@ CREATE TABLE quizzes (
 
 -- Quiz Perguntas
 CREATE TABLE quiz_perguntas (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "quizId" UUID REFERENCES quizzes(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY,
+    "quizId" TEXT REFERENCES quizzes(id) ON DELETE CASCADE,
     texto TEXT NOT NULL,
     opcoes JSONB,
     correta TEXT,
@@ -96,28 +95,28 @@ CREATE TABLE quiz_perguntas (
 
 -- Quizzes Enviados
 CREATE TABLE quizzes_enviados (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "quizId" UUID REFERENCES quizzes(id) ON DELETE CASCADE,
-    "alunoId" UUID REFERENCES alunos(id) ON DELETE CASCADE,
-    "salaId" UUID REFERENCES salas(id) ON DELETE CASCADE,
-    "professorId" UUID REFERENCES professores(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY,
+    "quizId" TEXT REFERENCES quizzes(id) ON DELETE CASCADE,
+    "alunoId" TEXT REFERENCES alunos(id) ON DELETE CASCADE,
+    "salaId" TEXT REFERENCES salas(id) ON DELETE CASCADE,
+    "professorId" TEXT REFERENCES professores(id) ON DELETE CASCADE,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Provas
 CREATE TABLE provas (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT PRIMARY KEY,
     titulo TEXT NOT NULL,
     imagem TEXT,
     rubrica TEXT,
-    "profId" UUID REFERENCES professores(id) ON DELETE CASCADE,
+    "profId" TEXT REFERENCES professores(id) ON DELETE CASCADE,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Prova Questoes
 CREATE TABLE prova_questoes (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "provaId" UUID REFERENCES provas(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY,
+    "provaId" TEXT REFERENCES provas(id) ON DELETE CASCADE,
     texto TEXT NOT NULL,
     tipo TEXT NOT NULL,
     opcoes JSONB,
@@ -127,18 +126,18 @@ CREATE TABLE prova_questoes (
 
 -- Provas Enviadas
 CREATE TABLE provas_enviadas (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "provaId" UUID REFERENCES provas(id) ON DELETE CASCADE,
-    "alunoId" UUID REFERENCES alunos(id) ON DELETE CASCADE,
-    "salaId" UUID REFERENCES salas(id) ON DELETE CASCADE,
-    "professorId" UUID REFERENCES professores(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY,
+    "provaId" TEXT REFERENCES provas(id) ON DELETE CASCADE,
+    "alunoId" TEXT REFERENCES alunos(id) ON DELETE CASCADE,
+    "salaId" TEXT REFERENCES salas(id) ON DELETE CASCADE,
+    "professorId" TEXT REFERENCES professores(id) ON DELETE CASCADE,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Notificacoes
 CREATE TABLE notificacoes (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "alunoId" UUID REFERENCES alunos(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY,
+    "alunoId" TEXT REFERENCES alunos(id) ON DELETE CASCADE,
     titulo TEXT NOT NULL,
     mensagem TEXT,
     tipo TEXT,
@@ -146,17 +145,9 @@ CREATE TABLE notificacoes (
     data TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Tabela adicional para os dados administrativos caso precise (Ex: admin_master)
-CREATE TABLE admins (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email TEXT UNIQUE NOT NULL,
-    senha TEXT NOT NULL,
-    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
 -- Jogos
 CREATE TABLE jogos (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id TEXT PRIMARY KEY,
     titulo TEXT NOT NULL,
     descricao TEXT,
     tipo TEXT NOT NULL,
@@ -168,18 +159,18 @@ CREATE TABLE jogos (
 
 -- Jogo Pontuacoes
 CREATE TABLE jogo_pontuacoes (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "jogoId" UUID REFERENCES jogos(id) ON DELETE CASCADE,
-    "alunoId" UUID REFERENCES alunos(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY,
+    "jogoId" TEXT REFERENCES jogos(id) ON DELETE CASCADE,
+    "alunoId" TEXT REFERENCES alunos(id) ON DELETE CASCADE,
     pontuacao NUMERIC,
     data TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Quiz Respostas
 CREATE TABLE quiz_respostas (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "quizId" UUID REFERENCES quizzes(id) ON DELETE CASCADE,
-    "alunoId" UUID REFERENCES alunos(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY,
+    "quizId" TEXT REFERENCES quizzes(id) ON DELETE CASCADE,
+    "alunoId" TEXT REFERENCES alunos(id) ON DELETE CASCADE,
     respostas JSONB,
     pontuacao NUMERIC,
     "pontuacaoMaxima" NUMERIC,
@@ -188,9 +179,9 @@ CREATE TABLE quiz_respostas (
 
 -- Prova Respostas
 CREATE TABLE prova_respostas (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "provaId" UUID REFERENCES provas(id) ON DELETE CASCADE,
-    "alunoId" UUID REFERENCES alunos(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY,
+    "provaId" TEXT REFERENCES provas(id) ON DELETE CASCADE,
+    "alunoId" TEXT REFERENCES alunos(id) ON DELETE CASCADE,
     respostas JSONB,
     status TEXT DEFAULT 'pendente',
     "dataEnvio" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -198,4 +189,3 @@ CREATE TABLE prova_respostas (
     feedback TEXT,
     "dataCorrecao" TIMESTAMP WITH TIME ZONE
 );
-
