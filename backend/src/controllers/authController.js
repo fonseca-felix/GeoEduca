@@ -1,11 +1,12 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
-const { supabase } = require('../../supabase/client');
+const { db } = require('../../firebase/firebase-admin');
 
+// Nova função unificada de Login
 const login = async (req, res) => {
     try {
-        const { identificador, senha, 'g-recaptcha-response': recaptchaResponse } = req.body; 
+        const { identificador, senha, 'g-recaptcha-response': recaptchaResponse } = req.body; // identificador pode ser email ou rm
 
         if (!identificador || !senha) {
             return res.status(400).json({ error: 'Identificador e senha são obrigatórios' });
@@ -24,6 +25,7 @@ const login = async (req, res) => {
             }
         }
 
+        // 1. Checar Master Admin
         const masterEmail = process.env.MASTER_EMAIL || 'GEOEDUCA';
         const masterSenha = process.env.MASTER_PASSWORD || 'FJLP47';
         if (identificador === masterEmail && senha === masterSenha) {
@@ -32,59 +34,94 @@ const login = async (req, res) => {
                 process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
                 { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
             );
-            return res.json({ token, usuario: { id: 'master_admin', nome: 'Admin Master', email: masterEmail, tipo: 'master' } });
+            return res.json({
+                token,
+                usuario: { id: 'master_admin', nome: 'Admin Master', email: masterEmail, tipo: 'master' }
+            });
         }
 
+        // 1.5. Conta ADM Escola Mock
         if (identificador === 'CE399 SESI' && senha === 'SesiCE399') {
             const token = jwt.sign(
                 { id: 'escola_ce399', tipo: 'escola', email: 'ce399@sesi' },
                 process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
                 { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
             );
-            return res.json({ token, usuario: { id: 'escola_ce399', nome: 'CE399 SESI', email: 'ce399@sesi', tipo: 'escola' } });
+            return res.json({
+                token,
+                usuario: { id: 'escola_ce399', nome: 'CE399 SESI', email: 'ce399@sesi', tipo: 'escola' }
+            });
         }
 
+        // Mock Prof
+        if (identificador === 'prof123' && senha === 'prof123') {
+            const token = jwt.sign({ id: 'prof_123', tipo: 'prof', email: 'prof123@mock', escolaId: 'escola_ce399' }, process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026', { expiresIn: '7d' });
+            return res.json({ token, usuario: { id: 'prof_123', nome: 'Professor Teste', email: 'prof123@mock', escolaId: 'escola_ce399', tipo: 'prof' } });
+        }
+
+        // Mock Aluno
+        if (identificador === 'aluno123' && senha === 'aluno123') {
+            const token = jwt.sign({ id: 'aluno_123', tipo: 'aluno', rm: 'aluno123' }, process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026', { expiresIn: '7d' });
+            return res.json({ token, usuario: { id: 'aluno_123', rm: 'aluno123', nome: 'Aluno Teste', tipo: 'aluno' } });
+        }
+
+        // 2. É um email? Checar Escolas e Professores
         if (identificador.includes('@')) {
-            const { data: escolaSnap } = await supabase.from('escolas').select('*').eq('email', identificador).limit(1);
-            if (escolaSnap && escolaSnap.length > 0) {
-                const escola = escolaSnap[0];
-                const senhaValida = await bcrypt.compare(senha, escola.senha);
+            // Tentar na coleção escolas
+            const escolaSnap = await db.collection('escolas').where('email', '==', identificador).limit(1).get();
+            if (!escolaSnap.empty) {
+                const escola = escolaSnap.docs[0];
+                const escolaData = escola.data();
+                const senhaValida = await bcrypt.compare(senha, escolaData.senha);
                 if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas' });
                 
                 const token = jwt.sign(
-                    { id: escola.id, tipo: 'escola', email: escola.email },
+                    { id: escola.id, tipo: 'escola', email: escolaData.email },
                     process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
                     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
                 );
-                return res.json({ token, usuario: { id: escola.id, nome: escola.nome, email: escola.email, tipo: 'escola' } });
+                return res.json({
+                    token,
+                    usuario: { id: escola.id, nome: escolaData.nome, email: escolaData.email, tipo: 'escola' }
+                });
             }
 
-            const { data: profSnap } = await supabase.from('professores').select('*').eq('email', identificador).limit(1);
-            if (profSnap && profSnap.length > 0) {
-                const prof = profSnap[0];
-                const senhaValida = await bcrypt.compare(senha, prof.senha);
+            // Tentar na coleção professores
+            const profSnap = await db.collection('professores').where('email', '==', identificador).limit(1).get();
+            if (!profSnap.empty) {
+                const prof = profSnap.docs[0];
+                const profData = prof.data();
+                const senhaValida = await bcrypt.compare(senha, profData.senha);
                 if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas' });
                 
                 const token = jwt.sign(
-                    { id: prof.id, tipo: 'prof', email: prof.email, escolaId: prof.escolaId },
+                    { id: prof.id, tipo: 'prof', email: profData.email, escolaId: profData.escolaId },
                     process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
                     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
                 );
-                return res.json({ token, usuario: { id: prof.id, nome: prof.nome, email: prof.email, escolaId: prof.escolaId, tipo: 'prof' } });
+                return res.json({
+                    token,
+                    usuario: { id: prof.id, nome: profData.nome, email: profData.email, escolaId: profData.escolaId, tipo: 'prof' }
+                });
             }
         } else {
-            const { data: alunoSnap } = await supabase.from('alunos').select('*').eq('rm', identificador).limit(1);
-            if (alunoSnap && alunoSnap.length > 0) {
-                const aluno = alunoSnap[0];
-                const senhaValida = await bcrypt.compare(senha, aluno.senha);
+            // 3. Não tem '@', é RM (Aluno)
+            const alunoSnap = await db.collection('alunos').where('rm', '==', identificador).limit(1).get();
+            if (!alunoSnap.empty) {
+                const aluno = alunoSnap.docs[0];
+                const alunoData = aluno.data();
+                const senhaValida = await bcrypt.compare(senha, alunoData.senha);
                 if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas' });
                 
                 const token = jwt.sign(
-                    { id: aluno.id, tipo: 'aluno', rm: aluno.rm },
+                    { id: aluno.id, tipo: 'aluno', rm: alunoData.rm },
                     process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
                     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
                 );
-                return res.json({ token, usuario: { id: aluno.id, rm: aluno.rm, nome: aluno.nome, salaId: aluno.salaId, salaNome: aluno.salaNome, tipo: 'aluno' } });
+                return res.json({
+                    token,
+                    usuario: { id: aluno.id, rm: alunoData.rm, nome: alunoData.nome, salaId: alunoData.salaId, salaNome: alunoData.salaNome, tipo: 'aluno' }
+                });
             }
         }
 
@@ -98,6 +135,7 @@ const login = async (req, res) => {
 
 const verifyToken = async (req, res) => {
     const token = req.headers.authorization?.split(' ')[1];
+
     if (!token) return res.status(401).json({ error: 'Token não fornecido' });
 
     try {
@@ -106,25 +144,35 @@ const verifyToken = async (req, res) => {
         if (decoded.tipo === 'master') {
             return res.json({ valido: true, usuario: { id: 'master_admin', nome: 'Admin Master', email: decoded.email, tipo: 'master' } });
         }
-        if (decoded.tipo === 'escola' && decoded.id === 'escola_ce399') {
-            return res.json({ valido: true, usuario: { id: 'escola_ce399', nome: 'CE399 SESI', email: 'ce399@sesi', tipo: 'escola' } });
+
+        if (decoded.tipo === 'prof' && decoded.id === 'prof_123') {
+            return res.json({ valido: true, usuario: { id: 'prof_123', nome: 'Professor Teste', email: 'prof123@mock', tipo: 'prof' } });
+        }
+        if (decoded.tipo === 'aluno' && decoded.id === 'aluno_123') {
+            return res.json({ valido: true, usuario: { id: 'aluno_123', rm: 'aluno123', nome: 'Aluno Teste', tipo: 'aluno' } });
         }
 
         if (decoded.tipo === 'escola') {
-            const { data: escola, error } = await supabase.from('escolas').select('*').eq('id', decoded.id).single();
-            if (error || !escola) return res.status(401).json({ error: 'Escola não encontrada' });
-            return res.json({ valido: true, usuario: { id: escola.id, nome: escola.nome, email: escola.email, tipo: 'escola' } });
+            if (decoded.id === 'escola_ce399') {
+                return res.json({ valido: true, usuario: { id: 'escola_ce399', nome: 'CE399 SESI', email: 'ce399@sesi', tipo: 'escola' } });
+            }
+            const escola = await db.collection('escolas').doc(decoded.id).get();
+            if (!escola.exists) return res.status(401).json({ error: 'Escola não encontrada' });
+            const d = escola.data();
+            return res.json({ valido: true, usuario: { id: escola.id, nome: d.nome, email: d.email, tipo: 'escola' } });
         }
 
         if (decoded.tipo === 'prof') {
-            const { data: professor, error } = await supabase.from('professores').select('*').eq('id', decoded.id).single();
-            if (error || !professor) return res.status(401).json({ error: 'Usuário não encontrado' });
-            return res.json({ valido: true, usuario: { id: professor.id, nome: professor.nome, email: professor.email, escolaId: professor.escolaId, tipo: 'prof' } });
+            const professor = await db.collection('professores').doc(decoded.id).get();
+            if (!professor.exists) return res.status(401).json({ error: 'Usuário não encontrado' });
+            const d = professor.data();
+            return res.json({ valido: true, usuario: { id: professor.id, nome: d.nome, email: d.email, escolaId: d.escolaId, tipo: 'prof' } });
         }
 
-        const { data: aluno, error } = await supabase.from('alunos').select('*').eq('id', decoded.id).single();
-        if (error || !aluno) return res.status(401).json({ error: 'Usuário não encontrado' });
-        res.json({ valido: true, usuario: { id: aluno.id, rm: aluno.rm, nome: aluno.nome, salaId: aluno.salaId, salaNome: aluno.salaNome, tipo: 'aluno' } });
+        const aluno = await db.collection('alunos').doc(decoded.id).get();
+        if (!aluno.exists) return res.status(401).json({ error: 'Usuário não encontrado' });
+        const d = aluno.data();
+        res.json({ valido: true, usuario: { id: aluno.id, rm: d.rm, nome: d.nome, salaId: d.salaId, salaNome: d.salaNome, tipo: 'aluno' } });
     } catch {
         res.status(401).json({ error: 'Token inválido' });
     }

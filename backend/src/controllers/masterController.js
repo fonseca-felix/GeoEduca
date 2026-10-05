@@ -1,7 +1,8 @@
-const { supabase } = require('../../supabase/client');
+const { db } = require('../../firebase/firebase-admin');
 const bcrypt = require('bcryptjs');
 
 const masterController = {
+  // Cria uma nova escola
   createEscola: async (req, res) => {
     try {
       const { nome, email, senha } = req.body;
@@ -10,13 +11,9 @@ const masterController = {
         return res.status(400).json({ error: 'Nome, email e senha são obrigatórios' });
       }
 
-      const { data: escolaSnap } = await supabase
-        .from('escolas')
-        .select('id')
-        .eq('email', email)
-        .limit(1);
-        
-      if (escolaSnap && escolaSnap.length > 0) {
+      // Check if email already exists
+      const escolaSnap = await db.collection('escolas').where('email', '==', email).limit(1).get();
+      if (!escolaSnap.empty) {
         return res.status(400).json({ error: 'Email já cadastrado para outra escola' });
       }
 
@@ -26,50 +23,56 @@ const masterController = {
       const novaEscola = {
         nome,
         email,
-        senha: hashedPassword
+        senha: hashedPassword,
+        criadoEm: new Date().toISOString(),
       };
 
-      const { data, error } = await supabase
-        .from('escolas')
-        .insert([novaEscola])
-        .select();
+      const docRef = await db.collection('escolas').add(novaEscola);
 
-      if (error) throw error;
-
-      res.status(201).json({ id: data[0].id, message: 'Escola cadastrada com sucesso' });
+      res.status(201).json({ id: docRef.id, message: 'Escola cadastrada com sucesso' });
     } catch (error) {
       console.error('Erro ao criar escola:', error);
       res.status(500).json({ error: 'Erro ao criar escola' });
     }
   },
 
+  // Lista todas as escolas
   getEscolas: async (req, res) => {
     try {
-      const { data: escolas, error } = await supabase
-        .from('escolas')
-        .select('id, nome, email, criadoEm');
-        
-      if (error) throw error;
+      const snapshot = await db.collection('escolas').get();
+      const escolas = [];
+      
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        escolas.push({
+          id: doc.id,
+          nome: data.nome,
+          email: data.email,
+          criadoEm: data.criadoEm
+        });
+      });
 
-      res.json(escolas || []);
+      res.json(escolas);
     } catch (error) {
       console.error('Erro ao listar escolas:', error);
       res.status(500).json({ error: 'Erro ao listar escolas' });
     }
   },
 
+  // Estatísticas Globais
   getStats: async (req, res) => {
     try {
-      const { count: totalEscolas } = await supabase.from('escolas').select('*', { count: 'exact', head: true });
-      const { count: totalProfessores } = await supabase.from('professores').select('*', { count: 'exact', head: true });
-      const { count: totalAlunos } = await supabase.from('alunos').select('*', { count: 'exact', head: true });
-      const { count: totalProvas } = await supabase.from('provas').select('*', { count: 'exact', head: true });
+      // Get counts for each collection
+      const escolasSnap = await db.collection('escolas').count().get();
+      const profSnap = await db.collection('professores').count().get();
+      const alunosSnap = await db.collection('alunos').count().get();
+      const provasSnap = await db.collection('provas').count().get();
       
       res.json({
-        totalEscolas: totalEscolas || 0,
-        totalProfessores: totalProfessores || 0,
-        totalAlunos: totalAlunos || 0,
-        totalProvas: totalProvas || 0,
+        totalEscolas: escolasSnap.data().count,
+        totalProfessores: profSnap.data().count,
+        totalAlunos: alunosSnap.data().count,
+        totalProvas: provasSnap.data().count,
       });
     } catch (error) {
       console.error('Erro ao buscar estatísticas globais:', error);

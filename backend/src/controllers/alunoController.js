@@ -1,14 +1,14 @@
 const bcrypt = require('bcryptjs');
-const { supabase } = require('../../supabase/client');
+const { db } = require('../../firebase/firebase-admin');
 
 const listarAlunos = async (req, res) => {
     try {
-        const { data: alunos, error } = await supabase
-            .from('alunos')
-            .select('id, rm, nome, salaId, salaNome, createdAt');
-            
-        if (error) throw error;
-        res.json(alunos || []);
+        const snapshot = await db.collection('alunos').get();
+        const alunos = snapshot.docs.map(doc => {
+            const d = doc.data();
+            return { id: doc.id, rm: d.rm, nome: d.nome, salaId: d.salaId, salaNome: d.salaNome, createdAt: d.createdAt };
+        });
+        res.json(alunos);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao listar alunos' });
@@ -18,13 +18,12 @@ const listarAlunos = async (req, res) => {
 const listarAlunosPorSala = async (req, res) => {
     try {
         const { salaId } = req.params;
-        const { data: alunos, error } = await supabase
-            .from('alunos')
-            .select('id, rm, nome, salaId, salaNome')
-            .eq('salaId', salaId);
-            
-        if (error) throw error;
-        res.json(alunos || []);
+        const snapshot = await db.collection('alunos').where('salaId', '==', salaId).get();
+        const alunos = snapshot.docs.map(doc => {
+            const d = doc.data();
+            return { id: doc.id, rm: d.rm, nome: d.nome, salaId: d.salaId, salaNome: d.salaNome };
+        });
+        res.json(alunos);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao listar alunos da sala' });
@@ -39,15 +38,11 @@ const buscarAluno = async (req, res) => {
             return res.status(403).json({ error: 'Acesso negado' });
         }
 
-        const { data: aluno, error } = await supabase
-            .from('alunos')
-            .select('id, rm, nome, salaId, salaNome, createdAt')
-            .eq('id', id)
-            .single();
-            
-        if (error || !aluno) return res.status(404).json({ error: 'Aluno não encontrado' });
+        const doc = await db.collection('alunos').doc(id).get();
+        if (!doc.exists) return res.status(404).json({ error: 'Aluno não encontrado' });
 
-        res.json(aluno);
+        const d = doc.data();
+        res.json({ id: doc.id, rm: d.rm, nome: d.nome, salaId: d.salaId, salaNome: d.salaNome, createdAt: d.createdAt });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao buscar aluno' });
@@ -62,27 +57,21 @@ const criarAluno = async (req, res) => {
             return res.status(400).json({ error: 'RM, nome, senha e sala são obrigatórios' });
         }
 
-        const { data: rmCheck } = await supabase.from('alunos').select('id').eq('rm', rm).limit(1);
-        if (rmCheck && rmCheck.length > 0) return res.status(400).json({ error: 'RM já cadastrado' });
+        const rmCheck = await db.collection('alunos').where('rm', '==', rm).limit(1).get();
+        if (!rmCheck.empty) return res.status(400).json({ error: 'RM já cadastrado' });
 
-        const { data: sala, error: salaErr } = await supabase.from('salas').select('*').eq('id', salaId).single();
-        if (salaErr || !sala) return res.status(404).json({ error: 'Sala não encontrada' });
+        const sala = await db.collection('salas').doc(salaId).get();
+        if (!sala.exists) return res.status(404).json({ error: 'Sala não encontrada' });
 
         const hashedPassword = await bcrypt.hash(senha, 10);
+        const salaData = sala.data();
 
-        const { data: novoAluno, error } = await supabase
-            .from('alunos')
-            .insert([{
-                rm, nome, senha: hashedPassword, salaId,
-                salaNome: sala.nome,
-                profId: sala.profId
-            }])
-            .select()
-            .single();
-            
-        if (error) throw error;
+        const docRef = await db.collection('alunos').add({
+            rm, nome, senha: hashedPassword, salaId,
+            salaNome: salaData.nome, createdAt: new Date().toISOString()
+        });
 
-        res.status(201).json({ id: novoAluno.id, rm, nome, salaId, salaNome: sala.nome });
+        res.status(201).json({ id: docRef.id, rm, nome, salaId, salaNome: salaData.nome });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao criar aluno' });
@@ -94,23 +83,21 @@ const atualizarAluno = async (req, res) => {
         const { id } = req.params;
         const { nome, senha, salaId } = req.body;
 
-        const { data: aluno, error: alunoErr } = await supabase.from('alunos').select('id').eq('id', id).single();
-        if (alunoErr || !aluno) return res.status(404).json({ error: 'Aluno não encontrado' });
+        const alunoRef = db.collection('alunos').doc(id);
+        const aluno = await alunoRef.get();
+        if (!aluno.exists) return res.status(404).json({ error: 'Aluno não encontrado' });
 
         const updates = {};
         if (nome) updates.nome = nome;
         if (senha) updates.senha = await bcrypt.hash(senha, 10);
         if (salaId) {
-            const { data: sala, error: salaErr } = await supabase.from('salas').select('*').eq('id', salaId).single();
-            if (salaErr || !sala) return res.status(404).json({ error: 'Sala não encontrada' });
+            const sala = await db.collection('salas').doc(salaId).get();
+            if (!sala.exists) return res.status(404).json({ error: 'Sala não encontrada' });
             updates.salaId = salaId;
-            updates.salaNome = sala.nome;
-            updates.profId = sala.profId;
+            updates.salaNome = sala.data().nome;
         }
 
-        const { error } = await supabase.from('alunos').update(updates).eq('id', id);
-        if (error) throw error;
-        
+        await alunoRef.update(updates);
         res.json({ message: 'Aluno atualizado com sucesso' });
     } catch (error) {
         console.error(error);
@@ -121,12 +108,10 @@ const atualizarAluno = async (req, res) => {
 const removerAluno = async (req, res) => {
     try {
         const { id } = req.params;
-        const { data: aluno, error: alunoErr } = await supabase.from('alunos').select('id').eq('id', id).single();
-        if (alunoErr || !aluno) return res.status(404).json({ error: 'Aluno não encontrado' });
-        
-        const { error } = await supabase.from('alunos').delete().eq('id', id);
-        if (error) throw error;
-        
+        const alunoRef = db.collection('alunos').doc(id);
+        const aluno = await alunoRef.get();
+        if (!aluno.exists) return res.status(404).json({ error: 'Aluno não encontrado' });
+        await alunoRef.delete();
         res.json({ message: 'Aluno removido com sucesso' });
     } catch (error) {
         console.error(error);
