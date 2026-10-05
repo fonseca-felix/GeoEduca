@@ -5,7 +5,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GeoEduca  Dashboard do Aluno</title>
+  <title>GeoEduca Â Dashboard do Aluno</title>
   <meta name="description" content="Acompanhe seu progresso, atividades pendentes e ranking da turma no GeoEduca." />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/tokens.css" />
@@ -98,7 +98,7 @@
     /* -- Quick Stats Row ----------------------------------- */
     .dash-stats {
       display: grid;
-      grid-template-columns: rePeçat(3, 1fr);
+      grid-template-columns: rePeÃ§at(3, 1fr);
       gap: 16px;
     }
 
@@ -195,7 +195,7 @@
     /* -- Activity Cards (injected by JS) ------------------- */
     #student-games {
       display: grid;
-      grid-template-columns: rePeçat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: rePeÃ§at(auto-fill, minmax(260px, 1fr));
       gap: 16px;
     }
 
@@ -407,7 +407,7 @@
         order: -1;
       }
       .dash-stats {
-        grid-template-columns: rePeçat(3, 1fr);
+        grid-template-columns: rePeÃ§at(3, 1fr);
       }
     }
 
@@ -437,7 +437,8 @@
     .bg-card        { animation: fadeUp .5s .25s ease both; }
 
   </style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">\n</head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
 <body>
 <div class="app-layout" id="app-layout">
   <main class="app-main">
@@ -464,7 +465,7 @@
           <div class="dash-hero">
             <div class="dash-hero-content">
               <h2 class="dash-hero-greeting">
-                Olá, <span id="student-name">Aluno</span>! <i class="fa-solid fa-hand-wave"></i>
+                OlÃ¡, <span id="student-name">Aluno</span>! <i class="fa-solid fa-hand-wave"></i>
               </h2>
               <p class="dash-hero-sub">
                 <span id="hero-pending-text">Carregando suas tarefas...</span>
@@ -483,7 +484,7 @@
             <div class="dash-stat gold">
               <div class="dash-stat-icon gold"><i class="fa-solid fa-star"></i></div>
               <div class="dash-stat-body">
-                <div class="dash-stat-value" id="stat-xp"></div>
+                <div class="dash-stat-value" id="stat-xp">Â</div>
                 <div class="dash-stat-label">XP Total</div>
               </div>
             </div>
@@ -491,14 +492,14 @@
               <div class="dash-stat-icon navy"><i class="fa-solid fa-trophy"></i></div>
               <div class="dash-stat-body">
                 <div class="dash-stat-value" id="stat-level">1</div>
-                <div class="dash-stat-label">Nível Atual</div>
+                <div class="dash-stat-label">NÃ­vel Atual</div>
               </div>
             </div>
             <div class="dash-stat forest">
               <div class="dash-stat-icon forest"><i class="fa-solid fa-book"></i></div>
               <div class="dash-stat-body">
-                <div class="dash-stat-value" id="stat-pending"></div>
-                <div class="dash-stat-label">Pendências</div>
+                <div class="dash-stat-value" id="stat-pending">Â</div>
+                <div class="dash-stat-label">PendÃªncias</div>
               </div>
             </div>
           </div>
@@ -525,7 +526,7 @@
             <div class="profile-card-body">
               <div class="profile-level-badge">
                 <span class="profile-level-dot" id="student-level">1</span>
-                Nível atual
+                NÃ­vel atual
               </div>
               <p class="profile-subtitle" id="student-level-title">Carregando...</p>
 
@@ -548,7 +549,7 @@
             <div class="bg-card-body">
               <div class="bg-attempts">
                 <span class="bg-attempts-label">Tentativas hoje</span>
-                <span class="bg-attempts-value" id="dashboard-bg-tentativas"></span>
+                <span class="bg-attempts-value" id="dashboard-bg-tentativas">Â</span>
               </div>
               <a href="hub_brazilguessr.html" class="btn btn-secondary btn-sm" style="width:100%; justify-content:center; margin-bottom:8px;">
                 Ver Hub
@@ -597,11 +598,12 @@
   })();
 </script>
 
+
 <!-- Modal Entrar na Turma -->
 <div id="joinRoomModal" class="modal-overlay">
-  <div class="modal-content" style="max-width: 400px; text-align: center;">
+  <div class="modal" style="max-width: 400px; text-align: center; padding: 2rem;">
     <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Space Grotesk', sans-serif;">Entrar em Turma</h2>
-    <p style="color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: 1.5rem;">Peça o código de 6 letras para seu professor.</p>
+    <p style="color: var(--text-muted, #6b7280); font-size: 0.875rem; margin-bottom: 1.5rem;">Peça o código de 6 letras para seu professor.</p>
     
     <div class="form-group" style="text-align: left;">
       <label class="form-label">Código da Turma</label>
@@ -624,23 +626,11 @@ async function joinRoom() {
     }
     
     try {
-        const token = Auth.getToken();
-        const res = await fetch(`${window.APP_CONFIG.API_BASE_URL}/salas/entrar`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ codigo: code })
-        });
-        const data = await res.json();
-        
-        if(!res.ok) throw new Error(data.error || 'Erro ao entrar na turma');
-        
-        Toast.success(data.message);
-        
-        // Atualizar o nome da sala no painel (mock: apenas reload)
+        const res = await api.post('/salas/entrar', { codigo: code });
+        Toast.success(res.message || 'Bem-vindo à turma!');
         setTimeout(() => window.location.reload(), 1500);
-        
     } catch(err) {
-        Toast.error(err.message);
+        Toast.error(err.message || 'Erro ao entrar na turma');
         console.error(err);
     }
 }

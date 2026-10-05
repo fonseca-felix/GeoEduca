@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../css/darkmode.css" />
   <style>
     .rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
-    .room-card { background: var(--bg-surface, #ffffff); border-radius: 12px; border: 1px solid var(--border-color, #e5e7eb); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
+    .room-card { background: var(--color-surface); border-radius: 12px; border: 1px solid var(--border-color, #e5e7eb); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
     .room-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
     .room-header { padding: 1.5rem; color: white; position: relative; }
     .room-title { font-size: 1.25rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; margin-bottom: 0.25rem; }
@@ -38,10 +38,10 @@
     /* Modal Styles — usa modal-overlay + .open para casar com ui.js */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: opacity 0.3s; }
     .modal-overlay.open { display: flex; opacity: 1; }
-    .modal-content { background: var(--bg-surface, #ffffff); padding: 2rem; border-radius: 16px; width: 100%; max-width: 500px; position: relative; transform: translateY(20px); transition: transform 0.3s; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+    .modal-content { background: var(--color-surface); padding: 2rem; border-radius: 16px; width: 100%; max-width: 500px; position: relative; transform: translateY(20px); transition: transform 0.3s; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
     .modal-overlay.open .modal-content { transform: translateY(0); }
     .form-group { margin-bottom: 1.25rem; }
-    .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.875rem; color: var(--text-primary, #374151); }
+    .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.875rem; color: var(--color-text-primary); }
     .form-control { width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 8px; font-family: 'Inter', sans-serif; outline: none; }
     .form-control:focus { border-color: var(--color-primary, #3b82f6); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
   </style>
