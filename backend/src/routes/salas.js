@@ -19,6 +19,7 @@ router.get('/', authenticateToken, async (req, res) => {
                 serie: data.serie,
                 turma: data.turma,
                 assunto: data.assunto || '',
+                codigo: data.codigo,
                 createdAt: data.createdAt
             });
         });
@@ -48,6 +49,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
             serie: data.serie,
             turma: data.turma,
             assunto: data.assunto || '',
+            codigo: data.codigo,
             createdAt: data.createdAt
         });
     } catch (error) {

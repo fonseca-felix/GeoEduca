@@ -109,25 +109,24 @@
 <body>
   <div class="app-layout" id="app-layout">
     <main class="app-main">
-      <div class="content-wrapper">
+      <header class="page-header" style="flex-wrap: wrap; gap: 1rem; position: relative;">
+        <div class="page-header-left">
+          <a href="salas.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Voltar para Salas
+          </a>
+          <h1 class="page-title" id="sala-nome">Carregando...</h1>
+          <p class="page-subtitle" id="sala-assunto">Relatório da turma e métricas de alunos</p>
+        </div>
         
-        <a href="salas.html" class="back-link">
-          <i class="fa-solid fa-arrow-left"></i> Voltar para Salas
-        </a>
+        <div class="page-header-right">
+          <div style="background: var(--bg-surface, #ffffff); padding: 0.75rem 1.5rem; border-radius: 12px; border: 1px dashed var(--color-primary, #3b82f6); display: flex; align-items: center; gap: 1rem; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);">
+            <span style="font-size: 0.875rem; color: var(--text-muted, #6b7280); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Código de Convite</span>
+            <strong style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: var(--color-primary, #3b82f6); letter-spacing: 4px;" id="sala-codigo">---</strong>
+          </div>
+        </div>
+      </header>
 
-        <header class="page-header" style="flex-wrap: wrap; gap: 1rem;">
-          <div class="page-header-left">
-            <h1 class="page-title" id="sala-nome">Carregando...</h1>
-            <p class="page-subtitle" id="sala-assunto">Relatório da turma e métricas de alunos</p>
-          </div>
-          
-          <div class="page-header-right">
-            <div style="background: var(--bg-surface, #ffffff); padding: 0.75rem 1.5rem; border-radius: 12px; border: 1px dashed var(--color-primary, #3b82f6); display: flex; align-items: center; gap: 1rem; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);">
-              <span style="font-size: 0.875rem; color: var(--text-muted, #6b7280); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Código de Convite</span>
-              <strong style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: var(--color-primary, #3b82f6); letter-spacing: 4px;" id="sala-codigo">---</strong>
-            </div>
-          </div>
-        </header>
+      <div class="page-content">
 
         <div class="stats-grid">
           <div class="stat-card">
