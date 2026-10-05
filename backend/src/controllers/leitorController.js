@@ -14,12 +14,12 @@ const corrigirProvaFisica = async (req, res) => {
             return res.status(500).json({ error: 'Chave GEMINI_API_KEY não configurada no servidor.' });
         }
 
-        // 1. Buscar a prova e suas questões no Firestore
-        const provaRef = await db.collection('provas').doc(provaId).get();
-        if (!provaRef.exists) return res.status(404).json({ error: 'Prova não encontrada.' });
+        // 1. Buscar a prova física (banco_provas) no Firestore
+        const provaRef = await db.collection('banco_provas').doc(provaId).get();
+        if (!provaRef.exists) return res.status(404).json({ error: 'Prova física não encontrada no banco.' });
         
-        const questoesSnap = await db.collection('prova_questoes').where('provaId', '==', provaId).get();
-        const questoes = questoesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const provaData = provaRef.data();
+        const questoes = provaData.questoes || [];
 
         if (questoes.length === 0) {
             return res.status(400).json({ error: 'A prova não possui questões cadastradas.' });
@@ -27,7 +27,7 @@ const corrigirProvaFisica = async (req, res) => {
 
         // Construir um gabarito legível para a IA
         const gabaritoText = questoes.map((q, index) => {
-            return `Questão ${index + 1}: ${q.texto}\nTipo: ${q.tipo}\nOpções: ${q.opcoes ? q.opcoes.join(' | ') : 'N/A'}\nResposta Correta Esperada: ${q.correta ? q.correta : 'Depende do texto'}\nValor: ${q.valor}`;
+            return `Questão ${index + 1}: ${q.enunciado || q.texto}\nOpções: ${q.alternativas ? q.alternativas.join(' | ') : 'N/A'}\nResposta Correta Esperada: ${q.respostaCorreta || q.correta}`;
         }).join('\n\n');
 
         // 2. Preparar a imagem para o Gemini Multimodal

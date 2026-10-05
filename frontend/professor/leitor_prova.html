@@ -75,76 +75,79 @@
     @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
-<body class="dark-mode">
-
-  <div id="sidebar-container"></div>
-
-  <main class="main-content">
-    <div class="content-wrapper">
-      <header class="page-header">
-        <div class="page-header-left">
-          <h1 class="page-title">Leitor de Provas Físicas</h1>
-          <p class="page-subtitle">Faça o upload da foto da prova do aluno e deixe a IA corrigir automaticamente baseada no gabarito.</p>
-        </div>
-      </header>
-      
-      <div class="page-content">
-        <div class="card" style="max-width: 800px; margin: 0 auto;">
-          <div class="form-group">
-            <label>1. Selecione a Prova Oficial</label>
-            <div class="select-wrapper">
-              <select id="prova-select" required>
-                <option value="">Carregando provas...</option>
-              </select>
-              <i class="fa-solid fa-chevron-down"></i>
+<body>
+  <div class="app-layout" id="app-layout">
+    <main class="app-main">
+      <div class="content-wrapper">
+        <header class="page-header">
+          <div class="page-header-left">
+            <h1 class="page-title">Leitor de Provas Físicas</h1>
+            <p class="page-subtitle">Faça o upload da foto da prova do aluno e deixe a IA corrigir automaticamente baseada no gabarito.</p>
+          </div>
+        </header>
+        
+        <div class="page-content">
+          <div class="card" style="max-width: 800px; margin: 0 auto;">
+            <div class="form-group">
+              <label>1. Selecione a Prova Oficial</label>
+              <div class="select-wrapper">
+                <select id="prova-select" required>
+                  <option value="">Carregando provas...</option>
+                </select>
+                <i class="fa-solid fa-chevron-down"></i>
+              </div>
+              <span class="field-hint">A IA usará o gabarito desta prova para correção.</span>
             </div>
-            <span class="field-hint">A IA usará o gabarito desta prova para correção.</span>
-          </div>
 
-          <div class="form-group" style="margin-top: 1.5rem;">
-            <label>2. Envie a Foto da Prova</label>
-            <input type="file" id="file-input" accept="image/*" style="display: none;" />
-            <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
-              <i class="fa-solid fa-camera upload-icon"></i>
-              <h3>Clique para tirar foto ou fazer upload</h3>
-              <p class="field-hint">Formatos suportados: JPG, PNG. (Tente tirar uma foto nítida e bem iluminada)</p>
-              <p id="file-name" style="margin-top: 10px; font-weight: bold; color: var(--gold);"></p>
+            <div class="form-group" style="margin-top: 1.5rem;">
+              <label>2. Envie a Foto da Prova</label>
+              <input type="file" id="file-input" accept="image/*" style="display: none;" />
+              <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+                <i class="fa-solid fa-camera upload-icon"></i>
+                <h3>Clique para tirar foto ou fazer upload</h3>
+                <p class="field-hint">Formatos suportados: JPG, PNG. (Tente tirar uma foto nítida e bem iluminada)</p>
+                <p id="file-name" style="margin-top: 10px; font-weight: bold; color: var(--gold);"></p>
+              </div>
             </div>
-          </div>
 
-          <div style="text-align: center; margin-top: 2rem;">
-            <button id="btn-corrigir" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1.1rem;" disabled>
-              <i class="fa-solid fa-robot" style="margin-right: 8px;"></i> Escanear e Corrigir
-            </button>
-          </div>
+            <div style="text-align: center; margin-top: 2rem;">
+              <button id="btn-corrigir" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1.1rem;" disabled>
+                <i class="fa-solid fa-robot" style="margin-right: 8px;"></i> Escanear e Corrigir
+              </button>
+            </div>
 
-          <!-- Loading State -->
-          <div id="loading" class="loading-state">
-            <i class="fa-solid fa-circle-notch spinner"></i>
-            <h3 style="margin-top: 1rem;">A IA está lendo a prova...</h3>
-            <p class="field-hint">Isso pode levar de 5 a 15 segundos dependendo da legibilidade da imagem.</p>
-          </div>
+            <!-- Loading State -->
+            <div id="loading" class="loading-state">
+              <i class="fa-solid fa-circle-notch spinner"></i>
+              <h3 style="margin-top: 1rem;">A IA está lendo a prova...</h3>
+              <p class="field-hint">Isso pode levar de 5 a 15 segundos dependendo da legibilidade da imagem.</p>
+            </div>
 
-          <!-- Results -->
-          <div id="result-container" class="result-container">
-            <div class="result-score">Nota: <span id="nota-final">0</span> / <span id="nota-maxima">10</span></div>
-            <div class="question-list" id="question-list">
-              <!-- Rendered via JS -->
+            <!-- Results -->
+            <div id="result-container" class="result-container">
+              <div class="result-score">Nota: <span id="nota-final">0</span> / <span id="nota-maxima">10</span></div>
+              <div class="question-list" id="question-list">
+                <!-- Rendered via JS -->
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </main>
+    </main>
+  </div>
 
   <script src="../js/config.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/ui.js"></script>
   <script src="../js/api.js"></script>
   <script src="../js/sidebar.js"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      Auth.requireAuth('prof');
+      document.getElementById('app-layout').insertAdjacentHTML('afterbegin', buildProfessorSidebar());
+      const user = initPage('prof');
+      if (!user) return;
       await carregarProvas();
       
       const fileInput = document.getElementById('file-input');
@@ -186,8 +189,8 @@
     async function carregarProvas() {
       const select = document.getElementById('prova-select');
       try {
-        const provas = await api.get('/provas');
-        select.innerHTML = '<option value="">Selecione a prova base...</option>';
+        const provas = await api.get('/banco_provas');
+        select.innerHTML = '<option value="">Selecione a prova física...</option>';
         provas.forEach(p => {
           const opt = document.createElement('option');
           opt.value = p.id;
@@ -195,7 +198,7 @@
           select.appendChild(opt);
         });
       } catch (err) {
-        select.innerHTML = '<option value="">Erro ao carregar provas</option>';
+        select.innerHTML = '<option value="">Erro ao carregar provas físicas</option>';
       }
     }
 
