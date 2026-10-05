@@ -77,10 +77,28 @@
     .filter-bar {
       display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;
     }
-    .filter-select {
+    
+    /* Dropdown customizado (Padrão do site) */
+    .custom-select-wrapper { position: relative; user-select: none; flex: 1; max-width: 400px; }
+    .custom-select {
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer;
       padding: 0.75rem 1rem; border: 1px solid var(--color-border, #e5e7eb); border-radius: 8px; 
-      font-family: 'Inter', sans-serif; background: var(--color-surface); color: var(--color-text); min-width: 250px; outline: none;
+      font-family: 'Inter', sans-serif; background: var(--color-surface); color: var(--color-text); outline: none;
     }
+    .custom-select-options {
+      position: absolute; top: calc(100% + 5px); left: 0; right: 0;
+      background: var(--color-surface, #fff); border: 1px solid var(--color-border, #e5e7eb);
+      border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      z-index: 50; display: none; max-height: 200px; overflow-y: auto;
+    }
+    .custom-select-wrapper.open .custom-select-options { display: block; }
+    .custom-option {
+      padding: 0.75rem 1rem; cursor: pointer; transition: background 0.2s; font-size: 0.875rem; color: var(--color-text);
+    }
+    .custom-option:hover { background: var(--color-surface-2, #f9fafb); color: var(--gold); }
+    .custom-option.selected { font-weight: 600; color: var(--gold); background: var(--color-surface-2, #f9fafb); }
+    
     .camera-container {
       display: none; flex-direction: column; align-items: center; gap: 1rem; margin-top: 1rem;
     }
@@ -100,11 +118,18 @@
         </header>
         
         <div class="page-content">
-          <!-- Filtro -->
+          <!-- Filtro Padronizado -->
           <div class="filter-bar">
-            <select id="prova-select" class="filter-select">
-              <option value="">Carregando provas...</option>
-            </select>
+            <div class="custom-select-wrapper" id="custom-select-prova">
+                <div class="custom-select" id="custom-select-prova-display" tabindex="0">
+                    <span id="custom-select-prova-text">Carregando provas...</span>
+                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div class="custom-select-options" id="custom-select-prova-options">
+                    <!-- Preenchido via JS -->
+                </div>
+            </div>
+            <input type="hidden" id="prova-select" value="" />
           </div>
 
           <div class="card" style="max-width: 800px; margin: 0 auto;">
@@ -175,7 +200,18 @@
       
       const fileInput = document.getElementById('file-input');
       const btnCorrigir = document.getElementById('btn-corrigir');
-      const provaSelect = document.getElementById('prova-select');
+
+      // Setup custom select toggle
+      const selectWrapper = document.getElementById('custom-select-prova');
+      document.getElementById('custom-select-prova-display').addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectWrapper.classList.toggle('open');
+      });
+      document.addEventListener('click', (e) => {
+        if (!selectWrapper.contains(e.target)) {
+          selectWrapper.classList.remove('open');
+        }
+      });
 
       // Upload Handler
       fileInput.addEventListener('change', () => {
@@ -187,7 +223,6 @@
         }
       });
 
-      provaSelect.addEventListener('change', verificarCampos);
       btnCorrigir.addEventListener('click', enviarParaCorrecao);
 
       // Camera Handlers
@@ -211,7 +246,8 @@
         video.srcObject = videoStream;
         cameraContainer.style.display = 'flex';
       } catch (err) {
-        alert('Não foi possível acessar a câmera: ' + err.message);
+        if(window.Toast) Toast.error('Não foi possível acessar a câmera: ' + err.message);
+        else alert('Não foi possível acessar a câmera: ' + err.message);
       }
     }
 
@@ -233,7 +269,6 @@
       
       canvas.toBlob((blob) => {
         currentImageBlob = blob;
-        // Mock a filename for the blob
         currentImageBlob.name = 'foto_camera.jpg';
         showPreview(URL.createObjectURL(blob), 'Foto da Câmera Capturada');
         stopCamera();
@@ -252,18 +287,38 @@
     }
 
     async function carregarProvas() {
-      const select = document.getElementById('prova-select');
+      const optionsContainer = document.getElementById('custom-select-prova-options');
+      const textDisplay = document.getElementById('custom-select-prova-text');
+      
       try {
         const provas = await api.get('/banco_provas');
-        select.innerHTML = '<option value="">Filtre por uma prova física...</option>';
+        optionsContainer.innerHTML = '';
+        
+        if (provas.length === 0) {
+            textDisplay.textContent = 'Nenhuma prova física encontrada';
+            return;
+        }
+        
+        textDisplay.textContent = 'Filtre por uma prova física...';
+        
         provas.forEach(p => {
-          const opt = document.createElement('option');
-          opt.value = p.id;
-          opt.textContent = p.titulo;
-          select.appendChild(opt);
+          const div = document.createElement('div');
+          div.className = 'custom-option';
+          div.dataset.value = p.id;
+          div.textContent = p.titulo;
+          div.onclick = () => {
+             document.querySelectorAll('#custom-select-prova-options .custom-option').forEach(el => el.classList.remove('selected'));
+             div.classList.add('selected');
+             textDisplay.textContent = p.titulo;
+             document.getElementById('prova-select').value = p.id;
+             document.getElementById('custom-select-prova').classList.remove('open');
+             verificarCampos();
+          };
+          optionsContainer.appendChild(div);
         });
       } catch (err) {
-        select.innerHTML = '<option value="">Erro ao carregar provas físicas</option>';
+        textDisplay.textContent = 'Erro ao carregar provas físicas';
+        if(window.Toast) Toast.error('Erro ao carregar provas.');
       }
     }
 
@@ -305,7 +360,9 @@
         renderResultados(data);
       } catch (error) {
         console.error(error);
-        alert('Erro ao corrigir prova: ' + error.message);
+        if (window.Toast) {
+            Toast.error('Erro ao corrigir prova: ' + error.message);
+        }
         btnCorrigir.style.display = 'inline-block';
       } finally {
         loading.style.display = 'none';
