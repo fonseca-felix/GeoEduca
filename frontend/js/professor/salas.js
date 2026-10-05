@@ -63,14 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
         assunto: s.assunto || 'Ensino de Geografia',
         alunos: contagemPorSala[s.id] || 0,
         quizzes: 0,
-        codigo: s.id.substring(0, 6).toUpperCase(),
+        codigo: s.codigo || s.id.substring(0, 6).toUpperCase(),
         cor: colors[index % colors.length]
       }));
       
       renderRooms();
     } catch (e) {
       console.error(e);
-      Toast.error('Erro ao carregar salas', 'Verifique se o servidor está rodando.');
+      Toast.error('Erro ao carregar salas', 'Verifique se o servidor estǭ rodando.');
     }
   }
 
@@ -89,9 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     roomsContainer.innerHTML = filtered.map(s => `
-      <div class="room-card">
+      <div class="room-card" style="cursor: pointer; position: relative;" onclick="window.location.href='sala_detalhes.html?id=${s.id}'">
         <div class="room-header" style="background: ${s.cor};">
-          <div style="position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); padding: 0.25rem; border-radius: 8px; backdrop-filter: blur(4px); cursor: pointer; transition: background 0.2s;" class="edit-room-btn" onclick="window.openEditRoom('${s.id}')" title="Editar Sala">
+          <div style="position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); padding: 0.25rem; border-radius: 8px; backdrop-filter: blur(4px); cursor: pointer; transition: background 0.2s;" class="edit-room-btn" onclick="event.stopPropagation(); window.openEditRoom('${s.id}')" title="Editar Sala">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
           </div>
           <h3 class="room-title">${s.nome}</h3>
@@ -113,9 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="room-stat-value">${s.quizzes}</span>
           </div>
         </div>
-        <div class="room-footer">
-          <button class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.875rem;" onclick="window.location.href='alunos.html'">Ver Alunos</button>
-          <div class="room-code" title="Clique para copiar" onclick="window.copyCode('${s.codigo}')">
+        <div class="room-footer" style="padding-top: 0;">
+          <button class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.875rem;" onclick="event.stopPropagation(); window.location.href='sala_detalhes.html?id=${s.id}'">Relatório da Sala</button>
+          <div class="room-code" title="Clique para copiar" onclick="event.stopPropagation(); window.copyCode('${s.codigo}')">
             ${s.codigo}
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
           </div>
