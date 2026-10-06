@@ -269,9 +269,37 @@ function initPage(tipo) {
   const nameEl = document.getElementById('sidebar-user-name');
   const roleEl = document.getElementById('sidebar-user-role');
   const avatarEl = document.getElementById('sidebar-user-avatar');
-  if (nameEl) nameEl.textContent = user.nome;
-  if (roleEl) roleEl.textContent = tipo === 'prof' ? 'Professor' : `Turma: ${user.salaNome || '-'}`;
-  if (avatarEl) avatarEl.textContent = Auth.getInitials(user.nome);
+
+  if (nameEl) {
+     if(user.tituloAtual) {
+         nameEl.innerHTML = `${user.nome} <br><span style="font-size:0.75rem; color:var(--primary); font-weight:800; text-transform:uppercase; letter-spacing:0.05em;">${user.tituloAtual}</span>`;
+     } else {
+         nameEl.textContent = user.nome;
+     }
+  }
+  if (roleEl) {
+      if (tipo === 'prof') roleEl.textContent = 'Professor';
+      else roleEl.textContent = `Turmas: ${user.salasNomes ? user.salasNomes.join(', ') : (user.salaNome || '-')}`;
+  }
+  if (avatarEl) {
+     avatarEl.textContent = Auth.getInitials(user.nome);
+     if(user.bordaAtual && user.bordaAtual !== 'transparent') {
+         avatarEl.style.border = `3px solid ${user.bordaAtual}`;
+         avatarEl.style.boxShadow = `0 0 10px ${user.bordaAtual}`;
+     }
+  }
+  
+  // Update header profile button if exists
+  const headerAvatar = document.querySelector('.page-header-right .avatar');
+  if (headerAvatar) {
+     if(user.bordaAtual && user.bordaAtual !== 'transparent') {
+         headerAvatar.style.border = `3px solid ${user.bordaAtual}`;
+         headerAvatar.style.boxShadow = `0 0 10px ${user.bordaAtual}`;
+     }
+     const headerInit = headerAvatar.querySelector('span');
+     if (headerInit) headerInit.textContent = Auth.getInitials(user.nome);
+  }
+
 
   // Theme toggle
   document.querySelectorAll('[data-action="toggle-theme"]').forEach(btn => {

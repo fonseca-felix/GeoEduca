@@ -71,15 +71,23 @@ router.get('/ranking/turma', authenticateToken, requireAluno, async (req, res) =
             return res.json([]);
         }
 
-        const alunosSnap = await db.collection('alunos').where('salaId', '==', salaId).get();
+        let alunosSnap;
+        if (req.user.salas && req.user.salas.length > 0) {
+            alunosSnap = await db.collection('alunos').where('salas', 'array-contains-any', req.user.salas).get();
+        } else {
+            alunosSnap = await db.collection('alunos').where('salaId', '==', salaId).get();
+        }
         const ranking = [];
 
         for (const alunoDoc of alunosSnap.docs) {
             const pontos = await somarPontosAluno(alunoDoc.id);
+            const d = alunoDoc.data();
             ranking.push({
                 alunoId: alunoDoc.id,
-                nome: alunoDoc.data().nome,
-                salaNome: alunoDoc.data().salaNome || '',
+                nome: d.nome,
+                salaNome: (d.salasNomes ? d.salasNomes.join(', ') : d.salaNome) || '',
+                tituloAtual: d.tituloAtual || '',
+                bordaAtual: d.bordaAtual || '',
                 pontos,
                 voce: alunoDoc.id === alunoId
             });
@@ -102,10 +110,13 @@ router.get('/ranking/geral', authenticateToken, requireAluno, async (req, res) =
 
         for (const alunoDoc of alunosSnap.docs) {
             const pontos = await somarPontosAluno(alunoDoc.id);
+            const d = alunoDoc.data();
             ranking.push({
                 alunoId: alunoDoc.id,
-                nome: alunoDoc.data().nome,
-                salaNome: alunoDoc.data().salaNome || '',
+                nome: d.nome,
+                salaNome: (d.salasNomes ? d.salasNomes.join(', ') : d.salaNome) || '',
+                tituloAtual: d.tituloAtual || '',
+                bordaAtual: d.bordaAtual || '',
                 pontos,
                 voce: alunoDoc.id === alunoId
             });
@@ -298,8 +309,8 @@ router.put('/:id', authenticateToken, requireProfessor, async (req, res) => {
             if (!sala.exists) {
                 return res.status(404).json({ error: 'Sala não encontrada' });
             }
-            updates.salaId = salaId;
-            updates.salaNome = sala.data().nome;
+            updates.salas = [salaId];
+            updates.salasNomes = [sala.data().nome];
         }
         
         await alunoRef.update(updates);
@@ -332,4 +343,94 @@ router.delete('/:id', authenticateToken, requireProfessor, async (req, res) => {
     }
 });
 
+
+// ==========================================
+// NOVAS ROTAS (Multi-Turma e Cosméticos)
+// ==========================================
+
+router.post('/entrar-sala', authenticateToken, requireAluno, async (req, res) => {
+    try {
+        const alunoId = req.user.id;
+        const { codigoSala } = req.body;
+        
+        const snapshot = await db.collection('salas').where('turma', '==', codigoSala).limit(1).get();
+        if (snapshot.empty) return res.status(404).json({ error: 'Código de sala inválido' });
+        
+        const salaDoc = snapshot.docs[0];
+        const salaId = salaDoc.id;
+        const salaData = salaDoc.data();
+        
+        const alunoRef = db.collection('alunos').doc(alunoId);
+        const alunoDoc = await alunoRef.get();
+        if (!alunoDoc.exists) return res.status(404).json({ error: 'Aluno não encontrado' });
+        
+        const d = alunoDoc.data();
+        let salas = d.salas || [];
+        let salasNomes = d.salasNomes || [];
+        
+        if (d.salaId && !salas.includes(d.salaId)) {
+            salas.push(d.salaId);
+            salasNomes.push(d.salaNome);
+        }
+        
+        if (salas.includes(salaId)) {
+            return res.status(400).json({ error: 'Você já está nesta turma' });
+        }
+        
+        salas.push(salaId);
+        salasNomes.push(salaData.nome);
+        
+        await alunoRef.update({ salas, salasNomes });
+        res.json({ message: 'Entrou na turma com sucesso', salas, salasNomes });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao entrar na turma' });
+    }
+});
+
+router.post('/equipar', authenticateToken, requireAluno, async (req, res) => {
+    try {
+        const alunoId = req.user.id;
+        const { tipo, valor } = req.body; // tipo: 'titulo' ou 'borda'
+        const updates = {};
+        if (tipo === 'titulo') updates.tituloAtual = valor;
+        if (tipo === 'borda') updates.bordaAtual = valor;
+        
+        await db.collection('alunos').doc(alunoId).update(updates);
+        res.json({ message: 'Cosmético equipado', updates });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao equipar cosmético' });
+    }
+});
+
+router.get('/minhas-salas', authenticateToken, requireAluno, async (req, res) => {
+    try {
+        const alunoId = req.user.id;
+        const alunoDoc = await db.collection('alunos').doc(alunoId).get();
+        if (!alunoDoc.exists) return res.status(404).json({ error: 'Aluno não encontrado' });
+        
+        const d = alunoDoc.data();
+        let salasIds = d.salas || [];
+        if (d.salaId && !salasIds.includes(d.salaId)) {
+            salasIds.push(d.salaId);
+        }
+        
+        if (salasIds.length === 0) return res.json([]);
+        
+        const salasArr = [];
+        for (const sId of salasIds) {
+            const salaDoc = await db.collection('salas').doc(sId).get();
+            if (salaDoc.exists) {
+                salasArr.push({ id: salaDoc.id, ...salaDoc.data() });
+            }
+        }
+        res.json(salasArr);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao listar salas do aluno' });
+    }
+});
+
 module.exports = router;
+

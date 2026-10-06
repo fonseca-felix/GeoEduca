@@ -6,7 +6,7 @@ const listarAlunos = async (req, res) => {
         const snapshot = await db.collection('alunos').get();
         const alunos = snapshot.docs.map(doc => {
             const d = doc.data();
-            return { id: doc.id, rm: d.rm, nome: d.nome, salaId: d.salaId, salaNome: d.salaNome, createdAt: d.createdAt };
+            return { id: doc.id, rm: d.rm, nome: d.nome, salas: d.salas || [d.salaId], salasNomes: d.salasNomes || [d.salaNome], tituloAtual: d.tituloAtual || "", bordaAtual: d.bordaAtual || "", createdAt: d.createdAt };
         });
         res.json(alunos);
     } catch (error) {
@@ -18,10 +18,10 @@ const listarAlunos = async (req, res) => {
 const listarAlunosPorSala = async (req, res) => {
     try {
         const { salaId } = req.params;
-        const snapshot = await db.collection('alunos').where('salaId', '==', salaId).get();
+        const snapshot = await db.collection('alunos').where('salas', 'array-contains', salaId).get();
         const alunos = snapshot.docs.map(doc => {
             const d = doc.data();
-            return { id: doc.id, rm: d.rm, nome: d.nome, salaId: d.salaId, salaNome: d.salaNome };
+            return { id: doc.id, rm: d.rm, nome: d.nome, salas: d.salas || [d.salaId], salasNomes: d.salasNomes || [d.salaNome], tituloAtual: d.tituloAtual || "", bordaAtual: d.bordaAtual || "" };
         });
         res.json(alunos);
     } catch (error) {
@@ -42,7 +42,7 @@ const buscarAluno = async (req, res) => {
         if (!doc.exists) return res.status(404).json({ error: 'Aluno não encontrado' });
 
         const d = doc.data();
-        res.json({ id: doc.id, rm: d.rm, nome: d.nome, salaId: d.salaId, salaNome: d.salaNome, createdAt: d.createdAt });
+        res.json({ id: doc.id, rm: d.rm, nome: d.nome, salas: d.salas || [d.salaId], salasNomes: d.salasNomes || [d.salaNome], tituloAtual: d.tituloAtual || "", bordaAtual: d.bordaAtual || "", createdAt: d.createdAt });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao buscar aluno' });
@@ -71,7 +71,7 @@ const criarAluno = async (req, res) => {
             salaNome: salaData.nome, createdAt: new Date().toISOString()
         });
 
-        res.status(201).json({ id: docRef.id, rm, nome, salaId, salaNome: salaData.nome });
+        res.status(201).json({ id: docRef.id, rm, nome, salas: [salaId], salasNomes: [salaData.nome] });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao criar aluno' });
@@ -119,4 +119,62 @@ const removerAluno = async (req, res) => {
     }
 };
 
-module.exports = { listarAlunos, listarAlunosPorSala, buscarAluno, criarAluno, atualizarAluno, removerAluno };
+
+const entrarTurma = async (req, res) => {
+  try {
+    const alunoId = req.user.id;
+    const { codigoSala } = req.body;
+    
+    const snapshot = await db.collection('salas').where('turma', '==', codigoSala).limit(1).get();
+    if (snapshot.empty) return res.status(404).json({ error: 'Código de sala inválido' });
+    
+    const salaDoc = snapshot.docs[0];
+    const salaId = salaDoc.id;
+    const salaData = salaDoc.data();
+    
+    const alunoRef = db.collection('alunos').doc(alunoId);
+    const alunoDoc = await alunoRef.get();
+    if (!alunoDoc.exists) return res.status(404).json({ error: 'Aluno não encontrado' });
+    
+    const d = alunoDoc.data();
+    let salas = d.salas || [];
+    let salasNomes = d.salasNomes || [];
+    
+    if (d.salaId && !salas.includes(d.salaId)) {
+        salas.push(d.salaId);
+        salasNomes.push(d.salaNome);
+    }
+    
+    if (salas.includes(salaId)) {
+        return res.status(400).json({ error: 'Você já está nesta turma' });
+    }
+    
+    salas.push(salaId);
+    salasNomes.push(salaData.nome);
+    
+    await alunoRef.update({ salas, salasNomes });
+    res.json({ message: 'Entrou na turma com sucesso', salas, salasNomes });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao entrar na turma' });
+  }
+};
+
+const equiparCosmetico = async (req, res) => {
+  try {
+    const alunoId = req.user.id;
+    const { tipo, valor } = req.body; // tipo: 'titulo' ou 'borda'
+    const updates = {};
+    if (tipo === 'titulo') updates.tituloAtual = valor;
+    if (tipo === 'borda') updates.bordaAtual = valor;
+    
+    await db.collection('alunos').doc(alunoId).update(updates);
+    res.json({ message: 'Cosmético equipado', updates });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao equipar cosmético' });
+  }
+};
+
+module.exports = { listarAlunos, listarAlunosPorSala, buscarAluno, criarAluno, atualizarAluno, removerAluno, entrarTurma, equiparCosmetico };
+
