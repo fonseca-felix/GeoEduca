@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!grid) return;
 
     if (!quizzes.length) {
-      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:3rem;border:1px dashed var(--border-color);border-radius:12px;background:var(--bg-card)">Nenhum quiz disponível.</div>`;
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--color-text-secondary);padding:3rem;border:1px dashed var(--color-border);border-radius:12px;background:var(--bg-card)">Nenhum quiz disponível.</div>`;
       return;
     }
 

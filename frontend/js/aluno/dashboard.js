@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items:center;">
                                 <div style="display:flex; align-items:center; gap:8px;">
                                     <span style="font-size:20px;">${g.icon}</span>
-                                    <span style="font-size:12px; font-weight:600; color:var(--text-secondary); text-transform:uppercase;">${g.type}</span>
+                                    <span style="font-size:12px; font-weight:600; color:var(--color-text-secondary); text-transform:uppercase;">${g.type}</span>
                                 </div>
                                 <span style="font-size:10px; padding: 4px 8px; border-radius: 4px; font-weight: 800; background-color: #fcf8ee; color: #b78a38; border: 1px solid #e8d7ab; text-transform: uppercase; letter-spacing: 0.05em;">${g.deadline}</span>
                             </div>

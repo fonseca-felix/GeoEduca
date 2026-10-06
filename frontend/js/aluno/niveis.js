@@ -97,7 +97,7 @@ function switchTab(tabId) {
 
 async function loadLevelInfo() {
     try {
-        const stats = await api.get('/atividades/estatisticas');
+        const stats = await api.get('/alunos/me/resumo');
         const xp = stats.pontos || 0;
         
         currentLevel = 1;
@@ -153,7 +153,7 @@ function renderTitulos() {
         card.innerHTML = `
             ${locked ? '<i class="fa-solid fa-lock lock-icon"></i>' : ''}
             <div class="titulo-preview" style="color: var(--gold)">${t.nome}</div>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Título de Perfil</p>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Título de Perfil</p>
             ${btnHtml}
         `;
         container.appendChild(card);
@@ -189,8 +189,8 @@ function renderBordas() {
         card.innerHTML = `
             ${locked ? '<i class="fa-solid fa-lock lock-icon"></i>' : ''}
             <div class="${cls}" style="${style}">${initial}</div>
-            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-primary);">${b.nome}</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Borda de Avatar</p>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--color-text-primary);">${b.nome}</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Borda de Avatar</p>
             ${btnHtml}
         `;
         container.appendChild(card);
@@ -218,8 +218,8 @@ function renderIcones() {
         card.innerHTML = `
             ${locked ? '<i class="fa-solid fa-lock lock-icon"></i>' : ''}
             <div class="avatar-preview">${iconHtml}</div>
-            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-primary);">${i.nome}</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Ícone de Avatar</p>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--color-text-primary);">${i.nome}</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Ícone de Avatar</p>
             ${btnHtml}
         `;
         container.appendChild(card);

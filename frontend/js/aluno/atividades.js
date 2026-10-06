@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
       : enriched.filter(a => a.status === currentFilter);
 
     if (!filtered.length) {
-      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-secondary);">Nenhuma atividade encontrada.</div>`;
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--color-text-secondary);">Nenhuma atividade encontrada.</div>`;
       return;
     }
 
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="badge ${act.status}">${act.status}</span>
         </div>
 
-        <p style="font-size:0.875rem;color:var(--text-secondary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+        <p style="font-size:0.875rem;color:var(--color-text-secondary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
           ${act.descricao || ''}
         </p>
 
@@ -128,11 +128,11 @@ document.addEventListener('DOMContentLoaded', () => {
         <span style="font-weight:600;color:#0f172a;">${escapeHtml(act.tipo || 'Atividade')}</span>
       </div>
 
-      ${act.descricao ? `<p style="color:var(--text-secondary);">${escapeHtml(act.descricao)}</p>` : ''}
+      ${act.descricao ? `<p style="color:var(--color-text-secondary);">${escapeHtml(act.descricao)}</p>` : ''}
 
       <div style="margin-top:1.25rem;background:#f8fafc;padding:1rem;border-radius:10px;border:1px solid var(--border-color, #e2e8f0);">
         <div style="font-weight:700;color:#0f172a;margin-bottom:0.25rem;">Prazo</div>
-        <div style="color:var(--text-secondary);">${escapeHtml(dueDate)}</div>
+        <div style="color:var(--color-text-secondary);">${escapeHtml(dueDate)}</div>
       </div>
     `;
 

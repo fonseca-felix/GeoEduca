@@ -42,7 +42,7 @@ async function carregarRanking(salaId) {
     try {
         const ranking = await api.get(`/alunos/ranking/turma?salaId=${salaId}`);
         if (!ranking || ranking.length === 0) {
-            container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum aluno nesta turma ainda.</div>';
+            container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--color-text-muted);">Nenhum aluno nesta turma ainda.</div>';
             return;
         }
 
@@ -71,7 +71,7 @@ async function carregarRanking(salaId) {
             div.innerHTML = `
                 <div class="r-pos">#${i + 1}</div>
                 <div class="r-avatar" style="${bordaStyle}">
-                    <div style="width:100%; height:100%; border-radius:50%; background:var(--surface-hover); display:flex; align-items:center; justify-content:center; color:var(--text-primary); font-size:14px;">${avatarContent}</div>
+                    <div style="width:100%; height:100%; border-radius:50%; background:var(--color-surface-2); display:flex; align-items:center; justify-content:center; color:var(--color-text-primary); font-size:14px;">${avatarContent}</div>
                 </div>
                 <div class="r-info">
                     <strong>${r.voce ? r.nome + ' (Você)' : r.nome}</strong>
@@ -93,7 +93,7 @@ async function carregarAtividades(salaId) {
     try {
         const atividades = await api.get(`/atividades/minhas?salaId=${salaId}`);
         if (!atividades || atividades.length === 0) {
-            container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhuma atividade pendente. Tudo certo!</div>';
+            container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--color-text-muted);">Nenhuma atividade pendente. Tudo certo!</div>';
             return;
         }
 
