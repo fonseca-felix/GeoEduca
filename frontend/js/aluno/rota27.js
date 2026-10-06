@@ -3,7 +3,7 @@
 // ============================================================
 
 async function carregarTentativasRestantes() {
-    const badge = document.getElementById('badge-tentativas');
+    const badge = document.getElementById('hero-tentativas-box');
     if (!badge) return;
     try {
         const token = Auth.getToken();
@@ -18,7 +18,7 @@ async function carregarTentativasRestantes() {
         } else {
             let restantes = data.limit - data.usesToday;
             if (restantes < 0) restantes = 0;
-            badge.textContent = `Tentativas Restantes: ${restantes}`;
+            document.getElementById('hero-tentativas-texto').textContent = `Tentativas Restantes: ${restantes}`;
             if (restantes === 0) {
                 badge.style.background = 'rgba(255, 0, 0, 0.2)';
                 badge.style.color = '#ff4d4d';
@@ -31,7 +31,7 @@ async function carregarTentativasRestantes() {
         }
     } catch (e) {
         console.error('Erro ao carregar tentativas', e);
-        badge.textContent = 'Tentativas Restantes: ?';
+        document.getElementById('hero-tentativas-texto').textContent = 'Tentativas Restantes: ?';
     }
 }
 
