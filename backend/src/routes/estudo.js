@@ -78,7 +78,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
         if (req.user && req.user.tipo === 'aluno') {
             const alunoId = req.user.id;
             const hoje = new Date().toISOString().split('T')[0];
-            const usageRef = db.collection('alunos_usage').doc(${alunoId}_);
+            const usageRef = db.collection('alunos_usage').doc(`${alunoId}_${hoje}`);
             const doc = await usageRef.get();
             let count = 0;
             if (doc.exists) {
