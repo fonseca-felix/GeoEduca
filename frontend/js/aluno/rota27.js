@@ -1,6 +1,39 @@
 // ============================================================
-// ROTA 27 - LÓGICA DE INTEGRAÇÃO COM IA
+// ROTA 27 - LOGICA DE INTEGRACAO COM IA
 // ============================================================
+
+async function carregarTentativasRestantes() {
+    const badge = document.getElementById('badge-tentativas');
+    if (!badge) return;
+    try {
+        const token = Auth.getToken();
+        const response = await fetch(`${API_BASE}/estudos/stats`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+        if (data.limit === 'Ilimitado') {
+            badge.style.display = 'none';
+        } else {
+            let restantes = data.limit - data.usesToday;
+            if (restantes < 0) restantes = 0;
+            badge.textContent = `Tentativas Restantes: ${restantes}`;
+            if (restantes === 0) {
+                badge.style.background = 'rgba(255, 0, 0, 0.2)';
+                badge.style.color = '#ff4d4d';
+                badge.style.borderColor = '#ff4d4d';
+            } else {
+                badge.style.background = 'rgba(204, 164, 59, 0.2)';
+                badge.style.color = 'var(--gold)';
+                badge.style.borderColor = 'var(--gold)';
+            }
+        }
+    } catch (e) {
+        console.error('Erro ao carregar tentativas', e);
+        badge.textContent = 'Tentativas Restantes: ?';
+    }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Injeta o HTML do sidebar no layout ANTES de qualquer init
@@ -9,11 +42,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         appLayout.insertAdjacentHTML('afterbegin', buildAlunoSidebar('../'));
     }
 
-    // 2. Inicializa página (checa auth, popula user, inicia Theme/Sidebar/Reveal)
+    // 2. Inicializa pagina (checa auth, popula user, inicia Theme/Sidebar/Reveal)
     if (typeof initPage === 'function') {
         initPage('aluno');
     } else {
-        // Fallback manual caso ui.js não carregue
         const user = Auth && Auth.getUser ? Auth.getUser() : null;
         if (!user) {
             window.location.href = '../login.html';
@@ -21,6 +53,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if (typeof Sidebar !== 'undefined') Sidebar.init();
     }
+    
+    // 3. Carrega tentativas restantes
+    await carregarTentativasRestantes();
 });
 
 function mostrarErro(mensagem) {
@@ -79,6 +114,7 @@ async function buscarDados(endpoint, callbackRender) {
 
         if (resultadoJson.sucesso) {
             callbackRender(resultadoJson.dados);
+            await carregarTentativasRestantes();
             painel.classList.remove("hidden");
             painel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {

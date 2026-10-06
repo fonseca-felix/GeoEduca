@@ -72,4 +72,26 @@ router.post('/gerarvideos', authenticateToken, rateLimitAluno, validarRequisicao
     res.json(resultado);
 });
 
+
+router.get('/stats', authenticateToken, async (req, res) => {
+    try {
+        if (req.user && req.user.tipo === 'aluno') {
+            const alunoId = req.user.id;
+            const hoje = new Date().toISOString().split('T')[0];
+            const usageRef = db.collection('alunos_usage').doc(${alunoId}_);
+            const doc = await usageRef.get();
+            let count = 0;
+            if (doc.exists) {
+                count = doc.data().rota27_uses || 0;
+            }
+            res.json({ usesToday: count, limit: 10 });
+        } else {
+            res.json({ usesToday: 0, limit: 'Ilimitado' });
+        }
+    } catch (e) {
+        res.json({ usesToday: 0, limit: 10 });
+    }
+});
+
 module.exports = router;
+
