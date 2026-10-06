@@ -201,7 +201,7 @@ function buildAlunoSidebar(basePath = '../') {
         <span class="sidebar-nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
         <span class="sidebar-nav-text">Placas 3D</span>
       </a>
-      <a class="sidebar-nav-item" href="${basePath}aluno/rota27.html" data-tooltip="Rota 27 (IA)" style="background: var(--color-surface-2); border-left: 3px solid #cca43b;">
+      <a class="sidebar-nav-item" href="${basePath}aluno/rota27.html" data-tooltip="Rota 27 (IA)" style="border-left: 3px solid #cca43b;">
         <span class="sidebar-nav-icon">${NAV_ICONS.rota27}</span>
         <span class="sidebar-nav-text" style="color: #cca43b; font-weight: bold;">Rota 27</span>
       </a>
