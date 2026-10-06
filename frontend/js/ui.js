@@ -269,6 +269,21 @@ function initPage(tipo) {
   const nameEl = document.getElementById('sidebar-user-name');
   const roleEl = document.getElementById('sidebar-user-role');
   const avatarEl = document.getElementById('sidebar-user-avatar');
+  
+  if (nameEl) {
+     if(user.tituloAtual) {
+         nameEl.innerHTML = `${user.nome} <br><span style="font-size:0.75rem; color:var(--gold); font-weight:800; text-transform:uppercase; letter-spacing:0.05em;">${user.tituloAtual}</span>`;
+     } else {
+         nameEl.textContent = user.nome;
+     }
+  }
+  
+  if (roleEl) {
+      if (tipo === 'admin') roleEl.textContent = 'Administrador';
+      else if (tipo === 'prof' || tipo === 'professor') roleEl.textContent = 'Professor';
+      else roleEl.textContent = `Turmas: ${user.salasNomes ? user.salasNomes.join(', ') : (user.salaNome || '-')}`;
+  }
+
   if (avatarEl) {
      if(user.iconeAtual) avatarEl.innerHTML = `<i class="${user.iconeAtual}" style="font-size:1.2rem;"></i>`; else avatarEl.textContent = Auth.getInitials(user.nome);
 
@@ -313,47 +328,6 @@ function initPage(tipo) {
          headerAvatar.style.boxShadow = '';
      }
   }
-  if (roleEl) {
-      if (tipo === 'prof') roleEl.textContent = 'Professor';
-      else roleEl.textContent = `Turmas: ${user.salasNomes ? user.salasNomes.join(', ') : (user.salaNome || '-')}`;
-  }
-  if (avatarEl) {
-     if(user.iconeAtual) avatarEl.innerHTML = `<i class="${user.iconeAtual}" style="font-size:1.2rem;"></i>`; else avatarEl.textContent = Auth.getInitials(user.nome);
-
-     if(user.bordaAtual && user.bordaAtual !== 'transparent') {
-         if (user.bordaAtual.startsWith('anim-')) {
-             avatarEl.classList.add(user.bordaAtual);
-             avatarEl.style.border = '';
-             avatarEl.style.boxShadow = '';
-         } else {
-             avatarEl.style.border = `3px solid ${user.bordaAtual}`;
-             avatarEl.style.boxShadow = `0 0 10px ${user.bordaAtual}`;
-             avatarEl.className = 'sidebar-user-avatar'; // reset classes
-         }
-     }
-
-  }
-  
-  // Update header profile button if exists
-  const headerAvatar = document.querySelector('.page-header-right .avatar');
-  if (headerAvatar) {
-
-     if(user.bordaAtual && user.bordaAtual !== 'transparent') {
-         if (user.bordaAtual.startsWith('anim-')) {
-             headerAvatar.classList.add(user.bordaAtual);
-             headerAvatar.style.border = '';
-             headerAvatar.style.boxShadow = '';
-         } else {
-             headerAvatar.style.border = `3px solid ${user.bordaAtual}`;
-             headerAvatar.style.boxShadow = `0 0 10px ${user.bordaAtual}`;
-             headerAvatar.className = 'avatar'; // reset classes
-         }
-     }
-
-     const headerInit = headerAvatar.querySelector('span');
-     if (headerInit) { if(user.iconeAtual) headerInit.innerHTML = `<i class="${user.iconeAtual}" style="font-size:1.2rem;"></i>`; else headerInit.textContent = Auth.getInitials(user.nome); }
-  }
-
 
   // Theme toggle
   document.querySelectorAll('[data-action="toggle-theme"]').forEach(btn => {
