@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoEduca - Meu Nível & Títulos</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
+    <title>GeoEduca - Níveis & Cosméticos</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../css/tokens.css" />
@@ -15,14 +15,15 @@
     <link rel="stylesheet" href="../css/darkmode.css" />
     <style>
         .niveis-hero {
-            background: linear-gradient(135deg, var(--navy) 0%, var(--primary) 100%);
-            border-radius: 16px;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+            border-radius: var(--radius-xl);
             padding: 3rem 2rem;
             color: white;
             text-align: center;
             margin-bottom: 2rem;
             position: relative;
             overflow: hidden;
+            box-shadow: var(--shadow-md);
         }
         .niveis-hero::before {
             content: '';
@@ -46,6 +47,7 @@
             position: relative;
             z-index: 1;
             box-shadow: 0 0 30px rgba(204, 164, 59, 0.4);
+            font-family: var(--font-display);
         }
         .xp-bar-container {
             max-width: 600px;
@@ -62,94 +64,152 @@
             color: rgba(255, 255, 255, 0.9);
         }
         .xp-bar-bg {
-            height: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 6px;
+            height: 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 7px;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .xp-bar-fill {
             height: 100%;
-            background: var(--gold);
+            background: linear-gradient(90deg, var(--gold), #FFE175);
             width: 0%;
-            transition: width 1s ease-out;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .cosmeticos-section {
-            margin-top: 3rem;
-        }
-        .cosmeticos-title {
-            font-size: 1.5rem;
-            color: var(--color-text-primary);
-            margin-bottom: 1.5rem;
+        /* Tabs */
+        .tabs {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1px;
         }
+        .tab-btn {
+            background: none;
+            border: none;
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
+
+        /* Grid Cosméticos */
         .cosmeticos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 1.5rem;
         }
         .cosmetico-card {
             background: var(--surface-primary);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: var(--radius-lg);
             padding: 1.5rem;
             text-align: center;
             position: relative;
             transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .cosmetico-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-md);
         }
         .cosmetico-card.locked {
-            opacity: 0.7;
             background: var(--surface-secondary);
+            border-color: transparent;
         }
-        .cosmetico-card.locked::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.05);
-            border-radius: 12px;
-            pointer-events: none;
+        .cosmetico-card.locked > * {
+            opacity: 0.5;
+        }
+        .cosmetico-card.locked .lock-icon {
+            opacity: 1;
         }
         .lock-icon {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            color: var(--color-text-muted);
-        }
-        .cosmetico-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-        .borda-preview {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 0 auto 1rem auto;
-            background: var(--surface-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--color-text-muted);
-            border: 4px solid transparent;
+            color: var(--text-muted);
+            font-size: 1.2rem;
         }
         .req-nivel {
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 700;
             color: var(--danger);
             background: rgba(239, 68, 68, 0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
             display: inline-block;
             margin-bottom: 1rem;
         }
-        
+
+        /* Títulos */
+        .titulo-preview {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Bordas & Icones Preview */
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem auto;
+            background: var(--surface-hover);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--text-muted);
+            border: 4px solid transparent;
+        }
+
+        /* Borda Animations (Rainbow, Pulse) */
+        @keyframes borderRainbow {
+            0% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
+            17% { border-color: #ff8000; box-shadow: 0 0 15px #ff8000; }
+            33% { border-color: #ffff00; box-shadow: 0 0 15px #ffff00; }
+            50% { border-color: #00ff00; box-shadow: 0 0 15px #00ff00; }
+            67% { border-color: #0000ff; box-shadow: 0 0 15px #0000ff; }
+            83% { border-color: #4b0082; box-shadow: 0 0 15px #4b0082; }
+            100% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
+        }
+        @keyframes borderPulseGeo {
+            0% { border-color: var(--navy); box-shadow: 0 0 5px var(--navy); }
+            50% { border-color: var(--gold); box-shadow: 0 0 20px var(--gold); }
+            100% { border-color: var(--navy); box-shadow: 0 0 5px var(--navy); }
+        }
+        @keyframes borderPulseGold {
+            0% { border-color: #B8860B; box-shadow: 0 0 5px #B8860B; }
+            50% { border-color: #FFD700; box-shadow: 0 0 25px #FFD700; }
+            100% { border-color: #B8860B; box-shadow: 0 0 5px #B8860B; }
+        }
+        @keyframes borderNeonCyan {
+            0% { border-color: #00ced1; box-shadow: 0 0 5px #00ced1, inset 0 0 5px #00ced1; }
+            50% { border-color: #00ffff; box-shadow: 0 0 20px #00ffff, inset 0 0 10px #00ffff; }
+            100% { border-color: #00ced1; box-shadow: 0 0 5px #00ced1, inset 0 0 5px #00ced1; }
+        }
+        @keyframes borderFire {
+            0% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
+            50% { border-color: #ffa500; box-shadow: 0 0 25px #ffa500; }
+            100% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
+        }
     </style>
 </head>
 <body>
@@ -157,45 +217,37 @@
         <main class="app-main">
             <header class="page-header">
                 <div class="page-header-left">
-                    <h1 class="page-title">Meu Nível e Títulos</h1>
-                    <p class="page-subtitle">Suba de nível e desbloqueie cosméticos exclusivos para o seu perfil!</p>
-                </div>
-                <div class="page-header-right">
-                    <div class="user-profile" id="profile-btn" style="cursor:pointer;">
-                        <div class="avatar" style="background:var(--navy);">
-                            <span id="user-initial">A</span>
-                        </div>
-                    </div>
+                    <h1 class="page-title">Níveis & Títulos</h1>
+                    <p class="page-subtitle">Suba de nível fazendo atividades e desbloqueie cosméticos exclusivos!</p>
                 </div>
             </header>
 
             <div class="page-content">
                 <div class="niveis-hero">
-                    <div class="nivel-circulo" id="hero-nivel">1</div>
+                    <div class="nivel-circulo" id="nivel-display">--</div>
+                    <h2 style="margin-bottom:1.5rem; font-family:var(--font-display); font-size:1.8rem;" id="nivel-nome">Novato</h2>
+                    
                     <div class="xp-bar-container">
                         <div class="xp-text">
-                            <span id="hero-xp-atual">0 XP</span>
-                            <span id="hero-xp-prox">200 XP para o Nível 2</span>
+                            <span>XP Atual: <strong id="xp-atual">0</strong></span>
+                            <span>Próximo Nível: <strong id="xp-prox">0</strong></span>
                         </div>
                         <div class="xp-bar-bg">
-                            <div class="xp-bar-fill" id="hero-xp-bar"></div>
+                            <div class="xp-bar-fill" id="xp-bar"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="cosmeticos-section">
-                    <h2 class="cosmeticos-title"><i class="fa-solid fa-medal" style="color: var(--gold);"></i> Títulos Desbloqueáveis</h2>
-                    <div class="cosmeticos-grid" id="grid-titulos">
-                        <!-- Preenchido via JS -->
-                    </div>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('titulos')"><i class="fa-solid fa-tag"></i> Títulos</button>
+                    <button class="tab-btn" onclick="switchTab('bordas')"><i class="fa-solid fa-circle-notch"></i> Bordas</button>
+                    <button class="tab-btn" onclick="switchTab('icones')"><i class="fa-solid fa-face-smile"></i> Ícones</button>
                 </div>
 
-                <div class="cosmeticos-section">
-                    <h2 class="cosmeticos-title"><i class="fa-solid fa-circle-user" style="color: var(--primary);"></i> Bordas de Perfil</h2>
-                    <div class="cosmeticos-grid" id="grid-bordas">
-                        <!-- Preenchido via JS -->
-                    </div>
-                </div>
+                <div id="tab-titulos" class="cosmeticos-grid"></div>
+                <div id="tab-bordas" class="cosmeticos-grid" style="display:none;"></div>
+                <div id="tab-icones" class="cosmeticos-grid" style="display:none;"></div>
+
             </div>
         </main>
     </div>

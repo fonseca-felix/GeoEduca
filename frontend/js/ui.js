@@ -282,22 +282,40 @@ function initPage(tipo) {
       else roleEl.textContent = `Turmas: ${user.salasNomes ? user.salasNomes.join(', ') : (user.salaNome || '-')}`;
   }
   if (avatarEl) {
-     avatarEl.textContent = Auth.getInitials(user.nome);
+     if(user.iconeAtual) avatarEl.innerHTML = `<i class="${user.iconeAtual}" style="font-size:1.2rem;"></i>`; else avatarEl.textContent = Auth.getInitials(user.nome);
+
      if(user.bordaAtual && user.bordaAtual !== 'transparent') {
-         avatarEl.style.border = `3px solid ${user.bordaAtual}`;
-         avatarEl.style.boxShadow = `0 0 10px ${user.bordaAtual}`;
+         if (user.bordaAtual.startsWith('anim-')) {
+             avatarEl.classList.add(user.bordaAtual);
+             avatarEl.style.border = '';
+             avatarEl.style.boxShadow = '';
+         } else {
+             avatarEl.style.border = `3px solid ${user.bordaAtual}`;
+             avatarEl.style.boxShadow = `0 0 10px ${user.bordaAtual}`;
+             avatarEl.className = 'sidebar-user-avatar'; // reset classes
+         }
      }
+
   }
   
   // Update header profile button if exists
   const headerAvatar = document.querySelector('.page-header-right .avatar');
   if (headerAvatar) {
+
      if(user.bordaAtual && user.bordaAtual !== 'transparent') {
-         headerAvatar.style.border = `3px solid ${user.bordaAtual}`;
-         headerAvatar.style.boxShadow = `0 0 10px ${user.bordaAtual}`;
+         if (user.bordaAtual.startsWith('anim-')) {
+             headerAvatar.classList.add(user.bordaAtual);
+             headerAvatar.style.border = '';
+             headerAvatar.style.boxShadow = '';
+         } else {
+             headerAvatar.style.border = `3px solid ${user.bordaAtual}`;
+             headerAvatar.style.boxShadow = `0 0 10px ${user.bordaAtual}`;
+             headerAvatar.className = 'avatar'; // reset classes
+         }
      }
+
      const headerInit = headerAvatar.querySelector('span');
-     if (headerInit) headerInit.textContent = Auth.getInitials(user.nome);
+     if (headerInit) { if(user.iconeAtual) headerInit.innerHTML = `<i class="${user.iconeAtual}" style="font-size:1.2rem;"></i>`; else headerInit.textContent = Auth.getInitials(user.nome); }
   }
 
 

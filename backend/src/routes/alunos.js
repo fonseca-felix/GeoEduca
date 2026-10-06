@@ -104,6 +104,7 @@ router.get('/ranking/turma', authenticateToken, requireAluno, async (req, res) =
                 salaNome: (d.salasNomes ? d.salasNomes.join(', ') : d.salaNome) || '',
                 tituloAtual: d.tituloAtual || '',
                 bordaAtual: d.bordaAtual || '',
+                iconeAtual: d.iconeAtual || '',
                 pontos,
                 voce: alunoDoc.id === alunoId
             });
@@ -133,6 +134,7 @@ router.get('/ranking/geral', authenticateToken, requireAluno, async (req, res) =
                 salaNome: (d.salasNomes ? d.salasNomes.join(', ') : d.salaNome) || '',
                 tituloAtual: d.tituloAtual || '',
                 bordaAtual: d.bordaAtual || '',
+                iconeAtual: d.iconeAtual || '',
                 pontos,
                 voce: alunoDoc.id === alunoId
             });
@@ -252,6 +254,7 @@ router.post('/equipar', authenticateToken, requireAluno, async (req, res) => {
         const updates = {};
         if (tipo === 'titulo') updates.tituloAtual = valor;
         if (tipo === 'borda') updates.bordaAtual = valor;
+        if (tipo === 'icone') updates.iconeAtual = valor;
         
         await db.collection('alunos').doc(alunoId).update(updates);
         res.json({ message: 'Cosmético equipado', updates });

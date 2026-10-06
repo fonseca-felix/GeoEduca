@@ -206,3 +206,40 @@
     transform: none;
   }
 }
+
+/* Border Animations */
+@keyframes borderRainbow {
+    0% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
+    17% { border-color: #ff8000; box-shadow: 0 0 15px #ff8000; }
+    33% { border-color: #ffff00; box-shadow: 0 0 15px #ffff00; }
+    50% { border-color: #00ff00; box-shadow: 0 0 15px #00ff00; }
+    67% { border-color: #0000ff; box-shadow: 0 0 15px #0000ff; }
+    83% { border-color: #4b0082; box-shadow: 0 0 15px #4b0082; }
+    100% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
+}
+@keyframes borderPulseGeo {
+    0% { border-color: var(--navy); box-shadow: 0 0 5px var(--navy); }
+    50% { border-color: var(--navy-light); box-shadow: 0 0 20px var(--navy-light); }
+    100% { border-color: var(--navy); box-shadow: 0 0 5px var(--navy); }
+}
+@keyframes borderPulseGold {
+    0% { border-color: #B8860B; box-shadow: 0 0 5px #B8860B; }
+    50% { border-color: #FFD700; box-shadow: 0 0 25px #FFD700; }
+    100% { border-color: #B8860B; box-shadow: 0 0 5px #B8860B; }
+}
+@keyframes borderNeonCyan {
+    0% { border-color: #00ced1; box-shadow: 0 0 5px #00ced1, inset 0 0 5px #00ced1; }
+    50% { border-color: #00ffff; box-shadow: 0 0 20px #00ffff, inset 0 0 10px #00ffff; }
+    100% { border-color: #00ced1; box-shadow: 0 0 5px #00ced1, inset 0 0 5px #00ced1; }
+}
+@keyframes borderFire {
+    0% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
+    50% { border-color: #ffa500; box-shadow: 0 0 25px #ffa500; }
+    100% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
+}
+
+.anim-borderRainbow { border: 3px solid transparent; animation: borderRainbow 4s linear infinite; }
+.anim-borderPulseGeo { border: 3px solid transparent; animation: borderPulseGeo 2s ease-in-out infinite; }
+.anim-borderPulseGold { border: 3px solid transparent; animation: borderPulseGold 2s ease-in-out infinite; }
+.anim-borderNeonCyan { border: 3px solid transparent; animation: borderNeonCyan 1.5s ease-in-out infinite; }
+.anim-borderFire { border: 3px solid transparent; animation: borderFire 2s ease-in-out infinite; }

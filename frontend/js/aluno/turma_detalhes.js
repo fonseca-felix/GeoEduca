@@ -60,14 +60,18 @@ async function carregarRanking(salaId) {
                 tituloHtml = `<span style="font-size:0.6rem; color:var(--navy-light); font-weight:800; text-transform:uppercase; display:block;">${r.tituloAtual}</span>`;
             }
 
+            
             const initial = r.nome.charAt(0).toUpperCase();
-
+            const avatarContent = r.iconeAtual 
+                ? `<i class="${r.iconeAtual}"></i>` 
+                : initial;
+            
             const div = document.createElement('div');
             div.className = `ranking-item ${r.voce ? 'is-me' : ''}`;
             div.innerHTML = `
                 <div class="r-pos">#${i + 1}</div>
                 <div class="r-avatar" style="${bordaStyle}">
-                    <div style="width:100%; height:100%; border-radius:50%; background:var(--surface-hover); display:flex; align-items:center; justify-content:center; color:var(--text-primary); font-size:14px;">${initial}</div>
+                    <div style="width:100%; height:100%; border-radius:50%; background:var(--surface-hover); display:flex; align-items:center; justify-content:center; color:var(--text-primary); font-size:14px;">${avatarContent}</div>
                 </div>
                 <div class="r-info">
                     <strong>${r.voce ? r.nome + ' (Você)' : r.nome}</strong>
