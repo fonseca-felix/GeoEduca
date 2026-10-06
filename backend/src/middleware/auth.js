@@ -12,8 +12,18 @@ const authenticateToken = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026');
         
-        // Verificar se o usuário ainda existe
-        if (decoded.tipo === 'prof') {
+        if (decoded.tipo === 'master') {
+            req.user = { id: 'master_admin', tipo: 'master' };
+        } else if (decoded.tipo === 'escola') {
+            if (decoded.id === 'escola_ce399') {
+                req.user = { id: 'escola_ce399', tipo: 'escola' };
+            } else {
+                const escolaRef = db.collection('escolas').doc(decoded.id);
+                const escola = await escolaRef.get();
+                if (!escola.exists) return res.status(401).json({ error: 'Usuário não encontrado.' });
+                req.user = { id: decoded.id, tipo: 'escola', ...escola.data() };
+            }
+        } else if (decoded.tipo === 'prof') {
             const professorRef = db.collection('professores').doc(decoded.id);
             const professor = await professorRef.get();
             if (!professor.exists) {
