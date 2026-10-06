@@ -57,7 +57,7 @@ async function carregarRanking(salaId) {
             
             let tituloHtml = '';
             if (r.tituloAtual) {
-                tituloHtml = `<span style="font-size:0.6rem; color:var(--primary); font-weight:800; text-transform:uppercase; display:block;">${r.tituloAtual}</span>`;
+                tituloHtml = `<span style="font-size:0.6rem; color:var(--navy-light); font-weight:800; text-transform:uppercase; display:block;">${r.tituloAtual}</span>`;
             }
 
             const initial = r.nome.charAt(0).toUpperCase();

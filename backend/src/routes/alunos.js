@@ -73,9 +73,23 @@ router.get('/ranking/turma', authenticateToken, requireAluno, async (req, res) =
 
         let alunosSnap;
         if (req.query.salaId) {
-            alunosSnap = await db.collection('alunos').where('salas', 'array-contains', req.query.salaId).get();
+            const snap1 = await db.collection('alunos').where('salas', 'array-contains', req.query.salaId).get();
+            const snap2 = await db.collection('alunos').where('salaId', '==', req.query.salaId).get();
+            const docsMap = new Map();
+            snap1.docs.forEach(d => docsMap.set(d.id, d));
+            snap2.docs.forEach(d => docsMap.set(d.id, d));
+            alunosSnap = { docs: Array.from(docsMap.values()) };
         } else if (req.user.salas && req.user.salas.length > 0) {
-            alunosSnap = await db.collection('alunos').where('salas', 'array-contains-any', req.user.salas).get();
+            const snap1 = await db.collection('alunos').where('salas', 'array-contains-any', req.user.salas).get();
+            const docsMap = new Map();
+            snap1.docs.forEach(d => docsMap.set(d.id, d));
+            
+            // Also fetch by legacy salaId
+            if (req.user.salaId) {
+                const snap2 = await db.collection('alunos').where('salaId', '==', req.user.salaId).get();
+                snap2.docs.forEach(d => docsMap.set(d.id, d));
+            }
+            alunosSnap = { docs: Array.from(docsMap.values()) };
         } else {
             alunosSnap = await db.collection('alunos').where('salaId', '==', targetSalaId).get();
         }
