@@ -599,16 +599,20 @@
 
 <!-- Modal Entrar na Turma -->
 <div id="joinRoomModal" class="modal-overlay">
-  <div class="modal" style="max-width: 400px; text-align: center;">
-    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; font-family: 'Space Grotesk', sans-serif;">Entrar em Turma</h2>
-    <p style="color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: 1.5rem;">Peça o código de 6 letras para seu professor.</p>
-    
-    <div class="form-group" style="text-align: left;">
-      <label class="form-label">Código da Turma</label>
-      <input type="text" id="roomCodeInput" class="form-control" style="text-transform: uppercase; font-family: monospace; font-size: 1.25rem; letter-spacing: 4px; text-align: center;" placeholder="XXXXXX" maxlength="6" autocomplete="off" />
+  <div class="modal" style="max-width: 400px;">
+    <div class="modal-header" style="justify-content: center; border-bottom: none; padding-bottom: 0;">
+      <h2 class="modal-title" style="font-size: 1.5rem; text-align: center; width: 100%;">Entrar em Turma</h2>
+    </div>
+    <div class="modal-body" style="text-align: center;">
+      <p style="color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: 0.5rem; margin-top: -10px;">Peça o código de 6 letras para seu professor.</p>
+      
+      <div class="form-group" style="text-align: left;">
+        <label class="form-label">Código da Turma</label>
+        <input type="text" id="roomCodeInput" class="form-control" style="text-transform: uppercase; font-family: monospace; font-size: 1.25rem; letter-spacing: 4px; text-align: center;" placeholder="XXXXXX" maxlength="6" autocomplete="off" />
+      </div>
     </div>
     
-    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+    <div class="modal-footer" style="border-top: none;">
       <button type="button" class="btn btn-outline" style="flex: 1;" onclick="Modal.close('joinRoomModal')">Cancelar</button>
       <button type="button" class="btn btn-primary" style="flex: 1;" onclick="joinRoom()">Entrar</button>
     </div>
