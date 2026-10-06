@@ -95,55 +95,28 @@ function switchTab(tabId) {
     document.getElementById(`tab-${tabId}`).style.display = 'grid';
 }
 
-function getXpForLevel(level) {
-    if (level <= 1) return 0;
-    let req = 200;
-    for (let i = 2; i < level; i++) {
-        req = (req * 2) + 100;
-    }
-    return req;
-}
+
 
 async function loadLevelInfo() {
     try {
         const stats = await api.get('/alunos/me/resumo');
-        const xp = stats.pontos || 0;
+        const localXP = LevelSystem.getLocalGamesXP(currentUser.nome);
+        const xpTotal = (stats.xpTotal || 0) + localXP;
         
-        currentLevel = 1;
-        let currentLevelBase = 0;
-        let xpProximo = 200;
+        const lvlInfo = LevelSystem.calculate(xpTotal);
+        currentLevel = lvlInfo.level;
         
-        for (let i = 1; i < 20; i++) {
-            const req = getXpForLevel(i + 1);
-            if (xp >= req) {
-                currentLevel = i + 1;
-                currentLevelBase = req;
-                xpProximo = getXpForLevel(i + 2);
-            } else {
-                xpProximo = req;
-                break;
-            }
-        }
-        
-        let progresso = 100;
-        if (currentLevel >= 20) {
-            currentLevel = 20;
-            xpProximo = 'MAX';
-        } else {
-            progresso = Math.min(100, Math.max(0, ((xp - currentLevelBase) / (xpProximo - currentLevelBase)) * 100));
-        }
-        
-        document.getElementById('nivel-display').textContent = currentLevel;
-        document.getElementById('xp-atual').textContent = xp;
-        document.getElementById('xp-prox').textContent = xpProximo;
-        document.getElementById('xp-bar').style.width = `${progresso}%`;
+        document.getElementById('nivel-display').textContent = lvlInfo.level;
+        document.getElementById('xp-atual').textContent = xpTotal;
+        document.getElementById('xp-prox').textContent = lvlInfo.next;
+        document.getElementById('xp-bar').style.width = `${lvlInfo.progress}%`;
         
         // Acha o título de maior nível desbloqueado que pode ser o "Nome do Nível"
         let nivelNome = 'Novato';
         for (let t of TITULOS) {
             if (t.nivel <= currentLevel) nivelNome = t.nome;
         }
-        document.getElementById('nivel-nome').textContent = `Nível ${currentLevel} - ${nivelNome}`;
+        document.getElementById('nivel-nome').textContent = `Nível  - ${nivelNome}`;
         
     } catch (error) {
         console.error('Erro ao carregar XP:', error);
