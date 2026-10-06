@@ -78,7 +78,7 @@ async function carregarTurmas() {
                 </div>
                 <div class="turma-meta">
                     <span><i class="fa-solid fa-graduation-cap"></i> Série: ${turma.serie}</span>
-                    <button class="btn btn-outline btn-sm" onclick="alert('Página da turma em construção!')">Ver Turma</button>
+                    <a href="turma_detalhes.html?id=${turma.id}" class="btn btn-outline btn-sm">Ver Turma</a>
                 </div>
             `;
             container.appendChild(card);

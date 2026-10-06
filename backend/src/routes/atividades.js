@@ -103,23 +103,40 @@ router.get('/minhas', authenticateToken, requireAluno, async (req, res) => {
             return res.status(400).json({ error: 'Aluno não encontrado' });
         }
 
-        const salaId = aluno.data().salaId || '';
+        
+        const d = aluno.data();
+        let salasArray = d.salas || [];
+        if (d.salaId && !salasArray.includes(d.salaId)) salasArray.push(d.salaId);
+        
+        const targetSalas = req.query.salaId ? [req.query.salaId] : salasArray;
+        
         const atividadesEnviadasRef = db.collection('atividades_enviadas');
-
-        const [porAlunoSnap, porSalaSnap] = await Promise.all([
-            atividadesEnviadasRef.where('alunoId', '==', alunoId).get(),
-            salaId ? atividadesEnviadasRef.where('salaId', '==', salaId).get() : Promise.resolve({ docs: [] })
-        ]);
-
-        const envioDocsMap = new Map();
-        porAlunoSnap.forEach(doc => envioDocsMap.set(doc.id, doc));
-        porSalaSnap.forEach(doc => {
-            const data = doc.data();
-            // Envio para sala inteira (sem alunoId) ou direcionado a este aluno
-            if (!data.alunoId || data.alunoId === alunoId) {
-                envioDocsMap.set(doc.id, doc);
+        
+        const queries = [atividadesEnviadasRef.where('alunoId', '==', alunoId).get()];
+        
+        if (targetSalas.length > 0) {
+            // max 10 for 'in'
+            const chunks = [];
+            for(let i=0; i<targetSalas.length; i+=10) {
+                chunks.push(targetSalas.slice(i, i+10));
             }
-        });
+            for(const chunk of chunks) {
+                queries.push(atividadesEnviadasRef.where('salaId', 'in', chunk).get());
+            }
+        }
+        
+        const snaps = await Promise.all(queries);
+        
+        const envioDocsMap = new Map();
+        for (const snap of snaps) {
+            snap.forEach(doc => {
+                const data = doc.data();
+                if (!data.alunoId || data.alunoId === alunoId) {
+                    envioDocsMap.set(doc.id, doc);
+                }
+            });
+        }
+
 
         const atividades = [];
         for (const doc of envioDocsMap.values()) {

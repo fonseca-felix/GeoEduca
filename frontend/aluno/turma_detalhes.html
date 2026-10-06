@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoEduca - Detalhes da Turma</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/tokens.css" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/animations.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
+    <link rel="stylesheet" href="../css/darkmode.css" />
+    <style>
+        .turma-header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--primary) 100%);
+            border-radius: var(--radius-xl);
+            padding: 3rem 2rem;
+            color: white;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+        .turma-header::before {
+            content: '\f51c';
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: -20px;
+            bottom: -40px;
+            font-size: 180px;
+            opacity: .05;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+        .turma-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .turma-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        .turma-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 900px) {
+            .turma-grid { grid-template-columns: 1fr; }
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* Ranking local */
+        .ranking-list {
+            background: var(--surface-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            gap: 1rem;
+            transition: background 0.2s;
+        }
+        .ranking-item:last-child { border-bottom: none; }
+        .ranking-item:hover { background: var(--surface-hover); }
+        .ranking-item.is-me {
+            background: rgba(204, 164, 59, 0.05);
+        }
+        .r-pos {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--text-muted);
+            width: 30px;
+            text-align: center;
+        }
+        .r-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--surface-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .r-info { flex: 1; line-height: 1.2; }
+        .r-pts {
+            font-weight: 700;
+            color: var(--gold);
+        }
+        /* Atividades local */
+        .ativ-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .ativ-card {
+            background: var(--surface-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .ativ-info h4 { margin: 0 0 0.25rem 0; color: var(--text-primary); }
+        .ativ-info p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
+        .badge {
+            padding: 4px 8px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge.concluida { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid #10b981; }
+        .badge.pendente { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="app-layout" id="app-layout">
+        <main class="app-main">
+            <header class="page-header">
+                <div class="page-header-left">
+                    <a href="turmas.html" class="btn btn-outline btn-sm" style="margin-bottom: 1rem; display: inline-flex;"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
+                    <h1 class="page-title" id="page-title">Detalhes da Turma</h1>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="turma-header">
+                    <div class="turma-title"><i class="fa-solid fa-users-rectangle"></i> <span id="th-nome">Carregando...</span></div>
+                    <div class="turma-subtitle" id="th-info">Série: -- | Código: --</div>
+                </div>
+
+                <div class="turma-grid">
+                    <div>
+                        <h2 class="section-title"><i class="fa-solid fa-trophy" style="color:var(--gold)"></i> Ranking da Turma</h2>
+                        <div class="ranking-list" id="ranking-container">
+                            <div style="padding: 2rem; text-align: center; color: var(--text-muted);">Carregando alunos...</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="section-title"><i class="fa-solid fa-clipboard-check" style="color:var(--primary)"></i> Minhas Atividades</h2>
+                        <div class="ativ-list" id="ativ-container">
+                            <div style="padding: 2rem; text-align: center; color: var(--text-muted);">Carregando atividades...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/sidebar.js"></script>
+    <script src="../js/aluno/turma_detalhes.js"></script>
+</body>
+</html>

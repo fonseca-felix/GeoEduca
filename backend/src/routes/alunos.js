@@ -65,17 +65,19 @@ router.get('/me/resumo', authenticateToken, requireAluno, async (req, res) => {
 router.get('/ranking/turma', authenticateToken, requireAluno, async (req, res) => {
     try {
         const alunoId = req.user.id;
-        const salaId = req.user.salaId;
+        const targetSalaId = req.query.salaId || req.user.salaId;
 
-        if (!salaId) {
+        if (!targetSalaId && (!req.user.salas || req.user.salas.length === 0)) {
             return res.json([]);
         }
 
         let alunosSnap;
-        if (req.user.salas && req.user.salas.length > 0) {
+        if (req.query.salaId) {
+            alunosSnap = await db.collection('alunos').where('salas', 'array-contains', req.query.salaId).get();
+        } else if (req.user.salas && req.user.salas.length > 0) {
             alunosSnap = await db.collection('alunos').where('salas', 'array-contains-any', req.user.salas).get();
         } else {
-            alunosSnap = await db.collection('alunos').where('salaId', '==', salaId).get();
+            alunosSnap = await db.collection('alunos').where('salaId', '==', targetSalaId).get();
         }
         const ranking = [];
 
