@@ -95,27 +95,43 @@ function switchTab(tabId) {
     document.getElementById(`tab-${tabId}`).style.display = 'grid';
 }
 
+function getXpForLevel(level) {
+    if (level <= 1) return 0;
+    let req = 200;
+    for (let i = 2; i < level; i++) {
+        req = (req * 2) + 100;
+    }
+    return req;
+}
+
 async function loadLevelInfo() {
     try {
         const stats = await api.get('/alunos/me/resumo');
         const xp = stats.pontos || 0;
         
         currentLevel = 1;
-        let xpProximo = 100;
         let currentLevelBase = 0;
+        let xpProximo = 200;
         
-        for (let i = 1; i <= 20; i++) {
-            const req = i * 100; // 100 XP por nível
+        for (let i = 1; i < 20; i++) {
+            const req = getXpForLevel(i + 1);
             if (xp >= req) {
                 currentLevel = i + 1;
                 currentLevelBase = req;
-                xpProximo = req + 100;
+                xpProximo = getXpForLevel(i + 2);
             } else {
+                xpProximo = req;
                 break;
             }
         }
         
-        const progresso = Math.min(100, Math.max(0, ((xp - currentLevelBase) / (xpProximo - currentLevelBase)) * 100));
+        let progresso = 100;
+        if (currentLevel >= 20) {
+            currentLevel = 20;
+            xpProximo = 'MAX';
+        } else {
+            progresso = Math.min(100, Math.max(0, ((xp - currentLevelBase) / (xpProximo - currentLevelBase)) * 100));
+        }
         
         document.getElementById('nivel-display').textContent = currentLevel;
         document.getElementById('xp-atual').textContent = xp;
