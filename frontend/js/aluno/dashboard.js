@@ -152,6 +152,22 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Erro ao carregar stats do BrazilGuessr', e);
         }
 
+        try {
+            const rota27Res = await api.get('/estudos/stats');
+            const rotaEl = document.getElementById('dashboard-rota27-tentativas');
+            if (rotaEl) {
+                if (rota27Res.limit === 'Ilimitado') {
+                    rotaEl.textContent = 'Ilimitado';
+                } else {
+                    let rotaRestantes = rota27Res.limit - (rota27Res.usesToday || 0);
+                    if (rotaRestantes < 0) rotaRestantes = 0;
+                    rotaEl.textContent = rotaRestantes;
+                }
+            }
+        } catch (e) {
+            console.error('Erro ao carregar stats da Rota 27', e);
+        }
+
         const ptsLocal = pontosJogosLocal(nomeUsuario);
         const bgPts = bgStats ? bgStats.total : 0;
         const xpTotal = (resumo?.xpTotal || 0) + ptsLocal + bgPts;
