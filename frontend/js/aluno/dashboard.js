@@ -188,6 +188,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (xpLabelEl) xpLabelEl.textContent = `${xpTotal} / ${lvlInfo.next} XP`;
         if (xpBarEl) xpBarEl.style.width = `${lvlInfo.progress}%`;
 
+        // Update big profile avatar with cosmetics
+        const profileAvatarEl = document.querySelector('.profile-avatar');
+        if (profileAvatarEl && user) {
+            
+            if (user.iconeAtual) {
+                profileAvatarEl.innerHTML = `<i class="${user.iconeAtual}"></i>`;
+            } else {
+                profileAvatarEl.innerHTML = `<i class="fa-solid fa-graduation-cap"></i>`;
+            }
+            
+            profileAvatarEl.className = 'profile-avatar'; // reset
+            if (user.bordaAtual && user.bordaAtual !== 'transparent') {
+                if (user.bordaAtual.startsWith('anim-')) {
+                    profileAvatarEl.classList.add(user.bordaAtual);
+                    profileAvatarEl.style.border = '4px solid transparent';
+                    profileAvatarEl.style.boxShadow = '';
+                } else {
+                    profileAvatarEl.style.border = `4px solid ${user.bordaAtual}`;
+                    profileAvatarEl.style.boxShadow = `0 0 15px ${user.bordaAtual}`;
+                }
+            } else {
+                profileAvatarEl.style.border = '4px solid rgba(255,255,255,.15)';
+                profileAvatarEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.25)';
+            }
+        }
+
 
         const rankingList = document.getElementById('ranking-list');
         if (!rankingList) return;

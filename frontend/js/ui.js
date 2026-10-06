@@ -269,12 +269,48 @@ function initPage(tipo) {
   const nameEl = document.getElementById('sidebar-user-name');
   const roleEl = document.getElementById('sidebar-user-role');
   const avatarEl = document.getElementById('sidebar-user-avatar');
+  if (avatarEl) {
+     if(user.iconeAtual) avatarEl.innerHTML = `<i class="${user.iconeAtual}" style="font-size:1.2rem;"></i>`; else avatarEl.textContent = Auth.getInitials(user.nome);
 
-  if (nameEl) {
-     if(user.tituloAtual) {
-         nameEl.innerHTML = `${user.nome} <br><span style="font-size:0.75rem; color:var(--primary); font-weight:800; text-transform:uppercase; letter-spacing:0.05em;">${user.tituloAtual}</span>`;
+     // Remove any existing anim-* classes
+     avatarEl.className = 'sidebar-user-avatar';
+     avatarEl.style.borderRadius = '50%'; // Force circle for cosmetics
+
+     if(user.bordaAtual && user.bordaAtual !== 'transparent') {
+         if (user.bordaAtual.startsWith('anim-')) {
+             avatarEl.classList.add(user.bordaAtual);
+             avatarEl.style.border = '3px solid transparent';
+             avatarEl.style.boxShadow = '';
+         } else {
+             avatarEl.style.border = `3px solid ${user.bordaAtual}`;
+             avatarEl.style.boxShadow = `0 0 10px ${user.bordaAtual}`;
+         }
      } else {
-         nameEl.textContent = user.nome;
+         avatarEl.style.border = '';
+         avatarEl.style.boxShadow = '';
+     }
+  }
+
+  // Update header profile button if exists
+  const headerAvatar = document.querySelector('.page-header-right .avatar');
+  if (headerAvatar) {
+     if(user.iconeAtual) headerAvatar.innerHTML = `<i class="${user.iconeAtual}" style="font-size:1.2rem;"></i>`; else headerAvatar.textContent = Auth.getInitials(user.nome);
+
+     headerAvatar.className = 'avatar';
+     headerAvatar.style.borderRadius = '50%';
+
+     if(user.bordaAtual && user.bordaAtual !== 'transparent') {
+         if (user.bordaAtual.startsWith('anim-')) {
+             headerAvatar.classList.add(user.bordaAtual);
+             headerAvatar.style.border = '3px solid transparent';
+             headerAvatar.style.boxShadow = '';
+         } else {
+             headerAvatar.style.border = `3px solid ${user.bordaAtual}`;
+             headerAvatar.style.boxShadow = `0 0 10px ${user.bordaAtual}`;
+         }
+     } else {
+         headerAvatar.style.border = '';
+         headerAvatar.style.boxShadow = '';
      }
   }
   if (roleEl) {
