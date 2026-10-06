@@ -212,7 +212,7 @@ router.post('/entrar-sala', authenticateToken, requireAluno, async (req, res) =>
         const alunoId = req.user.id;
         const { codigoSala } = req.body;
         
-        const snapshot = await db.collection('salas').where('turma', '==', codigoSala).limit(1).get();
+        const snapshot = await db.collection('salas').where('codigo', '==', codigoSala).limit(1).get();
         if (snapshot.empty) return res.status(404).json({ error: 'Código de sala inválido' });
         
         const salaDoc = snapshot.docs[0];

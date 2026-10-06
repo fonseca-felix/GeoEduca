@@ -21,8 +21,8 @@
             margin-top: 2rem;
         }
         .turma-card {
-            background: var(--surface-primary);
-            border: 1px solid var(--border-color);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
             border-radius: 12px;
             padding: 1.5rem;
             display: flex;
@@ -68,7 +68,7 @@
             justify-content: space-between;
             align-items: center;
             padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid var(--color-border);
             margin-top: auto;
         }
         .turma-meta span {
@@ -81,9 +81,9 @@
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
-            background: var(--surface-primary);
+            background: var(--color-surface);
             border-radius: 12px;
-            border: 1px dashed var(--border-color);
+            border: 1px dashed var(--color-border);
             grid-column: 1 / -1;
         }
         .empty-state i {
@@ -138,7 +138,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Entrar em uma Turma</h2>
-                <button class="close-modal" onclick="Modal.close('joinRoomModal')"><i class="fa-solid fa-xmark"></i></button>
+                <button class="modal-close" onclick="Modal.close('joinRoomModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
                 <form id="form-join-room">
