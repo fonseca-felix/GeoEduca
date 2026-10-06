@@ -417,6 +417,107 @@ router.get('/:id/respostas/sala/:salaId', authenticateToken, requireProfessor, a
     }
 });
 
+// GET - Estatísticas de uma prova
+router.get('/:id/estatisticas', authenticateToken, requireProfessor, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { salaId } = req.query;
+
+        // Buscar a prova
+        const provaRef = db.collection('provas').doc(id);
+        const provaSnap = await provaRef.get();
+        if (!provaSnap.exists) {
+            return res.status(404).json({ error: 'Prova não encontrada' });
+        }
+
+        // Buscar questões da prova
+        const questoesSnap = await db.collection('prova_questoes').where('provaId', '==', id).get();
+        const questoes = [];
+        questoesSnap.forEach(doc => {
+            const data = doc.data();
+            questoes.push({ id: doc.id, texto: data.texto, tipo: data.tipo, opcoes: data.opcoes || [] });
+        });
+
+        // Buscar envios para determinar alunos (total e filtrado por sala)
+        let enviosQuery = db.collection('provas_enviadas').where('provaId', '==', id);
+        if (salaId) {
+            enviosQuery = enviosQuery.where('salaId', '==', salaId);
+        }
+        const enviosSnap = await enviosQuery.get();
+        const alunosEnviados = enviosSnap.docs.map(d => d.data().alunoId);
+
+        if (alunosEnviados.length === 0) {
+            return res.json({
+                totalAlunos: 0,
+                totalRespondido: 0,
+                questoes: questoes.map(q => ({ id: q.id, texto: q.texto, tipo: q.tipo, acertos: 0, erros: 0, escolhas: {} }))
+            });
+        }
+
+        // Buscar respostas dos alunos que receberam a prova (filtro por sala se aplicável)
+        const respostasSnap = await db.collection('prova_respostas').where('provaId', '==', id).get();
+        
+        // Filtrar apenas respostas dos alunos relevantes
+        const respostas = respostasSnap.docs
+            .map(d => d.data())
+            .filter(r => alunosEnviados.includes(r.alunoId));
+
+        const totalRespondido = respostas.length;
+        
+        // Estatísticas por questão
+        const estatisticasQuestoes = questoes.map(q => {
+            let acertos = 0;
+            let erros = 0;
+            const escolhas = {}; // Para questoes de alternativa
+            
+            if (q.opcoes) {
+                q.opcoes.forEach(op => { escolhas[op] = 0; });
+            }
+
+            respostas.forEach(r => {
+                const reqQuestao = (r.respostas || []).find(rq => rq.questaoId === q.id);
+                if (reqQuestao) {
+                    if (q.tipo === 'alternativa') {
+                        if (reqQuestao.acertou) acertos++;
+                        else erros++;
+                        
+                        let textoResp = reqQuestao.respostaSelecionada;
+                        if (typeof textoResp === 'number' && q.opcoes) {
+                            textoResp = q.opcoes[textoResp];
+                        }
+                        if (textoResp) {
+                            escolhas[textoResp] = (escolhas[textoResp] || 0) + 1;
+                        }
+                    } else {
+                        // Discursiva: contaremos notas se estiver corrigida
+                        // We will count it as 'answered' in totalRespondidoParaQuestao
+                    }
+                }
+            });
+
+            return {
+                id: q.id,
+                texto: q.texto,
+                tipo: q.tipo,
+                acertos,
+                erros,
+                totalRespondidoParaQuestao: acertos + erros,
+                escolhas
+            };
+        });
+
+        res.json({
+            totalAlunos: alunosEnviados.length,
+            totalRespondido,
+            questoes: estatisticasQuestoes
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao buscar estatísticas da prova' });
+    }
+});
+
 // PUT - Corrigir e atribuir nota (professor)
 router.put('/respostas/:respostaId/corrigir', authenticateToken, requireProfessor, async (req, res) => {
     try {

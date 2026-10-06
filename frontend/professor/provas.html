@@ -329,5 +329,55 @@
 <script src="../js/ui.js"></script>
 <script src="../js/sidebar.js"></script>
 <script src="../js/professor/provas.js"></script>
+
+<!-- Modal Relatórios -->
+<div class="modal-overlay" id="modal-exam-reports">
+  <div class="modal modal-lg" style="height: 90vh; display: flex; flex-direction: column;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="report-title">Gráficos da Prova</h2>
+      <button class="btn-close" onclick="Modal.close('modal-exam-reports')">&times;</button>
+    </div>
+    <div class="modal-body" style="background: #f9fafb; overflow-y: auto; flex: 1;">
+      
+      <div class="form-group" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+        <label style="font-weight:600; font-size:0.875rem;">Filtrar por Sala:</label>
+        <div class="custom-select-wrapper" id="custom-select-report-sala" style="flex: 1; max-width: 300px;">
+            <div class="custom-select form-control" tabindex="0">
+                <span id="custom-select-report-sala-text">Todas as salas (Geral)</span>
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="custom-select-options" id="custom-select-report-sala-options">
+                <!-- Copiado do modal de correção -->
+            </div>
+        </div>
+        <input type="hidden" id="reportSalaSelect" value="" />
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem; margin-bottom: 2rem;">
+        <div style="background: #fff; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb;">
+          <h3 style="font-size: 0.95rem; margin-bottom: 1rem; text-align: center; color: var(--color-text-primary);">Participação</h3>
+          <div style="position: relative; height: 200px;">
+            <canvas id="chart-participacao"></canvas>
+          </div>
+        </div>
+        <div style="background: #fff; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb;">
+          <h3 style="font-size: 0.95rem; margin-bottom: 1rem; text-align: center; color: var(--color-text-primary);">Acertos vs Erros por Questão</h3>
+          <div style="position: relative; height: 200px;">
+            <canvas id="chart-acertos"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--color-text-primary);">Detalhes das Questões</h3>
+      <div id="report-detalhes">
+        <!-- Renderizado via JS -->
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </body>
 </html>

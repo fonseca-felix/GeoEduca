@@ -559,3 +559,134 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load on start
   loadInitialData();
 });
+
+
+
+let currentReportProvaId = null;
+let chartsInstances = {};
+
+window.openExamReports = async function(provaId, provaTitulo) {
+    currentReportProvaId = provaId;
+    document.getElementById('report-title').textContent = `Gráficos: ${provaTitulo}`;
+    document.getElementById('reportSalaSelect').value = '';
+    
+    // Carregar salas no filtro, caso ainda não tenha (copiar do modal de correção)
+    const optionsHtml = document.getElementById('custom-select-grade-sala-options').innerHTML;
+    document.getElementById('custom-select-report-sala-options').innerHTML = '<div class="custom-select-item" data-value="">Todas as salas (Geral)</div>' + optionsHtml;
+    document.getElementById('custom-select-report-sala-text').textContent = 'Todas as salas (Geral)';
+    
+    await loadExamReports();
+    Modal.open('modal-exam-reports');
+};
+
+window.loadExamReports = async function() {
+    const salaId = document.getElementById('reportSalaSelect').value;
+    const url = `/provas/${currentReportProvaId}/estatisticas` + (salaId ? `?salaId=${salaId}` : '');
+    
+    try {
+        const data = await api.get(url);
+        renderExamReports(data);
+    } catch(err) {
+        if(window.Toast) Toast.error(err.message || 'Erro ao carregar estatísticas');
+        console.error(err);
+    }
+};
+
+function renderExamReports(data) {
+    const pendentes = data.totalAlunos - data.totalRespondido;
+    const respondidos = data.totalRespondido;
+    
+    // 1. Gráfico de Participação
+    renderChart('chart-participacao', 'pie', {
+        labels: ['Responderam', 'Pendentes'],
+        datasets: [{
+            data: [respondidos, pendentes < 0 ? 0 : pendentes],
+            backgroundColor: ['#10b981', '#f43f5e']
+        }]
+    }, { responsive: true, maintainAspectRatio: false });
+
+    // 2. Gráfico de Acertos/Erros por Questão
+    const qLabels = data.questoes.map((q, i) => `Q${i+1}`);
+    const acertosData = data.questoes.map(q => q.acertos);
+    const errosData = data.questoes.map(q => q.erros);
+    
+    renderChart('chart-acertos', 'bar', {
+        labels: qLabels,
+        datasets: [
+            { label: 'Acertos', data: acertosData, backgroundColor: '#3b82f6' },
+            { label: 'Erros', data: errosData, backgroundColor: '#f59e0b' }
+        ]
+    }, { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } });
+    
+    // 3. Resumo em texto das questões
+    const detalhesContainer = document.getElementById('report-detalhes');
+    detalhesContainer.innerHTML = '';
+    
+    data.questoes.forEach((q, i) => {
+        let escolhasHtml = '';
+        if (q.tipo === 'alternativa' && q.escolhas) {
+            const escolhas = Object.entries(q.escolhas).sort((a,b) => b[1] - a[1]);
+            if (escolhas.length > 0) {
+                escolhasHtml = `<div style="font-size:0.8rem; margin-top:0.5rem; color:#6b7280;">
+                    <strong>Opções mais marcadas:</strong><br>
+                    ${escolhas.map(e => `• ${e[0]}: ${e[1]} voto(s)`).join('<br>')}
+                </div>`;
+            }
+        }
+        
+        const total = q.acertos + q.erros;
+        const taxaAcerto = total > 0 ? Math.round((q.acertos / total) * 100) : 0;
+        
+        detalhesContainer.innerHTML += `
+            <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 1rem;">
+                <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem;">Questão ${i+1}: ${q.texto}</h4>
+                <div style="display:flex; gap:1rem; font-size:0.85rem;">
+                    <span style="color:#10b981;"><b>${q.acertos}</b> Acertos</span>
+                    <span style="color:#f43f5e;"><b>${q.erros}</b> Erros</span>
+                    <span style="color:#6366f1;"><b>${taxaAcerto}%</b> Taxa de Acerto</span>
+                </div>
+                ${escolhasHtml}
+            </div>
+        `;
+    });
+}
+
+function renderChart(canvasId, type, data, options) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    if (chartsInstances[canvasId]) {
+        chartsInstances[canvasId].destroy();
+    }
+    chartsInstances[canvasId] = new Chart(ctx, { type, data, options });
+}
+
+// Configurar o dropdown de sala no modal de relatórios
+document.addEventListener('DOMContentLoaded', () => {
+    // Fazer setup manual pois ui.js não pegará os adicionados via script dinâmico a tempo
+    setTimeout(() => {
+        const wrapper = document.getElementById('custom-select-report-sala');
+        if(!wrapper) return;
+        const display = wrapper.querySelector('.custom-select');
+        const optionsList = wrapper.querySelector('.custom-select-options');
+        const hiddenInput = document.getElementById('reportSalaSelect');
+        const textSpan = display.querySelector('span');
+        
+        display.addEventListener('click', (e) => {
+            e.stopPropagation();
+            wrapper.classList.toggle('open');
+        });
+        
+        optionsList.addEventListener('click', (e) => {
+            const item = e.target.closest('.custom-select-item');
+            if (item) {
+                hiddenInput.value = item.dataset.value;
+                textSpan.textContent = item.textContent;
+                wrapper.classList.remove('open');
+                loadExamReports(); // Recarregar gráficos ao mudar sala
+            }
+        });
+        
+        document.addEventListener('click', () => {
+            wrapper.classList.remove('open');
+        });
+    }, 1000);
+});
