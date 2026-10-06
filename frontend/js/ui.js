@@ -294,6 +294,7 @@ function initPage(tipo) {
      if(user.bordaAtual && user.bordaAtual !== 'transparent') {
          if (user.bordaAtual.startsWith('anim-')) {
              avatarEl.classList.add(user.bordaAtual);
+             avatarEl.style.border = '3px solid transparent';
              
              avatarEl.style.boxShadow = '';
          } else {
@@ -317,6 +318,7 @@ function initPage(tipo) {
      if(user.bordaAtual && user.bordaAtual !== 'transparent') {
          if (user.bordaAtual.startsWith('anim-')) {
              headerAvatar.classList.add(user.bordaAtual);
+             headerAvatar.style.border = '3px solid transparent';
              
              headerAvatar.style.boxShadow = '';
          } else {

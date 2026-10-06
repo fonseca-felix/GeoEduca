@@ -202,6 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (user.bordaAtual && user.bordaAtual !== 'transparent') {
                 if (user.bordaAtual.startsWith('anim-')) {
                     profileAvatarEl.classList.add(user.bordaAtual);
+                    profileAvatarEl.style.border = '4px solid transparent';
                     
                     profileAvatarEl.style.boxShadow = '';
                 } else {
