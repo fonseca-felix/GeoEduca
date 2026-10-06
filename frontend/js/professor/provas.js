@@ -59,6 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="exam-footer">
           <span style="font-size:0.875rem; font-weight:600; color:#10b981;">Corrigir Respostas &rarr;</span>
+            <button class="btn btn-outline" style="padding:0.35rem 0.65rem; font-size:0.75rem; border-color: transparent; background: #e0e7ff; color: #4338ca;" onclick="event.stopPropagation(); openExamReports('${p.id}', '${p.titulo}')" title="Ver gráficos e relatórios">
+              <i class="fa-solid fa-chart-pie"></i> Gráficos
+            </button>
           <button class="btn btn-outline" style="padding:0.35rem 0.65rem; font-size:0.75rem;" onclick="event.stopPropagation(); openSendProva('${p.id}')" title="Enviar prova para alunos/sala">
             Enviar
           </button>
