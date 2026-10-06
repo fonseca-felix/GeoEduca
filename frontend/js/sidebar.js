@@ -162,6 +162,14 @@ function buildAlunoSidebar(basePath = '../') {
         <span class="sidebar-nav-icon">${NAV_ICONS.dashboard}</span>
         <span class="sidebar-nav-text">Dashboard</span>
       </a>
+      <a class="sidebar-nav-item" href="${basePath}aluno/turmas.html" data-tooltip="Minhas Turmas">
+        <span class="sidebar-nav-icon">${NAV_ICONS.salas}</span>
+        <span class="sidebar-nav-text">Minhas Turmas</span>
+      </a>
+      <a class="sidebar-nav-item" href="${basePath}aluno/niveis.html" data-tooltip="Níveis & Títulos">
+        <span class="sidebar-nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></span>
+        <span class="sidebar-nav-text">Níveis & Títulos</span>
+      </a>
       <a class="sidebar-nav-item" href="${basePath}aluno/notificacoes.html" data-tooltip="Notificações">
         <span class="sidebar-nav-icon">${NAV_ICONS.notificacoes}</span>
         <span class="sidebar-nav-text">Notificações</span>

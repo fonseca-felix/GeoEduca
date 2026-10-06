@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('app-layout').insertAdjacentHTML('afterbegin', buildAlunoSidebar());
     Auth.requireAuth('aluno');
     initPage('aluno');
 

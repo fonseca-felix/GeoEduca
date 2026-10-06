@@ -21,6 +21,7 @@ const COSMETICOS = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('app-layout').insertAdjacentHTML('afterbegin', buildAlunoSidebar());
     Auth.requireAuth('aluno');
     initPage('aluno');
 
