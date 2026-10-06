@@ -168,27 +168,26 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Erro ao carregar stats da Rota 27', e);
         }
 
-        const ptsLocal = pontosJogosLocal(nomeUsuario);
-        const bgPts = bgStats ? bgStats.total : 0;
-        const xpTotal = (resumo?.xpTotal || 0) + ptsLocal + bgPts;
-        const xpPorNivel = resumo?.xpProximoNivel || 200;
-        const nivel = Math.max(1, Math.floor(xpTotal / xpPorNivel) + 1);
-        const xpNoNivel = xpTotal % xpPorNivel;
-        const progressoPct = xpPorNivel ? Math.round((xpNoNivel / xpPorNivel) * 100) : 0;
+        
+        const localXP = LevelSystem.getLocalGamesXP(nomeUsuario);
+        const xpTotal = (resumo?.xpTotal || 0) + localXP;
+        
+        const lvlInfo = LevelSystem.calculate(xpTotal);
 
         const levelEl = document.getElementById('student-level');
         const levelTitleEl = document.getElementById('student-level-title');
         const xpLabelEl = document.getElementById('student-xp-label');
         const xpBarEl = document.getElementById('student-xp-bar');
 
-        if (levelEl) levelEl.textContent = nivel;
+        if (levelEl) levelEl.textContent = lvlInfo.level;
         if (levelTitleEl) {
             levelTitleEl.textContent = xpTotal > 0
-                ? (resumo?.salaNome ? `Turma: ${resumo.salaNome}` : 'Continue estudando!')
+                ? `Faltam ${lvlInfo.xpNeeded} XP para Nível ${lvlInfo.level === 20 ? 'MAX' : lvlInfo.level + 1}`
                 : 'Comece uma atividade para ganhar XP';
         }
-        if (xpLabelEl) xpLabelEl.textContent = `${xpNoNivel} / ${xpPorNivel} XP`;
-        if (xpBarEl) xpBarEl.style.width = `${progressoPct}%`;
+        if (xpLabelEl) xpLabelEl.textContent = `${xpTotal} / ${lvlInfo.next} XP`;
+        if (xpBarEl) xpBarEl.style.width = `${lvlInfo.progress}%`;
+
 
         const rankingList = document.getElementById('ranking-list');
         if (!rankingList) return;

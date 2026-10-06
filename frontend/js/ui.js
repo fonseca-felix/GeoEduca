@@ -345,3 +345,62 @@ function animateCounter(el, target, duration = 800) {
   let startTime = null;
   requestAnimationFrame(step);
 }
+
+/* ---- Level & XP Helper ---- */
+const LevelSystem = {
+    getXpForLevel(level) {
+        if (level <= 1) return 0;
+        let req = 200;
+        for (let i = 2; i < level; i++) {
+            req = (req * 2) + 100;
+        }
+        return req;
+    },
+    
+    calculate(xpTotal) {
+        let currentLevel = 1;
+        let currentLevelBase = 0;
+        let xpProximo = 200;
+        
+        for (let i = 1; i < 20; i++) {
+            const req = this.getXpForLevel(i + 1);
+            if (xpTotal >= req) {
+                currentLevel = i + 1;
+                currentLevelBase = req;
+                xpProximo = this.getXpForLevel(i + 2);
+            } else {
+                xpProximo = req;
+                break;
+            }
+        }
+        
+        let progresso = 100;
+        if (currentLevel >= 20) {
+            currentLevel = 20;
+            xpProximo = 'MAX';
+        } else {
+            progresso = Math.min(100, Math.max(0, ((xpTotal - currentLevelBase) / (xpProximo - currentLevelBase)) * 100));
+        }
+        
+        return {
+            level: currentLevel,
+            base: currentLevelBase,
+            next: xpProximo,
+            progress: progresso,
+            xpInLevel: xpTotal - currentLevelBase,
+            xpNeeded: xpProximo === 'MAX' ? 0 : xpProximo - xpTotal
+        };
+    },
+
+    getLocalGamesXP(nomeUsuario) {
+        let pts = 0;
+        try {
+            const hist = JSON.parse(localStorage.getItem('geo_brazil_history')) || [];
+            pts += hist.reduce((acc, curr) => acc + (curr.score || 0), 0);
+            
+            const stats27 = JSON.parse(localStorage.getItem('rota27_stats_' + nomeUsuario));
+            if (stats27) pts += (stats27.total || 0);
+        } catch (e) {}
+        return pts;
+    }
+};
