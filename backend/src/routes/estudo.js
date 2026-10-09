@@ -25,8 +25,8 @@ async function rateLimitAluno(req, res, next) {
                 count = doc.data().rota27_uses || 0;
             }
             
-            if (count >= 10) {
-                return res.status(429).json({ erro: 'Limite diário de 10 usos atingido para a conta de Aluno.' });
+            if (count >= 20) {
+                return res.status(429).json({ erro: 'Limite diário de 20 usos atingido para a conta de Aluno.' });
             }
             
             await usageRef.set({ rota27_uses: count + 1 }, { merge: true });
@@ -84,12 +84,12 @@ router.get('/stats', authenticateToken, async (req, res) => {
             if (doc.exists) {
                 count = doc.data().rota27_uses || 0;
             }
-            res.json({ usesToday: count, limit: 10 });
+            res.json({ usesToday: count, limit: 20 });
         } else {
             res.json({ usesToday: 0, limit: 'Ilimitado' });
         }
     } catch (e) {
-        res.json({ usesToday: 0, limit: 10 });
+        res.json({ usesToday: 0, limit: 20 });
     }
 });
 
