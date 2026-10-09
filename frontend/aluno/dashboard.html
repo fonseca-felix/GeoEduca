@@ -397,6 +397,21 @@
       top: 80px;
     }
 
+    
+    .side-games-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    @media (max-width: 1100px) {
+      .side-games-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+    }
+
     /* ── Responsive ──────────────────────────────────────── */
     @media (max-width: 1100px) {
       .dash-grid {
@@ -415,7 +430,7 @@
       .dash-hero { padding: 24px; }
       .dash-stats { grid-template-columns: 1fr 1fr; }
       .dash-stats .dash-stat:last-child { grid-column: 1 / -1; }
-      #student-games { grid-template-columns: 1fr; }
+      #student-games { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 480px) {
@@ -437,7 +452,8 @@
     .bg-card        { animation: fadeUp .5s .25s ease both; }
 
   </style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">\n</head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
 <body>
 <div class="app-layout" id="app-layout">
   <main class="app-main">
@@ -455,12 +471,7 @@
 
     <!-- ── Page Content ── -->
     <div class="page-content">
-      <div class="dash-grid">
-
-        <!-- ════════════ COLUNA PRINCIPAL ════════════ -->
-        <div class="dash-main-col">
-
-          <!-- Hero -->
+      <!-- Hero -->
           <div class="dash-hero">
             <div class="dash-hero-content">
               <h2 class="dash-hero-greeting">
@@ -477,6 +488,12 @@
               </div>
             </div>
           </div>
+
+          
+      <div class="dash-grid">
+
+        <!-- ════════════ COLUNA PRINCIPAL ════════════ -->
+        <div class="dash-main-col">
 
           <!-- Quick Stats -->
           <div class="dash-stats">
@@ -539,48 +556,50 @@
             </div>
           </a>
 
+          <div class="side-games-wrapper">
           <!-- BrazilGuessr Card -->
-          <div class="bg-card">
-            <div class="bg-card-banner">
-              <h4><i class="fa-solid fa-earth-americas"></i> BrazilGuessr</h4>
-              <p>Descubra o Brasil com geografias!</p>
-            </div>
-            <div class="bg-card-body">
-              <div class="bg-attempts">
-                <span class="bg-attempts-label">Tentativas hoje</span>
-                <span class="bg-attempts-value" id="dashboard-bg-tentativas">–</span>
-              </div>
-              <a href="hub_brazilguessr.html" class="btn btn-secondary btn-sm" style="width:100%; justify-content:center; margin-bottom:8px;">
-                Ver Hub
-              </a>
-              <a href="play_brazilguessr.html" class="btn btn-navy" style="width:100%; justify-content:center;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Jogar Agora
-              </a>
-            </div>
-          </div>
-
-          <!-- Rota 27 Card -->
-          <div class="bg-card" style="margin-top: 24px;">
-            <div class="bg-card-banner" style="background: linear-gradient(135deg, #cca43b 0%, #8c6a21 100%); overflow: hidden; position: relative;">
-              <i class="fa-solid fa-robot" style="position: absolute; right: -10px; bottom: -20px; font-size: 80px; opacity: 0.15; transform: rotate(-10deg);"></i>
-              <h4><i class="fa-solid fa-wand-magic-sparkles"></i> Rota 27</h4>
-              <p>Sua Inteligência Artificial</p>
-            </div>
-            <div class="bg-card-body">
-              <div class="bg-attempts">
-                <span class="bg-attempts-label">Tentativas restantes</span>
-                <span class="bg-attempts-value" id="dashboard-rota27-tentativas" style="color: #cca43b;">–</span>
-              </div>
-              <a href="rota27.html" class="btn btn-navy" style="width:100%; justify-content:center; background: #cca43b; color: #fff; border-color: #cca43b;">
-                <i class="fa-solid fa-bolt" style="margin-right: 6px;"></i>
-                Acessar IA
-              </a>
-            </div>
-          </div>
-
-
-        </div><!-- /dash-side-col -->
+                    <div class="bg-card">
+                      <div class="bg-card-banner">
+                        <h4><i class="fa-solid fa-earth-americas"></i> BrazilGuessr</h4>
+                        <p>Descubra o Brasil com geografias!</p>
+                      </div>
+                      <div class="bg-card-body">
+                        <div class="bg-attempts">
+                          <span class="bg-attempts-label">Tentativas hoje</span>
+                          <span class="bg-attempts-value" id="dashboard-bg-tentativas">–</span>
+                        </div>
+                        <a href="hub_brazilguessr.html" class="btn btn-secondary btn-sm" style="width:100%; justify-content:center; margin-bottom:8px;">
+                          Ver Hub
+                        </a>
+                        <a href="play_brazilguessr.html" class="btn btn-navy" style="width:100%; justify-content:center;">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                          Jogar Agora
+                        </a>
+                      </div>
+                    </div>
+          
+                    <!-- Rota 27 Card -->
+                    <div class="bg-card" style="margin-top: 24px;">
+                      <div class="bg-card-banner" style="background: linear-gradient(135deg, #cca43b 0%, #8c6a21 100%); overflow: hidden; position: relative;">
+                        <i class="fa-solid fa-robot" style="position: absolute; right: -10px; bottom: -20px; font-size: 80px; opacity: 0.15; transform: rotate(-10deg);"></i>
+                        <h4><i class="fa-solid fa-wand-magic-sparkles"></i> Rota 27</h4>
+                        <p>Sua Inteligência Artificial</p>
+                      </div>
+                      <div class="bg-card-body">
+                        <div class="bg-attempts">
+                          <span class="bg-attempts-label">Tentativas restantes</span>
+                          <span class="bg-attempts-value" id="dashboard-rota27-tentativas" style="color: #cca43b;">–</span>
+                        </div>
+                        <a href="rota27.html" class="btn btn-navy" style="width:100%; justify-content:center; background: #cca43b; color: #fff; border-color: #cca43b;">
+                          <i class="fa-solid fa-bolt" style="margin-right: 6px;"></i>
+                          Acessar IA
+                        </a>
+                      </div>
+                    </div>
+          
+          
+                  
+          </div></div><!-- /dash-side-col -->
 
       </div><!-- /dash-grid -->
     </div><!-- /page-content -->
