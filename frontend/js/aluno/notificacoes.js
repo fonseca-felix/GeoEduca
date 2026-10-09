@@ -21,9 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const typeIcon = (tipo) => {
         if (tipo === 'atividade') return '<i class="fa-solid fa-file-pen"></i>';
-        if (tipo === 'prova')     return '📋';
-        if (tipo === 'quiz')      return '🎮';
-        return '🔔';
+        if (tipo === 'prova')     return '<i class="fa-solid fa-clipboard-list"></i>';
+        if (tipo === 'quiz')      return '<i class="fa-solid fa-gamepad"></i>';
+        return '<i class="fa-solid fa-bell"></i>';
     };
 
     const formatDate = (iso) => {
