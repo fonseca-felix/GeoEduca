@@ -115,7 +115,7 @@
     <form id="addStudentForm">
       <div class="form-group">
         <label class="form-label">Nome Completo</label>
-        <input type="text" id="studentName" class="form-control" required placeholder="Ex: João da Silva" />
+        <input type="text" id="studentName" class="form-control" required placeholder="Ex: João da Silva" minlength="5" maxlength="100" />
       </div>
       <div class="form-group">
         <label class="form-label">RM (4 números)</label>
@@ -146,7 +146,7 @@
       <input type="hidden" id="editStudentIdDb" />
       <div class="form-group">
         <label class="form-label">Nome Completo</label>
-        <input type="text" id="editStudentName" class="form-control" required />
+        <input type="text" id="editStudentName" class="form-control" required minlength="5" maxlength="100" />
       </div>
       <div class="form-group">
         <label class="form-label">RM (4 números)</label>

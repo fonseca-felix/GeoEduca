@@ -333,6 +333,10 @@ router.post('/', authenticateToken, requireProfessor, async (req, res) => {
             return res.status(400).json({ error: 'RM, nome, senha e sala são obrigatórios' });
         }
 
+        if (nome.length < 5 || nome.length > 100) {
+            return res.status(400).json({ error: 'O nome do aluno deve ter entre 5 e 100 caracteres' });
+        }
+
         // Capitalizar primeira letra
         nome = nome.charAt(0).toUpperCase() + nome.slice(1);
         
@@ -403,6 +407,9 @@ router.put('/:id', authenticateToken, requireProfessor, async (req, res) => {
         }
 
         if (nome) {
+            if (nome.length < 5 || nome.length > 100) {
+                return res.status(400).json({ error: 'O nome do aluno deve ter entre 5 e 100 caracteres' });
+            }
             updates.nome = nome.charAt(0).toUpperCase() + nome.slice(1);
         }
         
