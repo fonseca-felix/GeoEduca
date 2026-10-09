@@ -134,7 +134,7 @@
 </head>
 <body class="theme-light">
 
-<div class="app-layout">
+<div class="app-layout" id="app-layout">
     <!-- Sidebar injetada via JS -->
     
     <main class="app-main">
@@ -210,6 +210,9 @@
 <script src="../js/sidebar.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
+    const user = initPage('aluno');
+    if (!user) return;
+
     // Carregar dados do aluno
     const nomeEl = document.getElementById('student-name');
     const rmEl = document.getElementById('student-rm');
