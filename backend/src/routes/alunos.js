@@ -333,6 +333,11 @@ router.post('/', authenticateToken, requireProfessor, async (req, res) => {
             return res.status(400).json({ error: 'RM, nome, senha e sala são obrigatórios' });
         }
 
+        const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>\-+=_]).{8,}$/;
+        if (!passwordRegex.test(senha)) {
+            return res.status(400).json({ error: 'A senha deve ter no mínimo 8 caracteres, 1 maiúscula e 1 caractere especial' });
+        }
+
         // Capitalizar primeira letra
         nome = nome.charAt(0).toUpperCase() + nome.slice(1);
         
@@ -407,6 +412,10 @@ router.put('/:id', authenticateToken, requireProfessor, async (req, res) => {
         }
         
         if (senha) {
+            const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>\-+=_]).{8,}$/;
+            if (!passwordRegex.test(senha)) {
+                return res.status(400).json({ error: 'A nova senha deve ter no mínimo 8 caracteres, 1 maiúscula e 1 caractere especial' });
+            }
             updates.senha = await bcrypt.hash(senha, 10);
             updates.senhaVisivel = senha;
         }
@@ -427,6 +436,44 @@ router.put('/:id', authenticateToken, requireProfessor, async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao atualizar aluno' });
+    }
+});
+
+
+// PUT - Aluno alterar a própria senha
+router.put('/me/password', authenticateToken, requireAluno, async (req, res) => {
+    try {
+        const alunoId = req.user.id;
+        const { senhaAtual, novaSenha } = req.body;
+        
+        if (!senhaAtual || !novaSenha) {
+            return res.status(400).json({ error: 'Senha atual e nova senha são obrigatórias' });
+        }
+        
+        const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>\-+=_]).{8,}$/;
+        if (!passwordRegex.test(novaSenha)) {
+            return res.status(400).json({ error: 'A nova senha deve ter no mínimo 8 caracteres, 1 maiúscula e 1 caractere especial' });
+        }
+        
+        const alunoRef = db.collection('alunos').doc(alunoId);
+        const aluno = await alunoRef.get();
+        if (!aluno.exists) return res.status(404).json({ error: 'Aluno não encontrado' });
+        
+        const alunoData = aluno.data();
+        const senhaValida = await bcrypt.compare(senhaAtual, alunoData.senha);
+        if (!senhaValida) return res.status(401).json({ error: 'Senha atual incorreta' });
+        
+        const hashedPassword = await bcrypt.hash(novaSenha, 10);
+        
+        await alunoRef.update({ 
+            senha: hashedPassword,
+            senhaVisivel: 'Redefinida pelo aluno' // Segurança
+        });
+        
+        res.json({ message: 'Senha alterada com sucesso' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao alterar senha' });
     }
 });
 

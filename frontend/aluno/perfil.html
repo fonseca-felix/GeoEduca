@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoEduca - Meu Perfil</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/tokens.css" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/animations.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
+    <link rel="stylesheet" href="../css/darkmode.css" />
+    <style>
+        .perfil-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .perfil-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .perfil-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy), var(--navy-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #fff;
+        }
+
+        .perfil-info h2 {
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            margin-bottom: 4px;
+        }
+
+        .perfil-info p {
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: var(--text-sm);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-bg);
+            color: var(--color-text-primary);
+            font-family: var(--font-body);
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--gold);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(204, 164, 59, 0.15);
+        }
+
+        .password-rules {
+            background: var(--color-surface-2, #f8fafc);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            margin-top: var(--space-4);
+            margin-bottom: var(--space-6);
+            font-size: var(--text-sm);
+        }
+
+        .password-rules h4 {
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .password-rules ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 12px 0;
+            color: var(--color-text-muted);
+        }
+
+        .password-rules li {
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .password-rules li i {
+            font-size: 12px;
+        }
+
+        .rule-pass { color: var(--forest); }
+        .rule-fail { color: var(--color-text-muted); }
+
+        .example-box {
+            background: rgba(204, 164, 59, 0.1);
+            border: 1px solid rgba(204, 164, 59, 0.3);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            color: var(--gold-dark);
+            font-family: monospace;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="theme-light">
+
+<div class="app-layout">
+    <!-- Sidebar injetada via JS -->
+    
+    <main class="app-main">
+        <header class="page-header">
+            <div class="page-header-left">
+                <h1 class="page-title">Meu Perfil</h1>
+                <p class="page-subtitle">Gerencie suas informacoes e seguranca</p>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div class="perfil-container fade-in-up">
+                <div class="perfil-header">
+                    <div class="perfil-avatar" id="avatar-icon">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="perfil-info">
+                        <h2 id="student-name">Carregando...</h2>
+                        <p id="student-rm">RM: ---</p>
+                    </div>
+                </div>
+
+                <h3>Alterar Senha</h3>
+                <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: var(--space-4);">
+                    Para sua seguranca, escolha uma senha forte.
+                </p>
+
+                <form id="form-password">
+                    <div class="form-group">
+                        <label for="senhaAtual">Senha Atual</label>
+                        <input type="password" id="senhaAtual" class="form-control" placeholder="Digite sua senha atual" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="novaSenha">Nova Senha</label>
+                        <input type="password" id="novaSenha" class="form-control" placeholder="Digite a nova senha" required>
+                    </div>
+
+                    <div class="password-rules">
+                        <h4>Criterios da Senha:</h4>
+                        <ul>
+                            <li id="rule-length"><i class="fa-solid fa-circle-xmark rule-fail"></i> Minimo de 8 caracteres</li>
+                            <li id="rule-upper"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 letra maiuscula</li>
+                            <li id="rule-special"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)</li>
+                        </ul>
+                        <div style="font-size: 12px; color: var(--color-text-muted); margin-bottom: 4px;">Exemplo de senha aceita:</div>
+                        <div class="example-box">Abcd1234@</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="novaSenha2">Repetir Nova Senha</label>
+                        <input type="password" id="novaSenha2" class="form-control" placeholder="Repita a nova senha" required>
+                        <div id="match-error" style="color: var(--danger); font-size: 12px; margin-top: 4px; display: none;">
+                            As senhas nao coincidem.
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-top: var(--space-6);">
+                        <button type="submit" class="btn btn-primary" id="btn-salvar" disabled>
+                            <i class="fa-solid fa-save"></i> Salvar Nova Senha
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    // Carregar dados do aluno
+    const nomeEl = document.getElementById('student-name');
+    const rmEl = document.getElementById('student-rm');
+    const avatarEl = document.getElementById('avatar-icon');
+    
+    try {
+        const aluno = await api.get('/alunos/me/resumo');
+        if (aluno && aluno.nome) {
+            nomeEl.textContent = aluno.nome;
+            rmEl.textContent = `RM: ${user.rm || '---'}`;
+            // Se tiver icone personalizado
+            if (user.iconeAtual) {
+                avatarEl.innerHTML = `<i class="${user.iconeAtual}"></i>`;
+            } else {
+                avatarEl.innerHTML = `<i class="fa-solid fa-graduation-cap"></i>`;
+            }
+        }
+    } catch (e) {
+        console.error('Erro ao carregar perfil', e);
+        if (user) {
+            nomeEl.textContent = user.nome;
+            rmEl.textContent = `RM: ${user.rm || '---'}`;
+        }
+    }
+
+    // Validacao em tempo real da senha
+    const novaSenhaInput = document.getElementById('novaSenha');
+    const novaSenha2Input = document.getElementById('novaSenha2');
+    const btnSalvar = document.getElementById('btn-salvar');
+    const matchError = document.getElementById('match-error');
+
+    const ruleLength = document.getElementById('rule-length');
+    const ruleUpper = document.getElementById('rule-upper');
+    const ruleSpecial = document.getElementById('rule-special');
+
+    function validatePassword() {
+        const pass = novaSenhaInput.value;
+        const pass2 = novaSenha2Input.value;
+        
+        let isValid = true;
+
+        // Comprimento (min 8)
+        if (pass.length >= 8) {
+            ruleLength.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Minimo de 8 caracteres';
+        } else {
+            ruleLength.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Minimo de 8 caracteres';
+            isValid = false;
+        }
+
+        // Maiuscula
+        if (/[A-Z]/.test(pass)) {
+            ruleUpper.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 letra maiuscula';
+        } else {
+            ruleUpper.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 letra maiuscula';
+            isValid = false;
+        }
+
+        // Especial
+        if (/[!@#$%^&*(),.?":{}|<>\-+=_]/.test(pass)) {
+            ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 caractere especial (!@#$%)';
+        } else {
+            ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)';
+            isValid = false;
+        }
+
+        // Match
+        if (pass2.length > 0 && pass !== pass2) {
+            matchError.style.display = 'block';
+            isValid = false;
+        } else {
+            matchError.style.display = 'none';
+        }
+
+        if (pass === '') isValid = false;
+        if (pass2 === '') isValid = false;
+        if (pass !== pass2) isValid = false;
+
+        btnSalvar.disabled = !isValid;
+        return isValid;
+    }
+
+    novaSenhaInput.addEventListener('input', validatePassword);
+    novaSenha2Input.addEventListener('input', validatePassword);
+
+    // Submit do form
+    document.getElementById('form-password').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (!validatePassword()) return;
+
+        const senhaAtual = document.getElementById('senhaAtual').value;
+        const novaSenha = document.getElementById('novaSenha').value;
+
+        try {
+            btnSalvar.disabled = true;
+            btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+            
+            await api.put('/alunos/me/password', { senhaAtual, novaSenha });
+            
+            Toast.success('Senha alterada com sucesso!');
+            
+            // Limpar form
+            document.getElementById('senhaAtual').value = '';
+            document.getElementById('novaSenha').value = '';
+            document.getElementById('novaSenha2').value = '';
+            validatePassword(); // re-desabilita o botao
+            
+        } catch (err) {
+            Toast.error(err.message || 'Erro ao alterar a senha');
+        } finally {
+            btnSalvar.innerHTML = '<i class="fa-solid fa-save"></i> Salvar Nova Senha';
+            if (validatePassword()) btnSalvar.disabled = false;
+        }
+    });
+});
+</script>
+</body>
+</html>
