@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Latitude e Longitude 3D — GeoEduca</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css?v=2" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/darkmode.css" />
+
+  <style>
+    /* O laboratório de Latitude e Longitude requer Tailwind, importado pelo React */
+    body, html {
+      overflow-x: hidden;
+    }
+  </style>
+</head>
+<body class="aluno-body" style="background: #0d0a0b;">
+
+<div id="mobile-blocker" style="display: none; position: fixed; inset: 0; background: rgba(13,10,11,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem;">
+  <i class="fa-solid fa-desktop" style="font-size: 3rem; color: #cca43b; margin-bottom: 1rem;"></i>
+  <h2 style="font-family: var(--font-display); font-size: 2rem; text-transform: uppercase; margin-bottom: 1rem;">Acesse pelo PC</h2>
+  <p style="color: var(--color-text-muted); max-width: 320px; margin-top: 1rem; font-size: 1.1rem;">
+    O laboratório de Latitude e Longitude requer processamento gráfico avançado e no momento foi otimizado apenas para computadores.
+  </p>
+  <a href="painel.html" style="margin-top: 2rem; padding: 0.75rem 2rem; background: #cca43b; color: #1a2332; border-radius: 9999px; font-weight: bold; font-family: var(--font-display); font-size: 1.25rem; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; transition: transform 0.2s;">Voltar ao Painel</a>
+</div>
+
+<script>
+  if (window.innerWidth < 1024) { 
+    document.getElementById('mobile-blocker').style.display = 'flex';
+  }
+</script>
+
+<div class="app-layout" id="app-layout">
+  <!-- Sidebar será injetada via JS -->
+
+  <main class="app-main latitude-page">
+    <header class="app-header" style="background: transparent; border-bottom: none; padding-bottom: 0;">
+      <div class="app-header-left">
+        <button class="sidebar-toggle" id="mobile-sidebar-toggle" aria-label="Abrir menu" style="color: var(--color-text);">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <div id="react-latitude-root"></div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="../js/darkmode.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const appLayout = document.getElementById('app-layout');
+    if (appLayout && typeof buildAlunoSidebar === 'function') {
+      appLayout.insertAdjacentHTML('afterbegin', buildAlunoSidebar('../'));
+    }
+    initPage('aluno');
+  });
+</script>
+
+<!-- Scripts e Estilos compilados pelo React (Micro-Frontend) -->
+<link rel="stylesheet" href="../react_dist/style.css?v=4" />
+<script type="module" src="../react_dist/latitude/app.js?v=4"></script>
+
+</body>
+</html>

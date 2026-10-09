@@ -16,7 +16,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         vulcao: 'src/main.tsx',
-        placas: 'src/main-placas.tsx'
+        placas: 'src/main-placas.tsx',
+        latitude: 'src/main-latitude.tsx'
       },
       output: {
         entryFileNames: '[name]/app.js',
