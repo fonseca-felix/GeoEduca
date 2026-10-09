@@ -157,36 +157,32 @@ const Sidebar = {
     if (!sidebar) return;
 
     // Mobile Hamburger Button & Overlay
-    if (!document.getElementById('mobile-menu-btn')) {
-      const mobileBtn = document.createElement('button');
+    let mobileBtn = document.getElementById('mobile-menu-btn');
+    if (!mobileBtn) {
+      mobileBtn = document.createElement('button');
       mobileBtn.id = 'mobile-menu-btn';
       mobileBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>`;
       document.body.appendChild(mobileBtn);
-      
-      const overlay = document.createElement('div');
+    }
+    
+    let overlay = document.querySelector('.sidebar-mobile-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
       overlay.className = 'sidebar-mobile-overlay';
       document.body.appendChild(overlay);
+    }
 
-      mobileBtn.addEventListener('click', () => {
-        sidebar.classList.add('mobile-open');
-        overlay.classList.add('show');
-        document.body.style.overflow = 'hidden'; // prevent bg scroll
-      });
+    mobileBtn.addEventListener('click', () => {
+      sidebar.classList.add('mobile-open');
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    });
 
-      overlay.addEventListener('click', () => {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('show');
-        document.body.style.overflow = '';
-      });
-      
-      // Close sidebar when clicking a nav item on mobile
-      sidebar.querySelectorAll('.sidebar-nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-          if (window.innerWidth <= 900) {
-            sidebar.classList.remove('mobile-open');
-            overlay.classList.remove('show');
-            document.body.style.overflow = '';
-          }
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('mobile-open');
+      overlay.classList.remove('show');
+      document.body.style.overflow = '';
+    });
         });
       });
     }
