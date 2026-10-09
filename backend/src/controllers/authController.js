@@ -118,7 +118,7 @@ const login = async (req, res) => {
             );
             return res.json({
                 token,
-                usuario: { id: aluno.id, rm: alunoData.rm, nome: alunoData.nome, salaId: alunoData.salaId, salaNome: alunoData.salaNome, tipo: 'aluno' }
+                usuario: { id: aluno.id, rm: alunoData.rm, nome: alunoData.nome, salaId: alunoData.salaId, salaNome: alunoData.salaNome, tipo: 'aluno', tituloAtual: alunoData.tituloAtual, bordaAtual: alunoData.bordaAtual, iconeAtual: alunoData.iconeAtual }
             });
         }
 
@@ -169,7 +169,7 @@ const verifyToken = async (req, res) => {
         const aluno = await db.collection('alunos').doc(decoded.id).get();
         if (!aluno.exists) return res.status(401).json({ error: 'Usuário não encontrado' });
         const d = aluno.data();
-        res.json({ valido: true, usuario: { id: aluno.id, rm: d.rm, nome: d.nome, salaId: d.salaId, salaNome: d.salaNome, tipo: 'aluno' } });
+        res.json({ valido: true, usuario: { id: aluno.id, rm: d.rm, nome: d.nome, salaId: d.salaId, salaNome: d.salaNome, tipo: 'aluno', tituloAtual: d.tituloAtual, bordaAtual: d.bordaAtual, iconeAtual: d.iconeAtual } });
     } catch {
         res.status(401).json({ error: 'Token inválido' });
     }
