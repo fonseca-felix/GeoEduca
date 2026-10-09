@@ -9,7 +9,7 @@ export type Coordinate = { lat: number; lon: number };
 function point(lat: number, lon: number, r = 2.52): [number, number, number] {
   const a = lat * Math.PI / 180;
   const b = lon * Math.PI / 180;
-  return [-r * Math.cos(a) * Math.sin(b), r * Math.sin(a), r * Math.cos(a) * Math.cos(b)];
+  return [r * Math.cos(a) * Math.sin(b), r * Math.sin(a), r * Math.cos(a) * Math.cos(b)];
 }
 
 function curve(points: [number, number, number][], color: string, opacity = 1) {
@@ -55,12 +55,14 @@ function Globe({ value, onChange }: { value: Coordinate; onChange: (c: Coordinat
   const p = point(value.lat, value.lon, 2.55);
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
-    const uv = e.uv;
-    if (!uv) return;
-    onChange({ lat: Math.max(-90, Math.min(90, Math.round((uv.y - .5) * 180))), lon: Math.max(-180, Math.min(180, Math.round(uv.x * 360 - 180))) });
+    if (e.delta > 5) return; // foi arrasto, não clique
+    if (!e.uv) return;
+    const lon = e.uv.x * 360 - 180;
+    const lat = (e.uv.y - 0.5) * 180;
+    onChange({ lat: Math.round(lat * 10) / 10, lon: Math.round(lon * 10) / 10 });
   };
   return <>
-    <mesh rotation-y={-Math.PI / 2} onPointerUp={(e) => { if (e.delta <= 2) handleClick(e); }}>
+    <mesh rotation-y={-Math.PI / 2} onClick={handleClick}>
       <sphereGeometry args={[2.5, 96, 64]} />
       <meshStandardMaterial map={texture} roughness={.92} metalness={.02} />
     </mesh>
