@@ -120,6 +120,29 @@
         .rule-pass { color: var(--forest); }
         .rule-fail { color: var(--color-text-muted); }
 
+        .input-with-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-with-icon .form-control {
+            padding-right: 40px;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toggle-password:hover {
+            color: var(--color-text-primary);
+        }
         .example-box {
             background: rgba(204, 164, 59, 0.1);
             border: 1px solid rgba(204, 164, 59, 0.3);
@@ -165,18 +188,24 @@
                 <form id="form-password">
                     <div class="form-group">
                         <label for="senhaAtual">Senha Atual</label>
-                        <input type="password" id="senhaAtual" class="form-control" placeholder="Digite sua senha atual" required>
+                        <div class="input-with-icon">
+                            <input type="password" id="senhaAtual" class="form-control" placeholder="Digite sua senha atual" required maxlength="20">
+                            <button type="button" class="toggle-password" onclick="toggleVisibility('senhaAtual', this)" aria-label="Mostrar senha"><i class="fa-regular fa-eye"></i></button>
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label for="novaSenha">Nova Senha</label>
-                        <input type="password" id="novaSenha" class="form-control" placeholder="Digite a nova senha" required>
+                        <div class="input-with-icon">
+                            <input type="password" id="novaSenha" class="form-control" placeholder="Digite a nova senha" required maxlength="20">
+                            <button type="button" class="toggle-password" onclick="toggleVisibility('novaSenha', this)" aria-label="Mostrar senha"><i class="fa-regular fa-eye"></i></button>
+                        </div>
                     </div>
 
                     <div class="password-rules">
                         <h4>Criterios da Senha:</h4>
                         <ul>
-                            <li id="rule-length"><i class="fa-solid fa-circle-xmark rule-fail"></i> Minimo de 8 caracteres</li>
+                            <li id="rule-length"><i class="fa-solid fa-circle-xmark rule-fail"></i> Minimo de 8 e maximo de 20 caracteres</li>
                             <li id="rule-upper"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 letra maiuscula</li>
                             <li id="rule-special"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)</li>
                         </ul>
@@ -186,7 +215,10 @@
 
                     <div class="form-group">
                         <label for="novaSenha2">Repetir Nova Senha</label>
-                        <input type="password" id="novaSenha2" class="form-control" placeholder="Repita a nova senha" required>
+                        <div class="input-with-icon">
+                            <input type="password" id="novaSenha2" class="form-control" placeholder="Repita a nova senha" required maxlength="20">
+                            <button type="button" class="toggle-password" onclick="toggleVisibility('novaSenha2', this)" aria-label="Mostrar senha"><i class="fa-regular fa-eye"></i></button>
+                        </div>
                         <div id="match-error" style="color: var(--danger); font-size: 12px; margin-top: 4px; display: none;">
                             As senhas nao coincidem.
                         </div>
@@ -256,11 +288,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         let isValid = true;
 
-        // Comprimento (min 8)
-        if (pass.length >= 8) {
-            ruleLength.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Minimo de 8 caracteres';
+        // Comprimento (min 8, max 20)
+        if (pass.length >= 8 && pass.length <= 20) {
+            ruleLength.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Minimo de 8 e maximo de 20 caracteres';
         } else {
-            ruleLength.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Minimo de 8 caracteres';
+            ruleLength.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Minimo de 8 e maximo de 20 caracteres';
             isValid = false;
         }
 
@@ -298,6 +330,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     novaSenhaInput.addEventListener('input', validatePassword);
     novaSenha2Input.addEventListener('input', validatePassword);
+
+    // Mostrar/Esconder Senha
+    window.toggleVisibility = function(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    };
 
     // Submit do form
     document.getElementById('form-password').addEventListener('submit', async (e) => {

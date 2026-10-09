@@ -333,9 +333,9 @@ router.post('/', authenticateToken, requireProfessor, async (req, res) => {
             return res.status(400).json({ error: 'RM, nome, senha e sala são obrigatórios' });
         }
 
-        const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>\-+=_]).{8,}$/;
+        const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>\-+=_]).{8,20}$/;
         if (!passwordRegex.test(senha)) {
-            return res.status(400).json({ error: 'A senha deve ter no mínimo 8 caracteres, 1 maiúscula e 1 caractere especial' });
+            return res.status(400).json({ error: 'A senha deve ter no mínimo 8 e máximo de 20 caracteres, 1 maiúscula e 1 caractere especial' });
         }
 
         // Capitalizar primeira letra
@@ -412,9 +412,9 @@ router.put('/:id', authenticateToken, requireProfessor, async (req, res) => {
         }
         
         if (senha) {
-            const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>\-+=_]).{8,}$/;
+            const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>\-+=_]).{8,20}$/;
             if (!passwordRegex.test(senha)) {
-                return res.status(400).json({ error: 'A nova senha deve ter no mínimo 8 caracteres, 1 maiúscula e 1 caractere especial' });
+                return res.status(400).json({ error: 'A nova senha deve ter no mínimo 8 e máximo de 20 caracteres, 1 maiúscula e 1 caractere especial' });
             }
             updates.senha = await bcrypt.hash(senha, 10);
             updates.senhaVisivel = senha;
@@ -450,9 +450,9 @@ router.put('/me/password', authenticateToken, requireAluno, async (req, res) => 
             return res.status(400).json({ error: 'Senha atual e nova senha são obrigatórias' });
         }
         
-        const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>\-+=_]).{8,}$/;
+        const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>\-+=_]).{8,20}$/;
         if (!passwordRegex.test(novaSenha)) {
-            return res.status(400).json({ error: 'A nova senha deve ter no mínimo 8 caracteres, 1 maiúscula e 1 caractere especial' });
+            return res.status(400).json({ error: 'A nova senha deve ter no mínimo 8 e máximo de 20 caracteres, 1 maiúscula e 1 caractere especial' });
         }
         
         const alunoRef = db.collection('alunos').doc(alunoId);
