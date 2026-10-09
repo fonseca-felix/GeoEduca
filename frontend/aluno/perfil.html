@@ -210,6 +210,8 @@
 <script src="../js/sidebar.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('app-layout').insertAdjacentHTML('afterbegin', buildAlunoSidebar('../'));
+    
     const user = initPage('aluno');
     if (!user) return;
 
