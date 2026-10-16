@@ -81,13 +81,19 @@
 
   <script src="../js/api.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/ui.js"></script>
   <script src="../js/sidebar.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
+      if (typeof Theme !== 'undefined' && Theme.init) Theme.init();
       const user = Auth.requireAuth('escola');
       if (!user) return;
-      document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildEscolaSidebar());
+      document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildEscolaSidebar('../'));
+      if (typeof Sidebar !== 'undefined' && Sidebar.init) Sidebar.init();
       
+      const themeBtn = document.querySelector('[data-action="toggle-theme"]');
+      if(themeBtn) themeBtn.addEventListener('click', () => Theme.toggle());
       const logoutBtn = document.querySelector('[data-action="logout"]');
       if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
 
@@ -109,12 +115,39 @@
         document.getElementById('stat-provas').textContent = data.totalProvas || 0;
         document.getElementById('stat-atividades').textContent = data.totalAtividades || 0;
         
+        const gmailSpan = document.createElement('p');
+        gmailSpan.style.cssText = 'color: var(--muted-foreground); font-size: 0.9rem; margin-top: -24px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;';
+        const gmail = data.emailRecuperacao || (data.email && data.email.endsWith('@gmail.com') ? data.email : '');
+        gmailSpan.innerHTML = `
+          <span>Gmail de Recuperação: <strong style="color:var(--foreground)">${gmail || 'Não vinculado'}</strong></span>
+          <button class="btn" id="btn-edit-gmail" style="padding:4px 10px;font-size:0.75rem;background:var(--secondary);color:var(--foreground);border:1px solid var(--border);cursor:pointer;border-radius:6px;">
+            ${gmail ? 'Alterar Gmail' : 'Vincular Gmail'}
+          </button>
+        `;
+        document.getElementById('prof-email').after(gmailSpan);
+
+        document.getElementById('btn-edit-gmail').addEventListener('click', async () => {
+          const novo = prompt('Informe o e-mail @gmail.com de recuperação para este professor:', gmail || '');
+          if (!novo) return;
+          if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(novo.trim())) {
+            alert('Por favor, informe um endereço válido @gmail.com');
+            return;
+          }
+          try {
+            const res = await api.put('/escola/professores/' + profId + '/email', { emailRecuperacao: novo.trim() });
+            alert(res.message || 'Gmail de recuperação salvo com sucesso!');
+            window.location.reload();
+          } catch(e) {
+            alert(e.message || 'Erro ao salvar Gmail');
+          }
+        });
+
         const salasList = document.getElementById('list-salas');
         if (data.salas && data.salas.length > 0) {
           salasList.innerHTML = data.salas.map(s => `
             <div class="list-item">
               <div>
-                <strong style="color:white">${s.nome}</strong>
+                <strong style="color:var(--foreground)">${s.nome}</strong>
               </div>
               <div style="color:var(--muted-foreground)">
                 ID: ${s.id}
