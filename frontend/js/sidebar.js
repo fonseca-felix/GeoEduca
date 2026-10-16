@@ -237,9 +237,14 @@ function buildAlunoSidebar(basePath = '../') {
   </aside>`;
 }
 function buildEscolaSidebar(basePath = '../') {
+  const resolvedBase = (basePath && basePath.endsWith('/')) ? basePath : '../';
+  const currentPath = (typeof window !== 'undefined' && window.location) ? window.location.pathname : '';
+  const isDash = currentPath.endsWith('dashboard.html');
+  const isProfs = currentPath.endsWith('professores.html') || currentPath.endsWith('professor_detalhes.html');
+
   return `
   <aside class="sidebar" id="sidebar">
-    <a class="sidebar-brand" href="${basePath}escola/dashboard.html" aria-label="GeoEduca - Dashboard">
+    <a class="sidebar-brand" href="${resolvedBase}escola/dashboard.html" aria-label="GeoEduca - Dashboard">
       <div class="sidebar-logo">${GLOBE_SVG}</div>
       <div class="sidebar-brand-text">
         <div class="sidebar-brand-name">GeoEduca</div>
@@ -257,11 +262,11 @@ function buildEscolaSidebar(basePath = '../') {
 
     <nav class="sidebar-nav" role="navigation">
       <span class="sidebar-nav-label">Principal</span>
-      <a class="sidebar-nav-item" href="${basePath}escola/dashboard.html" data-tooltip="Dashboard">
+      <a class="sidebar-nav-item ${isDash ? 'active' : ''}" href="${resolvedBase}escola/dashboard.html" data-tooltip="Dashboard">
         <span class="sidebar-nav-icon">${NAV_ICONS.dashboard}</span>
         <span class="sidebar-nav-text">Dashboard</span>
       </a>
-      <a class="sidebar-nav-item" href="${basePath}escola/professores.html" data-tooltip="Professores">
+      <a class="sidebar-nav-item ${isProfs ? 'active' : ''}" href="${resolvedBase}escola/professores.html" data-tooltip="Professores">
         <span class="sidebar-nav-icon">${NAV_ICONS.professores}</span>
         <span class="sidebar-nav-text">Professores</span>
       </a>
@@ -285,9 +290,14 @@ function buildEscolaSidebar(basePath = '../') {
 }
 
 function buildMasterSidebar(basePath = '../') {
+  const resolvedBase = (basePath && basePath.endsWith('/')) ? basePath : '../';
+  const currentPath = (typeof window !== 'undefined' && window.location) ? window.location.pathname : '';
+  const isDash = currentPath.endsWith('dashboard.html');
+  const isEscolas = currentPath.endsWith('escolas.html');
+
   return `
   <aside class="sidebar" id="sidebar">
-    <a class="sidebar-brand" href="${basePath}master/dashboard.html" aria-label="GeoEduca - Dashboard">
+    <a class="sidebar-brand" href="${resolvedBase}master/dashboard.html" aria-label="GeoEduca - Dashboard">
       <div class="sidebar-logo">${GLOBE_SVG}</div>
       <div class="sidebar-brand-text">
         <div class="sidebar-brand-name">GeoEduca</div>
@@ -305,11 +315,11 @@ function buildMasterSidebar(basePath = '../') {
 
     <nav class="sidebar-nav" role="navigation">
       <span class="sidebar-nav-label">Principal</span>
-      <a class="sidebar-nav-item" href="${basePath}master/dashboard.html" data-tooltip="Dashboard">
+      <a class="sidebar-nav-item ${isDash ? 'active' : ''}" href="${resolvedBase}master/dashboard.html" data-tooltip="Dashboard">
         <span class="sidebar-nav-icon">${NAV_ICONS.dashboard}</span>
         <span class="sidebar-nav-text">Dashboard</span>
       </a>
-      <a class="sidebar-nav-item" href="${basePath}master/escolas.html" data-tooltip="Escolas">
+      <a class="sidebar-nav-item ${isEscolas ? 'active' : ''}" href="${resolvedBase}master/escolas.html" data-tooltip="Escolas">
         <span class="sidebar-nav-icon">${NAV_ICONS.escolas}</span>
         <span class="sidebar-nav-text">Escolas</span>
       </a>
