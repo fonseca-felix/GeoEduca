@@ -5,20 +5,33 @@ const { authenticateToken, requireProfessor, requireAluno } = require('../middle
 
 const router = express.Router();
 
-async function somarPontosAluno(alunoId) {
-    let pontos = 0;
+async function obterMapaPontosAlunos() {
+    const pontosMap = new Map();
+    const addPontos = (alunoId, pts) => {
+        if (!alunoId) return;
+        pontosMap.set(alunoId, (pontosMap.get(alunoId) || 0) + (Number(pts) || 0));
+    };
 
     const [quizSnap, jogoSnap, provaSnap] = await Promise.all([
-        db.collection('quiz_respostas').where('alunoId', '==', alunoId).get(),
-        db.collection('jogo_pontuacoes').where('alunoId', '==', alunoId).get(),
-        db.collection('prova_respostas').where('alunoId', '==', alunoId).get()
+        db.collection('quiz_respostas').get(),
+        db.collection('jogo_pontuacoes').get(),
+        db.collection('prova_respostas').get()
     ]);
 
-    quizSnap.forEach(doc => { pontos += Number(doc.data().pontuacao) || 0; });
-    jogoSnap.forEach(doc => { pontos += Number(doc.data().pontuacao) || 0; });
-    provaSnap.forEach(doc => { pontos += Number(doc.data().notaAutomatica) || 0; });
+    quizSnap.forEach(doc => {
+        const d = doc.data();
+        addPontos(d.alunoId, d.pontuacao);
+    });
+    jogoSnap.forEach(doc => {
+        const d = doc.data();
+        addPontos(d.alunoId, d.pontuacao);
+    });
+    provaSnap.forEach(doc => {
+        const d = doc.data();
+        addPontos(d.alunoId, d.notaAutomatica);
+    });
 
-    return pontos;
+    return pontosMap;
 }
 
 // GET - Resumo do aluno logado (pontos, quizzes, provas)
@@ -26,13 +39,15 @@ router.get('/me/resumo', authenticateToken, requireAluno, async (req, res) => {
     try {
         const alunoId = req.user.id;
 
-        const quizSnap = await db.collection('quiz_respostas').where('alunoId', '==', alunoId).get();
+        const [quizSnap, provaSnap, jogoSnap] = await Promise.all([
+            db.collection('quiz_respostas').where('alunoId', '==', alunoId).get(),
+            db.collection('prova_respostas').where('alunoId', '==', alunoId).get(),
+            db.collection('jogo_pontuacoes').where('alunoId', '==', alunoId).get()
+        ]);
+
         let pontuacaoQuizzes = 0;
         quizSnap.forEach(doc => { pontuacaoQuizzes += Number(doc.data().pontuacao) || 0; });
 
-        const provaSnap = await db.collection('prova_respostas').where('alunoId', '==', alunoId).get();
-
-        const jogoSnap = await db.collection('jogo_pontuacoes').where('alunoId', '==', alunoId).get();
         let pontosJogos = 0;
         jogoSnap.forEach(doc => { pontosJogos += Number(doc.data().pontuacao) || 0; });
 
@@ -73,30 +88,32 @@ router.get('/ranking/turma', authenticateToken, requireAluno, async (req, res) =
 
         let alunosSnap;
         if (req.query.salaId) {
-            const snap1 = await db.collection('alunos').where('salas', 'array-contains', req.query.salaId).get();
-            const snap2 = await db.collection('alunos').where('salaId', '==', req.query.salaId).get();
+            const [snap1, snap2] = await Promise.all([
+                db.collection('alunos').where('salas', 'array-contains', req.query.salaId).get(),
+                db.collection('alunos').where('salaId', '==', req.query.salaId).get()
+            ]);
             const docsMap = new Map();
             snap1.docs.forEach(d => docsMap.set(d.id, d));
             snap2.docs.forEach(d => docsMap.set(d.id, d));
             alunosSnap = { docs: Array.from(docsMap.values()) };
         } else if (req.user.salas && req.user.salas.length > 0) {
-            const snap1 = await db.collection('alunos').where('salas', 'array-contains-any', req.user.salas).get();
-            const docsMap = new Map();
-            snap1.docs.forEach(d => docsMap.set(d.id, d));
-            
-            // Also fetch by legacy salaId
+            const queries = [db.collection('alunos').where('salas', 'array-contains-any', req.user.salas).get()];
             if (req.user.salaId) {
-                const snap2 = await db.collection('alunos').where('salaId', '==', req.user.salaId).get();
-                snap2.docs.forEach(d => docsMap.set(d.id, d));
+                queries.push(db.collection('alunos').where('salaId', '==', req.user.salaId).get());
             }
+            const snaps = await Promise.all(queries);
+            const docsMap = new Map();
+            snaps.forEach(snap => snap.docs.forEach(d => docsMap.set(d.id, d)));
             alunosSnap = { docs: Array.from(docsMap.values()) };
         } else {
             alunosSnap = await db.collection('alunos').where('salaId', '==', targetSalaId).get();
         }
+
+        const pontosMap = await obterMapaPontosAlunos();
         const ranking = [];
 
         for (const alunoDoc of alunosSnap.docs) {
-            const pontos = await somarPontosAluno(alunoDoc.id);
+            const pontos = pontosMap.get(alunoDoc.id) || 0;
             const d = alunoDoc.data();
             ranking.push({
                 alunoId: alunoDoc.id,
@@ -122,11 +139,14 @@ router.get('/ranking/turma', authenticateToken, requireAluno, async (req, res) =
 router.get('/ranking/geral', authenticateToken, requireAluno, async (req, res) => {
     try {
         const alunoId = req.user.id;
-        const alunosSnap = await db.collection('alunos').get();
+        const [alunosSnap, pontosMap] = await Promise.all([
+            db.collection('alunos').get(),
+            obterMapaPontosAlunos()
+        ]);
         const ranking = [];
 
         for (const alunoDoc of alunosSnap.docs) {
-            const pontos = await somarPontosAluno(alunoDoc.id);
+            const pontos = pontosMap.get(alunoDoc.id) || 0;
             const d = alunoDoc.data();
             ranking.push({
                 alunoId: alunoDoc.id,

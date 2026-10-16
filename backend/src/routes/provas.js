@@ -16,38 +16,38 @@ async function getAlunoDocsByIds(alunoIds) {
 // GET - Listar todas as provas
 router.get('/', authenticateToken, async (req, res) => {
     try {
-        const provasRef = db.collection('provas');
-        const snapshot = await provasRef.get();
+        const [snapshot, allQuestoesSnap] = await Promise.all([
+            db.collection('provas').get(),
+            db.collection('prova_questoes').get()
+        ]);
 
-        const provas = [];
-        for (const doc of snapshot.docs) {
-            const data = doc.data();
-
-            const questoesRef = db.collection('prova_questoes');
-            const questoesSnapshot = await questoesRef.where('provaId', '==', doc.id).get();
-
-            const questoes = [];
-            questoesSnapshot.forEach(qDoc => {
-                const qData = qDoc.data();
-                questoes.push({
-                    id: qDoc.id,
-                    texto: qData.texto,
-                    tipo: qData.tipo,
-                    opcoes: qData.opcoes || null,
-                    correta: qData.correta !== undefined ? qData.correta : null,
-                    valor: qData.valor
-                });
+        const questoesByProva = new Map();
+        allQuestoesSnap.forEach(qDoc => {
+            const qData = qDoc.data();
+            if (!questoesByProva.has(qData.provaId)) {
+                questoesByProva.set(qData.provaId, []);
+            }
+            questoesByProva.get(qData.provaId).push({
+                id: qDoc.id,
+                texto: qData.texto,
+                tipo: qData.tipo,
+                opcoes: qData.opcoes || null,
+                correta: qData.correta !== undefined ? qData.correta : null,
+                valor: qData.valor
             });
+        });
 
-            provas.push({
+        const provas = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
                 id: doc.id,
                 titulo: data.titulo,
                 imagem: data.imagem,
                 rubrica: data.rubrica,
-                questoes,
+                questoes: questoesByProva.get(doc.id) || [],
                 createdAt: data.createdAt
-            });
-        }
+            };
+        });
 
         res.json(provas);
     } catch (error) {
@@ -124,9 +124,32 @@ router.post('/enviar', authenticateToken, requireProfessor, async (req, res) => 
 router.get('/disponiveis', authenticateToken, requireAluno, async (req, res) => {
     try {
         const alunoId = req.user.id;
-        const enviosSnap = await db.collection('provas_enviadas')
-            .where('alunoId', '==', alunoId)
-            .get();
+        const [enviosSnap, respostasAlunoSnap, allQuestoesSnap] = await Promise.all([
+            db.collection('provas_enviadas').where('alunoId', '==', alunoId).get(),
+            db.collection('prova_respostas').where('alunoId', '==', alunoId).get(),
+            db.collection('prova_questoes').get()
+        ]);
+
+        const respondidasSet = new Set();
+        respostasAlunoSnap.forEach(rDoc => {
+            const rd = rDoc.data();
+            if (rd.provaId) respondidasSet.add(rd.provaId);
+        });
+
+        const questoesByProva = new Map();
+        allQuestoesSnap.forEach(qDoc => {
+            const qData = qDoc.data();
+            if (!questoesByProva.has(qData.provaId)) {
+                questoesByProva.set(qData.provaId, []);
+            }
+            questoesByProva.get(qData.provaId).push({
+                id: qDoc.id,
+                texto: qData.texto,
+                tipo: qData.tipo,
+                opcoes: qData.opcoes || null,
+                valor: qData.valor
+            });
+        });
 
         const envioDocs = enviosSnap.docs.slice().sort((a, b) => {
             const ta = a.data().createdAt || '';
@@ -134,46 +157,25 @@ router.get('/disponiveis', authenticateToken, requireAluno, async (req, res) => 
             return tb.localeCompare(ta);
         });
 
+        const provaSnaps = await Promise.all(
+            envioDocs.map(envioDoc => db.collection('provas').doc(envioDoc.data().provaId).get())
+        );
+
         const provas = [];
-        for (const envioDoc of envioDocs) {
-            const envio = envioDoc.data();
-            const provaRef = db.collection('provas').doc(envio.provaId);
-            const provaSnap = await provaRef.get();
-            if (!provaSnap.exists) continue;
+        for (let i = 0; i < envioDocs.length; i++) {
+            const provaSnap = provaSnaps[i];
+            if (!provaSnap || !provaSnap.exists) continue;
 
             const data = provaSnap.data();
             const provaId = provaSnap.id;
-
-            // Verificar se aluno já respondeu
-            const respostasRef = db.collection('prova_respostas');
-            const respostaExistente = await respostasRef
-                .where('provaId', '==', provaId)
-                .where('alunoId', '==', alunoId)
-                .limit(1)
-                .get();
-
-            const questoesRef = db.collection('prova_questoes');
-            const questoesSnapshot = await questoesRef.where('provaId', '==', provaId).get();
-
-            const questoes = [];
-            questoesSnapshot.forEach(qDoc => {
-                const qData = qDoc.data();
-                questoes.push({
-                    id: qDoc.id,
-                    texto: qData.texto,
-                    tipo: qData.tipo,
-                    opcoes: qData.opcoes || null,
-                    valor: qData.valor
-                });
-            });
 
             provas.push({
                 id: provaId,
                 titulo: data.titulo,
                 imagem: data.imagem,
                 rubrica: data.rubrica,
-                questoes,
-                realizada: !respostaExistente.empty,
+                questoes: questoesByProva.get(provaId) || [],
+                realizada: respondidasSet.has(provaId),
                 createdAt: data.createdAt
             });
         }

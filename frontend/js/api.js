@@ -16,6 +16,10 @@ if (window.location.protocol === 'file:') {
   API_BASE = `${window.location.origin}/api`;
 }
 
+const API_CACHE_PREFIX = 'geo_api_cache_';
+const API_CACHE_TTL_MS = 45 * 1000; // 45 segundos no navegador
+const _inFlightGet = new Map();
+
 const api = {
   _getHeaders() {
     const token = localStorage.getItem('geo_token');
@@ -24,39 +28,98 @@ const api = {
     return headers;
   },
 
-  async _request(method, endpoint, body = null) {
-    const opts = {
-      method,
-      headers: this._getHeaders(),
-    };
-    if (body) opts.body = JSON.stringify(body);
-
-    let res;
+  clearCache() {
     try {
-      res = await fetch(`${API_BASE}${endpoint}`, opts);
-    } catch (e) {
-      console.error('Network error:', e);
-      throw new Error('Erro de conexão com o servidor. Verifique se o backend está rodando.');
-    }
-
-    if (res.status === 401) {
-      // Não redirecionar se estiver na página de login (evita loop)
-      const isLoginPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/';
-      if (!isLoginPage) {
-        localStorage.removeItem('geo_token');
-        localStorage.removeItem('geo_user');
-        window.location.href = '/index.html';
-        return;
+      const keysToRemove = [];
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const k = sessionStorage.key(i);
+        if (k && k.startsWith(API_CACHE_PREFIX)) keysToRemove.push(k);
       }
+      keysToRemove.forEach(k => sessionStorage.removeItem(k));
+    } catch (e) { /* ignore */ }
+    _inFlightGet.clear();
+  },
+
+  _getCached(endpoint) {
+    try {
+      const token = (localStorage.getItem('geo_token') || '').slice(-16);
+      const raw = sessionStorage.getItem(`${API_CACHE_PREFIX}${token}_${endpoint}`);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (Date.now() > parsed.expiresAt) {
+        sessionStorage.removeItem(`${API_CACHE_PREFIX}${token}_${endpoint}`);
+        return null;
+      }
+      return parsed.data;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  _setCached(endpoint, data) {
+    try {
+      const token = (localStorage.getItem('geo_token') || '').slice(-16);
+      sessionStorage.setItem(
+        `${API_CACHE_PREFIX}${token}_${endpoint}`,
+        JSON.stringify({ data, expiresAt: Date.now() + API_CACHE_TTL_MS })
+      );
+    } catch (e) { /* ignore quota errors */ }
+  },
+
+  async _request(method, endpoint, body = null) {
+    if (method === 'GET' && endpoint !== '/csrf-token') {
+      const cached = this._getCached(endpoint);
+      if (cached !== null) return cached;
+      if (_inFlightGet.has(endpoint)) return _inFlightGet.get(endpoint);
     }
 
-    const data = await res.json().catch(() => ({}));
+    const execPromise = (async () => {
+      const opts = {
+        method,
+        headers: this._getHeaders(),
+      };
+      if (body) opts.body = JSON.stringify(body);
 
-    if (!res.ok) {
-      throw new Error(data.error || `Erro ${res.status}`);
+      let res;
+      try {
+        res = await fetch(`${API_BASE}${endpoint}`, opts);
+      } catch (e) {
+        console.error('Network error:', e);
+        throw new Error('Erro de conexão com o servidor. Verifique se o backend está rodando.');
+      }
+
+      if (res.status === 401) {
+        const isLoginPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/';
+        if (!isLoginPage) {
+          localStorage.removeItem('geo_token');
+          localStorage.removeItem('geo_user');
+          this.clearCache();
+          window.location.href = '/index.html';
+          return;
+        }
+      }
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.error || `Erro ${res.status}`);
+      }
+
+      if (method === 'GET' && endpoint !== '/csrf-token') {
+        this._setCached(endpoint, data);
+      } else if (method !== 'GET') {
+        this.clearCache();
+      }
+
+      return data;
+    })();
+
+    if (method === 'GET' && endpoint !== '/csrf-token') {
+      _inFlightGet.set(endpoint, execPromise);
+      execPromise.finally(() => _inFlightGet.delete(endpoint));
     }
 
-    return data;
+    return execPromise;
   },
 
   get: (endpoint) => api._request('GET', endpoint),
@@ -77,6 +140,7 @@ const api = {
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || 'Erro no upload');
+    this.clearCache();
     return data;
   }
 };

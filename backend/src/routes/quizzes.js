@@ -16,36 +16,36 @@ async function getAlunoDocsByIds(alunoIds) {
 // GET - Listar todos os quizzes
 router.get('/', authenticateToken, async (req, res) => {
     try {
-        const quizzesRef = db.collection('quizzes');
-        const snapshot = await quizzesRef.get();
+        const [snapshot, allPerguntasSnap] = await Promise.all([
+            db.collection('quizzes').get(),
+            db.collection('quiz_perguntas').get()
+        ]);
 
-        const quizzes = [];
-        for (const doc of snapshot.docs) {
-            const data = doc.data();
-
-            const perguntasRef = db.collection('quiz_perguntas');
-            const perguntasSnapshot = await perguntasRef.where('quizId', '==', doc.id).get();
-
-            const perguntas = [];
-            perguntasSnapshot.forEach(pDoc => {
-                const pData = pDoc.data();
-                perguntas.push({
-                    id: pDoc.id,
-                    texto: pData.texto,
-                    opcoes: pData.opcoes,
-                    correta: pData.correta,
-                    valor: pData.valor
-                });
+        const perguntasByQuiz = new Map();
+        allPerguntasSnap.forEach(pDoc => {
+            const pData = pDoc.data();
+            if (!perguntasByQuiz.has(pData.quizId)) {
+                perguntasByQuiz.set(pData.quizId, []);
+            }
+            perguntasByQuiz.get(pData.quizId).push({
+                id: pDoc.id,
+                texto: pData.texto,
+                opcoes: pData.opcoes,
+                correta: pData.correta,
+                valor: pData.valor
             });
+        });
 
-            quizzes.push({
+        const quizzes = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
                 id: doc.id,
                 titulo: data.titulo,
                 imagem: data.imagem,
-                perguntas,
+                perguntas: perguntasByQuiz.get(doc.id) || [],
                 createdAt: data.createdAt
-            });
-        }
+            };
+        });
 
         res.json(quizzes);
     } catch (error) {
@@ -122,9 +122,31 @@ router.post('/enviar', authenticateToken, requireProfessor, async (req, res) => 
 router.get('/disponiveis', authenticateToken, requireAluno, async (req, res) => {
     try {
         const alunoId = req.user.id;
-        const enviosSnap = await db.collection('quizzes_enviados')
-            .where('alunoId', '==', alunoId)
-            .get();
+        const [enviosSnap, respostasAlunoSnap, allPerguntasSnap] = await Promise.all([
+            db.collection('quizzes_enviados').where('alunoId', '==', alunoId).get(),
+            db.collection('quiz_respostas').where('alunoId', '==', alunoId).get(),
+            db.collection('quiz_perguntas').get()
+        ]);
+
+        const respostasMap = new Map();
+        respostasAlunoSnap.forEach(rDoc => {
+            const rd = rDoc.data();
+            if (rd.quizId) respostasMap.set(rd.quizId, rd.pontuacao);
+        });
+
+        const perguntasByQuiz = new Map();
+        allPerguntasSnap.forEach(pDoc => {
+            const pData = pDoc.data();
+            if (!perguntasByQuiz.has(pData.quizId)) {
+                perguntasByQuiz.set(pData.quizId, []);
+            }
+            perguntasByQuiz.get(pData.quizId).push({
+                id: pDoc.id,
+                texto: pData.texto,
+                opcoes: pData.opcoes,
+                valor: pData.valor
+            });
+        });
 
         const envioDocs = enviosSnap.docs.slice().sort((a, b) => {
             const ta = a.data().createdAt || '';
@@ -132,44 +154,26 @@ router.get('/disponiveis', authenticateToken, requireAluno, async (req, res) => 
             return tb.localeCompare(ta);
         });
 
+        const quizSnaps = await Promise.all(
+            envioDocs.map(envioDoc => db.collection('quizzes').doc(envioDoc.data().quizId).get())
+        );
+
         const quizzes = [];
-        for (const envioDoc of envioDocs) {
-            const envio = envioDoc.data();
-            const quizRef = db.collection('quizzes').doc(envio.quizId);
-            const quizSnap = await quizRef.get();
-            if (!quizSnap.exists) continue;
+        for (let i = 0; i < envioDocs.length; i++) {
+            const envio = envioDocs[i].data();
+            const quizSnap = quizSnaps[i];
+            if (!quizSnap || !quizSnap.exists) continue;
 
             const quizData = quizSnap.data();
-
-            const respostasRef = db.collection('quiz_respostas');
-            const respostaExistente = await respostasRef
-                .where('quizId', '==', quizSnap.id)
-                .where('alunoId', '==', alunoId)
-                .limit(1)
-                .get();
-
-            const perguntasRef = db.collection('quiz_perguntas');
-            const perguntasSnapshot = await perguntasRef.where('quizId', '==', quizSnap.id).get();
-
-            const perguntas = [];
-            perguntasSnapshot.forEach(pDoc => {
-                const pData = pDoc.data();
-                perguntas.push({
-                    id: pDoc.id,
-                    texto: pData.texto,
-                    opcoes: pData.opcoes,
-                    valor: pData.valor
-                    // Não expõe 'correta' para o aluno
-                });
-            });
+            const realizado = respostasMap.has(quizSnap.id);
 
             quizzes.push({
                 id: quizSnap.id,
                 titulo: quizData.titulo,
                 imagem: quizData.imagem,
-                perguntas,
-                realizado: !respostaExistente.empty,
-                pontuacao: respostaExistente.empty ? null : respostaExistente.docs[0].data().pontuacao,
+                perguntas: perguntasByQuiz.get(quizSnap.id) || [],
+                realizado,
+                pontuacao: realizado ? respostasMap.get(quizSnap.id) : null,
                 dataLimite: envio.dataLimite || null
             });
         }

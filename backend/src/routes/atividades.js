@@ -138,22 +138,28 @@ router.get('/minhas', authenticateToken, requireAluno, async (req, res) => {
         }
 
 
+        const [atividadesArr, visualizacoesSnap] = await Promise.all([
+            Promise.all(
+                Array.from(envioDocsMap.values()).map(async (doc) => {
+                    const data = doc.data();
+                    const atividade = await db.collection('atividades').doc(data.atividadeId).get();
+                    if (!atividade.exists) return null;
+                    return { doc, data, atividadeData: atividade.data() };
+                })
+            ),
+            db.collection('visualizacoes_atividades').where('alunoId', '==', alunoId).get()
+        ]);
+
+        const visualizadosSet = new Set();
+        visualizacoesSnap.forEach(vDoc => {
+            const vd = vDoc.data();
+            if (vd.atividadeEnviadaId) visualizadosSet.add(vd.atividadeEnviadaId);
+        });
+
         const atividades = [];
-        for (const doc of envioDocsMap.values()) {
-            const data = doc.data();
-            const atividadeRef = db.collection('atividades').doc(data.atividadeId);
-            const atividade = await atividadeRef.get();
-
-            if (!atividade.exists) continue;
-
-            const atividadeData = atividade.data();
-            const visualizacoesRef = db.collection('visualizacoes_atividades');
-            const visualizacao = await visualizacoesRef
-                .where('atividadeEnviadaId', '==', doc.id)
-                .where('alunoId', '==', alunoId)
-                .limit(1)
-                .get();
-
+        for (const item of atividadesArr) {
+            if (!item) continue;
+            const { doc, data, atividadeData } = item;
             atividades.push({
                 id: doc.id,
                 atividadeId: data.atividadeId,
@@ -163,7 +169,7 @@ router.get('/minhas', authenticateToken, requireAluno, async (req, res) => {
                 link: atividadeData.link,
                 descricao: atividadeData.descricao,
                 dataLimite: data.dataLimite,
-                visualizado: !visualizacao.empty,
+                visualizado: visualizadosSet.has(doc.id),
                 createdAt: data.createdAt
             });
         }
