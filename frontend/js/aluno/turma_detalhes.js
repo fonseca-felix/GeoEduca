@@ -49,29 +49,39 @@ async function carregarRanking(salaId) {
         ranking.sort((a, b) => b.pontos - a.pontos);
         container.innerHTML = '';
 
+        const currentUser = Auth.getUser();
+
         ranking.forEach((r, i) => {
+            const borda = (r.voce && currentUser?.bordaAtual) ? currentUser.bordaAtual : r.bordaAtual;
+            const icone = (r.voce && currentUser?.iconeAtual) ? currentUser.iconeAtual : r.iconeAtual;
+            const titulo = (r.voce && currentUser?.tituloAtual) ? currentUser.tituloAtual : r.tituloAtual;
+
+            let bordaClass = 'r-avatar';
             let bordaStyle = '';
-            if (r.bordaAtual && r.bordaAtual !== 'transparent') {
-                bordaStyle = `border: 2px solid ${r.bordaAtual}; padding: 1px;`;
+            if (borda && borda !== 'transparent') {
+                if (borda.startsWith('anim-')) {
+                    bordaClass += ` ${borda}`;
+                } else {
+                    bordaStyle = `border: 3px solid ${borda}; box-shadow: 0 0 10px ${borda};`;
+                }
             }
             
             let tituloHtml = '';
-            if (r.tituloAtual) {
-                tituloHtml = `<span style="font-size:0.6rem; color:var(--navy-light); font-weight:800; text-transform:uppercase; display:block;">${r.tituloAtual}</span>`;
+            if (titulo) {
+                tituloHtml = `<span style="font-size:0.6rem; color:var(--navy-light); font-weight:800; text-transform:uppercase; display:block;">${titulo}</span>`;
             }
 
-            
             const initial = r.nome.charAt(0).toUpperCase();
-            const avatarContent = r.iconeAtual 
-                ? `<i class="${r.iconeAtual}"></i>` 
+            const avatarContent = icone 
+                ? `<i class="${icone}"></i>` 
                 : initial;
             
             const div = document.createElement('div');
             div.className = `ranking-item ${r.voce ? 'is-me' : ''}`;
             div.innerHTML = `
                 <div class="r-pos">#${i + 1}</div>
-                <div class="r-avatar" style="${bordaStyle}">
-                    <div style="width:100%; height:100%; border-radius:50%; background:var(--color-surface-2); display:flex; align-items:center; justify-content:center; color:var(--color-text-primary); font-size:14px;">${avatarContent}</div>
+                <div class="${bordaClass}" style="${bordaStyle}">
+                    ${avatarContent}
                 </div>
                 <div class="r-info">
                     <strong>${r.voce ? r.nome + ' (Você)' : r.nome}</strong>
