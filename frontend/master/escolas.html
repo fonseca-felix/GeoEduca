@@ -156,6 +156,8 @@
           <div class="example-box">Abcd1234@</div>
         </div>
 
+        <div id="add-feedback" style="display:none; padding:10px 14px; border-radius:8px; font-size:0.85rem; margin-bottom:14px; line-height:1.4;"></div>
+
         <div style="display:flex;gap:12px;justify-content:flex-end">
           <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-add').classList.remove('active')">Cancelar</button>
           <button type="submit" class="btn" id="btn-cadastrar" disabled>Cadastrar</button>
@@ -170,8 +172,36 @@
   <script src="../js/ui.js"></script>
   <script src="../js/sidebar.js"></script>
   <script>
+    function showFormFeedback(elId, message, isError = true) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      el.style.display = 'flex';
+      el.style.alignItems = 'center';
+      el.style.gap = '8px';
+      if (isError) {
+        el.style.background = 'rgba(239, 68, 68, 0.12)';
+        el.style.border = '1px solid rgba(239, 68, 68, 0.35)';
+        el.style.color = '#ef4444';
+        el.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>${message}</span>`;
+      } else {
+        el.style.background = 'rgba(16, 185, 129, 0.12)';
+        el.style.border = '1px solid rgba(16, 185, 129, 0.35)';
+        el.style.color = '#10b981';
+        el.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
+      }
+    }
+
+    function clearFormFeedback(elId) {
+      const el = document.getElementById(elId);
+      if (el) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+      }
+    }
+
     function openModalAdd() {
       document.getElementById('form-add').reset();
+      clearFormFeedback('add-feedback');
       validateEscolaPassword();
       document.getElementById('modal-add').classList.add('active');
     }
@@ -246,19 +276,34 @@
         e.preventDefault();
         if (!validateEscolaPassword()) return;
 
+        const btn = document.getElementById('btn-cadastrar');
         const nome = document.getElementById('escola-nome').value;
         const email = document.getElementById('escola-email').value;
         const senha = document.getElementById('escola-senha').value;
 
         try {
+          btn.disabled = true;
+          btn.textContent = 'Salvando...';
+          clearFormFeedback('add-feedback');
+
           await api.post('/master/escola', { nome, email, senha });
-          alert('Escola cadastrada com sucesso!');
-          document.getElementById('modal-add').classList.remove('active');
-          document.getElementById('form-add').reset();
-          validateEscolaPassword();
-          loadEscolas();
+          showFormFeedback('add-feedback', 'Escola cadastrada com sucesso!', false);
+          Toast.success('Sucesso', 'Escola cadastrada com sucesso!');
+
+          setTimeout(() => {
+            document.getElementById('modal-add').classList.remove('active');
+            document.getElementById('form-add').reset();
+            clearFormFeedback('add-feedback');
+            validateEscolaPassword();
+            loadEscolas();
+          }, 800);
         } catch (err) {
-          alert(err.message || 'Erro ao cadastrar escola');
+          const msg = err.message || 'Erro ao cadastrar escola';
+          showFormFeedback('add-feedback', msg, true);
+          Toast.error('Erro no cadastro', msg);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Cadastrar';
         }
       });
     });
@@ -297,9 +342,10 @@
       if (!confirm(`Deseja realmente remover a escola "${nome}"?`)) return;
       try {
         await api.delete(`/master/escola/${id}`);
+        Toast.success('Escola removida', `"${nome}" foi excluída com sucesso.`);
         loadEscolas();
       } catch (err) {
-        alert(err.message || 'Erro ao excluir escola');
+        Toast.error('Erro ao excluir escola', err.message || 'Não foi possível remover a escola');
       }
     }
   </script>

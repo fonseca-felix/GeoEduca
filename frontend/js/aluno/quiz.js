@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.disabled = false;
           btn.textContent = 'Enviar respostas';
           if (window.Toast) window.Toast.error('Erro ao enviar', err.message || 'Tente novamente.');
-          else alert(err.message || 'Tente novamente.');
+          else console.error('Erro ao enviar quiz:', err);
         }
       };
     }

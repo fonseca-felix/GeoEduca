@@ -246,8 +246,8 @@
         video.srcObject = videoStream;
         cameraContainer.style.display = 'flex';
       } catch (err) {
-        if(window.Toast) Toast.error('Não foi possível acessar a câmera: ' + err.message);
-        else alert('Não foi possível acessar a câmera: ' + err.message);
+        if (window.Toast) Toast.error('Erro na câmera', 'Não foi possível acessar a câmera: ' + err.message);
+        else console.error('Não foi possível acessar a câmera:', err);
       }
     }
 

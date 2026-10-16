@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         btn.disabled = false;
         if (window.Toast) window.Toast.error('Erro', err.message || 'Tente novamente.');
-        else alert(err.message || 'Tente novamente.');
+        else console.error(err.message || 'Tente novamente.');
       }
     };
     document.getElementById('activity-modal')?.classList.add('active');

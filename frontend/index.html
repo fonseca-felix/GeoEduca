@@ -264,6 +264,7 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
           </div>
         </label>
         <p id="first-login-error" style="color:#ef4444;font-size:.85rem;margin:10px 0 0;display:none"></p>
+        <p id="first-login-success" style="color:#10b981;font-size:.85rem;margin:10px 0 0;display:none"></p>
         <div style="display:flex;gap:10px;margin-top:18px;">
           <button type="button" id="btn-resend-verify" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--foreground);cursor:pointer;font-weight:600;">Reenviar Código</button>
           <button type="submit" class="submit gold-glow" id="btn-confirm-verify" style="flex:1;margin:0;">Confirmar e Entrar</button>
@@ -339,6 +340,7 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
 
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
 <script>
 (function () {
   /* ---- globo controlado pelo scroll ---- */
@@ -570,7 +572,14 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
       btn.disabled = true;
       btn.textContent = 'Enviando...';
       var res = await api.post('/auth/resend-verification', { identificador: pendingFirstLogin.identificador });
-      alert(res.message || 'Novo código enviado para o seu Gmail!');
+      var successEl = document.getElementById('first-login-success');
+      if (successEl) {
+        successEl.textContent = res.message || 'Novo código enviado para o seu Gmail!';
+        successEl.style.display = 'block';
+      }
+      if (typeof Toast !== 'undefined') {
+        Toast.success('Código Reenviado', res.message || 'Novo código enviado para o seu Gmail!');
+      }
     } catch (err) {
       errEl.textContent = err.message || 'Erro ao reenviar código.';
       errEl.style.display = 'block';
@@ -725,10 +734,13 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
       btnConfirmReset.disabled = true;
       btnConfirmReset.textContent = 'Salvando...';
       var res = await api.post('/auth/reset-password', { email: email, codigo: codigo, novaSenha: novaSenha });
-      alert(res.message || 'Senha alterada com sucesso!');
+      if (typeof Toast !== 'undefined') {
+        Toast.success('Senha Alterada', res.message || 'Senha alterada com sucesso! Você já pode entrar.');
+      }
       forgotModal.classList.remove('active');
       loginInput.value = email;
       pwd.value = '';
+      pwd.focus();
     } catch (err) {
       errEl.textContent = err.message || 'Erro ao redefinir senha.';
       errEl.style.display = 'block';

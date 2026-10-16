@@ -19,6 +19,73 @@ const Toast = {
   container: null,
 
   _init() {
+    if (!document.getElementById('geo-toast-styles')) {
+      const style = document.createElement('style');
+      style.id = 'geo-toast-styles';
+      style.textContent = `
+        .toast-container {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          z-index: 99999;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          pointer-events: none;
+        }
+        .toast {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          background: #0f172a;
+          color: #f8fafc;
+          padding: 14px 18px;
+          border-radius: 12px;
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+          min-width: 280px;
+          max-width: 400px;
+          transform: translateX(120%);
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+          pointer-events: all;
+          border: 1px solid #334155;
+          border-left: 4px solid #cca43b;
+        }
+        .toast.show {
+          transform: translateX(0);
+        }
+        .toast.success { border-left-color: #10b981; }
+        .toast.error { border-left-color: #ef4444; }
+        .toast.warning { border-left-color: #f59e0b; }
+        .toast.info { border-left-color: #3b82f6; }
+        .toast-icon {
+          width: 20px;
+          height: 20px;
+          flex-shrink: 0;
+          margin-top: 2px;
+        }
+        .toast-icon svg {
+          width: 20px;
+          height: 20px;
+        }
+        .toast.success .toast-icon { color: #10b981; }
+        .toast.error .toast-icon { color: #ef4444; }
+        .toast.warning .toast-icon { color: #f59e0b; }
+        .toast.info .toast-icon { color: #3b82f6; }
+        .toast-content { flex: 1; }
+        .toast-title {
+          font-weight: 600;
+          font-size: 14px;
+          margin-bottom: 2px;
+          color: #f8fafc;
+        }
+        .toast-message {
+          font-size: 12px;
+          color: #94a3b8;
+          line-height: 1.4;
+        }
+      `;
+      document.head.appendChild(style);
+    }
     if (!this.container) {
       this.container = document.createElement('div');
       this.container.className = 'toast-container';
@@ -57,6 +124,23 @@ const Toast = {
   success: (title, msg) => Toast.show(title, msg, 'success'),
   error: (title, msg) => Toast.show(title, msg, 'error'),
   warning: (title, msg) => Toast.show(title, msg, 'warning'),
+  info: (title, msg) => Toast.show(title, msg, 'info'),
+};
+
+// Remove qualquer popup nativo do navegador transformando em Toast moderno do GeoEduca
+window.alert = function(msg) {
+  if (typeof Toast !== 'undefined' && Toast.show) {
+    const text = String(msg || '');
+    if (text.toLowerCase().includes('erro') || text.toLowerCase().includes('falha') || text.toLowerCase().includes('inválid') || text.toLowerCase().includes('não foi')) {
+      Toast.error('Atenção', text);
+    } else if (text.toLowerCase().includes('sucesso') || text.toLowerCase().includes('salvo') || text.toLowerCase().includes('cadastrad') || text.toLowerCase().includes('enviad')) {
+      Toast.success('Sucesso', text);
+    } else {
+      Toast.info('GeoEduca', text);
+    }
+  } else {
+    console.log('[Alert interceptado]:', msg);
+  }
 };
 
 /* ---- Modal ---- */

@@ -155,6 +155,8 @@
           <div class="example-box">Abcd1234@</div>
         </div>
 
+        <div id="add-feedback" style="display:none; padding:10px 14px; border-radius:8px; font-size:0.85rem; margin-bottom:14px; line-height:1.4;"></div>
+
         <div style="display:flex;gap:12px;justify-content:flex-end">
           <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-add').classList.remove('active')">Cancelar</button>
           <button type="submit" class="btn" id="btn-cadastrar" disabled>Cadastrar & Enviar Código</button>
@@ -176,6 +178,9 @@
           <label for="gmail-prof-input">Endereço Gmail (@gmail.com)</label>
           <input type="email" id="gmail-prof-input" placeholder="professora@gmail.com" required>
         </div>
+
+        <div id="gmail-feedback" style="display:none; padding:10px 14px; border-radius:8px; font-size:0.85rem; margin-bottom:14px; line-height:1.4;"></div>
+
         <div style="display:flex;gap:12px;justify-content:flex-end">
           <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-gmail').classList.remove('active')">Cancelar</button>
           <button type="submit" class="btn" id="btn-salvar-gmail">Salvar & Enviar Código</button>
@@ -190,8 +195,36 @@
   <script src="../js/ui.js"></script>
   <script src="../js/sidebar.js"></script>
   <script>
+    function showFormFeedback(elId, message, isError = true) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      el.style.display = 'flex';
+      el.style.alignItems = 'center';
+      el.style.gap = '8px';
+      if (isError) {
+        el.style.background = 'rgba(239, 68, 68, 0.12)';
+        el.style.border = '1px solid rgba(239, 68, 68, 0.35)';
+        el.style.color = '#ef4444';
+        el.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>${message}</span>`;
+      } else {
+        el.style.background = 'rgba(16, 185, 129, 0.12)';
+        el.style.border = '1px solid rgba(16, 185, 129, 0.35)';
+        el.style.color = '#10b981';
+        el.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
+      }
+    }
+
+    function clearFormFeedback(elId) {
+      const el = document.getElementById(elId);
+      if (el) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+      }
+    }
+
     function openModalAddProf() {
       document.getElementById('form-add').reset();
+      clearFormFeedback('add-feedback');
       validateProfPassword();
       document.getElementById('modal-add').classList.add('active');
     }
@@ -201,6 +234,7 @@
       document.getElementById('gmail-prof-id').value = id;
       document.getElementById('gmail-prof-nome').textContent = nome;
       document.getElementById('gmail-prof-input').value = emailAtual || '';
+      clearFormFeedback('gmail-feedback');
       document.getElementById('modal-gmail').classList.add('active');
     }
 
@@ -291,14 +325,23 @@
         try {
           btn.disabled = true;
           btn.textContent = 'Enviando...';
+          clearFormFeedback('add-feedback');
+
           const res = await api.post('/escola/professor', { nome, email, senha });
-          alert(res.message || 'Professor cadastrado com sucesso!');
-          document.getElementById('modal-add').classList.remove('active');
-          document.getElementById('form-add').reset();
-          validateProfPassword();
-          loadProfessores();
+          showFormFeedback('add-feedback', res.message || 'Professor cadastrado com sucesso!', false);
+          Toast.success('Professor cadastrado', res.message || 'Credenciais enviadas com sucesso!');
+
+          setTimeout(() => {
+            document.getElementById('modal-add').classList.remove('active');
+            document.getElementById('form-add').reset();
+            clearFormFeedback('add-feedback');
+            validateProfPassword();
+            loadProfessores();
+          }, 900);
         } catch (err) {
-          alert(err.message || 'Erro ao cadastrar');
+          const msg = err.message || 'Erro ao cadastrar';
+          showFormFeedback('add-feedback', msg, true);
+          Toast.error('Erro no cadastro', msg);
         } finally {
           btn.textContent = 'Cadastrar & Enviar Código';
           validateProfPassword();
@@ -312,19 +355,29 @@
         const btn = document.getElementById('btn-salvar-gmail');
 
         if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(emailRecuperacao)) {
-          alert('Informe um endereço @gmail.com válido.');
+          showFormFeedback('gmail-feedback', 'Informe um endereço @gmail.com válido.', true);
+          Toast.warning('Email inválido', 'Informe um endereço @gmail.com válido.');
           return;
         }
 
         try {
           btn.disabled = true;
           btn.textContent = 'Salvando...';
+          clearFormFeedback('gmail-feedback');
+
           const res = await api.put(`/escola/professores/${id}/email`, { emailRecuperacao });
-          alert(res.message || 'Gmail atualizado com sucesso!');
-          document.getElementById('modal-gmail').classList.remove('active');
-          loadProfessores();
+          showFormFeedback('gmail-feedback', res.message || 'Gmail atualizado com sucesso!', false);
+          Toast.success('Gmail salvo', res.message || 'Gmail atualizado com sucesso!');
+
+          setTimeout(() => {
+            document.getElementById('modal-gmail').classList.remove('active');
+            clearFormFeedback('gmail-feedback');
+            loadProfessores();
+          }, 900);
         } catch (err) {
-          alert(err.message || 'Erro ao salvar Gmail');
+          const msg = err.message || 'Erro ao salvar Gmail';
+          showFormFeedback('gmail-feedback', msg, true);
+          Toast.error('Erro ao salvar', msg);
         } finally {
           btn.disabled = false;
           btn.textContent = 'Salvar & Enviar Código';

@@ -41,10 +41,14 @@
     .list-container { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 32px;}
     .list-item { padding: 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .list-item:last-child { border-bottom: none; }
-    
-    
-    
-    
+
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
+    .modal.active { display: flex; }
+    .modal-content { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 100%; max-width: 480px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 0.875rem; color: var(--muted-foreground); margin-bottom: 6px; }
+    .field input { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--foreground); font-family: inherit; font-size: 0.9rem; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; background: var(--primary); color: var(--primary-foreground); border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -79,12 +83,62 @@
     </main>
   </div>
 
+  <!-- Modal Vincular/Alterar Gmail de Recuperação -->
+  <div class="modal" id="modal-gmail">
+    <div class="modal-content">
+      <h2 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:8px;">Gmail de Recuperação</h2>
+      <p style="font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 16px;">
+        Defina ou atualize o endereço <strong>@gmail.com</strong> do professor para envio de códigos de recuperação e validação de acesso.
+      </p>
+      <form id="form-gmail" autocomplete="off">
+        <div class="field">
+          <label for="gmail-prof-input">Endereço Gmail (@gmail.com)</label>
+          <input type="email" id="gmail-prof-input" placeholder="professor@gmail.com" required>
+        </div>
+
+        <div id="details-gmail-feedback" style="display:none; padding:10px 14px; border-radius:8px; font-size:0.85rem; margin-bottom:14px; line-height:1.4;"></div>
+
+        <div style="display:flex;gap:12px;justify-content:flex-end">
+          <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-gmail').classList.remove('active')">Cancelar</button>
+          <button type="submit" class="btn" id="btn-salvar-gmail">Salvar & Enviar Código</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="../js/api.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/theme.js"></script>
   <script src="../js/ui.js"></script>
   <script src="../js/sidebar.js"></script>
   <script>
+    function showFormFeedback(elId, message, isError = true) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      el.style.display = 'flex';
+      el.style.alignItems = 'center';
+      el.style.gap = '8px';
+      if (isError) {
+        el.style.background = 'rgba(239, 68, 68, 0.12)';
+        el.style.border = '1px solid rgba(239, 68, 68, 0.35)';
+        el.style.color = '#ef4444';
+        el.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>${message}</span>`;
+      } else {
+        el.style.background = 'rgba(16, 185, 129, 0.12)';
+        el.style.border = '1px solid rgba(16, 185, 129, 0.35)';
+        el.style.color = '#10b981';
+        el.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
+      }
+    }
+
+    function clearFormFeedback(elId) {
+      const el = document.getElementById(elId);
+      if (el) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       if (typeof Theme !== 'undefined' && Theme.init) Theme.init();
       const user = Auth.requireAuth('escola');
@@ -101,8 +155,8 @@
       const profId = urlParams.get('id');
 
       if (!profId) {
-        alert('ID do professor não fornecido');
-        window.location.href = 'professores.html';
+        if (typeof Toast !== 'undefined') Toast.error('Atenção', 'ID do professor não fornecido');
+        setTimeout(() => { window.location.href = 'professores.html'; }, 1000);
         return;
       }
 
@@ -117,28 +171,54 @@
         
         const gmailSpan = document.createElement('p');
         gmailSpan.style.cssText = 'color: var(--muted-foreground); font-size: 0.9rem; margin-top: -24px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;';
-        const gmail = data.emailRecuperacao || (data.email && data.email.endsWith('@gmail.com') ? data.email : '');
+        let currentGmail = data.emailRecuperacao || (data.email && data.email.endsWith('@gmail.com') ? data.email : '');
         gmailSpan.innerHTML = `
-          <span>Gmail de Recuperação: <strong style="color:var(--foreground)">${gmail || 'Não vinculado'}</strong></span>
+          <span>Gmail de Recuperação: <strong id="current-gmail-text" style="color:var(--foreground)">${currentGmail || 'Não vinculado'}</strong></span>
           <button class="btn" id="btn-edit-gmail" style="padding:4px 10px;font-size:0.75rem;background:var(--secondary);color:var(--foreground);border:1px solid var(--border);cursor:pointer;border-radius:6px;">
-            ${gmail ? 'Alterar Gmail' : 'Vincular Gmail'}
+            ${currentGmail ? 'Alterar Gmail' : 'Vincular Gmail'}
           </button>
         `;
         document.getElementById('prof-email').after(gmailSpan);
 
-        document.getElementById('btn-edit-gmail').addEventListener('click', async () => {
-          const novo = prompt('Informe o e-mail @gmail.com de recuperação para este professor:', gmail || '');
-          if (!novo) return;
-          if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(novo.trim())) {
-            alert('Por favor, informe um endereço válido @gmail.com');
+        document.getElementById('btn-edit-gmail').addEventListener('click', () => {
+          document.getElementById('gmail-prof-input').value = currentGmail || '';
+          clearFormFeedback('details-gmail-feedback');
+          document.getElementById('modal-gmail').classList.add('active');
+        });
+
+        document.getElementById('form-gmail').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const novo = document.getElementById('gmail-prof-input').value.trim();
+          const btn = document.getElementById('btn-salvar-gmail');
+
+          if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(novo)) {
+            showFormFeedback('details-gmail-feedback', 'Por favor, informe um endereço válido @gmail.com', true);
+            Toast.warning('Email inválido', 'Informe um endereço válido @gmail.com');
             return;
           }
+
           try {
-            const res = await api.put('/escola/professores/' + profId + '/email', { emailRecuperacao: novo.trim() });
-            alert(res.message || 'Gmail de recuperação salvo com sucesso!');
-            window.location.reload();
-          } catch(e) {
-            alert(e.message || 'Erro ao salvar Gmail');
+            btn.disabled = true;
+            btn.textContent = 'Salvando...';
+            clearFormFeedback('details-gmail-feedback');
+
+            const res = await api.put('/escola/professores/' + profId + '/email', { emailRecuperacao: novo });
+            showFormFeedback('details-gmail-feedback', res.message || 'Gmail salvo com sucesso!', false);
+            Toast.success('Gmail salvo', res.message || 'Gmail de recuperação salvo com sucesso!');
+            currentGmail = novo;
+            document.getElementById('current-gmail-text').textContent = novo;
+
+            setTimeout(() => {
+              document.getElementById('modal-gmail').classList.remove('active');
+              clearFormFeedback('details-gmail-feedback');
+            }, 800);
+          } catch(err) {
+            const msg = err.message || 'Erro ao salvar Gmail';
+            showFormFeedback('details-gmail-feedback', msg, true);
+            Toast.error('Erro ao salvar', msg);
+          } finally {
+            btn.disabled = false;
+            btn.textContent = 'Salvar & Enviar Código';
           }
         });
 
@@ -159,7 +239,7 @@
         }
         
       } catch (err) {
-        alert(err.message || 'Erro ao carregar detalhes');
+        Toast.error('Erro ao carregar detalhes', err.message || 'Falha ao conectar com o servidor');
       }
     });
   </script>

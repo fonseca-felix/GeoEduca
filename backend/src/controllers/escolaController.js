@@ -71,8 +71,8 @@ const escolaController = {
         emailSent: !!emailResult.sent,
         codigoSimulado: emailResult.simulated ? codigoVerificacao : undefined,
         message: emailResult.sent
-          ? `Professor cadastrado! Credenciais e código enviados para ${cleanEmail}.`
-          : `Professor cadastrado! (Aviso: configure EMAIL_USER e EMAIL_PASS no servidor para envio automático ao Gmail. Código gerado: ${codigoVerificacao})`
+          ? `Professor cadastrado com sucesso! Credenciais e código enviados para ${cleanEmail}.`
+          : `Professor cadastrado com sucesso! Código de acesso gerado: ${codigoVerificacao}.`
       });
     } catch (error) {
       console.error('Erro ao criar professor:', error);

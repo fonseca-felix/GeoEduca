@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const salaId = params.get('id');
 
     if (!salaId) {
-        alert('Turma não informada.');
-        window.location.href = 'turmas.html';
+        if (window.Toast) window.Toast.error('Atenção', 'Turma não informada.');
+        setTimeout(() => { window.location.href = 'turmas.html'; }, 1000);
         return;
     }
 

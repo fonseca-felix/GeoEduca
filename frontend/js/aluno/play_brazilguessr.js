@@ -221,8 +221,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.mostrarRegiaoDoDia = function() {
         if (partidasRestantes <= 0) {
-            alert('Você já atingiu o limite diário de partidas!');
-            window.location.href = 'hub_brazilguessr.html';
+            if (window.Toast) window.Toast.warning('Limite diário atingido', 'Você já atingiu o limite diário de partidas!');
+            setTimeout(() => { window.location.href = 'hub_brazilguessr.html'; }, 1200);
             return;
         }
 

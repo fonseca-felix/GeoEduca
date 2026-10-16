@@ -64,9 +64,12 @@
 
   <script src="../js/api.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/ui.js"></script>
   <script src="../js/sidebar.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
+      if (typeof Theme !== 'undefined' && Theme.init) Theme.init();
       const user = Auth.requireAuth('escola');
       if (!user) return;
 
@@ -74,9 +77,9 @@
       document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildEscolaSidebar());
       document.getElementById('escola-nome').textContent = user.nome;
 
-      // Theme toggle (if sidebar handles it)
+      // Theme toggle
       const themeBtn = document.querySelector('[data-action="toggle-theme"]');
-      if(themeBtn) themeBtn.addEventListener('click', () => alert('Tema'));
+      if(themeBtn) themeBtn.addEventListener('click', () => Theme.toggle());
       const logoutBtn = document.querySelector('[data-action="logout"]');
       if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
 
