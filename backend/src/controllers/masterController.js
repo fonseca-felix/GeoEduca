@@ -11,6 +11,12 @@ const masterController = {
         return res.status(400).json({ error: 'Nome, email e senha são obrigatórios' });
       }
 
+      if (senha.length < 8 || senha.length > 20 || !/[A-Z]/.test(senha) || !/[!@#$%^&*(),.?":{}|<>\-+=_]/.test(senha)) {
+        return res.status(400).json({
+          error: 'A senha deve ter entre 8 e 20 caracteres, pelo menos 1 letra maiúscula e 1 caractere especial.'
+        });
+      }
+
       const escolaSnap = await db.collection('escolas').where('email', '==', email).limit(1).get();
       if (!escolaSnap.empty) {
         return res.status(400).json({ error: 'Email já cadastrado para outra escola' });

@@ -12,6 +12,12 @@ const escolaController = {
         return res.status(400).json({ error: 'Nome, email e senha são obrigatórios' });
       }
 
+      if (senha.length < 8 || senha.length > 20 || !/[A-Z]/.test(senha) || !/[!@#$%^&*(),.?":{}|<>\-+=_]/.test(senha)) {
+        return res.status(400).json({
+          error: 'A senha deve ter entre 8 e 20 caracteres, pelo menos 1 letra maiúscula e 1 caractere especial.'
+        });
+      }
+
       // Check if email already exists
       const profSnap = await db.collection('professores').where('email', '==', email).limit(1).get();
       if (!profSnap.empty) {

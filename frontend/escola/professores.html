@@ -5,10 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Professores da Escola | GeoEduca</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
   <link href="../css/tokens.css" rel="stylesheet" />
   <link href="../css/sidebar.css" rel="stylesheet" />
   <style>
     :root {
+      --background: oklch(0.98 0.01 275);
+      --foreground: oklch(0.16 0.045 275);
+      --card: oklch(1 0 0);
+      --primary: oklch(0.82 0.14 88);
+      --primary-foreground: oklch(1 0 0);
+      --secondary: oklch(0.95 0.02 273);
+      --muted-foreground: oklch(0.5 0.025 265);
+      --border: oklch(0 0 0 / 12%);
+      --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+      --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    }
+
+    :root[data-theme="dark"] {
       --background: oklch(0.16 0.045 275);
       --foreground: oklch(0.97 0.005 260);
       --card: oklch(0.21 0.048 274);
@@ -17,36 +31,77 @@
       --secondary: oklch(0.26 0.05 273);
       --muted-foreground: oklch(0.72 0.025 265);
       --border: oklch(1 0 0 / 12%);
-      --input: oklch(1 0 0 / 10%);
-      --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-      --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
     .layout { display: flex; min-height: 100vh; }
-    .main-content { flex: 1; margin-left: 260px; padding: 40px; }
+    .main-content { flex: 1; margin-left: var(--sidebar-width, 260px); padding: 40px; transition: margin-left var(--transition-slow, 0.3s ease); }
+    .sidebar.collapsed ~ .main-content { margin-left: var(--sidebar-width-collapsed, 72px); }
+    @media (max-width: 900px) {
+      .main-content, .sidebar.collapsed ~ .main-content { margin-left: 0; padding: 24px 16px; padding-top: 72px; }
+    }
     
     h1 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 24px; }
     
     .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .btn { background: var(--primary); color: var(--primary-foreground); padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    .btn { background: var(--primary); color: var(--primary-foreground); padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     
     .prof-list { display: grid; gap: 16px; }
     .prof-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;}
     .prof-card:hover { border-color: var(--primary); }
     
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
     .modal.active { display: flex; }
-    .modal-content { background: var(--background); border: 1px solid var(--border); padding: 32px; border-radius: 12px; width: 100%; max-width: 400px; }
+    .modal-content { background: var(--card); border: 1px solid var(--border); padding: 32px; border-radius: 12px; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; }
     .modal h2 { font-family: var(--font-display); margin-bottom: 16px; }
     
     .field { margin-bottom: 16px; }
-    .field label { display: block; font-size: 0.875rem; margin-bottom: 8px; color: var(--muted-foreground); }
-    .field input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--input); color: white; }
-    
-    
-    
-    
+    .field label { display: block; font-size: 0.875rem; margin-bottom: 8px; color: var(--muted-foreground); font-weight: 500; }
+    .field input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--secondary); color: var(--foreground); font-family: var(--font-sans); }
+    .field input:focus { outline: 2px solid var(--primary); border-color: transparent; }
+
+    .input-with-icon { position: relative; display: flex; align-items: center; }
+    .input-with-icon input { padding-right: 40px; }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .toggle-password:hover { color: var(--foreground); }
+
+    .password-rules {
+      background: var(--secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 8px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+    }
+    .password-rules h4 { margin-bottom: 8px; font-weight: 600; color: var(--foreground); }
+    .password-rules ul { list-style: none; padding: 0; margin: 0 0 12px 0; color: var(--muted-foreground); }
+    .password-rules li { margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+    .password-rules li i { font-size: 13px; }
+    .rule-pass { color: #10b981; }
+    .rule-fail { color: var(--muted-foreground); }
+    .example-box {
+      background: rgba(204, 164, 59, 0.12);
+      border: 1px solid rgba(204, 164, 59, 0.35);
+      border-radius: 6px;
+      padding: 7px 12px;
+      color: var(--primary);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -55,7 +110,7 @@
     <main class="main-content">
       <div class="header-actions">
         <h1>Professores</h1>
-        <button class="btn" onclick="document.getElementById('modal-add').classList.add('active')">+ Novo Professor</button>
+        <button class="btn" onclick="openModalAddProf()">+ Novo Professor</button>
       </div>
       
       <div class="prof-list" id="prof-list">
@@ -68,22 +123,37 @@
   <div class="modal" id="modal-add">
     <div class="modal-content">
       <h2>Cadastrar Professor</h2>
-      <form id="form-add">
+      <form id="form-add" autocomplete="off">
         <div class="field">
-          <label>Nome</label>
-          <input type="text" id="prof-nome" required>
+          <label for="prof-nome">Nome</label>
+          <input type="text" id="prof-nome" placeholder="Nome completo" autocomplete="off" required>
         </div>
         <div class="field">
-          <label>Email</label>
-          <input type="email" id="prof-email" required>
+          <label for="prof-email">Email</label>
+          <input type="email" id="prof-email" placeholder="professor@escola.com.br" autocomplete="new-password" required>
         </div>
         <div class="field">
-          <label>Senha</label>
-          <input type="password" id="prof-senha" required>
+          <label for="prof-senha">Senha</label>
+          <div class="input-with-icon">
+            <input type="password" id="prof-senha" placeholder="Digite a senha" maxlength="20" autocomplete="new-password" required>
+            <button type="button" class="toggle-password" onclick="toggleVisibility('prof-senha', this)" aria-label="Mostrar senha"><i class="fa-regular fa-eye"></i></button>
+          </div>
         </div>
+
+        <div class="password-rules">
+          <h4>Critérios da Senha:</h4>
+          <ul>
+            <li id="rule-length"><i class="fa-solid fa-circle-xmark rule-fail"></i> Mínimo de 8 e máximo de 20 caracteres</li>
+            <li id="rule-upper"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 letra maiúscula</li>
+            <li id="rule-special"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)</li>
+          </ul>
+          <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 4px;">Exemplo de senha aceita:</div>
+          <div class="example-box">Abcd1234@</div>
+        </div>
+
         <div style="display:flex;gap:12px;justify-content:flex-end">
           <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-add').classList.remove('active')">Cancelar</button>
-          <button type="submit" class="btn">Cadastrar</button>
+          <button type="submit" class="btn" id="btn-cadastrar" disabled>Cadastrar</button>
         </div>
       </form>
     </div>
@@ -91,20 +161,85 @@
 
   <script src="../js/api.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/ui.js"></script>
   <script src="../js/sidebar.js"></script>
   <script>
+    function openModalAddProf() {
+      document.getElementById('form-add').reset();
+      validateProfPassword();
+      document.getElementById('modal-add').classList.add('active');
+    }
+
+    window.toggleVisibility = function(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    };
+
+    function validateProfPassword() {
+      const pass = document.getElementById('prof-senha').value;
+      const ruleLength = document.getElementById('rule-length');
+      const ruleUpper = document.getElementById('rule-upper');
+      const ruleSpecial = document.getElementById('rule-special');
+      const btnCadastrar = document.getElementById('btn-cadastrar');
+
+      let isValid = true;
+
+      if (pass.length >= 8 && pass.length <= 20) {
+        ruleLength.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Mínimo de 8 e máximo de 20 caracteres';
+      } else {
+        ruleLength.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Mínimo de 8 e máximo de 20 caracteres';
+        isValid = false;
+      }
+
+      if (/[A-Z]/.test(pass)) {
+        ruleUpper.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 letra maiúscula';
+      } else {
+        ruleUpper.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 letra maiúscula';
+        isValid = false;
+      }
+
+      if (/[!@#$%^&*(),.?":{}|<>\-+=_]/.test(pass)) {
+        ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 caractere especial (!@#$%)';
+      } else {
+        ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)';
+        isValid = false;
+      }
+
+      if (pass === '') isValid = false;
+      btnCadastrar.disabled = !isValid;
+      return isValid;
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      if (typeof Theme !== 'undefined' && Theme.init) Theme.init();
       const user = Auth.requireAuth('escola');
       if (!user) return;
-      document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildEscolaSidebar());
+      document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildEscolaSidebar('../'));
+      if (typeof Sidebar !== 'undefined' && Sidebar.init) Sidebar.init();
       
+      const themeBtn = document.querySelector('[data-action="toggle-theme"]');
+      if(themeBtn) themeBtn.addEventListener('click', () => Theme.toggle());
       const logoutBtn = document.querySelector('[data-action="logout"]');
       if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
 
       loadProfessores();
 
+      document.getElementById('prof-senha').addEventListener('input', validateProfPassword);
+
       document.getElementById('form-add').addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (!validateProfPassword()) return;
+
         const nome = document.getElementById('prof-nome').value;
         const email = document.getElementById('prof-email').value;
         const senha = document.getElementById('prof-senha').value;
@@ -114,6 +249,7 @@
           alert('Professor cadastrado com sucesso!');
           document.getElementById('modal-add').classList.remove('active');
           document.getElementById('form-add').reset();
+          validateProfPassword();
           loadProfessores();
         } catch (err) {
           alert(err.message || 'Erro ao cadastrar');
