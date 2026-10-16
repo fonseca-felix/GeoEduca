@@ -1,19 +1,20 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { db } = require('../../firebase/firebase-admin');
+const { sendProfessorWelcomeEmail, sendPasswordResetCodeEmail } = require('../services/emailService');
 
 // Nova função unificada de Login
 const login = async (req, res) => {
     try {
-        const { identificador, senha, 'g-recaptcha-response': recaptchaResponse } = req.body; // identificador pode ser email ou rm
+        const { identificador, senha, codigoVerificacao, 'g-recaptcha-response': recaptchaResponse } = req.body;
 
         if (!identificador || !senha) {
             return res.status(400).json({ error: 'Identificador e senha são obrigatórios' });
         }
 
-        // Verify reCAPTCHA if secret is set
+        // Verify reCAPTCHA if secret is set (skip on 2nd step when codigoVerificacao is being submitted)
         const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
-        if (recaptchaSecret) {
+        if (recaptchaSecret && !codigoVerificacao) {
             if (!recaptchaResponse) {
                 return res.status(400).json({ error: 'Validação de reCAPTCHA é obrigatória' });
             }
@@ -84,22 +85,51 @@ const login = async (req, res) => {
             });
         }
 
-        // 3. Tentar na coleção professores
-        const profSnap = await db.collection('professores').where('email', '==', identificador).limit(1).get();
-        if (!profSnap.empty) {
-            const prof = profSnap.docs[0];
-            const profData = prof.data();
+        // 3. Tentar na coleção professores (por email exato ou case-insensitive / emailRecuperacao)
+        const allProfsSnap = await db.collection('professores').get();
+        const identLower = identificador.trim().toLowerCase();
+        const profDoc = allProfsSnap.docs.find(d => {
+            const data = d.data();
+            return (
+                data.email === identificador.trim() ||
+                (data.email || '').toLowerCase() === identLower ||
+                (data.emailRecuperacao || '').toLowerCase() === identLower
+            );
+        });
+
+        if (profDoc) {
+            const profData = profDoc.data();
             const senhaValida = await bcrypt.compare(senha, profData.senha);
             if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas' });
-            
+
+            // Verificação de 1º login via código enviado ao Gmail
+            if (profData.emailVerificado === false && profData.codigoVerificacao) {
+                if (!codigoVerificacao) {
+                    return res.json({
+                        requiresVerification: true,
+                        email: profData.emailRecuperacao || profData.email,
+                        message: `Enviamos um código de 6 dígitos para ${profData.emailRecuperacao || profData.email}. Digite-o abaixo para confirmar seu 1º acesso.`
+                    });
+                }
+
+                if (String(codigoVerificacao).trim() !== String(profData.codigoVerificacao).trim()) {
+                    return res.status(400).json({ error: 'Código de confirmação incorreto. Verifique seu Gmail.' });
+                }
+
+                await db.collection('professores').doc(profDoc.id).update({
+                    emailVerificado: true,
+                    codigoVerificacao: null
+                });
+            }
+
             const token = jwt.sign(
-                { id: prof.id, tipo: 'prof', email: profData.email, escolaId: profData.escolaId },
+                { id: profDoc.id, tipo: 'prof', email: profData.email, escolaId: profData.escolaId },
                 process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
                 { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
             );
             return res.json({
                 token,
-                usuario: { id: prof.id, nome: profData.nome, email: profData.email, escolaId: profData.escolaId, tipo: 'prof' }
+                usuario: { id: profDoc.id, nome: profData.nome, email: profData.email, escolaId: profData.escolaId, tipo: 'prof' }
             });
         }
 
@@ -127,6 +157,158 @@ const login = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao fazer login' });
+    }
+};
+
+// Reenvia o código de confirmação de 1º acesso para o Gmail do professor
+const resendVerificationCode = async (req, res) => {
+    try {
+        const { identificador } = req.body;
+        if (!identificador) return res.status(400).json({ error: 'Informe o e-mail do professor' });
+
+        const identLower = identificador.trim().toLowerCase();
+        const allProfsSnap = await db.collection('professores').get();
+        const profDoc = allProfsSnap.docs.find(d => {
+            const data = d.data();
+            return (
+                data.email === identificador.trim() ||
+                (data.email || '').toLowerCase() === identLower ||
+                (data.emailRecuperacao || '').toLowerCase() === identLower
+            );
+        });
+
+        if (!profDoc) {
+            return res.status(404).json({ error: 'Professor não encontrado' });
+        }
+
+        const profData = profDoc.data();
+        const targetEmail = profData.emailRecuperacao || profData.email;
+        const codigoVerificacao = String(Math.floor(100000 + Math.random() * 900000));
+
+        await db.collection('professores').doc(profDoc.id).update({ codigoVerificacao });
+
+        const emailResult = await sendProfessorWelcomeEmail({
+            to: targetEmail,
+            nome: profData.nome,
+            emailLogin: profData.email,
+            senhaProvisoria: null,
+            codigoVerificacao
+        });
+
+        res.json({
+            message: emailResult.sent
+                ? `Novo código enviado para ${targetEmail}!`
+                : `Novo código gerado! (Configure EMAIL_USER e EMAIL_PASS no servidor. Código: ${codigoVerificacao})`,
+            codigoSimulado: emailResult.simulated ? codigoVerificacao : undefined
+        });
+    } catch (error) {
+        console.error('Erro ao reenviar código:', error);
+        res.status(500).json({ error: 'Erro ao reenviar código' });
+    }
+};
+
+// Envia código de 6 dígitos para o Gmail do professor ("Esqueci minha senha")
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ error: 'Informe o seu e-mail (@gmail.com) cadastrado.' });
+        }
+
+        const cleanEmail = email.trim().toLowerCase();
+        const allProfsSnap = await db.collection('professores').get();
+        const profDoc = allProfsSnap.docs.find(d => {
+            const data = d.data();
+            return (
+                (data.email || '').toLowerCase() === cleanEmail ||
+                (data.emailRecuperacao || '').toLowerCase() === cleanEmail
+            );
+        });
+
+        if (!profDoc) {
+            return res.status(404).json({ error: 'Nenhum professor encontrado com este Gmail de recuperação.' });
+        }
+
+        const profData = profDoc.data();
+        const targetEmail = profData.emailRecuperacao || profData.email;
+        const codigoRecuperacao = String(Math.floor(100000 + Math.random() * 900000));
+        const codigoRecuperacaoExpira = Date.now() + 15 * 60 * 1000; // 15 minutos
+
+        await db.collection('professores').doc(profDoc.id).update({
+            codigoRecuperacao,
+            codigoRecuperacaoExpira
+        });
+
+        const emailResult = await sendPasswordResetCodeEmail({
+            to: targetEmail,
+            nome: profData.nome,
+            codigoRecuperacao
+        });
+
+        res.json({
+            message: emailResult.sent
+                ? `Enviamos um código de 6 dígitos para ${targetEmail}!`
+                : `Código de recuperação gerado! (Configure EMAIL_USER/EMAIL_PASS no servidor. Código: ${codigoRecuperacao})`,
+            codigoSimulado: emailResult.simulated ? codigoRecuperacao : undefined
+        });
+    } catch (error) {
+        console.error('Erro em forgotPassword:', error);
+        res.status(500).json({ error: 'Erro ao processar solicitação de recuperação de senha' });
+    }
+};
+
+// Redefine a senha do professor validando o código de 6 dígitos enviado ao Gmail
+const resetPassword = async (req, res) => {
+    try {
+        const { email, codigo, novaSenha } = req.body;
+        if (!email || !codigo || !novaSenha) {
+            return res.status(400).json({ error: 'E-mail, código e nova senha são obrigatórios.' });
+        }
+
+        if (novaSenha.length < 8 || novaSenha.length > 20 || !/[A-Z]/.test(novaSenha) || !/[!@#$%^&*(),.?":{}|<>\-+=_]/.test(novaSenha)) {
+            return res.status(400).json({
+                error: 'A nova senha deve ter entre 8 e 20 caracteres, pelo menos 1 letra maiúscula e 1 caractere especial.'
+            });
+        }
+
+        const cleanEmail = email.trim().toLowerCase();
+        const allProfsSnap = await db.collection('professores').get();
+        const profDoc = allProfsSnap.docs.find(d => {
+            const data = d.data();
+            return (
+                (data.email || '').toLowerCase() === cleanEmail ||
+                (data.emailRecuperacao || '').toLowerCase() === cleanEmail
+            );
+        });
+
+        if (!profDoc) {
+            return res.status(404).json({ error: 'Professor não encontrado.' });
+        }
+
+        const profData = profDoc.data();
+        if (!profData.codigoRecuperacao || String(profData.codigoRecuperacao).trim() !== String(codigo).trim()) {
+            return res.status(400).json({ error: 'Código de recuperação inválido.' });
+        }
+
+        if (profData.codigoRecuperacaoExpira && Date.now() > profData.codigoRecuperacaoExpira) {
+            return res.status(400).json({ error: 'O código expirou. Solicite um novo código.' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(novaSenha, salt);
+
+        await db.collection('professores').doc(profDoc.id).update({
+            senha: hashedPassword,
+            codigoRecuperacao: null,
+            codigoRecuperacaoExpira: null,
+            emailVerificado: true,
+            codigoVerificacao: null
+        });
+
+        res.json({ message: 'Senha alterada com sucesso! Agora você já pode fazer login.' });
+    } catch (error) {
+        console.error('Erro em resetPassword:', error);
+        res.status(500).json({ error: 'Erro ao redefinir a senha' });
     }
 };
 
@@ -175,4 +357,4 @@ const verifyToken = async (req, res) => {
     }
 };
 
-module.exports = { login, verifyToken };
+module.exports = { login, verifyToken, resendVerificationCode, forgotPassword, resetPassword };

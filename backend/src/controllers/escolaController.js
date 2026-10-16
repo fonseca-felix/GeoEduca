@@ -1,8 +1,9 @@
 const { db } = require('../../firebase/firebase-admin');
 const bcrypt = require('bcryptjs');
+const { sendProfessorWelcomeEmail } = require('../services/emailService');
 
 const escolaController = {
-  // Cria um novo professor vinculado à escola
+  // Cria um novo professor vinculado à escola e envia o código de 6 dígitos para o Gmail
   createProfessor: async (req, res) => {
     try {
       const escolaId = req.user.id;
@@ -12,6 +13,13 @@ const escolaController = {
         return res.status(400).json({ error: 'Nome, email e senha são obrigatórios' });
       }
 
+      const cleanEmail = email.trim().toLowerCase();
+      if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(cleanEmail)) {
+        return res.status(400).json({
+          error: 'Informe um e-mail válido do Gmail (@gmail.com) para envio do código e recuperação de senha.'
+        });
+      }
+
       if (senha.length < 8 || senha.length > 20 || !/[A-Z]/.test(senha) || !/[!@#$%^&*(),.?":{}|<>\-+=_]/.test(senha)) {
         return res.status(400).json({
           error: 'A senha deve ter entre 8 e 20 caracteres, pelo menos 1 letra maiúscula e 1 caractere especial.'
@@ -19,28 +27,107 @@ const escolaController = {
       }
 
       // Check if email already exists
-      const profSnap = await db.collection('professores').where('email', '==', email).limit(1).get();
-      if (!profSnap.empty) {
-        return res.status(400).json({ error: 'Email já cadastrado para outro professor' });
+      const allProfsSnap = await db.collection('professores').get();
+      const emailExists = allProfsSnap.docs.some(doc => {
+        const d = doc.data();
+        return (d.email || '').toLowerCase() === cleanEmail || (d.emailRecuperacao || '').toLowerCase() === cleanEmail;
+      });
+      if (emailExists) {
+        return res.status(400).json({ error: 'Este Gmail já está cadastrado para outro professor.' });
       }
 
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(senha, salt);
+      const codigoVerificacao = String(Math.floor(100000 + Math.random() * 900000));
 
       const novoProf = {
-        nome,
-        email,
+        nome: nome.trim(),
+        email: cleanEmail,
+        emailRecuperacao: cleanEmail,
         senha: hashedPassword,
         escolaId,
+        emailVerificado: false,
+        codigoVerificacao,
         criadoEm: new Date().toISOString(),
       };
 
       const docRef = await db.collection('professores').add(novoProf);
 
-      res.status(201).json({ id: docRef.id, message: 'Professor cadastrado com sucesso' });
+      let emailResult = { sent: false };
+      try {
+        emailResult = await sendProfessorWelcomeEmail({
+          to: cleanEmail,
+          nome: nome.trim(),
+          emailLogin: cleanEmail,
+          senhaProvisoria: senha,
+          codigoVerificacao
+        });
+      } catch (mailErr) {
+        console.error('Erro ao enviar e-mail de boas-vindas ao professor:', mailErr.message);
+      }
+
+      res.status(201).json({
+        id: docRef.id,
+        emailSent: !!emailResult.sent,
+        codigoSimulado: emailResult.simulated ? codigoVerificacao : undefined,
+        message: emailResult.sent
+          ? `Professor cadastrado! Credenciais e código enviados para ${cleanEmail}.`
+          : `Professor cadastrado! (Aviso: configure EMAIL_USER e EMAIL_PASS no servidor para envio automático ao Gmail. Código gerado: ${codigoVerificacao})`
+      });
     } catch (error) {
       console.error('Erro ao criar professor:', error);
       res.status(500).json({ error: 'Erro ao criar professor' });
+    }
+  },
+
+  // Atualiza o Gmail de recuperação de um professor existente e reenvia código se solicitado
+  updateProfessorEmail: async (req, res) => {
+    try {
+      const escolaId = req.user.id;
+      const profId = req.params.id;
+      const { emailRecuperacao } = req.body;
+
+      if (!emailRecuperacao || !/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(emailRecuperacao.trim())) {
+        return res.status(400).json({ error: 'Informe um endereço @gmail.com válido.' });
+      }
+
+      const cleanEmail = emailRecuperacao.trim().toLowerCase();
+      const profDoc = await db.collection('professores').doc(profId).get();
+      const profEscolaId = profDoc.exists ? (profDoc.data().escolaId || 'escola_ce399') : null;
+      if (!profDoc.exists || profEscolaId !== escolaId) {
+        return res.status(404).json({ error: 'Professor não encontrado' });
+      }
+
+      const codigoVerificacao = String(Math.floor(100000 + Math.random() * 900000));
+      const profData = profDoc.data();
+
+      await db.collection('professores').doc(profId).update({
+        emailRecuperacao: cleanEmail,
+        codigoVerificacao
+      });
+
+      let emailResult = { sent: false };
+      try {
+        emailResult = await sendProfessorWelcomeEmail({
+          to: cleanEmail,
+          nome: profData.nome,
+          emailLogin: profData.email,
+          senhaProvisoria: null,
+          codigoVerificacao
+        });
+      } catch (mailErr) {
+        console.error('Erro ao enviar e-mail de vinculação:', mailErr.message);
+      }
+
+      res.json({
+        message: emailResult.sent
+          ? `Gmail de recuperação (${cleanEmail}) vinculado e e-mail enviado com sucesso!`
+          : `Gmail de recuperação (${cleanEmail}) salvo!`,
+        emailRecuperacao: cleanEmail
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar Gmail do professor:', error);
+      res.status(500).json({ error: 'Erro ao atualizar Gmail do professor' });
     }
   },
 
@@ -73,6 +160,8 @@ const escolaController = {
           id: doc.id,
           nome: data.nome,
           email: data.email,
+          emailRecuperacao: data.emailRecuperacao || (data.email && data.email.endsWith('@gmail.com') ? data.email : null),
+          emailVerificado: data.emailVerificado !== false,
           criadoEm: data.criadoEm,
           totalAlunos: alunosCount,
           totalProvas: provasCount
@@ -143,6 +232,8 @@ const escolaController = {
             id: profDoc.id,
             nome: data.nome,
             email: data.email,
+            emailRecuperacao: data.emailRecuperacao || (data.email && data.email.endsWith('@gmail.com') ? data.email : ''),
+            emailVerificado: data.emailVerificado !== false,
             totalAlunos: alunos.length,
             totalProvas: provas.length,
             totalAtividades: atividadesSnap.size + quizzesSnap.size,

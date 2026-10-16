@@ -149,7 +149,7 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
   </div></section>
 
   <section id="entrar">
-    <div class="login glass">
+    <div class="login glass" id="main-login-box">
       <h2>Bem-vindo de volta</h2>
       <p>Selecione seu perfil para continuar</p>
       <div class="roles">
@@ -169,7 +169,11 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
             <input id="login-input" name="username" type="text" required placeholder="Identificador (Email, Nome, RM)" autocomplete="username" />
           </div>
         </label>
-        <label><span>Senha</span>
+        <label>
+          <span style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Senha</span>
+            <a href="#" id="forgot-pwd-link" style="color:var(--primary);font-size:0.8rem;text-decoration:none;font-weight:500;">Esqueci minha senha</a>
+          </span>
           <div class="field">
             <svg viewBox="0 0 24 24" width="16" height="16" style="color:var(--muted-foreground)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <input id="pwd" name="password" type="password" required placeholder="••••••••" autocomplete="current-password" />
@@ -197,6 +201,18 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
         .admin-profiles { display: flex; gap: 8px; margin-bottom: 24px; }
         .admin-profile { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted-foreground); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 0.2s; }
         .admin-profile.active { border-color: var(--primary); background: color-mix(in oklab, var(--primary) 10%, transparent); color: var(--foreground); }
+        .geo-auth-modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(6px); z-index: 9999; align-items: center; justify-content: center; padding: 16px; }
+        .geo-auth-modal.active { display: flex; }
+        .geo-auth-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 430px; max-height: 92vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+        .geo-auth-card h3 { font-family: var(--font-display); font-size: 1.4rem; margin: 0 0 8px; color: var(--foreground); }
+        .geo-auth-card p { font-size: 0.875rem; color: var(--muted-foreground); margin: 0 0 18px; line-height: 1.5; }
+        .pwd-rules-box { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin: 10px 0 16px; font-size: 0.82rem; }
+        .pwd-rules-box h4 { margin: 0 0 8px; font-size: 0.85rem; color: var(--foreground); }
+        .pwd-rules-box ul { list-style: none; padding: 0; margin: 0 0 10px; color: var(--muted-foreground); }
+        .pwd-rules-box li { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .pwd-rule-ok { color: #10b981; font-weight: 600; }
+        .pwd-rule-no { color: var(--muted-foreground); }
+        .pwd-example { background: rgba(204, 164, 59, 0.14); border: 1px solid rgba(204, 164, 59, 0.35); border-radius: 6px; padding: 6px 10px; color: var(--primary); font-family: var(--font-mono); font-size: 0.8rem; text-align: center; }
       </style>
 
       <div class="admin-profiles">
@@ -235,6 +251,85 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
       </div>
     </div>
   </section>
+
+  <!-- Modal 1º Login: Código de Verificação do Gmail -->
+  <div class="geo-auth-modal" id="modal-first-login">
+    <div class="geo-auth-card">
+      <h3>Confirmar 1º Acesso</h3>
+      <p id="first-login-msg">Digite o código de 6 dígitos enviado para o seu Gmail para ativar sua conta de professor(a).</p>
+      <form id="form-first-login">
+        <label><span>Código de 6 Dígitos</span>
+          <div class="field" style="margin-top:6px;">
+            <input id="first-login-code" type="text" maxlength="6" placeholder="000000" required style="text-align:center;font-size:1.3rem;letter-spacing:6px;font-family:var(--font-mono);" />
+          </div>
+        </label>
+        <p id="first-login-error" style="color:#ef4444;font-size:.85rem;margin:10px 0 0;display:none"></p>
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button type="button" id="btn-resend-verify" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--foreground);cursor:pointer;font-weight:600;">Reenviar Código</button>
+          <button type="submit" class="submit gold-glow" id="btn-confirm-verify" style="flex:1;margin:0;">Confirmar e Entrar</button>
+        </div>
+        <div style="text-align:center;margin-top:12px;">
+          <a href="#" id="close-first-login" style="color:var(--muted-foreground);font-size:0.8rem;">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Esqueci Minha Senha (Professor via Gmail) -->
+  <div class="geo-auth-modal" id="modal-forgot-pwd">
+    <div class="geo-auth-card">
+      <h3>Recuperar Senha</h3>
+      <p id="forgot-step-desc">Informe o seu e-mail <strong>@gmail.com</strong> cadastrado na escola para receber um código de 6 dígitos do GeoEduca.</p>
+
+      <!-- Etapa 1: Solicitar código -->
+      <form id="form-forgot-step1">
+        <label><span>Seu Gmail de Professor(a)</span>
+          <div class="field" style="margin-top:6px;">
+            <input id="forgot-email-input" type="email" placeholder="professora@gmail.com" required />
+          </div>
+        </label>
+        <p id="forgot-step1-error" style="color:#ef4444;font-size:.85rem;margin:10px 0 0;display:none"></p>
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button type="button" id="close-forgot-modal" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--foreground);cursor:pointer;font-weight:600;">Cancelar</button>
+          <button type="submit" class="submit gold-glow" id="btn-send-reset-code" style="flex:1;margin:0;">Enviar Código</button>
+        </div>
+      </form>
+
+      <!-- Etapa 2: Validar código e criar nova senha -->
+      <form id="form-forgot-step2" style="display:none;" autocomplete="off">
+        <label><span>Código de 6 Dígitos (enviado ao Gmail)</span>
+          <div class="field" style="margin-top:6px;">
+            <input id="reset-code-input" type="text" maxlength="6" placeholder="000000" required style="text-align:center;font-size:1.25rem;letter-spacing:6px;font-family:var(--font-mono);" />
+          </div>
+        </label>
+        <label style="display:block;margin-top:12px;"><span>Nova Senha</span>
+          <div class="field" style="margin-top:6px;">
+            <input id="reset-new-pwd" type="password" maxlength="20" placeholder="Digite a nova senha" required autocomplete="new-password" />
+            <button id="toggle-reset-pwd" type="button" aria-label="Mostrar senha">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </label>
+
+        <div class="pwd-rules-box">
+          <h4>Critérios da Senha:</h4>
+          <ul>
+            <li id="reset-rule-len" class="pwd-rule-no">✖ Mínimo de 8 e máximo de 20 caracteres</li>
+            <li id="reset-rule-up" class="pwd-rule-no">✖ Pelo menos 1 letra maiúscula</li>
+            <li id="reset-rule-spec" class="pwd-rule-no">✖ Pelo menos 1 caractere especial (!@#$%)</li>
+          </ul>
+          <div style="font-size: 0.75rem; color: var(--muted-foreground); margin-bottom: 4px;">Exemplo de senha aceita:</div>
+          <div class="pwd-example">Abcd1234@</div>
+        </div>
+
+        <p id="forgot-step2-error" style="color:#ef4444;font-size:.85rem;margin:8px 0 0;display:none"></p>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button type="button" id="back-forgot-step1" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--foreground);cursor:pointer;font-weight:600;">Voltar</button>
+          <button type="submit" class="submit gold-glow" id="btn-confirm-reset" disabled style="flex:1;margin:0;opacity:0.5;">Trocar Senha</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </main>
 
 <footer>
@@ -365,89 +460,6 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
     }
   });
 
-  
-  /* ---- admin toggle logic ---- */
-  document.getElementById('show-admin-form').addEventListener('click', function(e) {
-    e.preventDefault();
-    document.querySelector('.login.glass').style.display = 'none';
-    document.getElementById('admin-login-box').style.display = 'block';
-  });
-  document.getElementById('hide-admin-form').addEventListener('click', function(e) {
-    e.preventDefault();
-    document.getElementById('admin-login-box').style.display = 'none';
-    document.querySelector('.login.glass').style.display = 'block';
-  });
-
-  var adminType = 'escola';
-  var adminProfiles = document.querySelectorAll('.admin-profile');
-  var adminLoginLabel = document.getElementById('admin-login-field-label');
-  var adminLoginInput = document.getElementById('admin-login-input');
-  var adminSubmitBtn = document.getElementById('admin-submit-btn');
-
-  adminProfiles.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      adminProfiles.forEach(function(b) { b.classList.remove('active'); });
-      this.classList.add('active');
-      adminType = this.getAttribute('data-type');
-      if (adminType === 'master') {
-        adminLoginLabel.textContent = 'Identificador Master';
-        adminLoginInput.placeholder = 'Identificador Master';
-        adminSubmitBtn.textContent = 'Entrar como Master';
-      } else {
-        adminLoginLabel.textContent = 'Email Institucional';
-        adminLoginInput.placeholder = 'Email Institucional';
-        adminSubmitBtn.textContent = 'Entrar como Escola';
-      }
-    });
-  });
-
-  var adminPwd = document.getElementById('admin-pwd');
-  document.getElementById('toggle-admin-pwd').addEventListener('click', function () {
-    var showing = adminPwd.type === 'text';
-    adminPwd.type = showing ? 'password' : 'text';
-    this.setAttribute('aria-label', showing ? 'Mostrar senha' : 'Ocultar senha');
-  });
-
-  document.getElementById('admin-login-form').addEventListener('submit', async function (e) {
-    e.preventDefault();
-    var errEl = document.getElementById('admin-login-error');
-    errEl.style.display = 'none';
-    adminSubmitBtn.disabled = true;
-    var originalText = adminSubmitBtn.textContent;
-    adminSubmitBtn.textContent = 'Entrando...';
-
-    var credential = adminLoginInput.value.trim();
-    var senha = adminPwd.value;
-
-    if (!credential || !senha) {
-      errEl.textContent = 'Preencha todos os campos.';
-      errEl.style.display = 'block';
-      adminSubmitBtn.disabled = false;
-      adminSubmitBtn.textContent = originalText;
-      return;
-    }
-
-    try {
-      var data = await api.post('/auth/login', { identificador: credential, senha: senha, "g-recaptcha-response": grecaptcha.getResponse() });
-      Auth.save(data.token, data.usuario);
-
-      if (data.usuario.tipo === 'master') {
-        window.location.href = './master/dashboard.html';
-      } else if (data.usuario.tipo === 'escola') {
-        window.location.href = './escola/dashboard.html';
-      } else if (data.usuario.tipo === 'prof') {
-        window.location.href = './professor/dashboard.html';
-      } else {
-        window.location.href = './aluno/dashboard.html';
-      }
-    } catch (err) {
-      errEl.textContent = err.message || 'Erro ao fazer login. Tente novamente.';
-      errEl.style.display = 'block';
-      adminSubmitBtn.disabled = false;
-      adminSubmitBtn.textContent = originalText;
-    }
-  });
-
   /* ---- roles selection ---- */
   var roleBtns = document.querySelectorAll('.role');
   var loginLabel = document.getElementById('login-field-label');
@@ -464,8 +476,8 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
         this.setAttribute('aria-pressed', 'true');
         
         if (this.dataset.role === 'prof') {
-            loginLabel.textContent = 'Email do Professor';
-            loginInput.placeholder = 'professor@escola.com';
+            loginLabel.textContent = 'Email do Professor (@gmail.com)';
+            loginInput.placeholder = 'professor@gmail.com';
         } else {
             loginLabel.textContent = 'Email ou RM';
             loginInput.placeholder = 'Identificador (Email, Nome, RM)';
@@ -475,16 +487,28 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
   }
 
   /* ---- login: perfil + senha ---- */
-
   var pwd = document.getElementById('pwd');
   var submitBtn = document.getElementById('submit-btn');
   var loginError = document.getElementById('login-error');
+  var pendingFirstLogin = { identificador: '', senha: '' };
 
   document.getElementById('toggle-pwd').addEventListener('click', function () {
     var showing = pwd.type === 'text';
     pwd.type = showing ? 'password' : 'text';
     this.setAttribute('aria-label', showing ? 'Mostrar senha' : 'Ocultar senha');
   });
+
+  function redirectUser(usuario) {
+    if (usuario.tipo === 'master') {
+      window.location.href = './master/dashboard.html';
+    } else if (usuario.tipo === 'escola') {
+      window.location.href = './escola/dashboard.html';
+    } else if (usuario.tipo === 'prof') {
+      window.location.href = './professor/dashboard.html';
+    } else {
+      window.location.href = './aluno/dashboard.html';
+    }
+  }
 
   document.getElementById('login-form').addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -504,19 +528,26 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
     }
 
     try {
-      var data = await api.post('/auth/login', { identificador: credential, senha: senha, "g-recaptcha-response": grecaptcha.getResponse() });
+      var data = await api.post('/auth/login', {
+        identificador: credential,
+        senha: senha,
+        "g-recaptcha-response": (typeof grecaptcha !== 'undefined' && grecaptcha.getResponse) ? grecaptcha.getResponse() : ''
+      });
+
+      if (data.requiresVerification) {
+        pendingFirstLogin.identificador = credential;
+        pendingFirstLogin.senha = senha;
+        document.getElementById('first-login-msg').textContent = data.message || 'Digite o código de 6 dígitos enviado para o seu Gmail.';
+        document.getElementById('first-login-code').value = '';
+        document.getElementById('first-login-error').style.display = 'none';
+        document.getElementById('modal-first-login').classList.add('active');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Entrar na Plataforma';
+        return;
+      }
 
       Auth.save(data.token, data.usuario);
-
-      if (data.usuario.tipo === 'master') {
-        window.location.href = './master/dashboard.html';
-      } else if (data.usuario.tipo === 'escola') {
-        window.location.href = './escola/dashboard.html';
-      } else if (data.usuario.tipo === 'prof') {
-        window.location.href = './professor/dashboard.html';
-      } else {
-        window.location.href = './aluno/dashboard.html';
-      }
+      redirectUser(data.usuario);
     } catch (err) {
       loginError.textContent = err.message || 'Erro ao fazer login. Tente novamente.';
       loginError.style.display = 'block';
@@ -525,18 +556,186 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
     }
   });
 
-  // If user is already logged in, redirect to dashboard
-  /*
-  if (Auth.isLoggedIn()) {
-    var user = Auth.getUser();
-    if (user) {
-      if (user.tipo === 'master') window.location.href = './master/dashboard.html';
-      else if (user.tipo === 'escola') window.location.href = './escola/dashboard.html';
-      else if (user.tipo === 'prof') window.location.href = './professor/dashboard.html';
-      else if (user.tipo === 'aluno') window.location.href = './aluno/dashboard.html';
+  /* ---- 1º Acesso do Professor (Código Gmail) ---- */
+  document.getElementById('close-first-login').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('modal-first-login').classList.remove('active');
+  });
+
+  document.getElementById('btn-resend-verify').addEventListener('click', async function() {
+    var btn = this;
+    var errEl = document.getElementById('first-login-error');
+    errEl.style.display = 'none';
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      var res = await api.post('/auth/resend-verification', { identificador: pendingFirstLogin.identificador });
+      alert(res.message || 'Novo código enviado para o seu Gmail!');
+    } catch (err) {
+      errEl.textContent = err.message || 'Erro ao reenviar código.';
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Reenviar Código';
     }
+  });
+
+  document.getElementById('form-first-login').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var code = document.getElementById('first-login-code').value.trim();
+    var errEl = document.getElementById('first-login-error');
+    var btn = document.getElementById('btn-confirm-verify');
+    errEl.style.display = 'none';
+
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Validando...';
+      var data = await api.post('/auth/login', {
+        identificador: pendingFirstLogin.identificador,
+        senha: pendingFirstLogin.senha,
+        codigoVerificacao: code
+      });
+      Auth.save(data.token, data.usuario);
+      redirectUser(data.usuario);
+    } catch (err) {
+      errEl.textContent = err.message || 'Código inválido.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Confirmar e Entrar';
+    }
+  });
+
+  /* ---- Esqueci Minha Senha (Professor via Gmail) ---- */
+  var forgotModal = document.getElementById('modal-forgot-pwd');
+  var forgotStep1 = document.getElementById('form-forgot-step1');
+  var forgotStep2 = document.getElementById('form-forgot-step2');
+  var forgotEmailInput = document.getElementById('forgot-email-input');
+  var resetNewPwd = document.getElementById('reset-new-pwd');
+  var btnConfirmReset = document.getElementById('btn-confirm-reset');
+
+  document.getElementById('forgot-pwd-link').addEventListener('click', function(e) {
+    e.preventDefault();
+    forgotStep1.style.display = 'block';
+    forgotStep2.style.display = 'none';
+    document.getElementById('forgot-step1-error').style.display = 'none';
+    document.getElementById('forgot-step2-error').style.display = 'none';
+    document.getElementById('forgot-step-desc').innerHTML = 'Informe o seu e-mail <strong>@gmail.com</strong> cadastrado na escola para receber um código de 6 dígitos do GeoEduca.';
+    if (loginInput.value.includes('@')) {
+      forgotEmailInput.value = loginInput.value.trim();
+    }
+    forgotModal.classList.add('active');
+  });
+
+  document.getElementById('close-forgot-modal').addEventListener('click', function() {
+    forgotModal.classList.remove('active');
+  });
+
+  document.getElementById('back-forgot-step1').addEventListener('click', function() {
+    forgotStep2.style.display = 'none';
+    forgotStep1.style.display = 'block';
+    document.getElementById('forgot-step-desc').innerHTML = 'Informe o seu e-mail <strong>@gmail.com</strong> cadastrado na escola para receber um código de 6 dígitos do GeoEduca.';
+  });
+
+  document.getElementById('toggle-reset-pwd').addEventListener('click', function() {
+    var showing = resetNewPwd.type === 'text';
+    resetNewPwd.type = showing ? 'password' : 'text';
+  });
+
+  function validateResetPassword() {
+    var p = resetNewPwd.value;
+    var rLen = document.getElementById('reset-rule-len');
+    var rUp = document.getElementById('reset-rule-up');
+    var rSpec = document.getElementById('reset-rule-spec');
+    var ok = true;
+
+    if (p.length >= 8 && p.length <= 20) {
+      rLen.className = 'pwd-rule-ok';
+      rLen.textContent = '✔ Mínimo de 8 e máximo de 20 caracteres';
+    } else {
+      rLen.className = 'pwd-rule-no';
+      rLen.textContent = '✖ Mínimo de 8 e máximo de 20 caracteres';
+      ok = false;
+    }
+
+    if (/[A-Z]/.test(p)) {
+      rUp.className = 'pwd-rule-ok';
+      rUp.textContent = '✔ Pelo menos 1 letra maiúscula';
+    } else {
+      rUp.className = 'pwd-rule-no';
+      rUp.textContent = '✖ Pelo menos 1 letra maiúscula';
+      ok = false;
+    }
+
+    if (/[!@#$%^&*(),.?":{}|<>\-+=_]/.test(p)) {
+      rSpec.className = 'pwd-rule-ok';
+      rSpec.textContent = '✔ Pelo menos 1 caractere especial (!@#$%)';
+    } else {
+      rSpec.className = 'pwd-rule-no';
+      rSpec.textContent = '✖ Pelo menos 1 caractere especial (!@#$%)';
+      ok = false;
+    }
+
+    if (!p) ok = false;
+    btnConfirmReset.disabled = !ok;
+    btnConfirmReset.style.opacity = ok ? '1' : '0.5';
+    return ok;
   }
-  */
+
+  resetNewPwd.addEventListener('input', validateResetPassword);
+
+  forgotStep1.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var errEl = document.getElementById('forgot-step1-error');
+    var btn = document.getElementById('btn-send-reset-code');
+    errEl.style.display = 'none';
+
+    var email = forgotEmailInput.value.trim();
+    if (!email) return;
+
+    try {
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      var res = await api.post('/auth/forgot-password', { email: email });
+      document.getElementById('forgot-step-desc').textContent = res.message || 'Digite o código de 6 dígitos enviado para o seu Gmail e escolha sua nova senha.';
+      document.getElementById('reset-code-input').value = '';
+      resetNewPwd.value = '';
+      validateResetPassword();
+      forgotStep1.style.display = 'none';
+      forgotStep2.style.display = 'block';
+    } catch (err) {
+      errEl.textContent = err.message || 'Erro ao enviar código.';
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Enviar Código';
+    }
+  });
+
+  forgotStep2.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!validateResetPassword()) return;
+
+    var errEl = document.getElementById('forgot-step2-error');
+    errEl.style.display = 'none';
+    var email = forgotEmailInput.value.trim();
+    var codigo = document.getElementById('reset-code-input').value.trim();
+    var novaSenha = resetNewPwd.value;
+
+    try {
+      btnConfirmReset.disabled = true;
+      btnConfirmReset.textContent = 'Salvando...';
+      var res = await api.post('/auth/reset-password', { email: email, codigo: codigo, novaSenha: novaSenha });
+      alert(res.message || 'Senha alterada com sucesso!');
+      forgotModal.classList.remove('active');
+      loginInput.value = email;
+      pwd.value = '';
+    } catch (err) {
+      errEl.textContent = err.message || 'Erro ao redefinir senha.';
+      errEl.style.display = 'block';
+      btnConfirmReset.disabled = false;
+      btnConfirmReset.textContent = 'Trocar Senha';
+    }
+  });
 })();
 </script>
 </body>

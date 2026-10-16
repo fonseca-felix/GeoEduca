@@ -17,6 +17,7 @@ router.use(authenticateToken);
 router.post('/professor', checkEscola, escolaController.createProfessor);
 router.get('/professores', checkEscola, escolaController.getProfessores);
 router.get('/professores/:id', checkEscola, escolaController.getProfessorDetalhes);
+router.put('/professores/:id/email', checkEscola, escolaController.updateProfessorEmail);
 router.get('/stats', checkEscola, escolaController.getStats);
 
 module.exports = router;

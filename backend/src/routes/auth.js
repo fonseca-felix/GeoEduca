@@ -1,10 +1,17 @@
 const express = require('express');
-const { login, verifyToken } = require('../controllers/authController');
+const { login, verifyToken, resendVerificationCode, forgotPassword, resetPassword } = require('../controllers/authController');
 
 const router = express.Router();
 
 // Nova rota unificada de login
 router.post('/login', login);
+
+// Reenviar código de confirmação de 1º acesso do professor
+router.post('/resend-verification', resendVerificationCode);
+
+// Recuperação de senha do professor via Gmail
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
 
 // Verificar token
 router.get('/verify', verifyToken);
