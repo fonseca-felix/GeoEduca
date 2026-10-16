@@ -1,18 +1,25 @@
+const { Resend } = require('resend');
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
-function getTransporter() {
+function getResendClient() {
+  const key = process.env.RESEND_API_KEY;
+  if (key && key.startsWith('re_')) {
+    return new Resend(key.trim());
+  }
+  return null;
+}
+
+function getNodemailerTransporter() {
   const user = process.env.EMAIL_USER;
   const pass = process.env.EMAIL_PASS;
-
-  if (!user || !pass) {
-    return null;
-  }
+  if (!user || !pass) return null;
 
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: user.trim(),
-      pass: pass.replace(/\s+/g, '') // Remove espaços caso a Senha de App venha formatada em blocos de 4 letras
+      pass: pass.replace(/\s+/g, '')
     }
   });
 }
@@ -21,13 +28,8 @@ function getTransporter() {
  * Envia o e-mail de boas-vindas ao professor recém-cadastrado com a senha provisória e o código de 6 dígitos
  */
 async function sendProfessorWelcomeEmail({ to, nome, emailLogin, senhaProvisoria, codigoVerificacao }) {
-  const transporter = getTransporter();
-  const fromEmail = process.env.EMAIL_USER || 'no-reply@geoeduca.com';
-
-  if (!transporter) {
-    console.warn(`⚠️ [GeoEduca Email] EMAIL_USER / EMAIL_PASS não configurados no .env. Código para ${to}: ${codigoVerificacao}`);
-    return { sent: false, simulated: true, codigoVerificacao };
-  }
+  const resend = getResendClient();
+  const transporter = getNodemailerTransporter();
 
   const html = `
     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #0f172a; color: #f8fafc; border-radius: 16px; overflow: hidden; border: 1px solid #334155;">
@@ -63,27 +65,52 @@ async function sendProfessorWelcomeEmail({ to, nome, emailLogin, senhaProvisoria
     </div>
   `;
 
-  await transporter.sendMail({
-    from: `"GeoEduca" <${fromEmail}>`,
-    to,
-    subject: '🌍 Bem-vindo(a) ao GeoEduca — Código de Confirmação e Acesso',
-    html
-  });
+  // 1. Tentar via Resend (Mais rápido e confiável)
+  if (resend) {
+    try {
+      const response = await resend.emails.send({
+        from: 'GeoEduca <onboarding@resend.dev>',
+        to: [to],
+        subject: '🌍 Bem-vindo(a) ao GeoEduca — Código de Confirmação e Acesso',
+        html
+      });
+      if (response && response.error) {
+        console.warn(`⚠️ [Resend Aviso]: ${response.error.message || response.error}`);
+      } else if (response && response.data) {
+        console.log(`✅ [Resend] E-mail enviado com sucesso para ${to}. ID: ${response.data.id}`);
+        return { sent: true, provider: 'resend', id: response.data.id };
+      }
+    } catch (resendErr) {
+      console.error('⚠️ [Resend Erro]:', resendErr.message);
+    }
+  }
 
-  return { sent: true };
+  // 2. Fallback via Nodemailer Gmail se configurado
+  if (transporter) {
+    try {
+      await transporter.sendMail({
+        from: `"GeoEduca" <${process.env.EMAIL_USER}>`,
+        to,
+        subject: '🌍 Bem-vindo(a) ao GeoEduca — Código de Confirmação e Acesso',
+        html
+      });
+      console.log(`✅ [Nodemailer] E-mail enviado com sucesso para ${to}`);
+      return { sent: true, provider: 'nodemailer' };
+    } catch (mailErr) {
+      console.error('⚠️ [Nodemailer Erro]:', mailErr.message);
+    }
+  }
+
+  console.warn(`⚠️ [GeoEduca Email] Disparo simulado para ${to}. Código: ${codigoVerificacao}`);
+  return { sent: false, simulated: true, codigoVerificacao };
 }
 
 /**
  * Envia o código de 6 dígitos para recuperação de senha ("Esqueci minha senha")
  */
 async function sendPasswordResetCodeEmail({ to, nome, codigoRecuperacao }) {
-  const transporter = getTransporter();
-  const fromEmail = process.env.EMAIL_USER || 'no-reply@geoeduca.com';
-
-  if (!transporter) {
-    console.warn(`⚠️ [GeoEduca Email] EMAIL_USER / EMAIL_PASS não configurados no .env. Código de recuperação para ${to}: ${codigoRecuperacao}`);
-    return { sent: false, simulated: true, codigoRecuperacao };
-  }
+  const resend = getResendClient();
+  const transporter = getNodemailerTransporter();
 
   const html = `
     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #0f172a; color: #f8fafc; border-radius: 16px; overflow: hidden; border: 1px solid #334155;">
@@ -113,14 +140,44 @@ async function sendPasswordResetCodeEmail({ to, nome, codigoRecuperacao }) {
     </div>
   `;
 
-  await transporter.sendMail({
-    from: `"GeoEduca" <${fromEmail}>`,
-    to,
-    subject: '🔐 Código de Recuperação de Senha — GeoEduca',
-    html
-  });
+  // 1. Tentar via Resend
+  if (resend) {
+    try {
+      const response = await resend.emails.send({
+        from: 'GeoEduca <onboarding@resend.dev>',
+        to: [to],
+        subject: '🔐 Código de Recuperação de Senha — GeoEduca',
+        html
+      });
+      if (response && response.error) {
+        console.warn(`⚠️ [Resend Aviso]: ${response.error.message || response.error}`);
+      } else if (response && response.data) {
+        console.log(`✅ [Resend] E-mail de recuperação enviado para ${to}. ID: ${response.data.id}`);
+        return { sent: true, provider: 'resend', id: response.data.id };
+      }
+    } catch (resendErr) {
+      console.error('⚠️ [Resend Erro]:', resendErr.message);
+    }
+  }
 
-  return { sent: true };
+  // 2. Fallback via Nodemailer Gmail
+  if (transporter) {
+    try {
+      await transporter.sendMail({
+        from: `"GeoEduca" <${process.env.EMAIL_USER}>`,
+        to,
+        subject: '🔐 Código de Recuperação de Senha — GeoEduca',
+        html
+      });
+      console.log(`✅ [Nodemailer] E-mail de recuperação enviado para ${to}`);
+      return { sent: true, provider: 'nodemailer' };
+    } catch (mailErr) {
+      console.error('⚠️ [Nodemailer Erro]:', mailErr.message);
+    }
+  }
+
+  console.warn(`⚠️ [GeoEduca Email] Disparo simulado para ${to}. Código: ${codigoRecuperacao}`);
+  return { sent: false, simulated: true, codigoRecuperacao };
 }
 
 module.exports = {
