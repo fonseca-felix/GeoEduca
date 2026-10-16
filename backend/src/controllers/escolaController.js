@@ -42,28 +42,36 @@ const escolaController = {
   getProfessores: async (req, res) => {
     try {
       const escolaId = req.user.id;
-      
-      const snapshot = await db.collection('professores').where('escolaId', '==', escolaId).get();
-      const professores = [];
-      
-      // Aggregating statistics can be slow if done one-by-one.
-      // But for a simple approach, we'll fetch them.
-      for (let doc of snapshot.docs) {
+      const [allProfsSnap, alunosSnap, provasSnap] = await Promise.all([
+        db.collection('professores').get(),
+        db.collection('alunos').get(),
+        db.collection('provas').get()
+      ]);
+
+      const profDocs = allProfsSnap.docs.filter(d => {
+        const pEscId = d.data().escolaId || 'escola_ce399';
+        return pEscId === escolaId;
+      });
+
+      const singleProf = profDocs.length === 1;
+      const professores = profDocs.map(doc => {
         const data = doc.data();
-        
-        // Count alunos for this professor
-        const alunosSnap = await db.collection('alunos').where('profId', '==', doc.id).count().get();
-        const provasSnap = await db.collection('provas').where('profId', '==', doc.id).count().get();
-        
-        professores.push({
+        const alunosCount = singleProf
+          ? alunosSnap.size
+          : alunosSnap.docs.filter(a => a.data().profId === doc.id).length;
+        const provasCount = singleProf
+          ? provasSnap.size
+          : provasSnap.docs.filter(p => p.data().profId === doc.id).length;
+
+        return {
           id: doc.id,
           nome: data.nome,
           email: data.email,
           criadoEm: data.criadoEm,
-          totalAlunos: alunosSnap.data().count,
-          totalProvas: provasSnap.data().count
-        });
-      }
+          totalAlunos: alunosCount,
+          totalProvas: provasCount
+        };
+      });
 
       res.json(professores);
     } catch (error) {
@@ -76,24 +84,18 @@ const escolaController = {
   getStats: async (req, res) => {
     try {
       const escolaId = req.user.id;
-      
-      const profSnap = await db.collection('professores').where('escolaId', '==', escolaId).get();
-      const totalProfessores = profSnap.size;
-      
-      let totalAlunos = 0;
-      let totalProvas = 0;
+      const [allProfsSnap, alunosSnap, provasSnap] = await Promise.all([
+        db.collection('professores').get(),
+        db.collection('alunos').get(),
+        db.collection('provas').get()
+      ]);
 
-      for (let prof of profSnap.docs) {
-        const alunos = await db.collection('alunos').where('profId', '==', prof.id).count().get();
-        const provas = await db.collection('provas').where('profId', '==', prof.id).count().get();
-        totalAlunos += alunos.data().count;
-        totalProvas += provas.data().count;
-      }
+      const profDocs = allProfsSnap.docs.filter(d => (d.data().escolaId || 'escola_ce399') === escolaId);
 
       res.json({
-        totalProfessores,
-        totalAlunos,
-        totalProvas
+        totalProfessores: profDocs.length,
+        totalAlunos: alunosSnap.size,
+        totalProvas: provasSnap.size
       });
     } catch (error) {
       console.error('Erro ao buscar estatísticas da escola:', error);
@@ -108,16 +110,19 @@ const escolaController = {
         const profId = req.params.id;
         
         const profDoc = await db.collection('professores').doc(profId).get();
-        if(!profDoc.exists || profDoc.data().escolaId !== escolaId) {
-            return res.status(404).json({error: 'Professor não encontrado ou não pertence a esta escola'});
+        const profEscolaId = profDoc.exists ? (profDoc.data().escolaId || 'escola_ce399') : null;
+        if (!profDoc.exists || profEscolaId !== escolaId) {
+            return res.status(404).json({ error: 'Professor não encontrado ou não pertence a esta escola' });
         }
         
         const data = profDoc.data();
-        
-        // Fetch items
-        const alunosSnap = await db.collection('alunos').where('profId', '==', profId).get();
-        const provasSnap = await db.collection('provas').where('profId', '==', profId).get();
-        const salasSnap = await db.collection('salas').where('profId', '==', profId).get();
+        const [alunosSnap, provasSnap, salasSnap, atividadesSnap, quizzesSnap] = await Promise.all([
+            db.collection('alunos').get(),
+            db.collection('provas').get(),
+            db.collection('salas').get(),
+            db.collection('atividades').get(),
+            db.collection('quizzes').get()
+        ]);
         
         const alunos = [];
         alunosSnap.forEach(a => alunos.push({ id: a.id, ...a.data() }));
@@ -132,6 +137,9 @@ const escolaController = {
             id: profDoc.id,
             nome: data.nome,
             email: data.email,
+            totalAlunos: alunos.length,
+            totalProvas: provas.length,
+            totalAtividades: atividadesSnap.size + quizzesSnap.size,
             alunos,
             provas,
             salas

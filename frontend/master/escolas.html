@@ -42,21 +42,23 @@
     .btn { background: var(--primary); color: var(--primary-foreground); padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
     
     .escola-list { display: grid; gap: 16px; }
-    .escola-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .escola-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; transition: border-color 0.2s; }
     .escola-card:hover { border-color: var(--primary); }
+    .escola-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .badge { background: var(--secondary); border: 1px solid var(--border); padding: 6px 12px; border-radius: 999px; font-size: 0.8rem; color: var(--foreground); }
+    .badge strong { color: var(--primary); font-family: var(--font-display); }
+    .btn-danger { background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.22); }
     
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
-    .modal-content { background: var(--background); border: 1px solid var(--border); padding: 32px; border-radius: 12px; width: 100%; max-width: 400px; }
+    .modal-content { background: var(--card); border: 1px solid var(--border); padding: 32px; border-radius: 12px; width: 100%; max-width: 420px; }
     .modal h2 { font-family: var(--font-display); margin-bottom: 16px; }
     
     .field { margin-bottom: 16px; }
     .field label { display: block; font-size: 0.875rem; margin-bottom: 8px; color: var(--muted-foreground); }
-    .field input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--input); color: white; }
-    
-    
-    
-    
+    .field input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--secondary); color: var(--foreground); font-family: var(--font-sans); }
+    .field input:focus { outline: 2px solid var(--primary); border-color: transparent; }
   </style>
 </head>
 <body>
@@ -81,15 +83,15 @@
       <form id="form-add">
         <div class="field">
           <label>Nome da Escola</label>
-          <input type="text" id="escola-nome" required>
+          <input type="text" id="escola-nome" placeholder="Ex: SESI CE399" required>
         </div>
         <div class="field">
           <label>Email de Acesso</label>
-          <input type="email" id="escola-email" required>
+          <input type="email" id="escola-email" placeholder="contato@escola.com.br" required>
         </div>
         <div class="field">
           <label>Senha Provisória</label>
-          <input type="password" id="escola-senha" required>
+          <input type="password" id="escola-senha" placeholder="••••••••" required>
         </div>
         <div style="display:flex;gap:12px;justify-content:flex-end">
           <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-add').classList.remove('active')">Cancelar</button>
@@ -105,10 +107,14 @@
   <script src="../js/sidebar.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      if (typeof Theme !== 'undefined' && Theme.init) Theme.init();
+
       const user = Auth.requireAuth('master');
       if (!user) return;
-      document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildMasterSidebar());
+      document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildMasterSidebar('escolas'));
       
+      const themeBtn = document.querySelector('[data-action="toggle-theme"]');
+      if(themeBtn) themeBtn.addEventListener('click', () => Theme.toggle());
       const logoutBtn = document.querySelector('[data-action="logout"]');
       if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
 
@@ -136,7 +142,7 @@
       const list = document.getElementById('escola-list');
       try {
         const escolas = await api.get('/master/escolas');
-        if (escolas.length === 0) {
+        if (!escolas || escolas.length === 0) {
           list.innerHTML = '<p style="color:var(--muted-foreground)">Nenhuma escola cadastrada ainda.</p>';
           return;
         }
@@ -144,16 +150,31 @@
         list.innerHTML = escolas.map(e => `
           <div class="escola-card">
             <div>
-              <h3 style="font-family:var(--font-display);color:var(--primary)">${e.nome}</h3>
-              <p style="font-size:0.875rem;color:var(--muted-foreground)">${e.email}</p>
+              <h3 style="font-family:var(--font-display);color:var(--primary);margin-bottom:4px;">${e.nome}</h3>
+              <p style="font-size:0.875rem;color:var(--muted-foreground);margin-bottom:4px;">${e.email}</p>
+              <span style="font-size:0.75rem;color:var(--muted-foreground);font-family:'JetBrains Mono',monospace;">ID: ${e.id}</span>
             </div>
-            <div style="text-align:right">
-              <span style="font-size:0.75rem;color:var(--muted-foreground)">ID: ${e.id}</span>
+            <div class="escola-meta">
+              <span class="badge"><strong>${e.totalProfessores ?? 0}</strong> Prof(s)</span>
+              <span class="badge"><strong>${e.totalSalas ?? 0}</strong> Turmas</span>
+              <span class="badge"><strong>${e.totalAlunos ?? 0}</strong> Alunos</span>
+              ${e.id !== 'escola_ce399' ? `<button class="btn-danger" onclick="removerEscola('${e.id}', '${e.nome.replace(/'/g, "\\'")}')">Excluir</button>` : ''}
             </div>
           </div>
         `).join('');
       } catch (err) {
-        list.innerHTML = '<p style="color:red">Erro ao carregar escolas</p>';
+        console.error('Erro ao carregar escolas:', err);
+        list.innerHTML = `<p style="color:#ef4444">Erro ao carregar escolas: ${err.message || 'Falha na conexão'}</p>`;
+      }
+    }
+
+    async function removerEscola(id, nome) {
+      if (!confirm(`Deseja realmente remover a escola "${nome}"?`)) return;
+      try {
+        await api.delete(`/master/escola/${id}`);
+        loadEscolas();
+      } catch (err) {
+        alert(err.message || 'Erro ao excluir escola');
       }
     }
   </script>

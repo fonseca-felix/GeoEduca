@@ -38,14 +38,23 @@
     
     h1 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 24px; }
     
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
-    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; transition: transform 0.2s, border-color 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); border-color: var(--primary); }
     .stat-title { color: var(--muted-foreground); font-size: 0.875rem; margin-bottom: 8px; }
-    .stat-value { font-family: var(--font-display); font-size: 2.5rem; font-weight: 700; color: var(--primary); }
-    
-    
-    
-    
+    .stat-value { font-family: var(--font-display); font-size: 2.25rem; font-weight: 700; color: var(--primary); }
+
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .section-header h2 { font-family: var(--font-display); font-size: 1.35rem; }
+    .link-btn { color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+    .link-btn:hover { text-decoration: underline; }
+
+    .escola-summary-list { display: grid; gap: 14px; }
+    .escola-row { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .escola-row:hover { border-color: var(--primary); }
+    .escola-badges { display: flex; gap: 12px; flex-wrap: wrap; }
+    .badge { background: var(--secondary); border: 1px solid var(--border); padding: 6px 12px; border-radius: 999px; font-size: 0.8rem; color: var(--foreground); }
+    .badge strong { color: var(--primary); font-family: var(--font-display); }
   </style>
 </head>
 <body>
@@ -54,7 +63,7 @@
     
     <main class="main-content">
       <h1>Bem-vindo, Administrador Global</h1>
-      <p style="color: var(--muted-foreground); margin-bottom: 32px;">Estatísticas gerais de toda a plataforma GeoEduca.</p>
+      <p style="color: var(--muted-foreground); margin-bottom: 32px;">Estatísticas gerais em tempo real de toda a plataforma GeoEduca.</p>
       
       <div class="stats-grid">
         <div class="stat-card">
@@ -70,9 +79,25 @@
           <div class="stat-value" id="stat-alunos">-</div>
         </div>
         <div class="stat-card">
+          <div class="stat-title">Turmas / Salas</div>
+          <div class="stat-value" id="stat-salas">-</div>
+        </div>
+        <div class="stat-card">
           <div class="stat-title">Total de Provas</div>
           <div class="stat-value" id="stat-provas">-</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-title">Quizzes & Atividades</div>
+          <div class="stat-value" id="stat-atividades">-</div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h2>Escolas Ativas na Plataforma</h2>
+        <a href="escolas.html" class="link-btn">Gerenciar Escolas →</a>
+      </div>
+      <div class="escola-summary-list" id="dashboard-escolas">
+        <p style="color: var(--muted-foreground);">Carregando escolas...</p>
       </div>
     </main>
   </div>
@@ -83,11 +108,13 @@
   <script src="../js/sidebar.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
+      if (typeof Theme !== 'undefined' && Theme.init) Theme.init();
+
       const user = Auth.requireAuth('master');
       if (!user) return;
 
       // Inject Sidebar
-      document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildMasterSidebar());
+      document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildMasterSidebar('dashboard'));
       
       // Theme toggle (if sidebar handles it)
       const themeBtn = document.querySelector('[data-action="toggle-theme"]');
@@ -95,15 +122,42 @@
       const logoutBtn = document.querySelector('[data-action="logout"]');
       if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
 
-      // Fetch Stats
+      // Fetch Stats & Escolas in parallel
       try {
-        const stats = await api.get('/master/stats');
-        document.getElementById('stat-escolas').textContent = stats.totalEscolas;
-        document.getElementById('stat-professores').textContent = stats.totalProfessores;
-        document.getElementById('stat-alunos').textContent = stats.totalAlunos;
-        document.getElementById('stat-provas').textContent = stats.totalProvas;
+        const [stats, escolas] = await Promise.all([
+          api.get('/master/stats'),
+          api.get('/master/escolas')
+        ]);
+
+        document.getElementById('stat-escolas').textContent = stats.totalEscolas ?? 0;
+        document.getElementById('stat-professores').textContent = stats.totalProfessores ?? 0;
+        document.getElementById('stat-alunos').textContent = stats.totalAlunos ?? 0;
+        document.getElementById('stat-salas').textContent = stats.totalSalas ?? 0;
+        document.getElementById('stat-provas').textContent = stats.totalProvas ?? 0;
+        document.getElementById('stat-atividades').textContent = (stats.totalQuizzes || 0) + (stats.totalAtividades || 0);
+
+        const listEl = document.getElementById('dashboard-escolas');
+        if (!escolas || escolas.length === 0) {
+          listEl.innerHTML = '<p style="color: var(--muted-foreground);">Nenhuma escola cadastrada.</p>';
+        } else {
+          listEl.innerHTML = escolas.map(e => `
+            <div class="escola-row">
+              <div>
+                <h3 style="font-family: var(--font-display); color: var(--primary); margin-bottom: 4px;">${e.nome}</h3>
+                <p style="font-size: 0.875rem; color: var(--muted-foreground);">${e.email}</p>
+              </div>
+              <div class="escola-badges">
+                <span class="badge"><strong>${e.totalProfessores ?? 0}</strong> Prof(s)</span>
+                <span class="badge"><strong>${e.totalSalas ?? 0}</strong> Turmas</span>
+                <span class="badge"><strong>${e.totalAlunos ?? 0}</strong> Alunos</span>
+              </div>
+            </div>
+          `).join('');
+        }
       } catch (err) {
         console.error('Erro ao carregar estatísticas', err);
+        document.getElementById('dashboard-escolas').innerHTML =
+          `<p style="color: #ef4444;">Erro ao carregar dados: ${err.message || 'Falha na conexão'}</p>`;
       }
     });
   </script>

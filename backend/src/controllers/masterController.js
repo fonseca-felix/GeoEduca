@@ -11,7 +11,6 @@ const masterController = {
         return res.status(400).json({ error: 'Nome, email e senha são obrigatórios' });
       }
 
-      // Check if email already exists
       const escolaSnap = await db.collection('escolas').where('email', '==', email).limit(1).get();
       if (!escolaSnap.empty) {
         return res.status(400).json({ error: 'Email já cadastrado para outra escola' });
@@ -36,21 +35,50 @@ const masterController = {
     }
   },
 
-  // Lista todas as escolas
+  // Lista todas as escolas com contagem de professores, alunos e salas
   getEscolas: async (req, res) => {
     try {
-      const snapshot = await db.collection('escolas').get();
+      const [escolasSnap, profSnap, alunosSnap, salasSnap] = await Promise.all([
+        db.collection('escolas').get(),
+        db.collection('professores').get(),
+        db.collection('alunos').get(),
+        db.collection('salas').get()
+      ]);
+
+      const profsPorEscola = {};
+      profSnap.forEach(doc => {
+        const d = doc.data();
+        const escId = d.escolaId || 'escola_ce399';
+        profsPorEscola[escId] = (profsPorEscola[escId] || 0) + 1;
+      });
+
       const escolas = [];
-      
-      snapshot.forEach(doc => {
+      escolasSnap.forEach(doc => {
         const data = doc.data();
+        const isDefault = doc.id === 'escola_ce399' || escolasSnap.size === 1;
         escolas.push({
           id: doc.id,
-          nome: data.nome,
-          email: data.email,
-          criadoEm: data.criadoEm
+          nome: data.nome || 'Escola',
+          email: data.email || '-',
+          criadoEm: data.criadoEm || null,
+          totalProfessores: profsPorEscola[doc.id] || 0,
+          totalAlunos: isDefault ? alunosSnap.size : 0,
+          totalSalas: isDefault ? salasSnap.size : 0
         });
       });
+
+      // Fallback caso a coleção esteja vazia
+      if (escolas.length === 0) {
+        escolas.push({
+          id: 'escola_ce399',
+          nome: 'CE399 SESI',
+          email: 'CE399 SESI',
+          criadoEm: new Date().toISOString(),
+          totalProfessores: profSnap.size,
+          totalAlunos: alunosSnap.size,
+          totalSalas: salasSnap.size
+        });
+      }
 
       res.json(escolas);
     } catch (error) {
@@ -59,20 +87,42 @@ const masterController = {
     }
   },
 
+  // Remove uma escola
+  deleteEscola: async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (id === 'escola_ce399') {
+        return res.status(400).json({ error: 'A escola principal padrão não pode ser removida.' });
+      }
+      await db.collection('escolas').doc(id).delete();
+      res.json({ message: 'Escola removida com sucesso' });
+    } catch (error) {
+      console.error('Erro ao remover escola:', error);
+      res.status(500).json({ error: 'Erro ao remover escola' });
+    }
+  },
+
   // Estatísticas Globais
   getStats: async (req, res) => {
     try {
-      // Get counts for each collection
-      const escolasSnap = await db.collection('escolas').count().get();
-      const profSnap = await db.collection('professores').count().get();
-      const alunosSnap = await db.collection('alunos').count().get();
-      const provasSnap = await db.collection('provas').count().get();
-      
+      const [escolasSnap, profSnap, alunosSnap, provasSnap, salasSnap, quizzesSnap, atividadesSnap] = await Promise.all([
+        db.collection('escolas').get(),
+        db.collection('professores').get(),
+        db.collection('alunos').get(),
+        db.collection('provas').get(),
+        db.collection('salas').get(),
+        db.collection('quizzes').get(),
+        db.collection('atividades').get()
+      ]);
+
       res.json({
-        totalEscolas: escolasSnap.data().count,
-        totalProfessores: profSnap.data().count,
-        totalAlunos: alunosSnap.data().count,
-        totalProvas: provasSnap.data().count,
+        totalEscolas: Math.max(1, escolasSnap.size),
+        totalProfessores: profSnap.size,
+        totalAlunos: alunosSnap.size,
+        totalProvas: provasSnap.size,
+        totalSalas: salasSnap.size,
+        totalQuizzes: quizzesSnap.size,
+        totalAtividades: atividadesSnap.size
       });
     } catch (error) {
       console.error('Erro ao buscar estatísticas globais:', error);
