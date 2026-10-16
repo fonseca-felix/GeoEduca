@@ -108,6 +108,7 @@ const login = async (req, res) => {
                     return res.json({
                         requiresVerification: true,
                         email: profData.emailRecuperacao || profData.email,
+                        codigoSimulado: profData.codigoVerificacao,
                         message: `Enviamos um código de 6 dígitos para ${profData.emailRecuperacao || profData.email}. Digite-o abaixo para confirmar seu 1º acesso.`
                     });
                 }
@@ -198,7 +199,7 @@ const resendVerificationCode = async (req, res) => {
         res.json({
             message: emailResult.sent
                 ? `Novo código enviado para ${targetEmail}!`
-                : `Novo código gerado! (Configure EMAIL_USER e EMAIL_PASS no servidor. Código: ${codigoVerificacao})`,
+                : `Novo código gerado com sucesso!`,
             codigoSimulado: emailResult.simulated ? codigoVerificacao : undefined
         });
     } catch (error) {
@@ -248,7 +249,7 @@ const forgotPassword = async (req, res) => {
         res.json({
             message: emailResult.sent
                 ? `Enviamos um código de 6 dígitos para ${targetEmail}!`
-                : `Código de recuperação gerado! (Configure EMAIL_USER/EMAIL_PASS no servidor. Código: ${codigoRecuperacao})`,
+                : `Código de recuperação gerado com sucesso!`,
             codigoSimulado: emailResult.simulated ? codigoRecuperacao : undefined
         });
     } catch (error) {

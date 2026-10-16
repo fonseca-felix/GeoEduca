@@ -539,8 +539,13 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
       if (data.requiresVerification) {
         pendingFirstLogin.identificador = credential;
         pendingFirstLogin.senha = senha;
-        document.getElementById('first-login-msg').textContent = data.message || 'Digite o código de 6 dígitos enviado para o seu Gmail.';
-        document.getElementById('first-login-code').value = '';
+        if (data.codigoSimulado) {
+          document.getElementById('first-login-msg').innerHTML = `${data.message}<br><span style="display:inline-block;margin-top:6px;padding:4px 10px;border-radius:6px;background:rgba(204,164,59,0.15);border:1px solid rgba(204,164,59,0.35);color:#cca43b;font-size:0.8rem;">Código de 1º Acesso: <strong>${data.codigoSimulado}</strong></span>`;
+          document.getElementById('first-login-code').value = data.codigoSimulado;
+        } else {
+          document.getElementById('first-login-msg').textContent = data.message || 'Digite o código de 6 dígitos enviado para o seu Gmail.';
+          document.getElementById('first-login-code').value = '';
+        }
         document.getElementById('first-login-error').style.display = 'none';
         document.getElementById('modal-first-login').classList.add('active');
         submitBtn.disabled = false;
@@ -574,11 +579,14 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
       var res = await api.post('/auth/resend-verification', { identificador: pendingFirstLogin.identificador });
       var successEl = document.getElementById('first-login-success');
       if (successEl) {
-        successEl.textContent = res.message || 'Novo código enviado para o seu Gmail!';
+        successEl.innerHTML = (res.message || 'Novo código gerado!') + (res.codigoSimulado ? `<br><small style="color:#cca43b;">(Código de teste: <strong>${res.codigoSimulado}</strong>)</small>` : '');
         successEl.style.display = 'block';
       }
+      if (res.codigoSimulado) {
+        document.getElementById('first-login-code').value = res.codigoSimulado;
+      }
       if (typeof Toast !== 'undefined') {
-        Toast.success('Código Reenviado', res.message || 'Novo código enviado para o seu Gmail!');
+        Toast.success('Código', res.message || 'Novo código gerado com sucesso!');
       }
     } catch (err) {
       errEl.textContent = err.message || 'Erro ao reenviar código.';

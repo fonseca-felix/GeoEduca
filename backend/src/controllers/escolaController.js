@@ -162,6 +162,7 @@ const escolaController = {
           email: data.email,
           emailRecuperacao: data.emailRecuperacao || (data.email && data.email.endsWith('@gmail.com') ? data.email : null),
           emailVerificado: data.emailVerificado !== false,
+          codigoVerificacao: data.emailVerificado === false ? data.codigoVerificacao : null,
           criadoEm: data.criadoEm,
           totalAlunos: alunosCount,
           totalProvas: provasCount
@@ -234,6 +235,7 @@ const escolaController = {
             email: data.email,
             emailRecuperacao: data.emailRecuperacao || (data.email && data.email.endsWith('@gmail.com') ? data.email : ''),
             emailVerificado: data.emailVerificado !== false,
+            codigoVerificacao: data.emailVerificado === false ? data.codigoVerificacao : null,
             totalAlunos: alunos.length,
             totalProvas: provas.length,
             totalAtividades: atividadesSnap.size + quizzesSnap.size,

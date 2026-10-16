@@ -400,11 +400,15 @@
             ? `<span style="font-size:0.75rem;padding:3px 8px;border-radius:999px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);margin-left:8px;"><i class="fa-brands fa-google"></i> ${gmail}</span>`
             : `<span style="font-size:0.75rem;padding:3px 8px;border-radius:999px;background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);margin-left:8px;">Sem @gmail de recuperação</span>`;
 
+          const codeBadge = (p.emailVerificado === false && p.codigoVerificacao)
+            ? `<span style="font-size:0.75rem;padding:3px 8px;border-radius:999px;background:rgba(204,164,59,0.15);color:#cca43b;border:1px solid rgba(204,164,59,0.35);margin-left:8px;"><i class="fa-solid fa-key"></i> Código 1º Acesso: <strong>${p.codigoVerificacao}</strong></span>`
+            : '';
+
           return `
           <div class="prof-card" onclick="verDetalhes('${p.id}')">
             <div>
               <h3 style="font-family:var(--font-display);color:var(--primary);display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
-                ${p.nome} ${statusBadge}
+                ${p.nome} ${statusBadge} ${codeBadge}
               </h3>
               <p style="font-size:0.875rem;color:var(--muted-foreground);margin-top:4px;">Login: ${p.email}</p>
             </div>
