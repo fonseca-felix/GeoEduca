@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     {
       id: 4, title: 'Memória dos Biomas', category: 'Memória',
-      image: '../assets/jogos/memoria_biomas.png',
+      image: '../assets/jogos/memoria_biomas.webp',
       icon: '<i class="fa-solid fa-leaf"></i>',
       gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
       desc: 'Vire as cartas e encontre os pares: nome do bioma e sua característica principal.',
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       id: 5, title: 'Ordenando por Região', category: 'Regiões',
-      image: '../assets/jogos/ordenando_regioes.png',
+      image: '../assets/jogos/ordenando_regioes.webp',
       icon: '<i class="fa-solid fa-map"></i>',
       gradient: 'linear-gradient(135deg, #ef4444 0%, #991b1b 100%)',
       desc: 'Classifique os estados nas 5 regiões do Brasil: Norte, Nordeste, Centro-Oeste, Sudeste e Sul.',
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       id: 6, title: 'Hidrografias', category: 'Rios',
-      image: '../assets/jogos/hidrografias.png',
+      image: '../assets/jogos/hidrografias.webp',
       icon: '<i class="fa-solid fa-water"></i>',
       gradient: 'linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%)',
       desc: 'Identifique os principais rios brasileiros pelas suas características e extensão.',
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       id: 7, title: 'Desafio da Posição', category: 'Orientação',
-      image: '../assets/jogos/desafio_posicao.png',
+      image: '../assets/jogos/desafio_posicao.webp',
       icon: '<i class="fa-regular fa-compass"></i>',
       gradient: 'linear-gradient(135deg, #f43f5e 0%, #9f1239 100%)',
       desc: 'Responda perguntas sobre a posição geográfica dos estados e suas relações de vizinhança.',
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       id: 9, title: 'Complete a Capital', category: 'Digitação',
-      image: '../assets/jogos/complete_capital.png',
+      image: '../assets/jogos/complete_capital.webp',
       icon: '<i class="fa-solid fa-pen-nib"></i>',
       gradient: 'linear-gradient(135deg, #84cc16 0%, #3f6212 100%)',
       desc: 'Complete o nome correto da capital com base na dica do estado e região.',
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       id: 10, title: 'Fronteiras com Cronômetro', category: 'Fronteiras',
-      image: '../assets/jogos/fronteiras_cronometro.png',
+      image: '../assets/jogos/fronteiras_cronometro.webp',
       icon: '<i class="fa-solid fa-stopwatch"></i>',
       gradient: 'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)',
       desc: 'Marque todos os estados vizinhos antes do tempo acabar!',
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       id: "'detetive_brasil'", title: 'Detetive do Brasil', category: 'Geografia',
-      image: '../assets/jogos/detetive_brasil.png',
+      image: '../assets/jogos/detetive_brasil.webp',
       icon: '<i class="fa-solid fa-user-secret"></i>',
       gradient: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
       desc: 'Persiga um criminoso pelo Brasil usando pistas culturais e geográficas!',
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     grid.innerHTML = games.map(g => {
       const d = difCor[g.dificuldade];
       const thumbContent = g.image
-        ? `<img src="${g.image}" alt="${g.title}" class="game-thumb-img" />`
+        ? `<img src="${g.image}" alt="${g.title}" class="game-thumb-img" loading="lazy" decoding="async" />`
         : `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
             font-size:48px;color:rgba(255,255,255,0.95);filter:drop-shadow(0 4px 12px rgba(0,0,0,.3))">${g.icon}</div>`;
       const thumbStyle = g.image ? '' : `background: ${g.gradient};`;

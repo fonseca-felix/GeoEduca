@@ -26,11 +26,48 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+const zlib = require('zlib');
 
-// Servir o frontend estático (pasta ../frontend)
+// Compressão Gzip nativa para respostas JSON da API (economiza até 80% de dados móveis)
+app.use((req, res, next) => {
+    const acceptEncoding = req.headers['accept-encoding'] || '';
+    if (!acceptEncoding.includes('gzip')) return next();
+
+    const origJson = res.json.bind(res);
+    res.json = (body) => {
+        try {
+            const str = JSON.stringify(body);
+            if (str.length < 512) return origJson(body);
+            zlib.gzip(Buffer.from(str, 'utf-8'), (err, compressed) => {
+                if (err || res.headersSent) return origJson(body);
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                res.setHeader('Content-Encoding', 'gzip');
+                res.setHeader('Vary', 'Accept-Encoding');
+                res.send(compressed);
+            });
+        } catch (e) {
+            return origJson(body);
+        }
+    };
+    next();
+});
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), { maxAge: '7d' }));
+
+// Servir o frontend estático com cache inteligente para economizar dados móveis
 const frontendPath = path.join(__dirname, '..', 'frontend');
-app.use(express.static(frontendPath));
+app.use(express.static(frontendPath, {
+    maxAge: '1d',
+    setHeaders: (res, filePath) => {
+        if (/\.(webp|png|jpg|jpeg|gif|svg|woff2?|ttf|eot)$/i.test(filePath)) {
+            res.setHeader('Cache-Control', 'public, max-age=604800, immutable'); // 7 dias para imagens e fontes
+        } else if (/\.(css|js)$/i.test(filePath)) {
+            res.setHeader('Cache-Control', 'public, max-age=86400'); // 1 dia para CSS/JS
+        } else if (/\.html$/i.test(filePath)) {
+            res.setHeader('Cache-Control', 'no-cache'); // HTML sempre verifica atualizações
+        }
+    }
+}));
 
 // Rate limiting
 const limiter = rateLimit({
