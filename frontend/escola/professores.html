@@ -124,7 +124,7 @@
     <div class="modal-content">
       <h2>Cadastrar Professor</h2>
       <p style="font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 16px;">
-        O GeoEduca enviará as credenciais e um código de 6 dígitos para o Gmail do professor. Esse mesmo Gmail será usado caso ele clique em "Esqueci minha senha".
+        Cadastre o professor com nome, e-mail institucional ou pessoal e defina a senha de acesso inicial.
       </p>
       <form id="form-add" autocomplete="off">
         <div class="field">
@@ -132,8 +132,8 @@
           <input type="text" id="prof-nome" placeholder="Nome completo" autocomplete="off" required>
         </div>
         <div class="field">
-          <label for="prof-email">Email Gmail do Professor (Login e Recuperação)</label>
-          <input type="email" id="prof-email" placeholder="professor@gmail.com" autocomplete="new-password" required>
+          <label for="prof-email">Email do Professor (Login)</label>
+          <input type="email" id="prof-email" placeholder="professor@escola.com.br" autocomplete="new-password" required>
         </div>
         <div class="field">
           <label for="prof-senha">Senha Provisória</label>
@@ -146,7 +146,6 @@
         <div class="password-rules">
           <h4>Critérios de Cadastro e Senha:</h4>
           <ul>
-            <li id="rule-gmail"><i class="fa-solid fa-circle-xmark rule-fail"></i> Email válido do Gmail (@gmail.com)</li>
             <li id="rule-length"><i class="fa-solid fa-circle-xmark rule-fail"></i> Mínimo de 8 e máximo de 20 caracteres</li>
             <li id="rule-upper"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 letra maiúscula</li>
             <li id="rule-special"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)</li>
@@ -159,31 +158,45 @@
 
         <div style="display:flex;gap:12px;justify-content:flex-end">
           <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-add').classList.remove('active')">Cancelar</button>
-          <button type="submit" class="btn" id="btn-cadastrar" disabled>Cadastrar & Enviar Código</button>
+          <button type="submit" class="btn" id="btn-cadastrar" disabled>Cadastrar Professor</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal Vincular/Alterar Gmail de Recuperação -->
-  <div class="modal" id="modal-gmail">
+    <!-- Modal Redefinir Senha do Professor -->
+  <div class="modal" id="modal-reset-senha">
     <div class="modal-content">
-      <h2>Gmail de Recuperação</h2>
+      <h2>Redefinir Senha do Professor</h2>
       <p style="font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 16px;">
-        Defina ou atualize o endereço <strong>@gmail.com</strong> de <strong id="gmail-prof-nome" style="color:var(--primary)"></strong> para envio de códigos de recuperação de senha.
+        Defina uma nova senha para o professor <strong id="reset-prof-nome" style="color:var(--primary)"></strong>. Ele poderá utilizá-la imediatamente para fazer login.
       </p>
-      <form id="form-gmail" autocomplete="off">
-        <input type="hidden" id="gmail-prof-id">
+      <form id="form-reset-senha" autocomplete="off">
+        <input type="hidden" id="reset-prof-id">
         <div class="field">
-          <label for="gmail-prof-input">Endereço Gmail (@gmail.com)</label>
-          <input type="email" id="gmail-prof-input" placeholder="professora@gmail.com" required>
+          <label for="reset-prof-senha">Nova Senha</label>
+          <div class="input-with-icon">
+            <input type="password" id="reset-prof-senha" placeholder="Digite a nova senha" maxlength="20" autocomplete="new-password" required>
+            <button type="button" class="toggle-password" onclick="toggleVisibility('reset-prof-senha', this)" aria-label="Mostrar senha"><i class="fa-regular fa-eye"></i></button>
+          </div>
         </div>
 
-        <div id="gmail-feedback" style="display:none; padding:10px 14px; border-radius:8px; font-size:0.85rem; margin-bottom:14px; line-height:1.4;"></div>
+        <div class="password-rules">
+          <h4>Critérios da Nova Senha:</h4>
+          <ul>
+            <li id="reset-rule-length"><i class="fa-solid fa-circle-xmark rule-fail"></i> Mínimo de 8 e máximo de 20 caracteres</li>
+            <li id="reset-rule-upper"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 letra maiúscula</li>
+            <li id="reset-rule-special"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)</li>
+          </ul>
+          <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 4px;">Exemplo de senha aceita:</div>
+          <div class="example-box">Abcd1234@</div>
+        </div>
+
+        <div id="reset-senha-feedback" style="display:none; padding:10px 14px; border-radius:8px; font-size:0.85rem; margin-bottom:14px; line-height:1.4;"></div>
 
         <div style="display:flex;gap:12px;justify-content:flex-end">
-          <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-gmail').classList.remove('active')">Cancelar</button>
-          <button type="submit" class="btn" id="btn-salvar-gmail">Salvar & Enviar Código</button>
+          <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-reset-senha').classList.remove('active')">Cancelar</button>
+          <button type="submit" class="btn" id="btn-salvar-senha" disabled>Salvar Nova Senha</button>
         </div>
       </form>
     </div>
@@ -229,13 +242,14 @@
       document.getElementById('modal-add').classList.add('active');
     }
 
-    function openModalGmail(event, id, nome, emailAtual) {
-      event.stopPropagation();
-      document.getElementById('gmail-prof-id').value = id;
-      document.getElementById('gmail-prof-nome').textContent = nome;
-      document.getElementById('gmail-prof-input').value = emailAtual || '';
-      clearFormFeedback('gmail-feedback');
-      document.getElementById('modal-gmail').classList.add('active');
+    function openModalResetSenha(event, id, nome) {
+      if (event && event.stopPropagation) event.stopPropagation();
+      document.getElementById('reset-prof-id').value = id;
+      document.getElementById('reset-prof-nome').textContent = nome;
+      document.getElementById('reset-prof-senha').value = '';
+      clearFormFeedback('reset-senha-feedback');
+      validateNewPassword();
+      document.getElementById('modal-reset-senha').classList.add('active');
     }
 
     window.toggleVisibility = function(inputId, btn) {
@@ -255,7 +269,6 @@
     function validateProfPassword() {
       const email = (document.getElementById('prof-email').value || '').trim();
       const pass = document.getElementById('prof-senha').value;
-      const ruleGmail = document.getElementById('rule-gmail');
       const ruleLength = document.getElementById('rule-length');
       const ruleUpper = document.getElementById('rule-upper');
       const ruleSpecial = document.getElementById('rule-special');
@@ -263,10 +276,7 @@
 
       let isValid = true;
 
-      if (/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(email)) {
-        ruleGmail.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Email válido do Gmail (@gmail.com)';
-      } else {
-        ruleGmail.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Email válido do Gmail (@gmail.com)';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         isValid = false;
       }
 
@@ -284,7 +294,7 @@
         isValid = false;
       }
 
-      if (/[!@#$%^&*(),.?":{}|<>\-+=_]/.test(pass)) {
+      if (/[!@#$%^&*(),.?":{}|<>-+=_]/.test(pass)) {
         ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 caractere especial (!@#$%)';
       } else {
         ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)';
@@ -293,6 +303,41 @@
 
       if (pass === '') isValid = false;
       btnCadastrar.disabled = !isValid;
+      return isValid;
+    }
+
+    function validateNewPassword() {
+      const pass = document.getElementById('reset-prof-senha').value;
+      const ruleLength = document.getElementById('reset-rule-length');
+      const ruleUpper = document.getElementById('reset-rule-upper');
+      const ruleSpecial = document.getElementById('reset-rule-special');
+      const btnSalvar = document.getElementById('btn-salvar-senha');
+
+      let isValid = true;
+
+      if (pass.length >= 8 && pass.length <= 20) {
+        ruleLength.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Mínimo de 8 e máximo de 20 caracteres';
+      } else {
+        ruleLength.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Mínimo de 8 e máximo de 20 caracteres';
+        isValid = false;
+      }
+
+      if (/[A-Z]/.test(pass)) {
+        ruleUpper.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 letra maiúscula';
+      } else {
+        ruleUpper.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 letra maiúscula';
+        isValid = false;
+      }
+
+      if (/[!@#$%^&*(),.?":{}|<>-+=_]/.test(pass)) {
+        ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 caractere especial (!@#$%)';
+      } else {
+        ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)';
+        isValid = false;
+      }
+
+      if (pass === '') isValid = false;
+      btnSalvar.disabled = !isValid;
       return isValid;
     }
 
@@ -312,6 +357,7 @@
 
       document.getElementById('prof-email').addEventListener('input', validateProfPassword);
       document.getElementById('prof-senha').addEventListener('input', validateProfPassword);
+      document.getElementById('reset-prof-senha').addEventListener('input', validateNewPassword);
 
       document.getElementById('form-add').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -324,12 +370,12 @@
 
         try {
           btn.disabled = true;
-          btn.textContent = 'Enviando...';
+          btn.textContent = 'Cadastrando...';
           clearFormFeedback('add-feedback');
 
           const res = await api.post('/escola/professor', { nome, email, senha });
           showFormFeedback('add-feedback', res.message || 'Professor cadastrado com sucesso!', false);
-          Toast.success('Professor cadastrado', res.message || 'Credenciais enviadas com sucesso!');
+          Toast.success('Professor cadastrado', res.message || 'Professor cadastrado com sucesso!');
 
           setTimeout(() => {
             document.getElementById('modal-add').classList.remove('active');
@@ -343,44 +389,42 @@
           showFormFeedback('add-feedback', msg, true);
           Toast.error('Erro no cadastro', msg);
         } finally {
-          btn.textContent = 'Cadastrar & Enviar Código';
+          btn.textContent = 'Cadastrar Professor';
           validateProfPassword();
         }
       });
 
-      document.getElementById('form-gmail').addEventListener('submit', async (e) => {
+      document.getElementById('form-reset-senha').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const id = document.getElementById('gmail-prof-id').value;
-        const emailRecuperacao = document.getElementById('gmail-prof-input').value.trim();
-        const btn = document.getElementById('btn-salvar-gmail');
+        if (!validateNewPassword()) return;
 
-        if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(emailRecuperacao)) {
-          showFormFeedback('gmail-feedback', 'Informe um endereço @gmail.com válido.', true);
-          Toast.warning('Email inválido', 'Informe um endereço @gmail.com válido.');
-          return;
-        }
+        const id = document.getElementById('reset-prof-id').value;
+        const novaSenha = document.getElementById('reset-prof-senha').value;
+        const btn = document.getElementById('btn-salvar-senha');
 
         try {
           btn.disabled = true;
           btn.textContent = 'Salvando...';
-          clearFormFeedback('gmail-feedback');
+          clearFormFeedback('reset-senha-feedback');
 
-          const res = await api.put(`/escola/professores/${id}/email`, { emailRecuperacao });
-          showFormFeedback('gmail-feedback', res.message || 'Gmail atualizado com sucesso!', false);
-          Toast.success('Gmail salvo', res.message || 'Gmail atualizado com sucesso!');
+          const res = await api.put('/escola/professores/' + id + '/senha', { novaSenha });
+          showFormFeedback('reset-senha-feedback', res.message || 'Senha redefinida com sucesso!', false);
+          Toast.success('Senha redefinida', res.message || 'Senha do professor redefinida com sucesso!');
 
           setTimeout(() => {
-            document.getElementById('modal-gmail').classList.remove('active');
-            clearFormFeedback('gmail-feedback');
+            document.getElementById('modal-reset-senha').classList.remove('active');
+            clearFormFeedback('reset-senha-feedback');
+            document.getElementById('reset-prof-senha').value = '';
             loadProfessores();
           }, 900);
         } catch (err) {
-          const msg = err.message || 'Erro ao salvar Gmail';
-          showFormFeedback('gmail-feedback', msg, true);
-          Toast.error('Erro ao salvar', msg);
+          const msg = err.message || 'Erro ao redefinir senha';
+          showFormFeedback('reset-senha-feedback', msg, true);
+          Toast.error('Erro', msg);
         } finally {
           btn.disabled = false;
-          btn.textContent = 'Salvar & Enviar Código';
+          btn.textContent = 'Salvar Nova Senha';
+          validateNewPassword();
         }
       });
     });
@@ -395,32 +439,22 @@
         }
 
         list.innerHTML = profs.map(p => {
-          const gmail = p.emailRecuperacao || (p.email && p.email.endsWith('@gmail.com') ? p.email : '');
-          const statusBadge = gmail
-            ? `<span style="font-size:0.75rem;padding:3px 8px;border-radius:999px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);margin-left:8px;"><i class="fa-brands fa-google"></i> ${gmail}</span>`
-            : `<span style="font-size:0.75rem;padding:3px 8px;border-radius:999px;background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);margin-left:8px;">Sem @gmail de recuperação</span>`;
-
-          const codeBadge = (p.emailVerificado === false && p.codigoVerificacao)
-            ? `<span style="font-size:0.75rem;padding:3px 8px;border-radius:999px;background:rgba(204,164,59,0.15);color:#cca43b;border:1px solid rgba(204,164,59,0.35);margin-left:8px;"><i class="fa-solid fa-key"></i> Código 1º Acesso: <strong>${p.codigoVerificacao}</strong></span>`
-            : '';
-
-          return `
-          <div class="prof-card" onclick="verDetalhes('${p.id}')">
-            <div>
-              <h3 style="font-family:var(--font-display);color:var(--primary);display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
-                ${p.nome} ${statusBadge} ${codeBadge}
-              </h3>
-              <p style="font-size:0.875rem;color:var(--muted-foreground);margin-top:4px;">Login: ${p.email}</p>
-            </div>
-            <div style="text-align:right;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-              <span><strong style="color:var(--foreground)">${p.totalAlunos}</strong> Alunos</span>
-              <span><strong style="color:var(--foreground)">${p.totalProvas}</strong> Provas</span>
-              <button type="button" class="btn" style="padding:6px 12px;font-size:0.8rem;" onclick="openModalGmail(event, '${p.id}', '${p.nome.replace(/'/g, "\\'")}', '${gmail}')">
-                <i class="fa-solid fa-envelope"></i> ${gmail ? 'Alterar Gmail' : 'Vincular Gmail'}
-              </button>
-            </div>
-          </div>
-        `}).join('');
+          return '<div class="prof-card" onclick="verDetalhes(\'' + p.id + '\')">' +
+            '<div>' +
+              '<h3 style="font-family:var(--font-display);color:var(--primary);display:flex;align-items:center;flex-wrap:wrap;gap:6px;">' +
+                p.nome + ' <span style="font-size:0.75rem;padding:3px 8px;border-radius:999px;background:rgba(204,164,59,0.12);color:var(--primary);border:1px solid rgba(204,164,59,0.3);"><i class="fa-solid fa-chalkboard-user"></i> Professor</span>' +
+              '</h3>' +
+              '<p style="font-size:0.875rem;color:var(--muted-foreground);margin-top:4px;">Login: ' + p.email + '</p>' +
+            '</div>' +
+            '<div style="text-align:right;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">' +
+              '<span><strong style="color:var(--foreground)">' + (p.totalAlunos || 0) + '</strong> Alunos</span>' +
+              '<span><strong style="color:var(--foreground)">' + (p.totalProvas || 0) + '</strong> Provas</span>' +
+              '<button type="button" class="btn" style="padding:6px 12px;font-size:0.8rem;" onclick="openModalResetSenha(event, \'' + p.id + '\', \'' + p.nome.replace(/'/g, "\\'") + '\')">' +
+                '<i class="fa-solid fa-key"></i> Redefinir Senha' +
+              '</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
       } catch (err) {
         list.innerHTML = '<p style="color:red">Erro ao carregar lista</p>';
       }

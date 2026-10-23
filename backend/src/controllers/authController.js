@@ -6,7 +6,7 @@ const { sendProfessorWelcomeEmail, sendPasswordResetCodeEmail } = require('../se
 // Nova função unificada de Login
 const login = async (req, res) => {
     try {
-        const { identificador, senha, codigoVerificacao, 'g-recaptcha-response': recaptchaResponse } = req.body;
+        const { identificador, senha, 'g-recaptcha-response': recaptchaResponse } = req.body;
 
         if (!identificador || !senha) {
             return res.status(400).json({ error: 'Identificador e senha são obrigatórios' });
@@ -14,7 +14,7 @@ const login = async (req, res) => {
 
         // Verify reCAPTCHA if secret is set (skip on 2nd step when codigoVerificacao is being submitted)
         const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
-        if (recaptchaSecret && !codigoVerificacao) {
+        if (recaptchaSecret) {
             if (!recaptchaResponse) {
                 return res.status(400).json({ error: 'Validação de reCAPTCHA é obrigatória' });
             }
@@ -101,27 +101,6 @@ const login = async (req, res) => {
             const profData = profDoc.data();
             const senhaValida = await bcrypt.compare(senha, profData.senha);
             if (!senhaValida) return res.status(401).json({ error: 'Credenciais inválidas' });
-
-            // Verificação de 1º login via código enviado ao Gmail
-            if (profData.emailVerificado === false && profData.codigoVerificacao) {
-                if (!codigoVerificacao) {
-                    return res.json({
-                        requiresVerification: true,
-                        email: profData.emailRecuperacao || profData.email,
-                        codigoSimulado: profData.codigoVerificacao,
-                        message: `Enviamos um código de 6 dígitos para ${profData.emailRecuperacao || profData.email}. Digite-o abaixo para confirmar seu 1º acesso.`
-                    });
-                }
-
-                if (String(codigoVerificacao).trim() !== String(profData.codigoVerificacao).trim()) {
-                    return res.status(400).json({ error: 'Código de confirmação incorreto. Verifique seu Gmail.' });
-                }
-
-                await db.collection('professores').doc(profDoc.id).update({
-                    emailVerificado: true,
-                    codigoVerificacao: null
-                });
-            }
 
             const token = jwt.sign(
                 { id: profDoc.id, tipo: 'prof', email: profData.email, escolaId: profData.escolaId },

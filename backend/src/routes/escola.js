@@ -18,6 +18,7 @@ router.post('/professor', checkEscola, escolaController.createProfessor);
 router.get('/professores', checkEscola, escolaController.getProfessores);
 router.get('/professores/:id', checkEscola, escolaController.getProfessorDetalhes);
 router.put('/professores/:id/email', checkEscola, escolaController.updateProfessorEmail);
+router.put('/professores/:id/senha', checkEscola, escolaController.resetProfessorPassword);
 router.get('/stats', checkEscola, escolaController.getStats);
 
 module.exports = router;

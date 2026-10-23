@@ -49,7 +49,20 @@
     .field label { display: block; font-size: 0.875rem; color: var(--muted-foreground); margin-bottom: 6px; }
     .field input { width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--foreground); font-family: inherit; font-size: 0.9rem; }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; background: var(--primary); color: var(--primary-foreground); border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+  
+    .input-with-icon { position: relative; display: flex; align-items: center; }
+    .input-with-icon input { width: 100%; padding: 10px 40px 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--foreground); }
+    .toggle-password { position: absolute; right: 10px; background: none; border: none; color: var(--muted-foreground); cursor: pointer; padding: 4px; }
+    .password-rules { background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 0.8rem; }
+    .password-rules h4 { font-size: 0.82rem; margin-bottom: 8px; color: var(--foreground); }
+    .password-rules ul { list-style: none; display: flex; flex-direction: column; gap: 4px; padding-left: 0; }
+    .password-rules li { display: flex; align-items: center; gap: 6px; }
+    .rule-pass { color: #10b981; }
+    .rule-fail { color: #ef4444; }
+    .example-box { font-family: monospace; background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px; color: var(--primary); }
+
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
   <div class="layout">
@@ -83,24 +96,38 @@
     </main>
   </div>
 
-  <!-- Modal Vincular/Alterar Gmail de Recuperação -->
-  <div class="modal" id="modal-gmail">
+    <!-- Modal Redefinir Senha do Professor -->
+  <div class="modal" id="modal-reset-senha">
     <div class="modal-content">
-      <h2 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:8px;">Gmail de Recuperação</h2>
+      <h2 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:8px;">Redefinir Senha do Professor</h2>
       <p style="font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 16px;">
-        Defina ou atualize o endereço <strong>@gmail.com</strong> do professor para envio de códigos de recuperação e validação de acesso.
+        Defina uma nova senha para este professor. Ele poderá utilizá-la imediatamente para fazer login no GeoEduca.
       </p>
-      <form id="form-gmail" autocomplete="off">
+      <form id="form-reset-senha" autocomplete="off">
         <div class="field">
-          <label for="gmail-prof-input">Endereço Gmail (@gmail.com)</label>
-          <input type="email" id="gmail-prof-input" placeholder="professor@gmail.com" required>
+          <label for="reset-prof-senha">Nova Senha</label>
+          <div class="input-with-icon">
+            <input type="password" id="reset-prof-senha" placeholder="Digite a nova senha" maxlength="20" autocomplete="new-password" required>
+            <button type="button" class="toggle-password" onclick="toggleVisibility('reset-prof-senha', this)" aria-label="Mostrar senha"><i class="fa-regular fa-eye"></i></button>
+          </div>
         </div>
 
-        <div id="details-gmail-feedback" style="display:none; padding:10px 14px; border-radius:8px; font-size:0.85rem; margin-bottom:14px; line-height:1.4;"></div>
+        <div class="password-rules">
+          <h4>Critérios da Nova Senha:</h4>
+          <ul>
+            <li id="detail-rule-length"><i class="fa-solid fa-circle-xmark rule-fail"></i> Mínimo de 8 e máximo de 20 caracteres</li>
+            <li id="detail-rule-upper"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 letra maiúscula</li>
+            <li id="detail-rule-special"><i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)</li>
+          </ul>
+          <div style="font-size: 12px; color: var(--muted-foreground); margin-bottom: 4px;">Exemplo de senha aceita:</div>
+          <div class="example-box">Abcd1234@</div>
+        </div>
+
+        <div id="details-reset-feedback" style="display:none; padding:10px 14px; border-radius:8px; font-size:0.85rem; margin-bottom:14px; line-height:1.4;"></div>
 
         <div style="display:flex;gap:12px;justify-content:flex-end">
-          <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-gmail').classList.remove('active')">Cancelar</button>
-          <button type="submit" class="btn" id="btn-salvar-gmail">Salvar & Enviar Código</button>
+          <button type="button" class="btn" style="background:transparent;border:1px solid var(--border);color:var(--foreground)" onclick="document.getElementById('modal-reset-senha').classList.remove('active')">Cancelar</button>
+          <button type="submit" class="btn" id="btn-salvar-senha" disabled>Salvar Nova Senha</button>
         </div>
       </form>
     </div>
@@ -151,7 +178,56 @@
       const logoutBtn = document.querySelector('[data-action="logout"]');
       if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
 
-      const urlParams = new URLSearchParams(window.location.search);
+      window.toggleVisibility = function(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    };
+
+    function validateDetailPassword() {
+      const pass = document.getElementById('reset-prof-senha').value;
+      const ruleLength = document.getElementById('detail-rule-length');
+      const ruleUpper = document.getElementById('detail-rule-upper');
+      const ruleSpecial = document.getElementById('detail-rule-special');
+      const btnSalvar = document.getElementById('btn-salvar-senha');
+
+      let isValid = true;
+
+      if (pass.length >= 8 && pass.length <= 20) {
+        ruleLength.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Mínimo de 8 e máximo de 20 caracteres';
+      } else {
+        ruleLength.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Mínimo de 8 e máximo de 20 caracteres';
+        isValid = false;
+      }
+
+      if (/[A-Z]/.test(pass)) {
+        ruleUpper.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 letra maiúscula';
+      } else {
+        ruleUpper.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 letra maiúscula';
+        isValid = false;
+      }
+
+      if (/[!@#$%^&*(),.?":{}|<>-+=_]/.test(pass)) {
+        ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 caractere especial (!@#$%)';
+      } else {
+        ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)';
+        isValid = false;
+      }
+
+      if (pass === '') isValid = false;
+      btnSalvar.disabled = !isValid;
+      return isValid;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
       const profId = urlParams.get('id');
 
       if (!profId) {
@@ -164,61 +240,52 @@
         const data = await api.get('/escola/professores/' + profId);
         
         document.getElementById('prof-nome').textContent = data.nome;
-        document.getElementById('prof-email').textContent = data.email;
+        document.getElementById('prof-email').textContent = 'Login: ' + data.email;
         document.getElementById('stat-alunos').textContent = data.totalAlunos || 0;
         document.getElementById('stat-provas').textContent = data.totalProvas || 0;
         document.getElementById('stat-atividades').textContent = data.totalAtividades || 0;
         
-        const gmailSpan = document.createElement('p');
-        gmailSpan.style.cssText = 'color: var(--muted-foreground); font-size: 0.9rem; margin-top: -24px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;';
-        let currentGmail = data.emailRecuperacao || (data.email && data.email.endsWith('@gmail.com') ? data.email : '');
-        gmailSpan.innerHTML = `
-          <span>Gmail de Recuperação: <strong id="current-gmail-text" style="color:var(--foreground)">${currentGmail || 'Não vinculado'}</strong></span>
-          <button class="btn" id="btn-edit-gmail" style="padding:4px 10px;font-size:0.75rem;background:var(--secondary);color:var(--foreground);border:1px solid var(--border);cursor:pointer;border-radius:6px;">
-            ${currentGmail ? 'Alterar Gmail' : 'Vincular Gmail'}
-          </button>
-        `;
-        document.getElementById('prof-email').after(gmailSpan);
+        const actionArea = document.createElement('div');
+        actionArea.style.cssText = 'margin-top: -16px; margin-bottom: 28px;';
+        actionArea.innerHTML = '<button class="btn" id="btn-open-reset-pwd" style="padding:8px 16px;font-size:0.85rem;"><i class="fa-solid fa-key"></i> Redefinir Senha do Professor</button>';
+        document.getElementById('prof-email').after(actionArea);
 
-        document.getElementById('btn-edit-gmail').addEventListener('click', () => {
-          document.getElementById('gmail-prof-input').value = currentGmail || '';
-          clearFormFeedback('details-gmail-feedback');
-          document.getElementById('modal-gmail').classList.add('active');
+        document.getElementById('reset-prof-senha').addEventListener('input', validateDetailPassword);
+
+        document.getElementById('btn-open-reset-pwd').addEventListener('click', () => {
+          document.getElementById('reset-prof-senha').value = '';
+          clearFormFeedback('details-reset-feedback');
+          validateDetailPassword();
+          document.getElementById('modal-reset-senha').classList.add('active');
         });
 
-        document.getElementById('form-gmail').addEventListener('submit', async (e) => {
+        document.getElementById('form-reset-senha').addEventListener('submit', async (e) => {
           e.preventDefault();
-          const novo = document.getElementById('gmail-prof-input').value.trim();
-          const btn = document.getElementById('btn-salvar-gmail');
-
-          if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(novo)) {
-            showFormFeedback('details-gmail-feedback', 'Por favor, informe um endereço válido @gmail.com', true);
-            Toast.warning('Email inválido', 'Informe um endereço válido @gmail.com');
-            return;
-          }
+          if (!validateDetailPassword()) return;
+          const novaSenha = document.getElementById('reset-prof-senha').value;
+          const btn = document.getElementById('btn-salvar-senha');
 
           try {
             btn.disabled = true;
             btn.textContent = 'Salvando...';
-            clearFormFeedback('details-gmail-feedback');
+            clearFormFeedback('details-reset-feedback');
 
-            const res = await api.put('/escola/professores/' + profId + '/email', { emailRecuperacao: novo });
-            showFormFeedback('details-gmail-feedback', res.message || 'Gmail salvo com sucesso!', false);
-            Toast.success('Gmail salvo', res.message || 'Gmail de recuperação salvo com sucesso!');
-            currentGmail = novo;
-            document.getElementById('current-gmail-text').textContent = novo;
+            const res = await api.put('/escola/professores/' + profId + '/senha', { novaSenha });
+            showFormFeedback('details-reset-feedback', res.message || 'Senha redefinida com sucesso!', false);
+            Toast.success('Senha redefinida', res.message || 'Senha do professor redefinida com sucesso!');
 
             setTimeout(() => {
-              document.getElementById('modal-gmail').classList.remove('active');
-              clearFormFeedback('details-gmail-feedback');
-            }, 800);
+              document.getElementById('modal-reset-senha').classList.remove('active');
+              clearFormFeedback('details-reset-feedback');
+            }, 900);
           } catch(err) {
-            const msg = err.message || 'Erro ao salvar Gmail';
-            showFormFeedback('details-gmail-feedback', msg, true);
-            Toast.error('Erro ao salvar', msg);
+            const msg = err.message || 'Erro ao redefinir senha';
+            showFormFeedback('details-reset-feedback', msg, true);
+            Toast.error('Erro', msg);
           } finally {
             btn.disabled = false;
-            btn.textContent = 'Salvar & Enviar Código';
+            btn.textContent = 'Salvar Nova Senha';
+            validateDetailPassword();
           }
         });
 
