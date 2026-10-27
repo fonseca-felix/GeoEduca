@@ -16,7 +16,38 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch (e) { /* ignore */ }
 
   const games = [
-    
+    {
+      id: "'detetive_brasil'", title: 'Detetive do Brasil', category: 'Investigação',
+      image: '../jogos/detetive-brasil/assets/celebracao/copero-detetive.webp',
+      icon: '<i class="fa-solid fa-user-secret"></i>',
+      gradient: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+      desc: 'Siga pistas culturais e geográficas, interrogue testemunhas e capture o suspeito em até 72 horas com o Copero!',
+      dificuldade: 'Médio', tempoMedio: '72h de jogo'
+    },
+    {
+      id: "'missao_brasil'", title: 'Missão Brasil', category: 'Geografia',
+      image: '../jogos/missao-brasil/assets/celebracao/classic.webp',
+      icon: '<i class="fa-solid fa-earth-americas"></i>',
+      gradient: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+      desc: 'Explore bandeiras, capitais e biomas dos 27 estados! 3 vidas, 5 segundos por resposta, álbum e conquistas.',
+      dificuldade: 'Médio', tempoMedio: '5s / pergunta'
+    },
+    {
+      id: "'geobr'", title: 'GeoBr · Desafio do Brasil', category: 'Brasil',
+      image: '../jogos/geobr/assets/celebracao/classic.webp',
+      icon: '<i class="fa-solid fa-flag"></i>',
+      gradient: 'linear-gradient(135deg, #047857 0%, #065f46 100%)',
+      desc: 'Quanto você conhece do Brasil? Enfrente os desafios de Bandeiras, Capitais e Biomas por região com o Copero!',
+      dificuldade: 'Médio', tempoMedio: '5s / pergunta'
+    },
+    {
+      id: "'geomundo'", title: 'GeoMundo · Jornada Mundial', category: 'Mundo',
+      image: '../jogos/geomundo/assets/celebracao/escot.webp',
+      icon: '<i class="fa-solid fa-globe"></i>',
+      gradient: 'linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%)',
+      desc: 'O mundo é sua próxima descoberta! 7 etapas pelos continentes com mapa interativo Leaflet e exploração de países.',
+      dificuldade: 'Médio', tempoMedio: '7 Etapas'
+    },
     {
       id: 4, title: 'Memória dos Biomas', category: 'Memória',
       image: '../assets/jogos/memoria_biomas.webp',
@@ -72,22 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
       desc: 'Marque todos os estados vizinhos antes do tempo acabar!',
       dificuldade: 'Difícil', tempoMedio: '5 min'
     },
-
-    {
-      id: "'missao_brasil'", title: 'Missão Brasil', category: 'Geografia',
-      icon: '<i class="fa-solid fa-earth-americas"></i>',
-      gradient: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
-      desc: 'Aprenda bandeiras, capitais e biomas dos 27 estados. Suba patentes e complete seu álbum!',
-      dificuldade: 'Médio', tempoMedio: 'Livre'
-    },
-    {
-      id: "'detetive_brasil'", title: 'Detetive do Brasil', category: 'Geografia',
-      image: '../assets/jogos/detetive_brasil.webp',
-      icon: '<i class="fa-solid fa-user-secret"></i>',
-      gradient: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-      desc: 'Persiga um criminoso pelo Brasil usando pistas culturais e geográficas!',
-      dificuldade: 'Médio', tempoMedio: '10 min'
-    },
     {
       id: "'rosa_ventos'", title: 'Desafio da Rosa dos Ventos', category: 'Orientação',
       icon: '<i class="fa-regular fa-compass"></i>',
@@ -97,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
-  const difCor = {
+    const difCor = {
     'Fácil':  { bg: 'var(--color-success-light)', c: 'var(--color-success)', b: 'rgba(39,103,73,.3)' },
     'Médio':  { bg: 'var(--color-warning-light)', c: 'var(--color-warning)', b: 'rgba(214,158,46,.3)' },
     'Difícil':{ bg: 'var(--color-danger-light)',  c: 'var(--color-danger)',  b: 'rgba(197,48,48,.3)' }
@@ -236,12 +251,20 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (id === 'missao_brasil') {
-      window.location.href = 'missao_brasil.html';
+    if (id === 'detetive_brasil') {
+      window.location.href = '../jogos/detetive-brasil/detetive-brasil.html';
       return;
     }
-    if (id === 'detetive_brasil') {
-      window.location.href = '../detetive-brasil.html';
+    if (id === 'missao_brasil') {
+      window.location.href = '../jogos/missao-brasil/index.html';
+      return;
+    }
+    if (id === 'geobr') {
+      window.location.href = '../jogos/geobr/index.html';
+      return;
+    }
+    if (id === 'geomundo') {
+      window.location.href = '../jogos/geomundo/index.html';
       return;
     }
     if (id === 'rosa_ventos') {

@@ -1,0 +1,2066 @@
+/* ============================================================
+   MISSÃO BRASIL - NEOBRUTALISM CLÁSSICO (VERSÃO OTIMIZADA)
+   ============================================================ */
+
+/* ========== RESET E VARIÁVEIS ========== */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ============================================================
+   GEO BR — IDENTIDADE VISUAL OFICIAL
+   ============================================================ */
+:root {
+    --bg: #f7f7fb;
+    --surface: #ffffff;
+    --text: #0b0a32;
+    --text-light: #5f6072;
+    --border: #0b0a32;
+    --border-light: #e2e2ea;
+    --primary: #0b0a32;
+    --primary-dark: #070621;
+    --primary-light: rgba(11, 10, 50, 0.08);
+    --primary-gradient: linear-gradient(135deg, #0b0a32 0%, #24235a 100%);
+    --success: #233b0b;
+    --success-bg: rgba(35, 59, 11, 0.12);
+    --error: #e55e5f;
+    --error-bg: rgba(229, 94, 95, 0.12);
+    --warning: #cca43b;
+    --gold: #cca43b;
+    --shadow: 0 16px 45px rgba(11, 10, 50, 0.12);
+    --shadow-sm: 0 8px 24px rgba(11, 10, 50, 0.10);
+    --shadow-lg: 0 24px 60px rgba(11, 10, 50, 0.16);
+    --font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+body {
+    background:
+        radial-gradient(circle at 8% 12%, rgba(204, 164, 59, .12), transparent 24%),
+        radial-gradient(circle at 92% 82%, rgba(11, 10, 50, .10), transparent 25%),
+        var(--bg);
+}
+
+.app { padding: 32px 20px; }
+.screen { max-width: 980px; }
+.card-neo,
+.modal-neo {
+    border: 1px solid var(--border-light);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+.neo-header { border-bottom: 0; padding: 34px 28px 30px; }
+.neo-title { font-size: clamp(36px, 7vw, 54px); letter-spacing: -2px; }
+.neo-title .highlight { color: var(--gold); -webkit-text-fill-color: var(--gold); }
+.neo-title .highlight::after { background: var(--gold); }
+.neo-perfil,
+.neo-modo,
+.neo-filtro { border-bottom: 1px solid var(--border-light); }
+.neo-stat,
+.neo-btn-modo,
+.neo-select,
+.neo-alt,
+.neo-bandeira,
+.neo-ranking,
+.neo-album-mini,
+.neo-bioma-tracker,
+.stat-row,
+.neo-input,
+.neo-select-modal {
+    border-color: var(--border-light) !important;
+    border-radius: 16px;
+}
+.neo-stat:hover,
+.neo-btn-modo:hover,
+.neo-alt:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.neo-btn,
+.neo-ranking-btn {
+    border-radius: 14px;
+    border-width: 1px;
+    box-shadow: none;
+}
+.neo-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.neo-btn-primary { background: var(--primary-gradient); }
+.neo-avatar-img { border: 1px solid var(--border-light); box-shadow: none; background: rgba(204,164,59,.10); }
+.neo-player-name { color: var(--text-light); font-weight: 800; font-size: 12px; letter-spacing: .08em; }
+
+.sound-toggle {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--primary);
+    box-shadow: var(--shadow-sm);
+    font: 800 11px var(--font-family);
+    cursor: pointer;
+}
+.sound-toggle.muted { color: var(--text-light); background: #f0f0f4; }
+
+.neo-game-header { gap: 10px; flex-wrap: wrap; }
+.neo-game-player {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px 5px 5px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+}
+.neo-game-player img { width: 36px; height: 36px; object-fit: contain; border-radius: 50%; background: white; }
+.neo-lives { color: #ffb1b2; }
+.neo-lives.danger { animation: lifePulse .7s ease-in-out infinite alternate; }
+@keyframes lifePulse { to { transform: scale(1.08); } }
+
+.neo-btn-hint {
+    width: auto;
+    margin: 0 auto 14px;
+    padding: 10px 18px;
+    background: rgba(204,164,59,.12);
+    color: #80630d;
+    border-color: rgba(204,164,59,.35);
+}
+.neo-btn-hint:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+.neo-alt.hint-hidden { opacity: .16; pointer-events: none; filter: grayscale(1); }
+
+.notification { border-radius: 18px; border-width: 1px; }
+.notification-mascot { width: 72px; height: 72px; object-fit: contain; flex: 0 0 72px; animation: mascotIn .35s ease-out both; }
+@keyframes mascotIn { from { opacity: 0; transform: translateY(8px) scale(.88); } }
+.result-mascot { width: 150px; height: 150px; object-fit: contain; margin: -8px auto -20px; display: block; }
+
+.character-picker { border: 0; margin-top: 20px; }
+.character-picker legend { font-size: 11px; font-weight: 900; letter-spacing: .08em; color: var(--text-light); margin-bottom: 10px; }
+.character-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.character-option {
+    min-width: 0;
+    padding: 7px;
+    border: 2px solid var(--border-light);
+    border-radius: 15px;
+    background: #fafafd;
+    color: var(--text);
+    font-family: inherit;
+    cursor: pointer;
+    transition: .18s ease;
+}
+.character-option:hover { transform: translateY(-2px); border-color: var(--gold); }
+.character-option.selected { border-color: var(--primary); background: rgba(204,164,59,.13); box-shadow: 0 0 0 3px rgba(204,164,59,.22); }
+.character-option img { width: 100%; height: 92px; object-fit: contain; }
+.character-option strong,
+.character-option small { display: block; }
+.character-option strong { font-size: 12px; }
+.character-option small { color: var(--text-light); font-size: 9px; margin-top: 2px; }
+.character-error { color: var(--error); min-height: 18px; text-align: center; font-weight: 700; font-size: 12px; margin-top: 7px; }
+.ranking-avatar { width: 34px; height: 34px; object-fit: contain; border-radius: 50%; background: rgba(204,164,59,.12); }
+
+@media (max-width: 640px) {
+    .app { padding: 12px 8px 28px; }
+    .card-neo { border-radius: 18px; }
+    .sound-toggle { top: 10px; right: 10px; }
+    .sound-toggle span { display: none; }
+    .character-options { grid-template-columns: repeat(2, 1fr); }
+    .character-option img { height: 82px; }
+    .neo-game-player { width: 100%; justify-content: center; order: -1; }
+    .notification { align-items: center; }
+    .notification-mascot { width: 58px; height: 58px; flex-basis: 58px; }
+}
+
+:root {
+    /* Cores Base */
+    --bg: #F0F2F5;
+    --surface: #FFFFFF;
+    --text: #1A1A1A;
+    --text-light: #666666;
+    --text-inverse: #FFFFFF;
+    
+    /* Bordas */
+    --border: #1A1A1A;
+    --border-light: #D4D4D4;
+    --border-radius: 0;
+    
+    /* Cores Primárias */
+    --primary: #005C8A;
+    --primary-dark: #003D5E;
+    --primary-light: #E6F3F8;
+    --primary-gradient: linear-gradient(135deg, #001F3F 0%, #003D5E 30%, #005C8A 60%, #0077B3 100%);
+    
+    /* Feedback */
+    --success: #00875A;
+    --success-bg: #E8F5E9;
+    --error: #D32F2F;
+    --error-bg: #FEF3E2;
+    --warning: #FF8C00;
+    --info: #0066CC;
+    --info-bg: #E3F2FD;
+    --gold: #FFD700;
+    
+    /* Sombras */
+    --shadow: 6px 6px 0px var(--border);
+    --shadow-sm: 4px 4px 0px var(--border);
+    --shadow-lg: 8px 8px 0px var(--border);
+    --shadow-inset: inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+    
+    /* Espaçamentos */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    --spacing-2xl: 32px;
+    
+    /* Tipografia */
+    --font-family: 'Inter', 'Segoe UI', sans-serif;
+    --font-weight-bold: 800;
+    --font-weight-semibold: 600;
+    --font-weight-medium: 500;
+    --font-weight-regular: 400;
+    
+    /* Transições */
+    --transition-fast: 0.05s linear;
+    --transition-medium: 0.2s ease;
+    --transition-slow: 0.3s ease;
+    
+    /* Tamanhos */
+    --flag-height: 150px;
+    --avatar-size: 70px;
+}
+
+/* ========== BASE ========== */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-family);
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========== APP CONTAINER ========== */
+.app {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+}
+
+/* ========== SCREENS ========== */
+.screen {
+    display: none;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.screen.active {
+    display: block;
+    animation: slideUp var(--transition-slow) ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulseIcon {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* ========== CARDS ========== */
+.card-neo {
+    background: var(--surface);
+    border: 3px solid var(--border);
+    box-shadow: var(--shadow);
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   HEADER REFORMULADO - SEM BANDEIRA DE FUNDO
+   ============================================================ */
+.neo-header {
+    background: var(--primary-gradient);
+    border-bottom: 4px solid var(--border);
+    padding: 32px 32px 28px;
+    text-align: center;
+    color: var(--text-inverse);
+    position: relative;
+    overflow: hidden;
+}
+
+.neo-header .decoration {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.04;
+}
+
+.neo-header .decoration-1 {
+    width: 250px;
+    height: 250px;
+    background: var(--gold);
+    top: -100px;
+    right: -60px;
+}
+
+.neo-header .decoration-2 {
+    width: 180px;
+    height: 180px;
+    background: #00C853;
+    bottom: -80px;
+    left: -40px;
+}
+
+.neo-header .decoration-3 {
+    width: 100px;
+    height: 100px;
+    background: #FF6B35;
+    top: 20px;
+    left: 40%;
+}
+
+.neo-icon-wrapper {
+    display: inline-block;
+    position: relative;
+    margin-bottom: 4px;
+}
+
+.neo-icon {
+    font-size: 48px;
+    display: inline-block;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+    position: relative;
+    z-index: 1;
+    animation: pulseIcon 3s ease-in-out infinite;
+}
+
+.neo-title {
+    font-family: var(--font-family);
+    font-size: 44px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.05;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.neo-title .highlight {
+    background: linear-gradient(135deg, #FFD700, #FFA000, #FF6F00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+    position: relative;
+}
+
+.neo-title .highlight::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #FFD700, transparent);
+    border-radius: 2px;
+}
+
+.neo-sub {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.85;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 6px;
+}
+
+.neo-sub .sep {
+    margin: 0 8px;
+    color: #FFD700;
+}
+
+.neo-sub i {
+    margin: 0 4px;
+    color: #FFD700;
+    font-size: 12px;
+}
+
+.neo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 8px 20px;
+    border-radius: 50px;
+    margin-top: 14px;
+    position: relative;
+    z-index: 1;
+}
+
+.neo-badge-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.neo-badge-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* ========== PERFIL ========== */
+.neo-perfil {
+    padding: var(--spacing-xl) 28px;
+    border-bottom: 3px solid var(--border-light);
+    background: linear-gradient(135deg, #FFFFFF 0%, #FAFBFC 100%);
+}
+
+.neo-avatar {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    margin-bottom: 20px;
+}
+
+.neo-avatar-img {
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    object-fit: contain;
+    border: 3px solid var(--border);
+    border-radius: 50%;
+    padding: 6px;
+    background: white;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast);
+}
+
+.neo-avatar-img:hover {
+    transform: scale(1.05);
+}
+
+.neo-avatar div {
+    display: flex;
+    flex-direction: column;
+}
+
+.neo-nivel {
+    font-size: 24px;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.5px;
+    color: var(--primary);
+}
+
+.neo-proximo {
+    font-size: 11px;
+    color: var(--text-light);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.5px;
+}
+
+/* ========== XP BAR ========== */
+.neo-xp {
+    margin-bottom: 20px;
+}
+
+.neo-xp-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.neo-xp-bar {
+    background: var(--border-light);
+    border: 2px solid var(--border);
+    height: 18px;
+    overflow: hidden;
+    position: relative;
+}
+
+.neo-xp-fill {
+    background: linear-gradient(90deg, var(--success), var(--warning));
+    width: 0%;
+    height: 100%;
+    transition: width var(--transition-medium);
+    position: relative;
+}
+
+.neo-xp-fill::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+/* ========== STATS ========== */
+.neo-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
+}
+
+.neo-stat {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    padding: var(--spacing-md) var(--spacing-sm);
+    text-align: center;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    cursor: default;
+}
+
+.neo-stat:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.neo-stat i {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 6px;
+    color: var(--primary);
+}
+
+.neo-stat-value {
+    font-size: 24px;
+    font-weight: var(--font-weight-bold);
+    display: block;
+    line-height: 1;
+}
+
+.neo-stat-small {
+    font-size: 11px;
+    font-weight: var(--font-weight-medium);
+}
+
+.neo-stat-label {
+    font-size: 9px;
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-top: 6px;
+    color: var(--text-light);
+}
+
+/* ========== MODO DE JOGO ========== */
+.neo-modo {
+    padding: var(--spacing-lg) 28px;
+    border-bottom: 3px solid var(--border-light);
+}
+
+.neo-label {
+    font-size: 11px;
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text-light);
+}
+
+.neo-modo-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.neo-btn-modo {
+    flex: 1;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    padding: 10px;
+    font-family: inherit;
+    font-weight: var(--font-weight-bold);
+    font-size: 13px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    letter-spacing: 0.5px;
+}
+
+.neo-btn-modo:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.neo-btn-modo:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+.neo-btn-modo.active {
+    background: var(--primary-gradient);
+    color: var(--text-inverse);
+    border-color: var(--border);
+    box-shadow: var(--shadow-sm);
+    transform: translate(-2px, -2px);
+}
+
+.neo-btn-modo.active:hover {
+    transform: translate(-1px, -1px);
+}
+
+/* ========== FILTRO ========== */
+.neo-filtro {
+    padding: var(--spacing-lg) 28px;
+    border-bottom: 3px solid var(--border-light);
+    transition: all var(--transition-medium);
+}
+
+.neo-filtro.hidden {
+    display: none;
+}
+
+.neo-select {
+    width: 100%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    padding: 10px var(--spacing-md);
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-bold);
+    font-size: 13px;
+    cursor: pointer;
+    text-transform: uppercase;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231A1A1A' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+.neo-select:focus {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ========== ÁLBUM MINI ========== */
+.neo-album-mini {
+    margin: var(--spacing-lg) 28px;
+    background: linear-gradient(135deg, var(--primary-light) 0%, #FFFFFF 100%);
+    border: 2px solid var(--border);
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.neo-album-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-md);
+    letter-spacing: 0.5px;
+}
+
+.neo-album-count {
+    color: var(--primary);
+}
+
+.neo-mini-flags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.mini-flag {
+    width: 44px;
+    height: 30px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.mini-flag:hover {
+    transform: scale(1.2);
+    z-index: 1;
+}
+
+.mini-flag.locked {
+    opacity: 0.2;
+    filter: grayscale(1);
+}
+
+/* ========== TRACKER DE BIOMAS ========== */
+.neo-bioma-tracker {
+    margin: var(--spacing-lg) 28px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.neo-bioma-tracker-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+.neo-bioma-tracker-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+}
+
+.bioma-tracker-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border: 2px solid var(--border-light);
+    background: var(--surface);
+    transition: all 0.2s ease;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.bioma-tracker-item.unlocked {
+    border-color: var(--success);
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.bioma-tracker-item.locked {
+    opacity: 0.4;
+    filter: grayscale(0.5);
+}
+
+.bioma-tracker-item .bioma-icon {
+    font-size: 20px;
+}
+
+/* ========== RANKING ========== */
+.neo-ranking {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    margin: var(--spacing-lg) 28px;
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.neo-ranking-header {
+    font-weight: var(--font-weight-bold);
+    font-size: 13px;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: var(--spacing-sm);
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.neo-ranking-header i {
+    color: var(--warning);
+    margin-right: 6px;
+}
+
+.neo-ranking-header div {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.neo-ranking-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    padding: var(--spacing-xs) 10px;
+    font-size: 10px;
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: inherit;
+}
+
+.neo-ranking-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.neo-ranking-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+.neo-ranking-btn-danger {
+    background: var(--error);
+    color: var(--text-inverse);
+    border-color: var(--error);
+}
+
+.neo-ranking-btn-danger:hover {
+    background: #b71c1c;
+}
+
+.neo-ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 200px;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    padding: var(--spacing-sm) 10px;
+    font-weight: var(--font-weight-semibold);
+    transition: transform var(--transition-fast);
+}
+
+.ranking-item:hover {
+    transform: translateX(4px);
+}
+
+.ranking-item.placeholder {
+    opacity: 0.3;
+}
+
+.ranking-pos {
+    font-weight: var(--font-weight-bold);
+    width: 32px;
+    font-size: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.ranking-nome {
+    flex: 1;
+    font-size: 13px;
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ranking-serie {
+    font-size: 10px;
+    background: var(--primary-light);
+    padding: 2px 6px;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+.ranking-xp {
+    font-weight: var(--font-weight-bold);
+    background: var(--primary);
+    color: var(--text-inverse);
+    padding: 2px 8px;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+/* ========== BOTÕES ========== */
+.neo-btn {
+    border: 3px solid var(--border);
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-bold);
+    font-size: 14px;
+    text-transform: uppercase;
+    padding: var(--spacing-md) 20px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    background: transparent;
+    color: var(--text);
+}
+
+.neo-btn:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+}
+
+.neo-btn-primary {
+    background: var(--primary-gradient);
+    color: var(--text-inverse);
+    box-shadow: var(--shadow);
+    width: calc(100% - 56px);
+    margin: 0 28px var(--spacing-lg);
+    border-color: var(--border);
+}
+
+.neo-btn-primary:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.neo-btn-primary:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+.neo-btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 2px solid var(--border);
+    flex: 1;
+}
+
+.neo-btn-secondary:hover {
+    background: var(--bg);
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.neo-btn-secondary:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+.neo-btn-secondary.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.neo-btn-secondary.locked:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    background: var(--surface) !important;
+}
+
+.neo-btn-group {
+    display: flex;
+    gap: var(--spacing-md);
+    margin: 0 28px var(--spacing-lg);
+}
+
+.neo-btn-reset {
+    background: transparent;
+    color: var(--error);
+    border: 2px solid var(--error);
+    width: calc(100% - 56px);
+    margin: 0 28px var(--spacing-xl);
+    font-size: 12px;
+}
+
+.neo-btn-reset:hover {
+    background: var(--error);
+    color: var(--text-inverse);
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.neo-btn-reset:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+.neo-btn-back {
+    background: transparent;
+    border: 2px solid var(--border);
+    width: 100%;
+    margin-top: 20px;
+}
+
+.neo-btn-back:hover {
+    background: var(--bg);
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.neo-btn-danger {
+    background: var(--error);
+    color: var(--text-inverse);
+    border: 2px solid var(--border);
+}
+
+.neo-btn-danger:hover {
+    background: #b71c1c;
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ========== TELA DE JOGO ========== */
+.neo-game-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 28px;
+    border-bottom: 3px solid var(--border-light);
+    flex-wrap: wrap;
+    background: var(--primary-light);
+}
+
+.neo-game-stat {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    padding: var(--spacing-sm) 14px;
+    font-size: 13px;
+    font-weight: var(--font-weight-bold);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast);
+}
+
+.neo-game-stat:hover {
+    transform: translateY(-2px);
+}
+
+.neo-combo {
+    background: var(--warning);
+    color: var(--border);
+}
+
+.neo-pergunta {
+    padding: var(--spacing-xl);
+    text-align: center;
+    border-bottom: 3px solid var(--border-light);
+}
+
+.neo-pergunta-icon {
+    font-size: 48px;
+    margin-bottom: var(--spacing-md);
+}
+
+.neo-pergunta-texto {
+    font-size: 20px;
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+}
+
+.neo-bandeira {
+    background: var(--flag-bg);
+    border: 3px solid var(--border);
+    padding: var(--spacing-xl);
+    display: inline-block;
+    width: 100%;
+    box-shadow: var(--shadow-inset), var(--shadow);
+    position: relative;
+    min-height: 220px;
+    transition: border-color 0.3s ease;
+}
+
+.neo-bandeira-img {
+    max-width: 100%;
+    height: var(--flag-height);
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.neo-bioma-img {
+    max-width: 100%;
+    height: var(--flag-height);
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ========== FUNDO DINÂMICO PARA BIOMAS ========== */
+.neo-bandeira.bioma-mode {
+    background: linear-gradient(135deg, #1a3a1a, #0d260d);
+    position: relative;
+    overflow: hidden;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.neo-bandeira.bioma-mode::before {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border: 28px solid rgba(67,160,71,.14);
+    border-radius: 50%;
+    right: -20px;
+    bottom: -30px;
+    pointer-events: none;
+}
+
+.neo-bandeira.bioma-mode::after {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(204,164,59,.1);
+    left: -10px;
+    top: -10px;
+    pointer-events: none;
+}
+
+.neo-bioma-img {
+    max-width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 3px solid rgba(255,255,255,0.15);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transition: transform 0.3s ease;
+}
+
+.neo-bioma-img:hover {
+    transform: scale(1.02);
+}
+
+/* ========== ANIMAÇÕES DE ACERTO/ERRO ========== */
+@keyframes correctPulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 135, 90, 0.4); }
+    50% { transform: scale(1.03); box-shadow: 0 0 40px 10px rgba(0, 135, 90, 0.2); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 135, 90, 0); }
+}
+
+@keyframes wrongShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+}
+
+.neo-bandeira.correct {
+    animation: correctPulse 0.6s ease;
+    border-color: var(--success) !important;
+    box-shadow: var(--shadow), inset 0 0 30px rgba(0, 135, 90, 0.1);
+}
+
+.neo-bandeira.wrong {
+    animation: wrongShake 0.5s ease;
+    border-color: var(--error) !important;
+    box-shadow: var(--shadow), inset 0 0 30px rgba(211, 47, 47, 0.1);
+}
+
+/* ========== ALTERNATIVAS ========== */
+.neo-alternativas {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+    padding: 20px 28px;
+}
+
+.neo-alt {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    padding: 14px;
+    text-align: center;
+    font-weight: var(--font-weight-bold);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    position: relative;
+}
+
+.neo-alt:hover:not(.disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-sm);
+    background: var(--bg);
+    border-color: var(--primary);
+}
+
+.neo-alt:active:not(.disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+.neo-alt.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ========== ALTERNATIVAS COM ÍCONES DE BIOMAS ========== */
+.neo-alt-bioma {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-left: 4px solid var(--border);
+}
+
+.neo-alt-bioma .bioma-icon {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+}
+
+.neo-alt-bioma .bioma-name {
+    flex: 1;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.neo-alt-bioma:hover:not(.disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-sm);
+    background: var(--bg);
+}
+
+/* Cores diferentes para cada bioma */
+.bioma-amazonia { border-left-color: #2E7D32; }
+.bioma-cerrado { border-left-color: #F9A825; }
+.bioma-mata-atlantica { border-left-color: #43A047; }
+.bioma-caatinga { border-left-color: #E65100; }
+.bioma-pantanal { border-left-color: #00897B; }
+.bioma-pampa { border-left-color: #78909C; }
+
+/* ========== FEEDBACK ========== */
+.neo-feedback {
+    padding: 0 28px;
+    margin-bottom: 20px;
+}
+
+.notification {
+    border: 2px solid var(--border);
+    padding: 14px var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: slideIn var(--transition-medium) ease-out;
+    box-shadow: var(--shadow-sm);
+}
+
+.notification-correct {
+    background: var(--success-bg);
+    border-left: 8px solid var(--success);
+}
+
+.notification-wrong {
+    background: var(--error-bg);
+    border-left: 8px solid var(--error);
+}
+
+.notification-info {
+    background: var(--info-bg);
+    border-left: 8px solid var(--info);
+}
+
+.notification i {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-title {
+    font-weight: var(--font-weight-bold);
+    font-size: 13px;
+    margin-bottom: var(--spacing-xs);
+    letter-spacing: 0.5px;
+}
+
+.notification-desc {
+    font-size: 12px;
+    opacity: 0.85;
+    word-wrap: break-word;
+}
+
+.notification-xp {
+    font-weight: var(--font-weight-bold);
+    font-size: 14px;
+    white-space: nowrap;
+    color: var(--success);
+    flex-shrink: 0;
+}
+
+/* ========== ÁLBUM COMPLETO ========== */
+.neo-album-full {
+    padding: 28px;
+}
+
+.neo-album-full-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.neo-album-full-header h2 {
+    font-size: 18px;
+    letter-spacing: -0.5px;
+}
+
+.neo-patente {
+    background: var(--primary-gradient);
+    color: var(--text-inverse);
+    border: 2px solid var(--border);
+    padding: 6px 14px;
+    font-weight: var(--font-weight-bold);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+.neo-album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--spacing-md);
+    max-height: 500px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    padding: var(--spacing-xs);
+}
+
+.neo-album-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.neo-album-grid::-webkit-scrollbar-track {
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+}
+
+.neo-album-grid::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border: 1px solid var(--border);
+}
+
+.neo-state-card {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    padding: var(--spacing-md);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.neo-state-card:hover:not(.locked) {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.neo-state-card:active:not(.locked) {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+.neo-state-card.locked {
+    opacity: 0.5;
+    filter: grayscale(0.3);
+    cursor: not-allowed;
+}
+
+.neo-state-flag {
+    width: 100%;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: var(--spacing-sm);
+}
+
+/* ========== RESULTADO ========== */
+.neo-resultado {
+    text-align: center;
+    padding: var(--spacing-2xl) var(--spacing-xl);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.neo-trofeu {
+    font-size: 56px;
+    margin-bottom: var(--spacing-lg);
+    color: var(--warning);
+}
+
+.neo-trofeu i {
+    margin: 0 6px;
+}
+
+.neo-resultado h1 {
+    font-size: 28px;
+    margin-bottom: var(--spacing-xl);
+    letter-spacing: -1px;
+    font-weight: 900;
+}
+
+.neo-resultado-stats {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    text-align: left;
+    padding: 20px 24px;
+    margin-bottom: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.neo-resultado-stats .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.neo-resultado-stats .stat-row:last-child {
+    border-bottom: none;
+}
+
+.neo-resultado-stats .stat-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.neo-resultado-stats .stat-label i {
+    font-size: 16px;
+    color: var(--primary);
+    width: 20px;
+    text-align: center;
+}
+
+.neo-resultado-stats .stat-value {
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.neo-resultado-stats .stat-value .stat-small {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.neo-resultado-stats .stat-value .stat-percent {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.neo-resultado-stats .stat-value .stat-x {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.neo-resultado-stats .stat-value .highlight-gold {
+    color: var(--warning);
+}
+
+.neo-resultado-stats .stat-value .highlight-green {
+    color: var(--success);
+}
+
+.neo-resultado-stats .stat-value .highlight-blue {
+    color: var(--primary);
+}
+
+.neo-resultado-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+}
+
+.neo-resultado-buttons .neo-btn {
+    flex: 1;
+    min-width: 140px;
+}
+
+/* ========== MODAIS ========== */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.modal.active {
+    display: flex;
+    animation: fadeIn var(--transition-medium) ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-neo {
+    background: var(--surface);
+    border: 3px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 450px;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideUp var(--transition-slow) ease-out;
+}
+
+.modal-neo-small {
+    max-width: 400px;
+}
+
+.modal-neo::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-neo::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+.modal-neo::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border: 1px solid var(--border);
+}
+
+.modal-neo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg) 20px;
+    border-bottom: 3px solid var(--border);
+    background: var(--primary-gradient);
+    color: var(--text-inverse);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.modal-neo-header h2 {
+    font-size: 16px;
+    letter-spacing: -0.5px;
+}
+
+.modal-neo-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--text-inverse);
+    font-weight: var(--font-weight-bold);
+    padding: 0 var(--spacing-sm);
+    transition: transform var(--transition-fast);
+    line-height: 1;
+}
+
+.modal-neo-close:hover {
+    transform: rotate(90deg);
+}
+
+.modal-neo-body {
+    padding: 20px;
+}
+
+.modal-neo-flag {
+    width: 100%;
+    max-height: 100px;
+    object-fit: contain;
+    border: 2px solid var(--border);
+    margin-bottom: var(--spacing-lg);
+}
+
+.modal-neo-info p {
+    margin: 10px 0;
+    font-size: 13px;
+}
+
+.modal-neo-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* ========== MODAL ALUNO ========== */
+.neo-label-modal {
+    font-size: 11px;
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 6px;
+    margin-top: var(--spacing-md);
+    color: var(--text-light);
+}
+
+.neo-label-modal:first-of-type {
+    margin-top: 0;
+}
+
+.neo-select-modal {
+    width: 100%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    padding: 10px var(--spacing-md);
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-semibold);
+    font-size: 13px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231A1A1A' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+.neo-select-modal:focus {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.neo-input {
+    width: 100%;
+    padding: 10px var(--spacing-md);
+    border: 2px solid var(--border);
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-semibold);
+    font-size: 14px;
+    transition: border-color var(--transition-fast);
+}
+
+.neo-input:focus {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* ========== CONQUISTAS ========== */
+.achievement-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: var(--spacing-md);
+    border: 2px solid var(--border);
+    margin-bottom: var(--spacing-md);
+    background: var(--bg);
+    transition: transform var(--transition-fast);
+}
+
+.achievement-item:hover {
+    transform: translateX(4px);
+}
+
+.achievement-item.locked {
+    opacity: 0.5;
+}
+
+.achievement-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.achievement-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.achievement-title {
+    font-weight: var(--font-weight-bold);
+    font-size: 13px;
+    letter-spacing: 0.3px;
+}
+
+.achievement-desc {
+    font-size: 11px;
+    color: var(--text-light);
+}
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 900px) {
+    .neo-header {
+        padding: 28px 20px 24px;
+    }
+    
+    .neo-title {
+        font-size: 34px;
+    }
+    
+    .neo-icon {
+        font-size: 38px;
+    }
+    
+    .neo-sub {
+        font-size: 12px;
+        letter-spacing: 1.5px;
+    }
+    
+    .neo-alternativas {
+        grid-template-columns: 1fr;
+    }
+    
+    .neo-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .neo-modo-buttons {
+        flex-direction: column;
+    }
+    
+    .neo-btn-group {
+        flex-direction: column;
+    }
+    
+    .neo-resultado-buttons {
+        flex-direction: column;
+    }
+    
+    .neo-pergunta-texto {
+        font-size: 16px;
+    }
+    
+    .neo-bandeira-img,
+    .neo-bioma-img {
+        height: 120px;
+    }
+    
+    .neo-game-header {
+        justify-content: center;
+    }
+    
+    .neo-bioma-tracker-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    :root {
+        --avatar-size: 55px;
+        --flag-height: 120px;
+    }
+    
+    .app {
+        padding: var(--spacing-md);
+    }
+    
+    .neo-header {
+        padding: 20px 16px 18px;
+    }
+    
+    .neo-title {
+        font-size: 26px;
+        letter-spacing: -1px;
+    }
+    
+    .neo-icon {
+        font-size: 30px;
+    }
+    
+    .neo-sub {
+        font-size: 10px;
+        letter-spacing: 1px;
+    }
+    
+    .neo-sub .sep {
+        margin: 0 4px;
+    }
+    
+    .neo-badge {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px 12px;
+        padding: 6px 14px;
+        margin-top: 10px;
+        border-radius: 30px;
+    }
+    
+    .neo-badge-item {
+        font-size: 9px;
+    }
+    
+    .neo-badge-divider {
+        display: none;
+    }
+    
+    .neo-header .decoration {
+        display: none;
+    }
+    
+    .neo-perfil,
+    .neo-modo,
+    .neo-filtro,
+    .neo-album-mini,
+    .neo-bioma-tracker,
+    .neo-ranking {
+        padding: var(--spacing-md) var(--spacing-lg);
+        margin: var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .neo-btn-primary,
+    .neo-btn-reset {
+        width: calc(100% - 32px);
+        margin: 0 var(--spacing-lg) var(--spacing-md);
+    }
+    
+    .neo-btn-group {
+        margin: 0 var(--spacing-lg) var(--spacing-md);
+    }
+    
+    .neo-pergunta {
+        padding: var(--spacing-lg);
+    }
+    
+    .neo-alternativas {
+        padding: var(--spacing-md) var(--spacing-lg);
+        gap: var(--spacing-sm);
+    }
+    
+    .neo-game-header {
+        padding: var(--spacing-md) var(--spacing-lg);
+        gap: var(--spacing-sm);
+    }
+    
+    .neo-game-stat {
+        font-size: 11px;
+        padding: var(--spacing-xs) 10px;
+    }
+    
+    .ranking-nome {
+        font-size: 11px;
+    }
+    
+    .ranking-serie {
+        font-size: 8px;
+    }
+    
+    .ranking-xp {
+        font-size: 9px;
+        padding: 2px 6px;
+    }
+    
+    .neo-ranking-header {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        align-items: stretch;
+    }
+    
+    .neo-ranking-header div {
+        justify-content: center;
+    }
+    
+    .neo-album-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        max-height: 400px;
+    }
+    
+    .neo-resultado {
+        padding: var(--spacing-lg);
+    }
+    
+    .neo-resultado h1 {
+        font-size: 22px;
+    }
+    
+    .neo-resultado-stats {
+        padding: 16px 18px;
+    }
+    
+    .neo-resultado-stats .stat-row {
+        padding: 8px 0;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    
+    .neo-resultado-stats .stat-label {
+        font-size: 12px;
+    }
+    
+    .neo-resultado-stats .stat-value {
+        font-size: 16px;
+    }
+    
+    .neo-resultado-buttons .neo-btn {
+        min-width: unset;
+    }
+    
+    .modal-neo {
+        max-width: 100%;
+        margin: var(--spacing-md);
+    }
+    
+    .neo-bioma-tracker-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+    }
+    
+    .bioma-tracker-item {
+        font-size: 8px;
+        padding: 6px 2px;
+    }
+    
+    .bioma-tracker-item .bioma-icon {
+        font-size: 16px;
+    }
+    
+    .neo-bioma-img {
+        height: 120px;
+    }
+}
+
+@media (max-width: 400px) {
+    .neo-title {
+        font-size: 22px;
+    }
+}
+
+/* ========== PRINT ========== */
+@media print {
+    .neo-btn,
+    .neo-btn-modo,
+    .neo-ranking-btn {
+        display: none !important;
+    }
+    
+    .card-neo {
+        box-shadow: none !important;
+        border-color: #ccc;
+    }
+    
+    .modal {
+        position: static !important;
+        background: none !important;
+        backdrop-filter: none !important;
+        display: block !important;
+        padding: 0 !important;
+    }
+    
+    .modal-neo {
+        box-shadow: none !important;
+        max-height: none !important;
+    }
+}
+
+/* ========== UTILITÁRIOS ========== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-1 { margin-top: var(--spacing-sm); }
+.mt-2 { margin-top: var(--spacing-lg); }
+.mb-1 { margin-bottom: var(--spacing-sm); }
+.mb-2 { margin-bottom: var(--spacing-lg); }
+.hidden { display: none !important; }
+
+/* Camada final: garante que a identidade GEO Mundo prevaleça sobre o tema legado. */
+:root {
+    --bg: #f7f7fb;
+    --surface: #ffffff;
+    --text: #0b0a32;
+    --text-light: #5f6072;
+    --border: #0b0a32;
+    --border-light: #e2e2ea;
+    --primary: #0b0a32;
+    --primary-dark: #070621;
+    --primary-light: rgba(11, 10, 50, 0.08);
+    --primary-gradient: linear-gradient(135deg, #0b0a32 0%, #24235a 100%);
+    --success: #233b0b;
+    --success-bg: rgba(35, 59, 11, 0.12);
+    --error: #e55e5f;
+    --error-bg: rgba(229, 94, 95, 0.12);
+    --gold: #cca43b;
+    --shadow: 0 16px 45px rgba(11, 10, 50, 0.12);
+    --shadow-sm: 0 8px 24px rgba(11, 10, 50, 0.10);
+    --shadow-lg: 0 24px 60px rgba(11, 10, 50, 0.16);
+    --font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+body { background: radial-gradient(circle at 8% 12%, rgba(204,164,59,.12), transparent 24%), radial-gradient(circle at 92% 82%, rgba(11,10,50,.10), transparent 25%), var(--bg); }
+.card-neo, .modal-neo { border: 1px solid var(--border-light); border-radius: 24px; box-shadow: var(--shadow); overflow: hidden; }
+.neo-header { border-bottom: 0; }
+.neo-perfil, .neo-modo, .neo-filtro { border-bottom: 1px solid var(--border-light); }
+.neo-stat, .neo-btn-modo, .neo-select, .neo-alt, .neo-bandeira, .neo-ranking, .neo-album-mini, .neo-bioma-tracker, .stat-row, .neo-input, .neo-select-modal { border-color: var(--border-light) !important; border-radius: 16px; }
+.neo-btn, .neo-ranking-btn { border-radius: 14px; border-width: 1px; box-shadow: none; }
+.neo-btn-primary { background: var(--primary-gradient); }

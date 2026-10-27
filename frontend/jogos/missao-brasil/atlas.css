@@ -1,0 +1,601 @@
+/* Atlas GeoEduca — a shared visual layer. Original palette tokens remain unchanged. */
+:root{--atlas-navy:var(--navy,var(--blue,var(--primary,#0b0a32)));--atlas-green:var(--olive,var(--green,var(--success,#233b0b)));--atlas-gold:var(--gold,#cca43b);--atlas-cream:#f7f8f5;--atlas-line:#e0e3de;--atlas-muted:#626575;--atlas-radius:18px;--atlas-shadow:0 12px 36px #0b0a320b}
+html:has(body.atlas-game){height:100%;width:100%}
+body.atlas-game{margin:0;background:var(--atlas-cream);color:var(--atlas-navy);font-family:"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.45;overflow:hidden;width:100%;height:100dvh;-webkit-font-smoothing:antialiased}
+body.atlas-game *{box-sizing:border-box}
+body.atlas-game button,body.atlas-game input,body.atlas-game select{font:inherit}
+body.atlas-game button{cursor:pointer}
+body.atlas-game button:disabled{cursor:default}
+body.atlas-game button:focus-visible,body.atlas-game a:focus-visible,body.atlas-game input:focus-visible,body.atlas-game select:focus-visible{outline:3px solid var(--atlas-gold);outline-offset:4px}
+body.atlas-game h1,body.atlas-game h2,body.atlas-game p{margin-top:0}
+body.atlas-game .floating-bubbles,body.atlas-game .decoration{display:none!important}
+body.atlas-game .atlas-icon{width:26px;height:26px;flex-shrink:0}
+body.atlas-game .eyebrow{font-size:11px;line-height:1.5;letter-spacing:1.6px;font-weight:700;color:#8c6c1a;margin:0 0 12px}
+body.atlas-game .atlas-lead,body.atlas-game .lead{color:var(--atlas-muted);font-size:15px;line-height:1.65;max-width:440px}
+body.atlas-game .primary-button,body.atlas-game .btn-primary,body.atlas-game .btn-green,body.atlas-game .menu-btn.primary,body.atlas-game .neo-btn-primary{background:var(--atlas-green)!important;border:1px solid var(--atlas-green)!important;color:white!important;border-radius:12px!important;min-height:48px;padding:12px 22px;font-weight:700!important;box-shadow:0 5px 12px #233b0b12!important;transform:none!important;letter-spacing:0!important;text-transform:none!important;transition:background .18s,box-shadow .18s}
+body.atlas-game .primary-button:hover,body.atlas-game .btn-primary:hover,body.atlas-game .menu-btn.primary:hover,body.atlas-game .neo-btn-primary:hover{background:#304e12!important;box-shadow:0 8px 18px #233b0b20!important}
+body.atlas-game .secondary-button,body.atlas-game .btn-outline,body.atlas-game .neo-btn-secondary{background:white!important;color:var(--atlas-navy)!important;border:1px solid var(--atlas-line)!important;border-radius:12px!important;min-height:44px;box-shadow:none!important;font-weight:600;text-transform:none}
+body.atlas-game input,body.atlas-game select{border:1px solid var(--atlas-line);background:white;color:var(--atlas-navy);border-radius:11px;min-height:44px;padding:10px 13px;max-width:100%}
+body.atlas-game .atlas-track{height:6px;background:#e5e8e0;border-radius:8px;overflow:hidden}
+body.atlas-game .atlas-track i{height:100%;display:block;background:var(--atlas-green);width:0;border-radius:8px;transition:width .25s}
+body.atlas-game .atlas-topbar,body.atlas-game .site-header{display:flex;align-items:center;justify-content:space-between;gap:18px;background:var(--atlas-navy);color:white;min-height:64px;padding:10px 24px;border:0;border-radius:0 0 16px 16px;position:relative;z-index:5}
+body.atlas-game .atlas-topbar nav{display:flex;gap:18px;align-items:center}
+body.atlas-game .atlas-wordmark{display:flex;align-items:center;gap:12px;color:white;text-decoration:none;font-size:22px;font-weight:700;line-height:1.05}
+body.atlas-game .atlas-wordmark .atlas-icon{width:34px;height:34px;color:var(--atlas-gold)}
+body.atlas-game .atlas-wordmark b{color:var(--atlas-gold)}
+body.atlas-game .atlas-wordmark small{display:block;font-size:9px;letter-spacing:2px;margin-top:7px;color:#d0d0dd}
+body.atlas-game .atlas-nav-button{border:0;background:none;color:#f3f3f7;font-size:13px;padding:10px 0}
+body.atlas-game .atlas-cover-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:22px 0;color:var(--atlas-muted);font-size:12px}
+body.atlas-game .atlas-cover-meta span+span{border-left:1px solid #bbb;padding-left:10px}
+body.atlas-game .atlas-cover-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--atlas-muted);font-size:11px;min-height:28px;padding:5px 0;letter-spacing:.4px}
+body.atlas-game .atlas-cover-footer>span:first-child{font-weight:400;letter-spacing:0}
+body.atlas-game .atlas-ranking-drawer{position:relative;font-size:12px;color:var(--atlas-muted)}
+body.atlas-game .atlas-ranking-drawer summary{cursor:pointer;width:fit-content;padding:5px 0}
+body.atlas-game .atlas-ranking-drawer[open]>.ranking-box,body.atlas-game .atlas-ranking-drawer[open]>.opening-ranking{position:absolute;bottom:34px;left:0;min-width:300px;width:min(500px,85vw);max-height:280px;overflow:auto;background:white;padding:20px;border:1px solid var(--atlas-line);border-radius:16px;box-shadow:0 12px 40px #0b0a3226;z-index:20}
+body.atlas-game .atlas-setup-preview{display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:0;min-height:0;border-radius:20px;background:linear-gradient(#f7f8f500,#f7f8f530),url("assets/atlas/paisagem.webp") center bottom/auto 60% no-repeat;position:relative;padding:16px;overflow:hidden}
+body.atlas-game .atlas-setup-preview>img{width:100%;max-width:360px;max-height:min(48vh,400px);height:auto;object-fit:contain;filter:drop-shadow(0 12px 14px #0b0a3210)}
+body.atlas-game .atlas-setup-preview>p{font-size:20px;font-weight:750;color:var(--atlas-navy);margin:0}
+body.atlas-game .atlas-setup-preview>small{font-size:12px;color:var(--atlas-muted);margin-top:5px;text-align:center}
+body.atlas-game .atlas-setup-fields{min-width:0;min-height:0;display:flex;flex-direction:column;gap:12px}
+body.atlas-game .atlas-setup-fields fieldset{border:0;padding:0;margin:0;min-width:0;min-height:0}
+body.atlas-game .atlas-setup-fields legend{font-size:12px;font-weight:600;margin:0 0 10px;color:var(--atlas-muted)}
+body.atlas-game .atlas-field-error{font-size:12px;color:#a13d3d;min-height:17px;margin:0}
+body.atlas-game .atlas-action-row{display:flex;gap:12px;align-items:center}
+body.atlas-game .atlas-action-row>.btn-primary{flex:1}
+body.atlas-game .atlas-stage-summary{font-size:12px;color:var(--atlas-muted);padding:12px 15px;border:1px solid var(--atlas-line);border-radius:10px;margin:0}
+body.atlas-game .atlas-stage-summary strong{display:block;color:var(--atlas-navy);font-size:14px}
+body.atlas-game .atlas-help{width:min(540px,calc(100vw - 32px));border:1px solid var(--atlas-line);border-radius:22px;padding:30px;color:var(--atlas-navy);max-height:calc(100dvh - 32px);overflow:auto;box-shadow:0 24px 60px #0b0a3230}
+body.atlas-game .atlas-help::backdrop{background:#0b0a3280;backdrop-filter:blur(5px)}
+body.atlas-game .atlas-help h2{font-size:30px;letter-spacing:-1px;margin:0 0 20px}
+body.atlas-game .atlas-help ol{padding-left:20px;font-size:14px;line-height:1.75}
+body.atlas-game .atlas-help li{margin-bottom:10px}
+body.atlas-game .atlas-dialog-close{position:absolute;right:14px;top:10px;border:0;background:none;font-size:28px;color:var(--atlas-muted)}
+body.atlas-game .atlas-hud-avatar{height:42px;width:42px;object-fit:contain}
+body.atlas-game .atlas-finish-mascot{width:min(240px,35vw);height:190px;object-fit:contain;display:block;margin:0 auto}
+body.atlas-game .atlas-map-fallback{height:100%;width:100%;object-fit:contain;padding:16px;background:var(--atlas-cream)}
+/* Missão Brasil: atlas, discovered states and collection. */
+body.atlas-missao .app-shell{max-width:1240px;height:100dvh;padding:0 28px;grid-template-rows:70px minmax(0,1fr) 28px;position:relative;isolation:isolate}
+body.atlas-missao .app-shell:before{content:"";position:absolute;inset:auto 28px 28px;height:210px;z-index:-1;background:url("assets/atlas/paisagem.webp") bottom/cover;opacity:.18;pointer-events:none;mask-image:linear-gradient(transparent,#000)}
+body.atlas-missao main{padding:20px 0;min-height:0}
+body.atlas-missao .brand{color:white;font-size:21px}
+body.atlas-missao .brand small{color:#ccccda;font-size:9px}
+body.atlas-missao .brand strong{color:var(--atlas-gold)}
+body.atlas-missao .brand-symbol{border:1px solid #ffffff30;background:none;color:var(--atlas-gold)}
+body.atlas-missao .brand-symbol svg{stroke:var(--atlas-gold)}
+body.atlas-missao .header-actions{gap:20px}
+body.atlas-missao .header-actions button,body.atlas-missao .pref-state{color:#f0f0f5}
+body.atlas-missao .home-screen{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);grid-template-rows:minmax(120px,1fr) auto 30px 62px;grid-template-areas:"intro map" "controls map" "secondary map" "ranking ranking";gap:15px 36px;max-width:1160px}
+body.atlas-missao .home-screen>.intro{grid-area:intro;text-align:left;align-self:end;padding:0}
+body.atlas-missao .home-screen h1{font-size:clamp(36px,4.7vw,56px);font-weight:780;letter-spacing:-2.3px;line-height:1.06}
+body.atlas-missao .home-screen .lead{margin-top:14px;max-width:420px}
+body.atlas-missao .home-screen>.mission-controls{grid-area:controls;width:100%;margin:0}
+body.atlas-missao .home-screen>.map-scene{grid-area:map;min-height:0}
+body.atlas-missao .mode-picker{border:0;background:none;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+body.atlas-missao .neo-btn-modo{background:#ffffffde;border:1px solid var(--atlas-line);border-radius:14px;color:var(--atlas-navy);padding:13px 8px;display:flex;flex-direction:column;align-items:center;gap:7px;min-height:102px;box-shadow:0 3px 8px #0b0a3204}
+body.atlas-missao .neo-btn-modo strong{font-size:14px}
+body.atlas-missao .neo-btn-modo small{font-size:11px;line-height:1.3;color:var(--atlas-muted);font-weight:400}
+body.atlas-missao .neo-btn-modo.active{background:#f9f5e8;border:1.5px solid var(--atlas-gold);box-shadow:0 0 0 2px #cca43b0c}
+body.atlas-missao .neo-btn-modo .atlas-icon{color:var(--atlas-green);height:25px}
+body.atlas-missao .select-wrap{margin:10px 0}
+body.atlas-missao .select-wrap select{height:43px;font-size:13px}
+body.atlas-missao .bioma-note{font-size:12px;min-height:43px;padding:12px 0;margin:10px 0;color:var(--atlas-muted)}
+body.atlas-missao .mission-meta{font-size:11px;margin:8px 0 0}
+body.atlas-missao .home-screen>.home-secondary{grid-area:secondary;justify-content:flex-start;gap:16px}
+body.atlas-missao .home-secondary .text-button{font-size:12px;padding:3px 0;color:var(--atlas-muted)}
+body.atlas-missao .home-screen>.ranking-panel{grid-area:ranking;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:16px;width:100%;padding:12px 16px;background:#ffffffd9;border:1px solid var(--atlas-line);border-radius:14px}
+body.atlas-missao .section-line{gap:15px;justify-content:flex-start}
+body.atlas-missao .section-line h2{font-size:13px;letter-spacing:0}
+body.atlas-missao .ranking-empty{font-size:11px;padding:0}
+body.atlas-missao .ranking-item{min-height:26px;font-size:12px;margin:0}
+body.atlas-missao .ranking-panel .ranking-footnote{display:none}
+body.atlas-missao #brazilMap{max-height:100%;max-width:100%;padding:2px 8px 30px}
+body.atlas-missao .map-halo{fill:#cca43b06}
+body.atlas-missao .map-orbit{stroke:#cca43b20}
+body.atlas-missao .map-state{fill:#d1d9d2;stroke:#fff;stroke-width:1.4;transition:fill .3s}
+body.atlas-missao .map-state:nth-child(3n){fill:#bdcbbf}
+body.atlas-missao .map-state.atlas-discovered{fill:var(--atlas-green)}
+body.atlas-missao .map-state.atlas-discovered:nth-child(2n){fill:var(--atlas-gold)}
+body.atlas-missao .atlas-map-mascot{position:absolute;bottom:12%;left:0;width:38%;max-height:47%;object-fit:contain;filter:drop-shadow(0 8px 14px #0b0a3210)}
+body.atlas-missao .atlas-map-card{position:absolute;top:5%;right:0;background:#ffffffed;border:1px solid var(--atlas-line);padding:13px 16px;border-radius:13px;box-shadow:var(--atlas-shadow);font-size:11px;min-width:150px}
+body.atlas-missao .atlas-map-card strong{display:block;font-size:14px;margin:3px 0 9px}
+body.atlas-missao .map-caption{font-size:11px;bottom:0}
+body.atlas-missao .setup-screen{max-width:1080px;grid-template-rows:24px auto minmax(0,1fr);gap:14px}
+body.atlas-missao .setup-screen .intro{text-align:left;padding-left:8px}
+body.atlas-missao .setup-screen h1{font-size:34px;letter-spacing:-1.3px}
+body.atlas-missao #formPersonagem{grid-template-columns:minmax(0,.9fr) minmax(0,1.2fr);grid-template-rows:minmax(0,1fr);gap:30px}
+body.atlas-missao .atlas-setup-fields .name-field{width:100%;margin:0}
+body.atlas-missao .name-field label{font-size:13px;font-weight:600}
+body.atlas-missao .name-field input{height:44px;margin-top:7px}
+body.atlas-missao .character-fieldset{flex:1}
+body.atlas-missao .character-grid{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:9px;min-height:0}
+body.atlas-missao .character-option{border:1px solid var(--atlas-line);border-radius:14px;background:#ffffffc9;padding:8px;justify-content:center;box-shadow:none;min-height:0}
+body.atlas-missao .character-option img{width:100%;height:clamp(55px,10vh,108px);max-width:130px;min-height:0;object-fit:contain;flex:0 1 auto;mix-blend-mode:normal}
+body.atlas-missao .character-option strong{font-size:12px}
+body.atlas-missao .character-option small{display:none}
+body.atlas-missao .character-option:has(input:checked){border:2px solid var(--atlas-gold);background:#fbf7ea}
+body.atlas-missao .selection-check{background:var(--atlas-gold);color:var(--atlas-navy)}
+body.atlas-missao .setup-bottom{gap:12px;align-items:center;flex-shrink:0;margin-top:0}
+body.atlas-missao .setup-bottom p{font-size:11px;max-width:180px}
+body.atlas-missao .setup-bottom .primary-button{min-width:190px}
+body.atlas-missao .quiz-screen{max-width:1100px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:44px 32px 5px auto minmax(0,1fr) minmax(85px,auto);gap:12px 24px}
+body.atlas-missao .quiz-top{grid-column:1/-1;grid-row:1}
+body.atlas-missao .quiz-status{grid-column:1/-1;grid-row:2;font-size:13px}
+body.atlas-missao .quiz-status strong{font-size:14px}
+body.atlas-missao .question-progress{grid-column:1/-1;grid-row:3;height:5px}
+body.atlas-missao .question-progress>div{background:var(--atlas-gold)}
+body.atlas-missao .question-body{display:contents}
+body.atlas-missao .question-body>.eyebrow{display:none}
+body.atlas-missao .question-body h1{grid-column:1/-1;grid-row:4;font-size:clamp(23px,2.3vw,30px);font-weight:750;text-align:left;padding:10px 0;max-width:none;margin:0}
+body.atlas-missao .question-image{grid-column:1;grid-row:5;width:100%;max-width:none;max-height:none;height:100%;margin:0;border:1px solid var(--atlas-line);background:#ffffffa6;border-radius:18px;padding:24px}
+body.atlas-missao .question-image.bioma{max-width:none;padding:0}
+body.atlas-missao .question-image img{filter:drop-shadow(0 8px 12px #0b0a3209)}
+body.atlas-missao .answer-grid{grid-column:2;grid-row:5;display:grid;grid-template-columns:1fr;grid-template-rows:repeat(4,minmax(45px,1fr));gap:10px}
+body.atlas-missao .answer-button{font-size:15px;min-height:47px;background:#ffffffdc;border-radius:12px;padding:10px 16px;box-shadow:0 3px 6px #0b0a3203}
+body.atlas-missao .answer-letter{width:29px;height:29px;border-radius:50%;background:#f3f3f6;border:0;font-size:12px}
+body.atlas-missao .answer-button.correct{background:#edf3e8;border-color:var(--atlas-green);color:var(--atlas-green)}
+body.atlas-missao .answer-button.wrong{background:#fdf0ed;border-color:#d48076;color:#92463e}
+body.atlas-missao .feedback-row{grid-column:1/-1;grid-row:6;gap:16px;min-height:85px;background:#ffffffb5;border-radius:14px;padding:10px 16px;border:1px solid var(--atlas-line)}
+body.atlas-missao .atlas-feedback-avatar{width:86px;height:86px;object-fit:contain;margin:-15px 0;flex-shrink:0}
+body.atlas-missao .answer-feedback{font-size:13px;flex:1;min-width:0;line-height:1.45}
+body.atlas-missao .answer-feedback p{margin-bottom:0}
+body.atlas-missao .answer-feedback strong{font-size:15px}
+body.atlas-missao .answer-feedback .xp-gain{margin-top:4px;font-size:12px;color:#8c6c1a}
+body.atlas-missao .player-chip img{mix-blend-mode:normal;background:white}
+body.atlas-missao .result-screen{max-width:1040px;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);grid-template-rows:auto auto auto minmax(0,1fr) auto auto;gap:14px 30px;text-align:left;padding:20px 0}
+body.atlas-missao .result-mascot{grid-column:1;grid-row:1/-1;width:100%;height:100%;max-height:470px;max-width:380px;object-fit:contain;align-self:center;margin:0}
+body.atlas-missao .result-screen>.eyebrow,body.atlas-missao .result-screen>h1,body.atlas-missao .result-screen>.lead,body.atlas-missao .result-stats,body.atlas-missao .result-progress,body.atlas-missao .result-actions{grid-column:2}
+body.atlas-missao .result-screen h1{font-size:40px;font-weight:780;letter-spacing:-1.7px}
+body.atlas-missao .result-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0;border:0;align-self:center}
+body.atlas-missao .result-stats>div{border:1px solid var(--atlas-line);background:#ffffffd9;border-radius:14px;padding:18px 20px;text-align:left}
+body.atlas-missao .result-stats strong{font-size:32px}
+body.atlas-missao .result-stats span{font-size:12px;margin-bottom:8px}
+body.atlas-missao .result-actions{flex-wrap:wrap;justify-content:flex-start;margin:0;gap:10px;flex-direction:row}
+body.atlas-missao .result-actions .text-button{font-size:12px}
+body.atlas-missao .album-screen{max-width:1100px}
+body.atlas-missao .state-card{background:#ffffffcc;border:1px solid var(--atlas-line);border-radius:14px}
+body.atlas-missao .state-card strong{font-size:12px}
+body.atlas-missao .state-card small{font-size:11px}
+body.atlas-missao dialog{background:#fffefb;border:1px solid var(--atlas-line);max-height:calc(100dvh - 32px);overflow:auto;box-shadow:0 24px 80px #0b0a3224}
+body.atlas-missao dialog::backdrop{background:#0b0a3278;backdrop-filter:blur(5px)}
+body.atlas-missao .site-footer{border-top:1px solid var(--atlas-line);background:#f7f8f5a0;font-size:10px}
+/* GeoBr: stronger navy framing and a compact challenge HUD. */
+body.atlas-geobr #geoBrOpening{display:grid;grid-template-rows:70px minmax(0,1fr) 28px;height:100dvh;min-height:0;padding:0 28px;max-width:1240px;margin:auto;overflow:hidden;background:var(--atlas-cream)}
+body.atlas-geobr #geoBrOpening.hidden{display:none!important}
+body.atlas-geobr .sound-toggle-menu{position:static!important;inset:auto!important;box-shadow:none!important;background:transparent!important;border:1px solid #ffffff30!important;color:white!important;min-width:68px;height:36px;border-radius:10px}
+body.atlas-geobr .geo-opening-content{width:100%;max-width:none;margin:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) 108px 48px 28px;gap:16px 24px;padding:20px 0;min-height:0;text-align:left;position:relative}
+body.atlas-geobr .geo-opening-content:before{content:"";position:absolute;inset:15px 0 10px;background:linear-gradient(#0b0a32e8,#0b0a32d9),url("assets/atlas/paisagem.webp") center/cover;border-radius:22px;z-index:0;pointer-events:none}
+body.atlas-geobr .geo-opening-content>*{position:relative;z-index:1}
+body.atlas-geobr .atlas-cover-copy{padding:24px 0 0 30px;align-self:center;min-width:0;grid-row:1;grid-column:1}
+body.atlas-geobr .atlas-cover-copy h1{font-size:clamp(36px,4vw,54px);line-height:1.08;font-weight:780;letter-spacing:-2px;color:white;margin:0 0 16px}
+body.atlas-geobr .atlas-cover-copy h1 em{font-style:normal;color:var(--atlas-gold)}
+body.atlas-geobr .atlas-cover-copy .eyebrow{color:var(--atlas-gold);font-size:10px}
+body.atlas-geobr .atlas-cover-copy .atlas-lead{color:#e0e0e7;font-size:14px;max-width:390px;margin:0}
+body.atlas-geobr .atlas-cover-meta{color:#e5e5eb;margin:18px 0 0}
+body.atlas-geobr .atlas-cover-art{grid-row:1;grid-column:2;height:100%;min-height:0;position:relative;overflow:hidden}
+body.atlas-geobr .atlas-cover-map{position:absolute;width:95%;height:98%;right:0;top:0;object-fit:contain;opacity:.65;filter:drop-shadow(0 10px 12px #00000030)}
+body.atlas-geobr .atlas-cover-copero{position:absolute;bottom:-3%;left:0;width:83%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 24px #00000020)}
+body.atlas-geobr .opening-modes{grid-column:1/-1;grid-row:2;padding:0 30px;margin:0}
+body.atlas-geobr .mode-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;height:100%}
+body.atlas-geobr .mode-card{display:flex;align-items:center;gap:16px;padding:18px 20px;background:#ffffffed!important;color:var(--atlas-navy)!important;border:1px solid #fff!important;border-radius:14px!important;box-shadow:none!important;transform:none!important;min-height:0;text-align:left}
+body.atlas-geobr .mode-card.primary{border:2px solid var(--atlas-gold)!important;background:#fcf7e9!important;box-shadow:0 0 0 3px #cca43b14!important}
+body.atlas-geobr .mode-card .atlas-icon{color:var(--atlas-green);width:35px;height:35px}
+body.atlas-geobr .mode-card-copy{display:flex;flex-direction:column;gap:5px}
+body.atlas-geobr .mode-card-copy strong{font-size:16px!important;font-weight:750!important;text-transform:none}
+body.atlas-geobr .mode-card-copy small{font-size:12px!important;color:var(--atlas-muted)}
+body.atlas-geobr .atlas-cover-actions{grid-column:1/-1;grid-row:3;display:flex;align-items:stretch;gap:14px;padding:0 30px}
+body.atlas-geobr .atlas-cover-actions select{width:40%;max-width:360px;min-width:0;font-size:13px}
+body.atlas-geobr .atlas-cover-actions .btn-primary{flex:1;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 16px #00000020!important;border-color:#6d862f!important;font-size:15px!important}
+body.atlas-geobr .atlas-ranking-drawer{grid-column:1/-1;grid-row:4;padding:0 30px;color:#dedee6}
+body.atlas-geobr .atlas-ranking-drawer .opening-ranking{color:var(--atlas-navy);bottom:28px}
+body.atlas-geobr #appRoot{height:100dvh;min-height:0;max-width:1240px;margin:auto;padding:18px 28px;display:block}
+body.atlas-geobr #appRoot.hidden{display:none!important}
+body.atlas-geobr #telaJogo{height:100%;max-width:none;margin:0;background:#ffffffa8;border:1px solid var(--atlas-line);border-radius:20px;overflow:hidden;box-shadow:var(--atlas-shadow);display:none}
+body.atlas-geobr #telaJogo.active{display:flex;flex-direction:column}
+body.atlas-geobr #telaJogo .topbar{background:var(--atlas-navy);color:white;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 20px;min-height:74px;flex-shrink:0;border:0}
+body.atlas-geobr #telaJogo .btn-voltar{color:white!important;border:1px solid #ffffff40!important;background:transparent!important;border-radius:10px;padding:9px 13px}
+body.atlas-geobr #telaJogo .quiz-logo-brand img{height:45px;width:70px;object-fit:contain;background:#ffffffef;border-radius:10px;padding:4px}
+body.atlas-geobr #telaJogo .topbar-player-info{display:flex;gap:22px;align-items:center}
+body.atlas-geobr #telaJogo .hud-player{display:flex;gap:8px;align-items:center;color:white}
+body.atlas-geobr #telaJogo .hud-player img{width:42px;height:42px;object-fit:contain}
+body.atlas-geobr #telaJogo .hud-player span{font-size:13px!important;color:white;max-width:140px;overflow-wrap:anywhere}
+body.atlas-geobr #telaJogo .hud-stat{display:flex;flex-direction:column;align-items:center;color:white}
+body.atlas-geobr #telaJogo .hud-stat small{font-size:9px!important;color:#d3d3df;letter-spacing:.6px}
+body.atlas-geobr #telaJogo .hud-stat strong{font-size:15px!important;color:white}
+body.atlas-geobr #telaJogo .geobr-game-layout{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr);gap:26px;padding:26px;min-height:0;flex:1;height:auto;width:100%;overflow:hidden}
+body.atlas-geobr #telaJogo .geobr-visual-column{display:flex;flex-direction:column;min-width:0;min-height:0;background:none;border:0;position:relative;height:100%;overflow:hidden}
+body.atlas-geobr #telaJogo .geobr-visual-stage{display:flex;align-items:center;justify-content:center;flex:1;min-height:0;border:1px solid var(--atlas-line);border-radius:18px;background:var(--atlas-cream);overflow:hidden;padding:22px}
+body.atlas-geobr #telaJogo #containerImagem{display:flex;align-items:center;justify-content:center;width:100%;height:100%;max-height:none;max-width:none;min-height:0;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;overflow:hidden;border-radius:12px}
+body.atlas-geobr #telaJogo #containerImagem img{height:100%;width:100%;max-height:100%;max-width:100%;object-fit:contain;filter:drop-shadow(0 7px 8px #0b0a3210)}
+body.atlas-geobr #telaJogo #containerImagem.bioma-mode img{object-fit:cover;border-radius:12px}
+body.atlas-geobr #telaJogo .geobr-mode-caption{position:static;background:transparent;border:0;padding:12px 0 0;text-align:left;min-height:30px;color:var(--atlas-muted);font-size:11px;letter-spacing:1px}
+body.atlas-geobr #telaJogo .geobr-quiz-column{display:flex!important;flex-direction:column;justify-content:center;min-width:0;min-height:0;gap:16px;padding:0;background:none;border:0;overflow:auto}
+body.atlas-geobr #telaJogo .question-card{padding:0;margin:0;border:0;border-radius:0;box-shadow:none;background:none}
+body.atlas-geobr #telaJogo .question-card .eyebrow{font-size:10px!important;color:#8c6c1a;margin-bottom:10px}
+body.atlas-geobr #telaJogo .question-card .question-text{font-size:clamp(21px,2.4vw,30px)!important;line-height:1.25!important;font-weight:750!important;letter-spacing:-.7px;text-transform:none;min-height:0}
+body.atlas-geobr #telaJogo #containerAlternativas{counter-reset:answers;display:grid;grid-template-columns:1fr;gap:10px;margin:0}
+body.atlas-geobr #telaJogo #containerAlternativas .neo-alt{counter-increment:answers;display:flex;align-items:center;gap:12px;width:100%;min-height:50px;border:1px solid var(--atlas-line)!important;border-left:1px solid var(--atlas-line)!important;border-radius:12px;padding:11px 14px!important;font-size:14px!important;font-weight:600!important;text-align:left;background:white!important;color:var(--atlas-navy)!important;box-shadow:0 3px 8px #0b0a3204!important;transform:none!important;line-height:1.4;transition:background .18s,border-color .18s}
+body.atlas-geobr #telaJogo #containerAlternativas .neo-alt:before{content:counter(answers,upper-alpha);display:grid;place-items:center;border-radius:50%;background:#f0f1f5;color:var(--atlas-navy);font-size:12px;width:27px;height:27px;flex-shrink:0}
+body.atlas-geobr #telaJogo #containerAlternativas .neo-alt.correct{background:#eef4e9!important;color:var(--atlas-green)!important;border-color:var(--atlas-green)!important}
+body.atlas-geobr #telaJogo #containerAlternativas .neo-alt.wrong{background:#fff0ed!important;border-color:#c67c70!important;color:#91473e!important}
+body.atlas-geobr #telaJogo #containerAlternativas .neo-alt.hint-hidden{visibility:hidden;pointer-events:none}
+body.atlas-geobr #telaJogo .geobr-quiz-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;padding:0;margin:0;min-height:38px;flex-shrink:0}
+body.atlas-geobr #telaJogo .neo-lives,body.atlas-geobr #telaJogo .streak-badge{font-size:12px!important;background:#f0f3ec;border:0;border-radius:9px;color:var(--atlas-green);padding:8px 10px;display:flex;gap:6px;align-items:center}
+body.atlas-geobr #telaJogo .neo-lives small{font-size:10px}
+body.atlas-geobr #telaJogo .neo-lives.danger{color:#a03f36;background:#fff0ed}
+body.atlas-geobr #telaJogo .hint-btn{border:1px solid var(--atlas-line);border-radius:9px;padding:8px 12px;background:white;font-size:12px!important;color:var(--atlas-navy)}
+body.atlas-geobr #telaJogo #areaFeedback{margin:0;min-height:0}
+body.atlas-geobr #telaJogo #areaFeedback:empty{display:none}
+body.atlas-geobr #telaJogo .notification{display:flex;align-items:center;gap:10px;border:1px solid var(--atlas-line);border-radius:12px;background:#fbf8ed;padding:10px;box-shadow:none;position:static;transform:none;animation:none}
+body.atlas-geobr #telaJogo .notification-mascot{width:64px;height:70px;object-fit:contain;flex-shrink:0;position:static}
+body.atlas-geobr #telaJogo .notification-content{min-width:0;flex:1}
+body.atlas-geobr #telaJogo .notification-title{font-size:12px!important;color:var(--atlas-green)}
+body.atlas-geobr #telaJogo .notification-desc{font-size:12px!important;color:var(--atlas-muted);line-height:1.5}
+body.atlas-geobr #telaJogo .notification-xp{font-size:14px!important;color:#8c6c1a;white-space:nowrap}
+body.atlas-geobr .modal{background:#0b0a327d;backdrop-filter:blur(6px);padding:20px}
+body.atlas-geobr #modalAluno .player-setup-panel{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);width:min(1000px,100%);max-width:1000px;max-height:calc(100dvh - 40px);padding:26px;gap:30px;border:1px solid var(--atlas-line)!important;border-radius:22px!important;background:#fffefa;box-shadow:0 30px 100px #0b0a3240;overflow:auto}
+body.atlas-geobr #modalAluno .profile-modal-content{padding:0;min-width:0}
+body.atlas-geobr #modalAluno .player-setup-title{font-size:29px!important;line-height:1.12;font-weight:750!important;letter-spacing:-1px;text-transform:none;margin:0 0 10px}
+body.atlas-geobr #modalAluno .player-setup-desc{font-size:13px;margin-bottom:18px;color:var(--atlas-muted)}
+body.atlas-geobr #modalAluno .player-setup-label,body.atlas-geobr #modalAluno legend{font-size:12px;margin:0 0 7px;font-weight:600;color:var(--atlas-muted)}
+body.atlas-geobr #modalAluno input{font-size:16px;width:100%;margin:0 0 15px}
+body.atlas-geobr #modalAluno fieldset{border:0;padding:0;margin:0}
+body.atlas-geobr #modalAluno .character-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+body.atlas-geobr #modalAluno .character-option{display:flex;flex-direction:column;align-items:center;justify-content:center;background:white;border:1px solid var(--atlas-line);border-radius:12px;padding:7px;min-height:0;min-width:0;box-shadow:none;transform:none}
+body.atlas-geobr #modalAluno .character-option.selected{border:2px solid var(--atlas-gold);background:#fbf7eb}
+body.atlas-geobr #modalAluno .character-option img{width:100%;height:clamp(50px,10vh,100px);object-fit:contain;mix-blend-mode:normal}
+body.atlas-geobr #modalAluno .character-option strong{font-size:12px}
+body.atlas-geobr #modalAluno .character-option small{display:none}
+body.atlas-geobr #modalAluno .player-setup-error{min-height:18px;font-size:12px;margin:7px 0}
+body.atlas-geobr #modalAluno .player-setup-actions{display:flex;gap:10px;margin:0}
+body.atlas-geobr #modalAluno .player-setup-actions .btn-primary{flex:1}
+body.atlas-geobr #telaResultado{height:100%;max-width:1100px;margin:auto}
+body.atlas-geobr #telaResultado .neo-resultado{height:100%;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);grid-template-rows:auto minmax(0,1fr) auto;gap:20px 30px;align-items:center;background:#fffefa url("assets/atlas/paisagem.webp") left bottom/auto 50% no-repeat;border:1px solid var(--atlas-line);padding:35px;border-radius:22px;box-shadow:var(--atlas-shadow)}
+body.atlas-geobr #telaResultado .result-mascot{grid-column:1;grid-row:1/-1;width:100%;height:100%;max-height:470px;max-width:380px;object-fit:contain;margin:0}
+body.atlas-geobr #telaResultado h1{grid-column:2;font-size:36px!important;line-height:1.1;letter-spacing:-1.3px;margin:0;text-transform:none}
+body.atlas-geobr #telaResultado .neo-resultado-stats{grid-column:2;display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0;background:none;border:0;padding:0}
+body.atlas-geobr #telaResultado .stat-row{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:15px;background:#ffffffed;border:1px solid var(--atlas-line);border-radius:12px}
+body.atlas-geobr #telaResultado .stat-label{font-size:11px!important;color:var(--atlas-muted)}
+body.atlas-geobr #telaResultado .stat-value{font-size:22px!important;line-height:1.2;font-weight:750!important}
+body.atlas-geobr #telaResultado .neo-resultado-buttons{grid-column:2;display:flex;flex-wrap:wrap;gap:10px;margin:0}
+/* GeoMundo: map-first geography journey, feedback stays beside the question. */
+body.atlas-mundo #screen-menu{display:grid;grid-template-rows:70px minmax(0,1fr) 28px;max-width:1240px;height:100dvh;margin:auto;padding:0 28px;overflow:hidden;background:none}
+body.atlas-mundo #screen-menu.hidden{display:none!important}
+body.atlas-mundo .atlas-world-home{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.2fr);grid-template-rows:minmax(0,1fr) 28px;gap:18px 20px;padding:24px 0;min-height:0;position:relative}
+body.atlas-mundo .atlas-world-home:before{content:"";position:absolute;inset:auto 0 20px;height:160px;background:url("assets/atlas/paisagem.webp") bottom/cover;opacity:.18;z-index:0;mask-image:linear-gradient(transparent,#000);pointer-events:none}
+body.atlas-mundo .atlas-world-copy{align-self:center;position:relative;z-index:1;padding-left:8px}
+body.atlas-mundo .atlas-world-copy h1{font-size:clamp(38px,4.5vw,62px);line-height:1.06;letter-spacing:-2.5px;font-weight:780;margin:0 0 20px}
+body.atlas-mundo .atlas-world-copy h1 em{font-style:normal;color:var(--atlas-green)}
+body.atlas-mundo .atlas-world-copy .menu-btn{width:min(100%,380px);font-size:16px;text-align:left;display:flex;justify-content:space-between}
+body.atlas-mundo .atlas-world-map{align-self:center;position:relative;min-width:0;height:100%;max-height:490px;display:flex;align-items:center;justify-content:center}
+body.atlas-mundo .atlas-world-map>img:first-child{width:110%;height:100%;max-width:none;object-fit:contain;opacity:.9}
+body.atlas-mundo .atlas-world-map .atlas-world-guide{position:absolute;width:35%;height:40%;object-fit:contain;right:0;bottom:0}
+body.atlas-mundo .atlas-world-map>span{position:absolute;bottom:4%;left:5%;font-size:11px;color:var(--atlas-muted);max-width:65%}
+body.atlas-mundo .atlas-world-home>.atlas-ranking-drawer{grid-column:1/-1;padding-left:8px}
+body.atlas-mundo #screen-game{max-width:1400px;margin:auto;padding:16px 24px;gap:18px;height:100dvh!important;overflow:hidden!important}
+body.atlas-mundo #screen-game .topbar{background:var(--atlas-navy);color:white;border:0;border-radius:15px;min-height:66px;padding:10px 18px!important;gap:15px;display:flex;align-items:center;justify-content:space-between}
+body.atlas-mundo #screen-game .topbar .brand-name,body.atlas-mundo #screen-game .topbar #hud-nome,body.atlas-mundo #screen-game .topbar #hud-nivel{color:white!important}
+body.atlas-mundo #screen-game .topbar #hud-xp{color:var(--atlas-gold)!important}
+body.atlas-mundo #screen-game .topbar .brand-name{font-size:13px!important;line-height:1.1}
+body.atlas-mundo #screen-game .btn-voltar{border:1px solid #ffffff40;background:none;color:white;border-radius:9px;padding:8px 12px!important;min-height:36px}
+body.atlas-mundo #screen-game .game-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:22px;overflow:hidden;flex:1;min-height:0;border:0;border-radius:0}
+body.atlas-mundo #screen-game .map-column{height:100%;min-height:0;border:1px solid var(--atlas-line);border-radius:20px;overflow:hidden;background:#e7eee7}
+body.atlas-mundo #screen-game #map{width:100%;height:100%;min-height:0;z-index:0}
+body.atlas-mundo #screen-game .map-hint{font-size:12px;padding:10px 16px;background:#fffffff0;color:var(--atlas-muted);border-top:1px solid var(--atlas-line);border-radius:0 0 18px 18px}
+body.atlas-mundo #screen-game .quiz-column{display:flex;flex-direction:column;justify-content:center;gap:14px;min-height:0;padding:12px 0;overflow:auto;background:none;border:0}
+body.atlas-mundo .atlas-region-status{display:grid;grid-template-columns:1fr auto;gap:10px;color:var(--atlas-muted);font-size:12px;align-items:center}
+body.atlas-mundo .atlas-region-status strong{font-size:12px;color:var(--atlas-green)}
+body.atlas-mundo .atlas-region-status .atlas-track{grid-column:1/-1;height:5px}
+body.atlas-mundo #screen-game .question-card{border:0;background:none;box-shadow:none;padding:5px 0;margin:0}
+body.atlas-mundo #screen-game .question-card .eyebrow{font-size:10px;margin-bottom:8px}
+body.atlas-mundo #screen-game .question-text{font-size:clamp(22px,2.3vw,29px);line-height:1.25;font-weight:750;letter-spacing:-.7px;color:var(--atlas-navy)}
+body.atlas-mundo #screen-game .answers{display:grid;grid-template-columns:1fr;gap:9px;margin:0}
+body.atlas-mundo #screen-game .answer-btn{display:flex;align-items:center;gap:12px;font-size:14px;line-height:1.4;min-height:49px;padding:10px 14px;background:#ffffffed;border:1px solid var(--atlas-line);border-radius:12px;color:var(--atlas-navy);box-shadow:0 3px 7px #0b0a3204;transform:none}
+body.atlas-mundo #screen-game .answer-letter{display:grid;place-items:center;width:27px;height:27px;flex-shrink:0;background:#eeeef4;color:var(--atlas-navy);border:0;border-radius:50%;font-size:12px}
+body.atlas-mundo #screen-game .answer-btn.correct{background:#edf4e8;border-color:var(--atlas-green);color:var(--atlas-green)}
+body.atlas-mundo #screen-game .answer-btn.wrong{background:#fff0ed;border-color:#c67c70;color:#91473e}
+body.atlas-mundo #screen-game .quiz-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;border:0;margin:0;padding:0;flex-shrink:0}
+body.atlas-mundo #screen-game .lives{display:flex;gap:5px;color:#b84f46;align-items:center}
+body.atlas-mundo #screen-game .life{font-size:0;width:22px;height:22px;transform:none}
+body.atlas-mundo #screen-game .life.lost{color:#c6c8cf;opacity:.55;filter:none}
+body.atlas-mundo #screen-game .streak-badge{font-size:12px;border:0;border-radius:9px;padding:8px 10px;background:#f0f3ea;color:var(--atlas-green)}
+body.atlas-mundo #screen-game .hint-btn{font-size:12px;border:1px solid var(--atlas-line);border-radius:9px;padding:8px 12px;background:white;color:var(--atlas-navy)}
+body.atlas-mundo #screen-game #hint-box-wrap:empty{display:none}
+body.atlas-mundo #screen-game .hint-box{font-size:12px;line-height:1.5;background:#faf5e7;border:1px solid #e2cf9b;padding:9px 12px;border-radius:9px;margin:0 0 4px}
+body.atlas-mundo #overlay-result{position:static;background:none;padding:0;margin:0;width:100%;height:auto;z-index:auto;inset:auto;display:block;backdrop-filter:none;animation:none}
+body.atlas-mundo #overlay-result.hidden{display:none!important}
+body.atlas-mundo #overlay-result #result-panel{display:flex;align-items:center;gap:10px;max-width:none;width:100%;padding:10px 12px;margin:0;border:1px solid #e6d7ad;border-radius:14px;background:#fdfaf0;box-shadow:none;animation:none;transform:none;position:static}
+body.atlas-mundo #overlay-result #result-panel.wrong{background:#fff6f2;border-color:#e6c9c3}
+body.atlas-mundo .atlas-inline-mascot{width:74px;height:82px;object-fit:contain;flex-shrink:0}
+body.atlas-mundo .atlas-inline-copy{flex:1;min-width:0;font-size:12px;color:var(--atlas-muted)}
+body.atlas-mundo .atlas-inline-copy #result-title{font-size:14px;color:var(--atlas-green)}
+body.atlas-mundo .atlas-inline-copy #result-icon{font-size:14px;margin-right:5px;color:var(--atlas-green)}
+body.atlas-mundo .atlas-inline-copy p{font-size:12px;line-height:1.5;margin:3px 0}
+body.atlas-mundo .atlas-inline-copy #result-xp{font-size:13px;color:#8c6c1a;font-weight:700}
+body.atlas-mundo .atlas-inline-next{display:flex;flex-direction:column;gap:7px;align-items:center;flex-shrink:0}
+body.atlas-mundo .atlas-inline-next>span{font-size:10px;color:var(--atlas-muted)}
+body.atlas-mundo .atlas-inline-next .btn{font-size:11px;min-height:35px;padding:8px 10px}
+body.atlas-mundo .overlay{background:#0b0a327d;backdrop-filter:blur(6px);padding:20px;overflow:auto}
+body.atlas-mundo .atlas-mundo-setup{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:30px;width:min(1040px,100%);max-height:calc(100dvh - 40px);padding:28px;border:1px solid var(--atlas-line);border-radius:22px;background:#fffefa;box-shadow:0 30px 100px #0b0a3240;overflow:auto}
+body.atlas-mundo .atlas-mundo-setup h2{font-size:30px;font-weight:750;letter-spacing:-1px;line-height:1.15;margin:0 0 5px}
+body.atlas-mundo .atlas-mundo-setup .eyebrow{font-size:10px;margin:0}
+body.atlas-mundo .atlas-mundo-setup input.text-input{width:100%;min-height:44px;margin:0;text-transform:none;font-size:16px}
+body.atlas-mundo .atlas-mundo-setup label[for]{font-size:13px;font-weight:600}
+body.atlas-mundo .atlas-mundo-setup .atlas-field-error{margin-top:-8px}
+body.atlas-mundo .atlas-character-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+body.atlas-mundo .atlas-character-choice{position:relative;display:flex;align-items:center;flex-direction:column;gap:4px;border:1px solid var(--atlas-line);border-radius:12px;background:white;padding:7px;cursor:pointer;min-width:0}
+body.atlas-mundo .atlas-character-choice:has(input:checked){border:2px solid var(--atlas-gold);background:#fbf7eb}
+body.atlas-mundo .atlas-character-choice:has(input:focus-visible){outline:3px solid var(--atlas-gold);outline-offset:3px}
+body.atlas-mundo .atlas-character-choice input{position:absolute;width:1px;height:1px;min-height:0;opacity:0;inset:0;padding:0}
+body.atlas-mundo .atlas-character-choice img{height:clamp(50px,9vh,90px);width:100%;object-fit:contain}
+body.atlas-mundo .atlas-character-choice strong{font-size:12px}
+body.atlas-mundo #overlay-vitoria .result-panel,body.atlas-mundo #overlay-gameover .result-panel{max-width:920px!important;width:100%;padding:26px!important;border:1px solid var(--atlas-line);border-radius:22px;background:#fffefa url("assets/atlas/paisagem.webp") left bottom/auto 45% no-repeat;overflow:auto;box-shadow:0 30px 100px #0b0a3240}
+body.atlas-mundo #overlay-vitoria .result-panel>div,body.atlas-mundo #overlay-gameover .result-panel>div{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);grid-template-rows:auto auto auto auto auto;gap:12px 24px;align-items:center}
+body.atlas-mundo #overlay-vitoria .result-panel>div>*:not(img),body.atlas-mundo #overlay-gameover .result-panel>div>*:not(img){grid-column:2}
+body.atlas-mundo #overlay-vitoria .atlas-finish-mascot,body.atlas-mundo #overlay-gameover .atlas-finish-mascot{grid-column:1;grid-row:1/8;width:100%;height:100%;max-height:350px;object-fit:contain}
+body.atlas-mundo #overlay-vitoria .result-title,body.atlas-mundo #overlay-gameover .result-title{font-size:31px!important;line-height:1.1;text-align:left!important;color:var(--atlas-navy)}
+body.atlas-mundo #overlay-vitoria .result-desc,body.atlas-mundo #overlay-gameover .result-desc{text-align:left!important;margin:0!important;font-size:13px!important}
+body.atlas-mundo #overlay-vitoria .stat-grid,body.atlas-mundo #overlay-gameover .stat-grid{margin:0!important;display:grid;gap:9px!important}
+body.atlas-mundo .stat-box{border:1px solid var(--atlas-line)!important;border-radius:12px!important;background:#ffffffeb!important;box-shadow:none!important;padding:14px 10px!important}
+body.atlas-mundo .stat-box .num{font-size:25px!important;font-weight:750;color:var(--atlas-green)}
+body.atlas-mundo .stat-box .lbl{font-size:10px!important;color:var(--atlas-muted);margin-top:5px}
+body.atlas-mundo .atlas-journey{list-style:none;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;margin:8px 0 4px}
+body.atlas-mundo .atlas-journey li{display:flex;flex-direction:column;align-items:center;position:relative;gap:6px;text-align:center;font-size:9px;color:var(--atlas-muted);min-width:0}
+body.atlas-mundo .atlas-journey li:before{content:"";position:absolute;left:-50%;width:100%;top:14px;height:2px;background:#dcded9;z-index:0}
+body.atlas-mundo .atlas-journey li:first-child:before{display:none}
+body.atlas-mundo .atlas-journey strong{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:#e4e5e7;color:var(--atlas-muted);font-size:12px;z-index:1}
+body.atlas-mundo .atlas-journey .complete strong{background:var(--atlas-gold);color:white}
+body.atlas-mundo .atlas-journey .next strong{background:var(--atlas-green);color:white}
+/* Adaptive layouts. Small viewports may scroll instead of shrinking reading text. */
+@media(min-width:900px) and (max-height:720px){
+ body.atlas-missao .app-shell,body.atlas-geobr #geoBrOpening,body.atlas-mundo #screen-menu{grid-template-rows:62px minmax(0,1fr) 24px}
+ body.atlas-missao main{padding:14px 0}
+ body.atlas-missao .home-screen{gap:10px 30px;grid-template-rows:minmax(100px,1fr) auto 26px 54px}
+ body.atlas-missao .home-screen h1{font-size:40px}
+ body.atlas-missao .home-screen .lead{font-size:13px;margin-top:10px}
+ body.atlas-missao .neo-btn-modo{min-height:86px;padding:10px 6px;gap:5px}
+ body.atlas-missao .neo-btn-modo small{font-size:10px}
+ body.atlas-missao .quiz-screen{grid-template-rows:38px 27px 4px auto minmax(0,1fr) minmax(76px,auto);gap:8px 20px}
+ body.atlas-missao .question-body h1{font-size:24px;padding:5px 0}
+ body.atlas-missao .answer-button{min-height:42px;padding:8px 12px;font-size:14px}
+ body.atlas-missao .feedback-row{min-height:76px;padding:8px 12px}
+ body.atlas-missao .atlas-feedback-avatar{height:68px;width:68px}
+ body.atlas-missao .result-screen{gap:10px 25px;padding:10px 0}
+ body.atlas-missao .result-stats>div{padding:12px 16px}
+ body.atlas-missao .result-stats strong{font-size:28px}
+ body.atlas-geobr .geo-opening-content{grid-template-rows:minmax(0,1fr) 90px 44px 25px;gap:12px 20px;padding:12px 0}
+ body.atlas-geobr .atlas-cover-copy h1{font-size:42px}
+ body.atlas-geobr #telaJogo .geobr-game-layout{padding:20px;gap:22px}
+ body.atlas-geobr #telaJogo .geobr-quiz-column{gap:11px}
+ body.atlas-geobr #telaJogo #containerAlternativas .neo-alt{min-height:44px;padding:8px 12px!important;font-size:13px!important}
+ body.atlas-geobr #telaJogo .notification-mascot{width:48px;height:55px}
+ body.atlas-geobr #modalAluno .player-setup-panel,body.atlas-mundo .atlas-mundo-setup{padding:22px;gap:24px}
+ body.atlas-geobr #modalAluno .character-option img{height:60px}
+ body.atlas-mundo #screen-game .quiz-column{gap:10px}
+ body.atlas-mundo #screen-game .answer-btn{min-height:42px;padding:8px 12px;font-size:13px}
+ body.atlas-mundo #screen-game .question-text{font-size:24px}
+ body.atlas-mundo .atlas-inline-mascot{width:55px;height:65px}
+ body.atlas-mundo .atlas-inline-next>span{display:none}
+ body.atlas-mundo .atlas-mundo-setup{gap:9px 24px}
+ body.atlas-mundo .atlas-mundo-setup .atlas-setup-fields{gap:8px}
+ body.atlas-mundo .atlas-character-choice img{height:55px}
+}
+@media(max-width:899px){
+ body.atlas-game{height:auto;min-height:100dvh;overflow:auto}
+ html:has(body.atlas-game){height:auto;overflow:auto}
+ body.atlas-game .atlas-topbar,body.atlas-game .site-header{min-height:62px;padding:10px 18px}
+ body.atlas-game .atlas-wordmark{font-size:19px}
+ body.atlas-game .atlas-topbar nav{gap:12px}
+ body.atlas-game .atlas-setup-preview>img{max-height:230px;max-width:250px}
+ body.atlas-game .atlas-setup-preview{background-size:auto 90%;padding:10px}
+ body.atlas-game .atlas-setup-preview>p{font-size:17px}
+ body.atlas-game .atlas-setup-preview>small{font-size:11px}
+ body.atlas-missao .app-shell{height:auto;min-height:100dvh;padding:0 18px;grid-template-rows:64px 1fr 28px}
+ body.atlas-missao main{padding:22px 0}
+ body.atlas-missao .screen.active{height:auto;min-height:0}
+ body.atlas-missao .home-screen{grid-template-columns:1fr;grid-template-rows:auto 230px auto 32px auto;grid-template-areas:"intro" "map" "controls" "secondary" "ranking";max-width:650px;gap:18px}
+ body.atlas-missao .home-screen>.intro{text-align:center;align-self:auto}
+ body.atlas-missao .home-screen h1{font-size:40px}
+ body.atlas-missao .home-screen .lead{margin:12px auto 0;font-size:14px}
+ body.atlas-missao .map-scene{width:100%;max-width:480px;margin:auto;height:230px}
+ body.atlas-missao #brazilMap{padding:0 0 8px}
+ body.atlas-missao .atlas-map-mascot{height:155px;width:140px;left:0;bottom:0;max-height:none}
+ body.atlas-missao .atlas-map-card{top:8%;right:0;padding:10px 12px}
+ body.atlas-missao .map-caption{display:none}
+ body.atlas-missao .home-screen>.home-secondary{justify-content:center}
+ body.atlas-missao .home-screen>.ranking-panel{grid-template-columns:1fr;padding:13px 16px;gap:10px}
+ body.atlas-missao .setup-screen{gap:15px}
+ body.atlas-missao .setup-screen .intro{text-align:center;padding:0}
+ body.atlas-missao .setup-screen h1{font-size:29px}
+ body.atlas-missao #formPersonagem{display:flex;flex-direction:column;gap:18px}
+ body.atlas-missao .character-grid{grid-template-rows:auto auto;gap:10px}
+ body.atlas-missao .character-option img{height:100px}
+ body.atlas-missao .setup-bottom{flex-direction:column;align-items:stretch}
+ body.atlas-missao .setup-bottom p{max-width:none;display:block}
+ body.atlas-missao .setup-bottom .primary-button{width:100%}
+ body.atlas-missao .quiz-screen{grid-template-columns:1fr;grid-template-rows:auto auto 4px auto minmax(160px,28vh) auto auto;gap:13px}
+ body.atlas-missao .quiz-top{grid-row:1}
+ body.atlas-missao .quiz-status{grid-row:2;font-size:12px}
+ body.atlas-missao .quiz-metrics{gap:12px}
+ body.atlas-missao .question-progress{grid-row:3}
+ body.atlas-missao .question-body h1{grid-row:4;font-size:23px;padding:0}
+ body.atlas-missao .question-image{grid-column:1;grid-row:5;height:100%;padding:18px;max-height:290px}
+ body.atlas-missao .answer-grid{grid-column:1;grid-row:6;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:9px}
+ body.atlas-missao .answer-button{min-height:58px;font-size:13px;padding:9px 10px;gap:9px}
+ body.atlas-missao .feedback-row{grid-column:1;grid-row:7;min-height:90px;padding:12px;flex-wrap:wrap;gap:10px}
+ body.atlas-missao .answer-feedback{flex-basis:60%;font-size:12px}
+ body.atlas-missao .atlas-feedback-avatar{width:65px;height:65px}
+ body.atlas-missao .next-button{margin-left:auto}
+ body.atlas-missao .result-screen{display:flex;flex-direction:column;gap:16px;padding:0;text-align:center}
+ body.atlas-missao .result-mascot{width:230px;height:210px}
+ body.atlas-missao .result-screen h1{font-size:34px}
+ body.atlas-missao .result-stats{width:100%;gap:10px}
+ body.atlas-missao .result-actions{justify-content:center;width:100%}
+ body.atlas-missao .album-screen{height:calc(100dvh - 140px)!important;min-height:440px!important}
+ body.atlas-missao .state-card strong{font-size:11px}
+ body.atlas-geobr #geoBrOpening{height:auto;min-height:100dvh;padding:0 18px;grid-template-rows:64px 1fr 28px;overflow:visible}
+ body.atlas-geobr .geo-opening-content{grid-template-columns:1fr;grid-template-rows:auto 230px auto auto 28px;gap:18px;padding:20px 0}
+ body.atlas-geobr .geo-opening-content:before{inset:10px 0}
+ body.atlas-geobr .atlas-cover-copy{grid-row:1;grid-column:1;text-align:center;padding:24px 20px 0}
+ body.atlas-geobr .atlas-cover-copy h1{font-size:40px}
+ body.atlas-geobr .atlas-cover-copy .atlas-lead{margin:auto;max-width:500px}
+ body.atlas-geobr .atlas-cover-meta{justify-content:center;margin-top:16px}
+ body.atlas-geobr .atlas-cover-art{grid-row:2;grid-column:1;width:100%;max-width:450px;margin:auto;height:230px}
+ body.atlas-geobr .atlas-cover-copero{height:250px;max-width:75%;left:0}
+ body.atlas-geobr .opening-modes{grid-row:3;padding:0 20px}
+ body.atlas-geobr .mode-card-grid{gap:9px}
+ body.atlas-geobr .mode-card{flex-direction:column;gap:8px;padding:13px 6px;text-align:center}
+ body.atlas-geobr .mode-card-copy strong{font-size:13px!important}
+ body.atlas-geobr .mode-card-copy small{font-size:10px!important}
+ body.atlas-geobr .atlas-cover-actions{grid-row:4;padding:0 20px;flex-direction:column;gap:10px}
+ body.atlas-geobr .atlas-cover-actions select{width:100%;max-width:none;min-height:44px}
+ body.atlas-geobr .atlas-cover-actions .btn-primary{min-height:48px}
+ body.atlas-geobr .atlas-ranking-drawer{grid-row:5;padding:0 20px}
+ body.atlas-geobr #appRoot{height:auto;min-height:100dvh;padding:12px 16px}
+ body.atlas-geobr #telaJogo{height:auto;min-height:calc(100dvh - 24px)}
+ body.atlas-geobr #telaJogo .topbar{gap:10px;flex-wrap:wrap;padding:10px 13px;min-height:70px}
+ body.atlas-geobr #telaJogo .quiz-logo-brand{display:none}
+ body.atlas-geobr #telaJogo .topbar-player-info{gap:12px;flex:1;justify-content:flex-end}
+ body.atlas-geobr #telaJogo .hud-player span{max-width:100px}
+ body.atlas-geobr #telaJogo .hud-player img{width:32px;height:32px}
+ body.atlas-geobr #telaJogo .hud-stat strong{font-size:13px!important}
+ body.atlas-geobr #telaJogo .geobr-game-layout{grid-template-columns:1fr!important;grid-template-rows:minmax(170px,29vh) auto;gap:18px;padding:18px;overflow:visible}
+ body.atlas-geobr #telaJogo .geobr-visual-column{height:100%}
+ body.atlas-geobr #telaJogo .geobr-mode-caption{font-size:10px;padding-top:8px}
+ body.atlas-geobr #telaJogo .geobr-quiz-column{gap:14px;overflow:visible}
+ body.atlas-geobr #telaJogo .question-card .question-text{font-size:23px!important}
+ body.atlas-geobr #telaJogo #containerAlternativas{grid-template-columns:1fr 1fr;gap:9px}
+ body.atlas-geobr #telaJogo #containerAlternativas .neo-alt{font-size:13px!important;min-height:60px;padding:9px!important;gap:7px}
+ body.atlas-geobr #modalAluno .player-setup-panel{grid-template-columns:1fr;gap:20px;padding:22px;max-height:calc(100dvh - 30px)}
+ body.atlas-geobr #modalAluno .atlas-setup-preview{display:none}
+ body.atlas-geobr #modalAluno .character-option img{height:85px}
+ body.atlas-geobr #modalAluno .player-setup-title{font-size:27px!important}
+ body.atlas-geobr #telaResultado .neo-resultado{display:flex;flex-direction:column;gap:18px;padding:24px;background-size:auto 45%}
+ body.atlas-geobr #telaResultado .result-mascot{height:210px;width:230px}
+ body.atlas-geobr #telaResultado h1{font-size:32px!important;text-align:center}
+ body.atlas-geobr #telaResultado .neo-resultado-stats{width:100%}
+ body.atlas-geobr #telaResultado .neo-resultado-buttons{justify-content:center;width:100%}
+ body.atlas-mundo #screen-menu{height:auto;min-height:100dvh;grid-template-rows:64px 1fr 28px;padding:0 18px;overflow:visible}
+ body.atlas-mundo .atlas-world-home{grid-template-columns:1fr;grid-template-rows:auto 270px 28px;gap:18px;padding:30px 0}
+ body.atlas-mundo .atlas-world-copy{text-align:center;padding:0}
+ body.atlas-mundo .atlas-world-copy h1{font-size:43px;letter-spacing:-1.7px}
+ body.atlas-mundo .atlas-world-copy h1 br{display:none}
+ body.atlas-mundo .atlas-world-copy .atlas-lead{margin:0 auto}
+ body.atlas-mundo .atlas-world-copy .atlas-cover-meta{justify-content:center;margin:20px 0}
+ body.atlas-mundo .atlas-world-copy .menu-btn{margin:auto}
+ body.atlas-mundo .atlas-world-map{height:270px;max-width:620px;width:100%;margin:auto}
+ body.atlas-mundo .atlas-world-map>img:first-child{width:100%}
+ body.atlas-mundo #screen-game{height:auto!important;min-height:100dvh;padding:12px 16px;overflow:visible!important;gap:16px}
+ body.atlas-mundo #screen-game .topbar{gap:10px;flex-wrap:wrap;padding:10px 12px!important}
+ body.atlas-mundo #screen-game .topbar>div:last-child{gap:12px!important;justify-content:flex-end;flex:1}
+ body.atlas-mundo #screen-game #hud-nivel{font-size:11px;max-width:130px}
+ body.atlas-mundo #screen-game #hud-nome{font-size:12px;overflow-wrap:anywhere;max-width:100px}
+ body.atlas-mundo #screen-game .atlas-hud-avatar{display:none}
+ body.atlas-mundo #screen-game .game-layout{grid-template-columns:1fr;grid-template-rows:minmax(220px,33vh) auto;gap:20px;overflow:visible}
+ body.atlas-mundo #screen-game .map-column{height:100%;min-height:220px}
+ body.atlas-mundo #screen-game .quiz-column{overflow:visible;padding:0;gap:14px}
+ body.atlas-mundo #screen-game .question-text{font-size:24px}
+ body.atlas-mundo #screen-game .answers{grid-template-columns:1fr 1fr}
+ body.atlas-mundo #screen-game .answer-btn{min-height:62px;font-size:13px;padding:10px;gap:8px}
+ body.atlas-mundo .atlas-mundo-setup{grid-template-columns:1fr;padding:22px;gap:16px}
+ body.atlas-mundo .atlas-mundo-setup .atlas-setup-preview{display:none}
+ body.atlas-mundo .atlas-mundo-setup h2{font-size:28px}
+ body.atlas-mundo .atlas-character-choice img{height:85px}
+ body.atlas-mundo #overlay-vitoria .result-panel>div,body.atlas-mundo #overlay-gameover .result-panel>div{display:flex;flex-direction:column;gap:14px}
+ body.atlas-mundo #overlay-vitoria .atlas-finish-mascot,body.atlas-mundo #overlay-gameover .atlas-finish-mascot{height:180px;width:210px}
+ body.atlas-mundo #overlay-vitoria .result-panel,body.atlas-mundo #overlay-gameover .result-panel{padding:22px!important}
+ body.atlas-mundo #overlay-vitoria .stat-grid,body.atlas-mundo #overlay-gameover .stat-grid{width:100%}
+ body.atlas-mundo .atlas-journey{width:100%;gap:4px}
+}
+@media(max-width:480px){
+ body.atlas-game .atlas-cover-footer>span:first-child{display:none}
+ body.atlas-game .atlas-setup-fields{gap:10px}
+ body.atlas-game .atlas-setup-preview>img{max-height:180px}
+ body.atlas-game .atlas-cover-meta{font-size:11px;gap:8px}
+ body.atlas-game .atlas-topbar,body.atlas-game .site-header{padding:10px 12px;gap:10px}
+ body.atlas-missao .app-shell{padding:0 14px}
+ body.atlas-missao .header-actions{gap:10px}
+ body.atlas-missao .header-actions .motion-label{display:none}
+ body.atlas-missao .header-actions .text-button{font-size:11px}
+ body.atlas-missao .brand{font-size:16px;gap:7px}
+ body.atlas-missao .brand small{font-size:8px;letter-spacing:1.5px}
+ body.atlas-missao .brand-symbol{width:28px;height:30px}
+ body.atlas-missao .preference{font-size:11px;gap:4px}
+ body.atlas-missao .home-screen h1{font-size:35px}
+ body.atlas-missao .home-screen{grid-template-rows:auto 205px auto 30px auto;gap:15px}
+ body.atlas-missao .map-scene{height:205px}
+ body.atlas-missao .atlas-map-mascot{height:125px;width:115px}
+ body.atlas-missao .atlas-map-card{min-width:130px;padding:8px 10px}
+ body.atlas-missao .atlas-map-card strong{font-size:12px}
+ body.atlas-missao .neo-btn-modo{padding:12px 5px;min-height:100px;gap:7px}
+ body.atlas-missao .neo-btn-modo strong{font-size:12px}
+ body.atlas-missao .neo-btn-modo small{font-size:10px}
+ body.atlas-missao .character-option img{height:80px}
+ body.atlas-missao .quiz-top .text-button{font-size:11px}
+ body.atlas-missao .player-chip strong{font-size:12px;max-width:160px}
+ body.atlas-missao .player-chip span{font-size:10px}
+ body.atlas-missao .quiz-status{font-size:11px;gap:8px}
+ body.atlas-missao .quiz-status strong{font-size:12px}
+ body.atlas-missao .quiz-metrics{gap:9px}
+ body.atlas-missao .quiz-metrics>span:nth-child(2){display:none}
+ body.atlas-missao .question-body h1{font-size:21px}
+ body.atlas-missao .answer-button{font-size:12px;padding:9px;gap:7px;min-height:61px}
+ body.atlas-missao .answer-letter{width:23px;height:23px;font-size:11px}
+ body.atlas-missao .result-actions{flex-direction:column;align-items:stretch}
+ body.atlas-geobr #geoBrOpening{padding:0 14px}
+ body.atlas-geobr .atlas-cover-copy{padding:23px 16px 0}
+ body.atlas-geobr .atlas-cover-copy h1{font-size:34px;letter-spacing:-1.4px}
+ body.atlas-geobr .atlas-cover-copy .atlas-lead{font-size:13px}
+ body.atlas-geobr .opening-modes,body.atlas-geobr .atlas-cover-actions{padding:0 14px}
+ body.atlas-geobr .mode-card .atlas-icon{width:28px;height:28px}
+ body.atlas-geobr .mode-card-copy small{display:none}
+ body.atlas-geobr .mode-card-copy strong{font-size:12px!important}
+ body.atlas-geobr .geo-opening-content{grid-template-rows:auto 205px 84px auto 26px;gap:15px}
+ body.atlas-geobr .atlas-cover-art{height:205px}
+ body.atlas-geobr .atlas-cover-copero{height:225px}
+ body.atlas-geobr #telaJogo .topbar-player-info{gap:9px}
+ body.atlas-geobr #telaJogo .hud-player span{max-width:80px;font-size:11px!important}
+ body.atlas-geobr #telaJogo .hud-player img{display:none}
+ body.atlas-geobr #telaJogo .hud-stat small{font-size:8px!important}
+ body.atlas-geobr #telaJogo .geobr-game-layout{padding:14px;gap:16px}
+ body.atlas-geobr #telaJogo #containerAlternativas .neo-alt{font-size:12px!important;gap:6px;min-height:62px}
+ body.atlas-geobr #telaJogo .notification-mascot{width:47px;height:56px}
+ body.atlas-geobr #telaJogo .notification-desc{font-size:11px!important}
+ body.atlas-geobr #telaJogo .notification-xp{font-size:12px!important}
+ body.atlas-geobr #modalAluno .player-setup-panel{padding:18px}
+ body.atlas-geobr #modalAluno .character-option img{height:66px}
+ body.atlas-geobr #modalAluno .player-setup-actions{flex-direction:column}
+ body.atlas-mundo #screen-menu{padding:0 14px}
+ body.atlas-mundo .atlas-world-copy h1{font-size:36px}
+ body.atlas-mundo .atlas-world-home{grid-template-rows:auto 220px 26px;gap:20px;padding:28px 0}
+ body.atlas-mundo .atlas-world-map{height:220px}
+ body.atlas-mundo #screen-game .brand{display:none}
+ body.atlas-mundo #screen-game .topbar>div:first-child{gap:0!important}
+ body.atlas-mundo #screen-game .topbar>div:last-child{gap:8px!important}
+ body.atlas-mundo #screen-game #hud-nivel{font-size:10px;max-width:90px}
+ body.atlas-mundo #screen-game #hud-nome{font-size:11px;max-width:75px}
+ body.atlas-mundo #screen-game #hud-xp{font-size:12px}
+ body.atlas-mundo #screen-game .question-text{font-size:21px}
+ body.atlas-mundo #screen-game .answer-btn{font-size:12px;gap:7px;min-height:64px}
+ body.atlas-mundo #screen-game .answer-letter{width:24px;height:24px;font-size:11px}
+ body.atlas-mundo .atlas-inline-mascot{width:50px;height:60px}
+ body.atlas-mundo #overlay-result #result-panel{flex-wrap:wrap;gap:9px}
+ body.atlas-mundo .atlas-inline-copy{flex-basis:70%}
+ body.atlas-mundo .atlas-inline-next{flex-direction:row;margin-left:auto}
+ body.atlas-mundo .atlas-inline-next>span{display:none}
+ body.atlas-mundo .atlas-region-status{font-size:11px;gap:8px}
+ body.atlas-mundo .atlas-region-status strong{font-size:11px}
+ body.atlas-mundo .atlas-mundo-setup{padding:18px}
+ body.atlas-mundo .atlas-mundo-setup .atlas-setup-fields{gap:8px}
+ body.atlas-mundo .atlas-character-choice img{height:66px}
+ body.atlas-mundo .atlas-action-row{flex-direction:column;align-items:stretch}
+ body.atlas-mundo .atlas-journey li{font-size:8px;line-height:1.3}
+ body.atlas-mundo #overlay-vitoria .result-title,body.atlas-mundo #overlay-gameover .result-title{font-size:28px!important}
+}
+@media(prefers-reduced-motion:reduce){body.atlas-game *,body.atlas-game *:before,body.atlas-game *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+body.atlas-game,body.atlas-game h1,body.atlas-game h2,body.atlas-game h3,body.atlas-game button,body.atlas-game input,body.atlas-game select,body.atlas-game .question-text{font-family:"Segoe UI",Arial,sans-serif!important}
+body.atlas-mundo #overlay-result .atlas-result-metrics[hidden]{display:none!important}
+body.atlas-missao .album-heading .lead{font-size:13px}
+body.atlas-mundo .atlas-inline-copy #result-icon{display:inline;width:auto;height:auto;margin:0 5px 0 0;border-radius:0;background:none;color:var(--atlas-green);vertical-align:baseline}
+body.atlas-mundo #screen-game .answers{flex:0 0 auto;overflow:visible}
+body.atlas-geobr #telaJogo .notification-mascot{flex:0 0 auto}

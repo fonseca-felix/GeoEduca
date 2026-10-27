@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0B0A32">
+  <meta name="description" content="Siga as pistas, investigue os estados brasileiros e recupere o patrimônio com o Copero.">
+  <title>Detetive do Brasil · GeoEduca</title>
+  <link rel="icon" type="image/svg+xml" href="assets/brand-brasil.svg">
+  <link rel="preload" as="image" href="assets/personagens/copero-detetive-lupa.webp" type="image/webp" fetchpriority="high">
+  <link rel="stylesheet" href="detetive-brasil.css">
+  <script src="detetive-brasil.js" defer></script>
+</head>
+<body data-mode="integrado" data-screen="telaInicial" data-tone="gold">
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+  <header class="site-header">
+    <a href="#inicio" class="brand" id="brand-home" aria-label="Detetive do Brasil, início"><span class="brand-map" aria-hidden="true"></span><span>DETETIVE<br>DO BRASIL<span class="brand-line"></span></span></a>
+    <ol id="progresso-rota" class="route" aria-label="Progresso da investigação" hidden></ol>
+    <div class="header-right">
+      <div id="timer-display" class="case-clock" hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6M12 2v3"/></svg><span><strong id="horas-header">72h</strong><small>restantes</small></span></div>
+      <img class="header-agent" id="header-agent" src="assets/personagens/copero-detetive-lupa.webp" alt="Copero, seu parceiro" hidden>
+      <details class="options-menu" id="options-menu"><summary aria-label="Abrir opções"><span class="options-word">Opções</span><span aria-hidden="true">⋮</span></summary><nav aria-label="Opções do jogo"><button id="open-help">Como jogar</button><button data-action="new-case">Novo caso</button><a class="other-games" href="../../aluno/jogos.html">Outros jogos</a></nav></details>
+    </div>
+  </header>
+  <main id="conteudo" tabindex="-1">
+    <section id="tela-inicio" class="tela home-screen ativa" aria-labelledby="cover-title">
+      <div class="home-shape" aria-hidden="true"></div>
+      <div class="home-copy"><h1 id="cover-title" tabindex="-1">O próximo destino<br>está nas pistas.</h1><button id="btn-iniciar" class="primary-button navy-button">Iniciar investigação <span aria-hidden="true">→</span></button><p class="cover-meta">72 horas <span>·</span> Até 5 estados</p></div>
+      <img class="home-mascot" width="1920" height="1920" decoding="async" fetchpriority="high" src="assets/personagens/copero-detetive-lupa.webp" alt="Copero detetive com lupa, pronto para investigar">
+    </section>
+
+    <section id="tela-carregamento" class="tela loading-screen" aria-labelledby="loading-title" hidden>
+      <div class="loading-center"><span id="loading-spinner" class="spinner" aria-hidden="true"></span><h1 id="loading-title" tabindex="-1">Preparando seu caso…</h1><p id="loading-msg" role="status" aria-live="polite">Organizando a rota e as pistas da investigação.</p><button id="btn-retry" class="primary-button" hidden>Tentar novamente <span aria-hidden="true">→</span></button><button class="text-button" data-action="home">Voltar ao início</button></div>
+    </section>
+
+    <section id="tela-briefing" class="tela paper-screen" aria-labelledby="briefing-title" hidden>
+      <div class="briefing-layout">
+        <div class="briefing-copy"><p class="eyebrow">NOVO CASO</p><h1 id="briefing-title" tabindex="-1">Uma peça histórica desapareceu.</h1><h2 id="briefing-patrimonio" class="stolen-title"></h2><p id="briefing-desc" class="body-copy"></p>
+          <dl class="case-file"><div><dt>Suspeito</dt><dd><strong id="briefing-crim-nome"></strong> <span id="briefing-crim-apelido"></span></dd></div><div><dt>Aparência</dt><dd id="briefing-crim-desc"></dd></div><div><dt>Motivação</dt><dd id="briefing-crim-motivo"></dd></div></dl>
+          <button id="btn-investigar" class="primary-button">Começar investigação <span aria-hidden="true">→</span></button>
+        </div>
+        <aside class="briefing-partner"><img src="assets/personagens/copero-detetive-lupa.webp" alt="Copero detetive com lupa"><strong>Seu parceiro Copero</strong><div class="starting-point"><span>Ponto de partida</span><h2 id="briefing-local"></h2></div><p>72 horas para solucionar o caso.</p></aside>
+      </div>
+    </section>
+
+    <section id="tela-investigacao" class="tela paper-screen" aria-labelledby="inv-estado-nome" hidden>
+      <div class="page-heading"><p id="inv-eyebrow" class="eyebrow">INVESTIGAÇÃO</p><h1 id="inv-estado-nome" tabindex="-1">Bahia</h1><p id="inv-mensagem" class="body-copy">Converse com os moradores e descubra o próximo destino.</p></div>
+      <div class="investigation-layout"><figure class="case-map"><img id="inv-mapa" src="assets/maps/ba.svg" alt="Bahia destacada no mapa do Brasil"><figcaption id="inv-map-caption">Localização atual</figcaption></figure><div class="witness-area"><h2>Quem você vai ouvir?</h2><div id="npc-grid" class="witness-list"></div><button id="btn-aeroporto" class="primary-button">Ir ao aeroporto <span aria-hidden="true">→</span></button><button id="btn-prender" class="primary-button" hidden>Prender suspeito <span aria-hidden="true">→</span></button><div class="investigation-footer"><button class="notebook-link text-button" data-action="notebook">Caderneta · <span id="badge-notas">0</span> <span id="notas-label">pistas</span></button><span>As horas são gastas por ação.</span></div></div></div>
+    </section>
+
+    <section id="tela-npc" class="tela paper-screen" aria-labelledby="npc-title" hidden>
+      <button class="back-button" data-action="investigate">← Investigação</button>
+      <div class="dialogue-layout"><div class="dialogue-copy"><div class="witness-person"><span class="person-icon" id="npc-dialog-emoji" aria-hidden="true"></span><div><strong id="npc-dialog-nome"></strong><span id="npc-dialog-job"></span></div></div><h1 id="npc-title" tabindex="-1">Uma nova pista.</h1><blockquote id="npc-dialog-dica"></blockquote><p class="clue-saved" id="npc-clue-status">Pista salva na caderneta · Conversa: −2h</p><div class="dialogue-actions"><button class="primary-button" data-action="investigate">Voltar à investigação <span aria-hidden="true">→</span></button><button class="secondary-button" data-action="notebook">Abrir caderneta</button></div></div><img class="dialogue-agent" src="assets/personagens/copero-detetive-acolhendo.webp" alt="Copero detetive orientando a investigação"></div>
+    </section>
+
+    <section id="tela-caderneta" class="tela paper-screen" aria-labelledby="notebook-title" hidden>
+      <div class="page-heading"><h1 id="notebook-title" tabindex="-1">Suas pistas, reunidas.</h1><p class="body-copy">Use o que você descobriu para decidir o próximo destino.</p></div>
+      <div class="notebook-layout"><nav id="caderneta-estados" class="notebook-states" aria-label="Estados com pistas"></nav><div class="notebook-content"><div id="caderneta-lista" class="clues" aria-live="polite"></div><div class="notebook-actions"><button class="primary-button" data-action="airport">Ir ao aeroporto <span aria-hidden="true">→</span></button><button class="text-button" data-action="investigate">← Voltar à investigação</button></div></div></div>
+    </section>
+
+    <section id="tela-aeroporto" class="tela paper-screen" aria-labelledby="airport-title" hidden>
+      <div class="airport-layout"><div class="airport-location"><h1 id="airport-title" tabindex="-1">Para onde seguimos?</h1><p class="body-copy">Saindo de <strong id="aeroporto-estado-atual"></strong></p><img id="airport-map" src="assets/maps/ba.svg" alt="Sua localização no Brasil"><button class="text-button notebook-link" data-action="notebook">Consultar caderneta</button></div><div class="airport-selection"><label class="sr-only" for="estado-busca">Buscar estado ou sigla</label><input type="search" id="estado-busca" placeholder="Buscar estado ou sigla" autocomplete="off"><div id="filtros-regiao" class="region-filters" role="group" aria-label="Filtrar destinos por região"></div><div id="aeroporto-estados" class="destination-list" role="group" aria-label="Escolha seu destino"></div><p id="airport-selection-status" class="selection-status" role="status" aria-live="polite">Escolha um estado para embarcar.</p><button id="btn-embarcar" class="primary-button" disabled>Selecione um destino <span aria-hidden="true">→</span></button><p class="flight-cost">Destino correto: <strong>−8h</strong> · Destino errado: <strong>−12h</strong></p><button class="text-button" data-action="investigate">← Voltar à investigação</button></div></div>
+    </section>
+
+    <section id="tela-fim" class="tela result-screen" aria-labelledby="fim-titulo" hidden>
+      <div class="result-copy"><h1 id="fim-titulo" tabindex="-1">Caso encerrado!</h1><p id="fim-mensagem" class="result-message"></p><div class="result-stats"><div><strong id="fim-pontuacao">0</strong><span>pontos</span></div><div><strong id="fim-estados">0</strong><span>estados visitados</span></div><div><strong id="fim-horas">0h</strong><span>restantes</span></div></div><div class="result-actions"><button id="btn-novo-caso" class="primary-button" data-action="new-case">Investigar novo caso <span aria-hidden="true">→</span></button><a class="text-button other-games" href="aluno/jogos.html">Outros jogos</a></div><details class="result-details"><summary>Detalhes da investigação</summary><div><span>Viagens certas <strong id="fim-acertos">0</strong></span><span>Erros de viagem <strong id="fim-erros">0</strong></span><span>Pistas coletadas <strong id="fim-pistas">0</strong></span><span>Tempo real <strong id="fim-tempo">0m 0s</strong></span></div></details><p id="save-status" class="save-status" role="status" aria-live="polite"></p></div><img id="fim-copero" class="result-mascot" src="assets/celebracao/copero-detetive.webp" alt="Copero comemorando a recuperação do patrimônio">
+    </section>
+  </main>
+
+  <dialog id="travel-dialog" aria-labelledby="travel-title" aria-describedby="travel-desc"><div class="travel-top"><span id="travel-symbol" class="travel-symbol" aria-hidden="true"></span><img src="assets/personagens/copero-detetive-acolhendo.webp" alt=""></div><h2 id="travel-title">Rastros encontrados!</h2><p id="travel-desc"></p><p id="travel-cost" class="travel-cost"></p><button id="travel-continue" class="primary-button">Continuar investigação <span aria-hidden="true">→</span></button></dialog>
+  <dialog id="help-dialog" aria-labelledby="help-title"><div class="dialog-head"><p class="eyebrow">DETETIVE DO BRASIL</p><button class="close-button" data-close aria-label="Fechar ajuda">×</button></div><h2 id="help-title">Toda pista conta.</h2><ol class="help-steps"><li><strong>Conheça o caso.</strong><p>Leia sobre o patrimônio roubado, o suspeito e o estado de partida.</p></li><li><strong>Converse e deduza.</strong><p>Cada nova conversa custa 2h. A pista é salva automaticamente na caderneta. Reler uma pista já coletada não gasta horas.</p></li><li><strong>Escolha o próximo destino.</strong><p>Use a busca ou as regiões do aeroporto. O destino correto custa 8h; um destino errado custa 12h e mantém você na etapa atual.</p></li><li><strong>Resolva a investigação.</strong><p>Siga a rota por até cinco estados e prenda o suspeito no último. Ao chegar a zero horas, o caso termina.</p></li></ol><p class="dialog-note">As 72h são um saldo do caso, consumido por ações. O tempo real da partida aparece separadamente no resultado.</p><button class="primary-button" data-close>Entendi <span aria-hidden="true">→</span></button></dialog>
+  <dialog id="exit-dialog" aria-labelledby="exit-title"><h2 id="exit-title">Encerrar esta investigação?</h2><p>O progresso deste caso será descartado.</p><div class="exit-actions"><button id="confirm-exit" class="primary-button">Encerrar investigação</button><button class="secondary-button" data-close>Continuar investigando</button></div></dialog>
+  <noscript><p class="noscript-message">Ative o JavaScript para abrir o jogo.</p></noscript>
+</body>
+</html>

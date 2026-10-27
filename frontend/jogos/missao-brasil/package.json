@@ -1,0 +1,9 @@
+{
+  "name": "missao-brasil",
+  "version": "2.3.0",
+  "private": true,
+  "description": "Missão Brasil · identidade azul e dourada com o Copero original",
+  "scripts": {
+    "test": "node tests/verify.cjs"
+  }
+}

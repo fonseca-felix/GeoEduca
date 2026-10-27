@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B0A32">
+  <meta name="description" content="Explore as bandeiras, capitais e biomas do Brasil com o Copero, da GeoEduca.">
+  <title>Missão Brasil · GeoEduca</title>
+  <link rel="icon" href="assets/brand-brasil.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="interface.css">
+  <script src="vendor/gsap.min.js" defer></script>
+  <script src="data.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body data-screen="telaInicial">
+<a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+<div class="app-shell">
+  <header class="site-header">
+    <a class="brand" id="brandHome" href="#inicio" aria-label="Missão Brasil, início"><span class="brand-map" aria-hidden="true"></span><span>MISSÃO<br>BRASIL<span class="brand-line"></span></span></a>
+    <div class="header-right">
+      <span class="header-mode" id="quizMode">Bandeiras</span>
+      <div class="question-progress" id="questionProgress" role="progressbar" aria-label="Progresso da missão" aria-valuemin="0" aria-valuemax="27" aria-valuenow="1"><div id="questionProgressFill"></div></div>
+      <span class="header-progress"><strong id="progressoAtual">1</strong> de <strong id="totalPerguntas">27</strong></span>
+      <img class="quiz-avatar" id="quizAvatar" src="assets/personagens/classic_2.webp" alt="">
+      <details class="options-menu" id="optionsMenu">
+        <summary aria-label="Abrir opções">Opções <span aria-hidden="true">⋮</span></summary>
+        <nav aria-label="Opções do jogo">
+          <button id="btnComoJogar">Como jogar</button>
+          <button id="btnVerRanking">Ranking</button>
+          <button id="btnProgresso">Meu progresso</button>
+          <button id="btnAbrirAlbum">Minha coleção <span id="albumCount">0/27</span></button>
+          <button id="btnSom" aria-pressed="false" aria-label="Ativar som">Som <span id="somEstado">off</span></button>
+          <button id="btnMovimento" aria-pressed="true" aria-label="Pausar animações"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg> Animações</button>
+        </nav>
+      </details>
+    </div>
+  </header>
+  <main id="conteudo" tabindex="-1">
+    <section class="screen home-screen active" id="telaInicial" aria-labelledby="tituloInicial">
+      <div class="home-shape" aria-hidden="true"></div>
+      <div class="home-copy"><h1 id="tituloInicial" tabindex="-1">O Brasil é seu<br>próximo desafio.</h1><button class="primary-button navy-button" id="btnIniciarJogo">Começar <span aria-hidden="true">→</span></button></div>
+      <img class="home-mascot" id="homeMascot" src="assets/celebracao/classic.webp" alt="Copero comemorando, com os dois braços levantados">
+    </section>
+    <section class="screen setup-screen" id="telaPersonagem" hidden aria-labelledby="tituloPersonagem">
+      <button class="back-button" id="btnVoltarPersonagem"><span aria-hidden="true">←</span> Voltar</button>
+      <h1 id="tituloPersonagem" tabindex="-1">Prepare sua missão</h1>
+      <form id="formPersonagem" novalidate>
+        <div class="setup-fields">
+          <div class="name-field"><label for="alunoNome">Seu nome</label><input id="alunoNome" name="nome" placeholder="Ex.: Explorador" maxlength="30" autocomplete="nickname" required aria-describedby="nomeErro"><p class="field-error" id="nomeErro" aria-live="polite"></p></div>
+          <fieldset class="mode-fieldset"><legend>Modo de jogo</legend><div class="mode-picker"><button type="button" class="neo-btn-modo active" data-modo="bandeiras" aria-pressed="true">Bandeiras</button><button type="button" class="neo-btn-modo" data-modo="capitais" aria-pressed="false">Capitais</button><button type="button" class="neo-btn-modo" data-modo="biomas" aria-pressed="false">Biomas</button></div></fieldset>
+          <div class="region-field" id="containerFiltro"><label for="filtroRegiao">Região</label><select id="filtroRegiao"><option value="all">Todo o Brasil</option><option>Norte</option><option>Nordeste</option><option>Centro-Oeste</option><option>Sudeste</option><option>Sul</option></select></div>
+          <p class="bioma-note hidden" id="biomaNote">Os biomas dos 26 estados e do Distrito Federal.</p>
+          <p class="mission-meta" id="missionMeta">27 perguntas · 5 segundos por resposta</p>
+        </div>
+        <div class="setup-characters"><fieldset class="character-fieldset"><legend>Escolha seu avatar</legend><div class="character-grid" id="characterGrid"></div></fieldset><div class="setup-bottom"><button class="primary-button" type="submit" id="btnComecar">Jogar <span aria-hidden="true">→</span></button><p id="setupSummary" class="sr-only"></p></div></div>
+      </form>
+    </section>
+    <section class="screen quiz-screen" id="telaJogo" hidden aria-labelledby="perguntaTexto">
+      <div class="quiz-status"><span id="quizNome"></span><div class="quiz-metrics"><span><strong id="pontuacaoAtual">0</strong> acertos</span><span><strong id="comboAtual">0</strong> em sequência</span><span class="timer" role="timer" aria-label="Segundos restantes"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg><strong id="timerSegundos">5</strong> s</span></div><button class="text-button" id="btnVoltarMenu">Sair <span aria-hidden="true">↗</span></button></div>
+      <div class="quiz-layout"><div class="question-image" id="containerImagem"><img id="bandeiraImg" src="assets/flags/sp.svg" alt="Bandeira do estado desta pergunta"></div><div class="question-content"><p class="sr-only" id="questionCategory">OLHE COM ATENÇÃO</p><h1 id="perguntaTexto" tabindex="-1"></h1><div class="answer-grid" id="containerAlternativas" role="group" aria-label="Escolha uma resposta"></div><div class="feedback-row"><img id="feedbackAvatar" src="assets/personagens/classic_2.webp" alt="" hidden><div id="areaFeedback" class="answer-feedback" role="status" aria-live="polite" aria-atomic="true"><p class="answer-hint">Escolha uma das quatro alternativas.</p></div><button class="primary-button next-button" id="btnProxima" hidden>Próxima <span aria-hidden="true">→</span></button></div></div></div>
+    </section>
+    <section class="screen result-screen" id="telaResultado" hidden aria-labelledby="tituloResultado">
+      <div class="result-copy"><h1 id="tituloResultado" tabindex="-1">Missão concluída!</h1><p class="sr-only" id="resultMessage"></p><div class="result-stats"><div><strong><b id="finalAcertos">0</b><small id="finalTotal" class="sr-only">/27</small></strong><span>acertos</span></div><div><strong><b id="finalPrecisao">0</b>%</strong><span>de precisão</span></div><div><strong id="sessionXP">0</strong><span>XP</span></div></div><div class="result-actions"><button class="primary-button" id="btnJogarNovamente">Jogar novamente <span aria-hidden="true">→</span></button><button class="text-button" id="btnResultadoInicio">Voltar ao início</button><button class="text-button result-collection" id="btnVerAlbum">Ver minha coleção</button></div><details class="result-details"><summary>Detalhes da missão</summary><div><span>Tempo <strong id="finalTempo">00:00</strong></span><span>Melhor sequência <strong id="finalMaxCombo">0</strong></span><span id="finalPatente">Explorador</span></div></details></div>
+      <img class="result-mascot" id="resultAvatar" src="assets/celebracao/classic.webp" alt="Seu Copero comemorando a missão">
+    </section>
+    <section
+          class="screen album-screen"
+          id="telaAlbum"
+          hidden
+          aria-labelledby="tituloAlbum"
+        >
+          <button class="back-button" id="btnFecharAlbum">
+            <span aria-hidden="true">←</span> Voltar ao início
+          </button>
+          <div class="album-heading">
+            <div>
+              <p class="eyebrow">SUAS DESCOBERTAS</p>
+              <h1 id="tituloAlbum" tabindex="-1">Coleção Brasil</h1>
+              <p class="lead">
+                Acerte perguntas para revelar cada estado e o Distrito Federal.
+              </p>
+            </div>
+            <span class="badge" id="albumPatente">Explorador</span>
+          </div>
+          <div class="album-grid" id="listaAlbum"></div>
+          <nav class="page-navigation" aria-label="Páginas da coleção">
+            <button
+              class="secondary-button"
+              id="albumAnterior"
+              aria-label="Página anterior da coleção"
+            >
+              ←</button
+            ><span id="albumPagina" aria-live="polite"></span
+            ><button
+              class="secondary-button"
+              id="albumProximo"
+              aria-label="Próxima página da coleção"
+            >
+              →
+            </button>
+          </nav>
+        </section>
+  </main>
+</div>
+    <dialog id="modalAjuda" aria-labelledby="ajudaTitle">
+      <div class="dialog-head">
+        <p class="eyebrow">SEU GUIA DE VIAGEM</p>
+        <button class="close-button" data-close aria-label="Fechar instruções">
+          ×
+        </button>
+      </div>
+      <h2 id="ajudaTitle">Como jogar</h2>
+      <ol class="help-steps">
+        <li>
+          <strong>Escolha sua missão.</strong>
+          <p>
+            Bandeiras, capitais ou biomas. Em bandeiras e capitais, você também
+            pode escolher uma região.
+          </p>
+        </li>
+        <li>
+          <strong>Monte seu perfil.</strong>
+          <p>Digite seu nome e escolha um dos seis mascotes da GeoEduca.</p>
+        </li>
+        <li>
+          <strong>Responda e descubra.</strong>
+          <p>
+            Você tem 5 segundos por pergunta. Cada acerto vale 10 pontos e XP
+            com bônus de sequência. Errar também rende 2 XP para continuar
+            aprendendo.
+          </p>
+        </li>
+      </ol>
+      <p class="dialog-note">
+        A próxima pergunta chega automaticamente após 5 segundos. Você também
+        pode avançar pelo botão Próxima. Seu progresso fica salvo neste
+        navegador.
+      </p>
+      <button class="primary-button" data-close>Vamos explorar</button>
+    </dialog>
+    <dialog id="modalRanking" aria-labelledby="rankingCompletoTitle">
+      <div class="dialog-head">
+        <p class="eyebrow">EXPLORADORES EM DESTAQUE</p>
+        <button class="close-button" data-close aria-label="Fechar ranking">
+          ×
+        </button>
+      </div>
+      <h2 id="rankingCompletoTitle">Ranking da missão</h2>
+      <div id="rankingFullList"></div>
+      <div class="dialog-actions">
+        <p class="ranking-footnote">Salvo neste navegador.</p>
+        <button class="small-link" id="btnResetarRanking">Gerenciar</button>
+      </div>
+    </dialog>
+    <dialog id="modalProgresso" aria-labelledby="progressoTitle">
+      <div class="dialog-head">
+        <p class="eyebrow">SUA JORNADA</p>
+        <button class="close-button" data-close aria-label="Fechar progresso">
+          ×
+        </button>
+      </div>
+      <h2 id="progressoTitle">Meu progresso</h2>
+      <div class="profile-summary">
+        <img id="profileAvatar" src="assets/personagens/classic_2.webp" alt="" />
+        <div>
+          <strong id="profileName">Explorador</strong
+          ><span id="nivelJogador">Explorador</span>
+        </div>
+        <button class="small-link" id="btnTrocarNome">Editar perfil</button>
+      </div>
+      <div class="progress-stats">
+        <div><strong id="totalXP">0</strong><span>XP total</span></div>
+        <div><strong id="totalAcertos">0</strong><span>Acertos</span></div>
+        <div><strong id="maxCombo">0</strong><span>Sequência</span></div>
+        <div>
+          <strong id="bandeirasDesbloqueadas">0/27</strong><span>Coleção</span>
+        </div>
+      </div>
+      <div class="xp-label">
+        <span id="proximoNivel">Próximo nível</span
+        ><strong id="xpTexto">0 / 30</strong>
+      </div>
+      <div class="xp-track"><div id="barraXP"></div></div>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="btnAbrirConquistas">
+          Ver conquistas</button
+        ><button class="small-link" id="btnResetarProgresso">
+          Reiniciar progresso
+        </button>
+      </div>
+    </dialog>
+    <dialog id="modalConquistas" aria-labelledby="conquistasTitle">
+      <div class="dialog-head">
+        <p class="eyebrow">PASSO A PASSO</p>
+        <button class="close-button" data-close aria-label="Fechar conquistas">
+          ×
+        </button>
+      </div>
+      <h2 id="conquistasTitle">Suas conquistas</h2>
+      <div id="listaConquistas"></div>
+      <nav class="page-navigation" aria-label="Páginas das conquistas">
+        <button
+          class="secondary-button"
+          id="conquistasAnterior"
+          aria-label="Conquistas anteriores"
+        >
+          ←</button
+        ><span id="conquistasPagina" aria-live="polite"></span
+        ><button
+          class="secondary-button"
+          id="conquistasProximo"
+          aria-label="Próximas conquistas"
+        >
+          →
+        </button>
+      </nav>
+    </dialog>
+    <dialog id="modalEstado" aria-labelledby="modalNomeEstado">
+      <div class="dialog-head">
+        <p class="eyebrow">DESTINO DESBLOQUEADO</p>
+        <button class="close-button" data-close aria-label="Fechar estado">
+          ×
+        </button>
+      </div>
+      <h2 id="modalNomeEstado"></h2>
+      <img
+        id="modalBandeira"
+        class="state-detail-flag"
+        alt="Bandeira do estado selecionado"
+      />
+      <dl class="state-facts">
+        <div>
+          <dt>Capital</dt>
+          <dd id="modalCapital"></dd>
+        </div>
+        <div>
+          <dt>Região</dt>
+          <dd id="modalRegiao"></dd>
+        </div>
+        <div>
+          <dt>Bioma principal</dt>
+          <dd id="modalBioma"></dd>
+        </div>
+      </dl>
+      <p id="modalCuriosidade" class="dialog-note"></p>
+    </dialog>
+    <dialog id="modalReset" aria-labelledby="resetTitle">
+      <div class="dialog-head">
+        <p class="eyebrow">RECOMEÇAR</p>
+        <button class="close-button" data-close aria-label="Cancelar reinício">
+          ×
+        </button>
+      </div>
+      <h2 id="resetTitle">Reiniciar seu progresso?</h2>
+      <p class="dialog-note">
+        Seu XP, suas conquistas e sua coleção serão zerados. Seu nome e
+        personagem serão mantidos.
+      </p>
+      <div class="dialog-actions">
+        <button class="secondary-button" data-close>Cancelar</button
+        ><button class="primary-button" id="btnConfirmarReset">
+          Reiniciar
+        </button>
+      </div>
+    </dialog>
+    <dialog id="modalResetRanking" aria-labelledby="rankingResetTitle">
+      <div class="dialog-head">
+        <p class="eyebrow">RANKING DESTE NAVEGADOR</p>
+        <button
+          class="close-button"
+          data-close
+          aria-label="Fechar gerenciamento"
+        >
+          ×
+        </button>
+      </div>
+      <h2 id="rankingResetTitle">Limpar ranking</h2>
+      <p class="dialog-note">
+        Todos os nomes do ranking serão removidos. Os dados de progresso do
+        jogador serão preservados.
+      </p>
+      <form id="formResetRanking">
+        <label for="senhaResetRanking">Senha do professor</label
+        ><input
+          id="senhaResetRanking"
+          type="password"
+          autocomplete="off"
+          required
+          aria-describedby="rankingErro"
+        />
+        <p id="rankingErro" class="field-error" aria-live="polite"></p>
+        <div class="dialog-actions">
+          <button class="secondary-button" type="button" data-close>
+            Cancelar</button
+          ><button class="primary-button" type="submit">Limpar ranking</button>
+        </div>
+      </form>
+    </dialog>
+
+<div id="rankingList" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<noscript><p class="noscript-message">Ative o JavaScript para jogar Missão Brasil.</p></noscript>
+</body>
+</html>
