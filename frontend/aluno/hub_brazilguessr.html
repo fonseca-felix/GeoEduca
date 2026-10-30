@@ -1,182 +1,59 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
-
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GeoEduca - Hub BrazilGuessr</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/tokens.css" />
-  <link rel="stylesheet" href="../css/base.css" />
-  <link rel="stylesheet" href="../css/components.css" />
-  <link rel="stylesheet" href="../css/animations.css?v=2" />
-  <link rel="stylesheet" href="../css/sidebar.css" />
-  <link rel="stylesheet" href="../css/darkmode.css" />
-  <style>
-    .hub-wrapper { display: flex; flex-direction: column; gap: 2rem; }
-    
-    .hub-header-card {
-      background: linear-gradient(135deg, var(--gold) 0%, #b45309 100%);
-      border-radius: var(--radius-xl);
-      padding: 2.5rem;
-      color: white;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow-lg);
-    }
-
-    .hub-header-info h2 {
-      font-family: var(--font-display);
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: white;
-    }
-
-    .hub-header-info p {
-      font-size: 1.1rem;
-      opacity: 0.9;
-      max-width: 500px;
-    }
-
-    .hub-action {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(8px);
-      padding: 1.5rem;
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .btn-play-big {
-      background: white;
-      color: #b45309;
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: var(--radius-full);
-      font-size: 1.2rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .btn-play-big:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-
-    .btn-play-big:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .stat-card {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .stat-title {
-      font-size: 0.9rem;
-      color: var(--color-text-secondary);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .stat-value {
-      font-family: var(--font-display);
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--color-text-primary);
-    }
-
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Hub do BrazilGuessr no GeoEduca: acompanhe suas estatísticas e inicie novas explorações pelo Brasil." />
+<title>GeoEduca - Hub BrazilGuessr</title>
+<link rel="icon" href="brazilguessr/assets/brasil.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/tokens.css" />
+<link rel="stylesheet" href="../css/base.css" />
+<link rel="stylesheet" href="../css/components.css" />
+<link rel="stylesheet" href="../css/animations.css?v=2" />
+<link rel="stylesheet" href="../css/sidebar.css" />
+<link rel="stylesheet" href="../css/darkmode.css" />
+<link rel="preload" href="brazilguessr/assets/fonts/titulo.woff" as="font" type="font/woff" crossorigin>
+<link rel="stylesheet" href="brazilguessr/hub.css" />
 </head>
-<body>
+<body class="bg-body">
+<svg class="svg-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 5l7 7-7 7"/></symbol><symbol id="i-ticket" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 0 0 4v4h18v-4a2 2 0 0 1 0-4V4H3v4Zm10-4v2m0 4v2m0 4v2"/></symbol></svg>
 <div class="app-layout" id="app-layout">
   <main class="app-main">
-    <header class="page-header">
-      <div class="page-header-left">
-        <h1 class="page-title">Hub BrazilGuessr</h1>
-        <p class="page-subtitle">Acompanhe seu desempenho e inicie novas partidas!</p>
-      </div>
-      <div class="page-header-right">
-      </div>
-    </header>
-    <div class="page-content">
-      <div class="hub-wrapper">
-        
-        <!-- Header Banner -->
-        <div class="hub-header-card">
-          <div class="hub-header-info">
-            <h2>BrazilGuessr</h2>
-            <p>Descubra onde você está no Brasil! Você será colocado em um local aleatório no Google Street View e terá que adivinhar no mapa.</p>
-          </div>
-          <div class="hub-action">
-            <span id="partidas-hoje" style="font-weight: 600; font-size: 1.1rem;">Tentativas Restantes: 10</span>
-            <button id="btn-jogar-agora" class="btn-play-big" onclick="irParaJogo()">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              Jogar Agora
-            </button>
-            <span id="aviso-limite" style="font-size: 0.85rem; color: rgba(255,255,255,0.8); display: none;">Limite diário atingido! Volte amanhã.</span>
-          </div>
+    <div class="bg-hub">
+      <section class="hub-cover" aria-labelledby="hub-titulo">
+        <div class="hub-shape" aria-hidden="true"></div>
+        <div class="hub-brand"><span class="brand-map" aria-hidden="true"></span><span>BrazilGuessr<small>GEOEDUCA</small></span></div>
+        <div class="hub-copy">
+          <p class="eyebrow">HUB DO EXPLORADOR</p>
+          <h1 id="hub-titulo">O Brasil está<br>nas pistas.</h1>
+          <p class="lead">Você será levado a uma paisagem em 360° do Street View. Observe os detalhes e marque no mapa onde acha que está.</p>
+          <button id="btn-jogar-agora" class="hub-play" type="button" onclick="irParaJogo()">Jogar agora <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          <span class="hub-attempts"><svg class="icon" aria-hidden="true" style="width:16px;height:16px"><use href="#i-ticket"/></svg><span id="partidas-hoje">Tentativas Restantes: …</span></span>
+          <span id="aviso-limite" class="hub-limit" style="display:none">Limite diário atingido! Volte amanhã.</span>
+          <p class="hub-rule">Cada rodada usa <strong>1 tentativa</strong>. <strong>Trocar local também gasta 1 tentativa</strong> (a rodada trocada vale 0 pontos).</p>
+        </div>
+        <img class="hub-mascot" src="brazilguessr/assets/copero-explorador-comemorando.webp" width="1920" height="1920" alt="Copero explorador comemorando" decoding="async">
+      </section>
+
+      <section class="hub-body" aria-labelledby="hub-stats-titulo">
+        <div class="hub-section-title"><h2 id="hub-stats-titulo">Suas estatísticas</h2><span>PONTOS ACUMULADOS</span></div>
+        <div class="hub-stats">
+          <div class="hub-stat featured"><span>TOTAL</span><strong id="stat-total">0</strong><small>desde o início</small></div>
+          <div class="hub-stat"><span>SEMANAL</span><strong id="stat-semanal">0</strong><small>últimos 7 dias</small></div>
+          <div class="hub-stat"><span>MENSAL</span><strong id="stat-mensal">0</strong><small>últimos 30 dias</small></div>
+          <div class="hub-stat"><span>TRIMESTRAL</span><strong id="stat-trimestral">0</strong><small>últimos 90 dias</small></div>
+          <div class="hub-stat"><span>SEMESTRAL</span><strong id="stat-semestral">0</strong><small>últimos 180 dias</small></div>
+          <div class="hub-stat"><span>ANUAL</span><strong id="stat-anual">0</strong><small>últimos 365 dias</small></div>
         </div>
 
-        <!-- Estatísticas -->
-        <div>
-          <h3 style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 1rem; color: var(--color-text-primary);">Suas Estatísticas</h3>
-          <div class="stats-grid">
-            <div class="stat-card">
-              <span class="stat-title">Total</span>
-              <span class="stat-value" id="stat-total">0</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-title">Semanal</span>
-              <span class="stat-value" id="stat-semanal">0</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-title">Mensal</span>
-              <span class="stat-value" id="stat-mensal">0</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-title">Trimestral</span>
-              <span class="stat-value" id="stat-trimestral">0</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-title">Semestral</span>
-              <span class="stat-value" id="stat-semestral">0</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-title">Anual</span>
-              <span class="stat-value" id="stat-anual">0</span>
-            </div>
-          </div>
+        <div class="hub-how">
+          <div class="hub-step"><b>01</b><h3>Observe</h3><p>Arraste a paisagem em 360° e procure placas, vegetação, clima e arquitetura.</p></div>
+          <div class="hub-step"><b>02</b><h3>Marque</h3><p>Amplie o mapa até as ruas e marque seu palpite. Você tem 2 minutos.</p></div>
+          <div class="hub-step"><b>03</b><h3>Descubra</h3><p>Quanto mais perto do local real, mais pontos: até 5.000 por rodada.</p></div>
+          <div class="hub-step warn"><b>ATENÇÃO</b><h3>10 tentativas por dia</h3><p>Rodadas confirmadas, com tempo esgotado ou <strong>trocas de local</strong> usam 1 tentativa cada.</p></div>
         </div>
-
-      </div>
+      </section>
     </div>
   </main>
 </div>

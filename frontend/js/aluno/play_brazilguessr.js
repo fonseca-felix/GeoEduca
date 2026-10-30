@@ -1,417 +1,554 @@
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('app-layout').insertAdjacentHTML('afterbegin', buildAlunoSidebar());
-    const user = initPage('aluno');
-    if (!user) return;
+// BrazilGuessr integrado ao GeoEduca: visual novo + regras do sistema
+// (login, limite diário, pontuação salva no backend e retorno ao hub).
+const HUB_URL = 'hub_brazilguessr.html';
+const ASSETS = 'brazilguessr/assets/';
+const jogoId = localStorage.getItem('bg_jogo_id') || 'brazilguessr';
 
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+document.getElementById('app-layout').insertAdjacentHTML('afterbegin', buildAlunoSidebar());
+const usuario = initPage('aluno');
+
+// Catálogo revisado (locais.js); região definida pela UF.
+const regioesDoJogo = ["norte", "nordeste", "centro-oeste", "sudeste", "sul"];
+const bancoLocais = {};
+for (const regiao of regioesDoJogo) {
+    bancoLocais[regiao] = locaisRevisados.filter(local => dadosEstados[local.uf].regiao === regiao);
+}
+
+let regiaoSorteada = "";
+let localAtual = null;
+let palpiteJogador = null;
+let marcadorPalpite = null;
+let marcadorReal = null;
+let linhaConexao = null;
+let jogoFinalizado = false;
+let trocaEmAndamento = false;
+let tempoEsgotadoSemPalpite = false;
+let pontosTotais = 0;
+let pontosDaRodada = 0;
+
+// ------------------------------------------------------------------
+// Tentativas diárias (backend)
+// ------------------------------------------------------------------
+let partidasRestantes = 0;
+let estatisticasCarregadas = false;
+
+function atualizarTentativas() {
+    const texto = estatisticasCarregadas ? String(partidasRestantes) : '…';
+    document.querySelectorAll('[data-tentativas]').forEach(el => {
+        el.querySelector('b').innerText = texto;
+        el.classList.toggle('esgotado', estatisticasCarregadas && partidasRestantes <= 0);
+    });
+    document.querySelectorAll('[data-tentativas-num]').forEach(el => { el.innerText = texto; });
+
+    const btnIniciar = document.getElementById('btn-iniciar');
+    btnIniciar.disabled = !estatisticasCarregadas || partidasRestantes <= 0;
+
+    const btnNova = document.getElementById('btn-nova-exploracao');
+    btnNova.firstChild.textContent = partidasRestantes > 0 ? 'Explorar de novo ' : 'Voltar ao hub ';
+
+    const btnTrocar = document.getElementById('btn-trocar-local');
+    if (!jogoFinalizado) btnTrocar.disabled = partidasRestantes < 2;
+    btnTrocar.title = partidasRestantes < 2
+        ? 'Sem tentativas suficientes para trocar: a troca gasta 1 tentativa e a nova rodada precisa de outra.'
+        : 'Trocar local gasta 1 tentativa';
+}
+
+function definirRestantes(stats) {
+    const limite = stats.limiteDiario || 10;
+    partidasRestantes = Math.max(0, limite - (stats.partidasHoje || 0));
+    estatisticasCarregadas = true;
+    atualizarTentativas();
+}
+
+async function registrarRodada(pontos) {
+    try {
+        await api.post(`/jogos/${jogoId}/pontuacao`, { pontuacao: pontos });
+        partidasRestantes = Math.max(0, partidasRestantes - 1);
+        atualizarTentativas();
+        return true;
+    } catch (err) {
+        console.error('Erro ao salvar pontos', err);
+        if (String(err?.message || err).includes('Limite')) partidasRestantes = 0;
+        avisar('error', 'Erro', 'Não foi possível salvar a rodada.');
+        atualizarTentativas();
+        return false;
     }
+}
 
-    const jogoId = localStorage.getItem('bg_jogo_id') || 'brazilguessr';
-    let partidasRestantes = 10;
-    let pontosTotais = 0;
-    let partidasHoje = 0;
-    let limiteDiario = 10;
-    
-    // Buscar status inicial no backend
+function avisar(tipo, titulo, msg) { if (typeof Toast !== 'undefined') Toast[tipo](titulo, msg); }
+
+function irParaHub() { window.location.href = HUB_URL; }
+
+if (usuario) {
     api.get(`/jogos/${jogoId}/estatisticas`).then(stats => {
         pontosTotais = stats.total || 0;
-        limiteDiario = stats.limiteDiario || 10;
-        partidasHoje = stats.partidasHoje || 0;
-        partidasRestantes = limiteDiario - partidasHoje;
-        if (partidasRestantes < 0) partidasRestantes = 0;
-        document.getElementById('header-partidas-restantes').innerText = `Tentativas Restantes: ${partidasRestantes}`;
-        const placar = document.getElementById('placar-total');
-        if(placar) placar.innerText = pontosTotais.toString();
+        atualizarPlacarTotal();
+        definirRestantes(stats);
     }).catch(err => {
         console.error('Erro ao buscar estatísticas', err);
-        document.getElementById('header-partidas-restantes').innerText = `Erro ao carregar dados`;
+        avisar('error', 'Erro', 'Não foi possível carregar suas tentativas.');
     });
+}
 
-    const regioesDoJogo = ["norte", "nordeste", "centro-oeste", "sudeste", "sul"];
+// Locais já sorteados persistem entre sessões (por id).
+const CHAVE_SORTEADOS = 'bg_locais_sorteados_v2';
+const locaisJaSorteadosPorRegiao = Object.fromEntries(regioesDoJogo.map(r => [r, new Set()]));
+try {
+    const salvos = JSON.parse(localStorage.getItem(CHAVE_SORTEADOS));
+    if (salvos) for (const r of regioesDoJogo) if (salvos[r]) locaisJaSorteadosPorRegiao[r] = new Set(salvos[r]);
+} catch (e) { /* armazenamento corrompido: recomeça */ }
 
-    const bancoLocais = {
-        "norte": [
-            { nome: "Teatro Amazonas - Manaus, AM", lat: -3.1302, lng: -60.0234, heading: 135 },
-            { nome: "Mercado Ver-o-Peso - Belém, PA", lat: -1.4522, lng: -48.5037, heading: 300 },
-            { nome: "Marco Zero do Equador - Macapá, AP", lat: 0.0006, lng: -51.0853, heading: 90 },
-            { nome: "Praça da República - Belém, PA", lat: -1.4563, lng: -48.5021, heading: 180 },
-            { nome: "Orla de Santarém - Santarém, PA", lat: -2.4433, lng: -54.7084, heading: 120 },
-            { nome: "Forte do Presépio - Belém, PA", lat: -1.4538, lng: -48.5045, heading: 90 },
-            { nome: "Ponta Negra - Manaus, AM", lat: -3.0788, lng: -60.0898, heading: 180 },
-            { nome: "Praça das Águas - Boa Vista, RR", lat: -2.8190, lng: -60.6730, heading: 45 },
-            { nome: "Palácio Rio Branco - Rio Branco, AC", lat: -9.9740, lng: -67.8100, heading: 90 },
-            { nome: "Estrada de Ferro Madeira-Mamoré - Porto Velho, RO", lat: -8.7600, lng: -63.9050, heading: 180 },
-            { nome: "Praça dos Girassóis - Palmas, TO", lat: -10.1840, lng: -48.3330, heading: 0 },
-            { nome: "Bumbódromo - Parintins, AM", lat: -2.6280, lng: -56.7360, heading: 90 },
-            { nome: "Orla de Marabá - Marabá, PA", lat: -5.3520, lng: -49.1170, heading: 120 },
-            { nome: "Parque Anauá - Boa Vista, RR", lat: -2.8390, lng: -60.6580, heading: 270 },
-            { nome: "Basílica de Nazaré - Belém, PA", lat: -1.4520, lng: -48.4760, heading: 90 },
-            { nome: "Praia da Graciosa - Palmas, TO", lat: -10.1760, lng: -48.3610, heading: 180 },
-            { nome: "Arena da Amazônia - Manaus, AM", lat: -3.0830, lng: -60.0280, heading: 0 }
-        ],
-        "nordeste": [
-            { nome: "Pelourinho - Salvador, BA", lat: -12.9716, lng: -38.5089, heading: 0 },
-            { nome: "Elevador Lacerda - Salvador, BA", lat: -12.9753, lng: -38.5129, heading: 45 },
-            { nome: "Praia de Ponta Negra - Natal, RN", lat: -5.8856, lng: -35.1719, heading: 45 },
-            { nome: "Marco Zero - Recife, PE", lat: -8.0632, lng: -34.8715, heading: 120 },
-            { nome: "Lençóis Maranhenses - Barreirinhas, MA", lat: -2.4755, lng: -43.1239, heading: 0 },
-            { nome: "Farol da Barra - Salvador, BA", lat: -13.0105, lng: -38.5328, heading: 270 },
-            { nome: "Centro Histórico - Olinda, PE", lat: -8.0135, lng: -34.8553, heading: 90 },
-            { nome: "Dragão do Mar - Fortaleza, CE", lat: -3.7212, lng: -38.5118, heading: 180 },
-            { nome: "Praia de Tambaú - João Pessoa, PB", lat: -7.1140, lng: -34.8210, heading: 90 },
-            { nome: "Praia de Pajuçara - Maceió, AL", lat: -9.6730, lng: -35.7140, heading: 180 },
-            { nome: "Orla de Atalaia - Aracaju, SE", lat: -10.9950, lng: -37.0370, heading: 45 },
-            { nome: "Ponte Estaiada - Teresina, PI", lat: -5.0740, lng: -42.7930, heading: 270 },
-            { nome: "Palácio dos Leões - São Luís, MA", lat: -2.5270, lng: -44.3060, heading: 0 },
-            { nome: "Praia do Futuro - Fortaleza, CE", lat: -3.7380, lng: -38.4520, heading: 90 },
-            { nome: "Boa Viagem - Recife, PE", lat: -8.1300, lng: -34.9000, heading: 180 },
-            { nome: "Lagoa do Abaeté - Salvador, BA", lat: -12.9460, lng: -38.3560, heading: 45 },
-            { nome: "Açude Velho - Campina Grande, PB", lat: -7.2220, lng: -35.8830, heading: 135 }
-        ],
-        "centro-oeste": [
-            { nome: "Esplanada dos Ministérios - Brasília, DF", lat: -15.8005, lng: -47.8642, heading: 90 },
-            { nome: "Catedral de Brasília - Brasília, DF", lat: -15.7821, lng: -47.8750, heading: 180 },
-            { nome: "Praça Cívica - Goiânia, GO", lat: -16.6732, lng: -49.2559, heading: 180 },
-            { nome: "Parque Mãe Bonifácia - Cuiabá, MT", lat: -15.6091, lng: -56.1103, heading: 135 },
-            { nome: "Morada dos Baís - Campo Grande, MS", lat: -20.4486, lng: -54.6159, heading: 300 },
-            { nome: "Pontão do Lago Sul - Brasília, DF", lat: -15.8306, lng: -47.8571, heading: 45 },
-            { nome: "Praça do Rádio Clube - Campo Grande, MS", lat: -20.4608, lng: -54.6152, heading: 90 },
-            { nome: "Parque Flamboyant - Goiânia, GO", lat: -16.7080, lng: -49.2340, heading: 180 },
-            { nome: "Arena Pantanal - Cuiabá, MT", lat: -15.6030, lng: -56.1210, heading: 270 },
-            { nome: "Parque das Nações Indígenas - Campo Grande, MS", lat: -20.4500, lng: -54.5800, heading: 90 },
-            { nome: "Memorial JK - Brasília, DF", lat: -15.7840, lng: -47.9130, heading: 0 },
-            { nome: "Parque Vaca Brava - Goiânia, GO", lat: -16.7120, lng: -49.2730, heading: 45 },
-            { nome: "Chapada dos Guimarães (Centro) - MT", lat: -15.4600, lng: -55.7490, heading: 180 },
-            { nome: "Praça da Liberdade - Bonito, MS", lat: -21.1260, lng: -56.4810, heading: 90 },
-            { nome: "Praça do Coreto - Goiás Velho, GO", lat: -15.9330, lng: -50.1400, heading: 0 }
-        ],
-        "sudeste": [
-            { nome: "Avenida Paulista - São Paulo, SP", lat: -23.5615, lng: -46.6560, heading: 210 },
-            { nome: "MASP - São Paulo, SP", lat: -23.5617, lng: -46.6558, heading: 0 },
-            { nome: "Copacabana - Rio de Janeiro, RJ", lat: -22.9711, lng: -43.1843, heading: 120 },
-            { nome: "Cristo Redentor - Rio de Janeiro, RJ", lat: -22.9519, lng: -43.2105, heading: 180 },
-            { nome: "Praça da Liberdade - Belo Horizonte, MG", lat: -19.9323, lng: -43.9380, heading: 220 },
-            { nome: "Parque Ibirapuera - São Paulo, SP", lat: -23.5874, lng: -46.6576, heading: 45 },
-            { nome: "Museu do Amanhã - Rio de Janeiro, RJ", lat: -22.8945, lng: -43.1795, heading: 90 },
-            { nome: "Praça Tiradentes - Ouro Preto, MG", lat: -20.3855, lng: -43.5036, heading: 180 },
-            { nome: "Maracanã - Rio de Janeiro, RJ", lat: -22.9120, lng: -43.2300, heading: 270 },
-            { nome: "Igreja da Pampulha - Belo Horizonte, MG", lat: -19.8580, lng: -43.9800, heading: 135 },
-            { nome: "Praça do Papa - Vitória, ES", lat: -20.3150, lng: -40.2900, heading: 90 },
-            { nome: "Convento da Penha - Vila Velha, ES", lat: -20.3290, lng: -40.2860, heading: 180 },
-            { nome: "Beco do Batman - São Paulo, SP", lat: -23.5560, lng: -46.6860, heading: 270 },
-            { nome: "Arcos da Lapa - Rio de Janeiro, RJ", lat: -22.9140, lng: -43.1790, heading: 0 },
-            { nome: "Mercado Central - Belo Horizonte, MG", lat: -19.9210, lng: -43.9430, heading: 45 },
-            { nome: "Lagoa do Taquaral - Campinas, SP", lat: -22.8750, lng: -47.0540, heading: 180 },
-            { nome: "Praia de Pitangueiras - Guarujá, SP", lat: -23.9980, lng: -46.2570, heading: 90 },
-            { nome: "Boulevard Olímpico - Rio de Janeiro, RJ", lat: -22.8970, lng: -43.1810, heading: 135 },
-            { nome: "Praia Vermelha (Pão de Açúcar) - Rio de Janeiro, RJ", lat: -22.9550, lng: -43.1650, heading: 45 }
-        ],
-        "sul": [
-            { nome: "Ópera de Arame - Curitiba, PR", lat: -25.3853, lng: -49.2765, heading: 180 },
-            { nome: "Jardim Botânico - Curitiba, PR", lat: -25.4455, lng: -49.2366, heading: 45 },
-            { nome: "Ponte Hercílio Luz - Florianópolis, SC", lat: -27.5934, lng: -48.5636, heading: 300 },
-            { nome: "Estátua do Laçador - Porto Alegre, RS", lat: -29.9934, lng: -51.1712, heading: 15 },
-            { nome: "Usina do Gasômetro - Porto Alegre, RS", lat: -30.0344, lng: -51.2352, heading: 270 },
-            { nome: "Cataratas do Iguaçu - Foz do Iguaçu, PR", lat: -25.6953, lng: -54.4367, heading: 90 },
-            { nome: "Rua Coberta - Gramado, RS", lat: -29.3808, lng: -50.8732, heading: 180 },
-            { nome: "Praia Central - Balneário Camboriú, SC", lat: -26.9856, lng: -48.6322, heading: 45 },
-            { nome: "Museu do Olho (MON) - Curitiba, PR", lat: -25.4100, lng: -49.2660, heading: 0 },
-            { nome: "Praia de Jurerê - Florianópolis, SC", lat: -27.4390, lng: -48.4950, heading: 90 },
-            { nome: "Parque Redenção - Porto Alegre, RS", lat: -30.0350, lng: -51.2140, heading: 180 },
-            { nome: "Rua das Palmeiras - Joinville, SC", lat: -26.3010, lng: -48.8450, heading: 45 },
-            { nome: "Lago Igapó - Londrina, PR", lat: -23.3230, lng: -51.1720, heading: 270 },
-            { nome: "Catedral de Maringá - Maringá, PR", lat: -23.4260, lng: -51.9380, heading: 180 },
-            { nome: "Vila Germânica - Blumenau, SC", lat: -26.9150, lng: -49.0840, heading: 90 },
-            { nome: "Catedral de Pedra - Canela, RS", lat: -29.3630, lng: -50.8140, heading: 0 }
-        ]
-    };
+function salvarSorteados() {
+    const dados = {};
+    for (const r of regioesDoJogo) dados[r] = Array.from(locaisJaSorteadosPorRegiao[r]);
+    localStorage.setItem(CHAVE_SORTEADOS, JSON.stringify(dados));
+}
 
-    let regiaoSorteada = "";
-    let localAtual = null;
-    let palpiteJogador = null;
-    let marcadorPalpite = null;
-    let marcadorReal = null;
-    let linhaConexao = null;
-    let jogoFinalizado = false;
-    let tempoEsgotadoSemPalpite = false;
-    let pontosDaRodada = 0;
+const iconePalpite = L.divIcon({ className: 'guess-pin-wrapper', html: '<span class="map-pin"></span>', iconSize: [25, 25], iconAnchor: [12, 25] });
+const iconeReal = L.divIcon({ className: 'real-pin-wrapper', html: '<span class="map-pin real-pin"></span>', iconSize: [25, 25], iconAnchor: [12, 25] });
 
-    let locaisIniciais = { norte: new Set(), nordeste: new Set(), "centro-oeste": new Set(), sudeste: new Set(), sul: new Set() };
-    try {
-        const salvos = JSON.parse(localStorage.getItem('bg_locais_sorteados'));
-        if (salvos) {
-            for (let r in salvos) locaisIniciais[r] = new Set(salvos[r]);
+const limitesBrasil = L.latLngBounds(L.latLng(-34.5, -74.5), L.latLng(5.5, -32.0));
+
+let tempoRestante = 120;
+let intervaloCronometro = null;
+let avisoPaisagemTimeout = null;
+let ultimoLocalId = null;
+
+function encerrarCarregamentoPaisagem() {
+    clearTimeout(avisoPaisagemTimeout);
+    avisoPaisagemTimeout = null;
+    document.getElementById('paisagem-carregando').classList.add('hidden');
+}
+
+function carregarPaisagem() {
+    encerrarCarregamentoPaisagem();
+    document.getElementById('paisagem-carregando').classList.remove('hidden');
+    const iframe = document.getElementById('sv-iframe');
+    iframe.src = `https://www.google.com/maps?cbll=${localAtual.lat},${localAtual.lng}&layer=c&cbp=12,${localAtual.heading},0,0,0&output=svembed`;
+    avisoPaisagemTimeout = setTimeout(() => {
+        document.getElementById('paisagem-carregando-texto').innerText = 'Demorou para abrir? Use Trocar local abaixo (gasta 1 tentativa).';
+    }, 12000);
+}
+
+document.getElementById('sv-iframe').addEventListener('load', encerrarCarregamentoPaisagem);
+document.getElementById('sv-iframe').addEventListener('error', encerrarCarregamentoPaisagem);
+
+// ------------------------------------------------------------------
+// Trocar local: consome 1 tentativa (rodada registrada com 0 pontos)
+// ------------------------------------------------------------------
+const dialogoTroca = document.getElementById('confirmar-troca');
+
+function pedirTrocaLocal() {
+    if (jogoFinalizado || document.body.dataset.tela !== 'partida') return;
+    if (partidasRestantes < 2) {
+        avisar('warning', 'Sem tentativas para trocar', 'A troca gasta 1 tentativa e a nova rodada precisa de outra.');
+        return;
+    }
+    document.getElementById('troca-restantes').innerText = String(partidasRestantes - 1);
+    dialogoTroca.showModal();
+}
+
+async function confirmarTrocaLocal() {
+    dialogoTroca.close();
+    if (jogoFinalizado || trocaEmAndamento || partidasRestantes < 2) return;
+    const btn = document.getElementById('btn-trocar-local');
+    const btnEnviar = document.getElementById('btn-enviar');
+    const btnCentro = document.getElementById('btn-marcar-centro');
+    trocaEmAndamento = true;
+    btn.disabled = true;
+    btnEnviar.disabled = true;
+    btnCentro.disabled = true;
+    clearInterval(intervaloCronometro);
+
+    const tentativaRegistrada = await registrarRodada(0);
+    if (!tentativaRegistrada) {
+        trocaEmAndamento = false;
+        if (!jogoFinalizado) {
+            btn.disabled = partidasRestantes < 2;
+            btnCentro.disabled = false;
+            interfaceJogo.palpite(Boolean(palpiteJogador));
+            if (tempoRestante > 0) {
+                intervaloCronometro = setInterval(contarTempo, 1000);
+            } else {
+                tempoEsgotadoSemPalpite = !palpiteJogador;
+                verificarPalpite();
+            }
         }
-    } catch(e) {}
-    const locaisJaSorteadosPorRegiao = locaisIniciais;
-
-    function salvarSorteados() {
-        let p = {};
-        for(let r of Object.keys(locaisJaSorteadosPorRegiao)) p[r] = Array.from(locaisJaSorteadosPorRegiao[r]);
-        localStorage.setItem('bg_locais_sorteados', JSON.stringify(p));
+        return;
     }
 
-    const limitesBrasil = L.latLngBounds(
-        L.latLng(-34.5, -74.5),
-        L.latLng(5.5, -32.0)
-    );
+    trocaEmAndamento = false;
+    iniciarNovaRodada();
+    interfaceJogo.painel('paisagem');
+    interfaceJogo.anunciar(`Local trocado. 1 tentativa usada; restam ${partidasRestantes}. Você tem dois minutos para o novo cenário.`);
+    avisar('info', 'Local trocado', `1 tentativa usada. Restam ${partidasRestantes} hoje.`);
+}
 
-    const limitesVisuais = L.latLngBounds(
-        L.latLng(-50.0, -90.0), // Expansão para o sul e oeste
-        L.latLng(15.0, -20.0)   // Expansão para o norte e leste
-    );
+document.getElementById('btn-confirmar-troca').addEventListener('click', confirmarTrocaLocal);
+for (const id of ['btn-cancelar-troca', 'btn-fechar-troca']) {
+    document.getElementById(id).addEventListener('click', () => dialogoTroca.close());
+}
 
-    let tempoRestante = 120; 
-    let intervaloCronometro = null;
+function atualizarPlacarTotal() {
+    document.getElementById('placar-total').innerText = pontosTotais.toLocaleString('pt-BR');
+}
 
-    // Inicialização do Mapa
-    const map = L.map('map', {
-        zoomControl: false,
-        maxBounds: limitesVisuais,
-        maxBoundsViscosity: 0.8,
-        minZoom: 3,
-        maxZoom: 18,
-        worldCopyJump: false
-    }).setView([-14.2350, -51.9253], 4);
-    L.control.zoom({ position: 'topright' }).addTo(map);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
-
-    // Destacar o Brasil
-    fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson')
-        .then(res => res.json())
-        .then(data => {
-            L.geoJSON(data, {
-                style: {
-                    color: '#10b981',
-                    weight: 2,
-                    opacity: 0.6,
-                    fillColor: '#10b981',
-                    fillOpacity: 0.1
-                }
-            }).addTo(map);
-        })
-        .catch(err => console.log('Erro ao carregar mapa do Brasil', err));
-
-    let avisoMapaTimeout = null;
-
-    function mostrarAvisoMapa(mensagem) {
-        const avisoMapa = document.getElementById('aviso-mapa');
-        if (!avisoMapa) return;
-        avisoMapa.innerText = mensagem;
-        avisoMapa.classList.remove('hidden');
-        if (avisoMapaTimeout) clearTimeout(avisoMapaTimeout);
-        avisoMapaTimeout = setTimeout(() => avisoMapa.classList.add('hidden'), 2200);
+function restaurarInterfaceCompleta() {
+    document.getElementById('main-game').classList.remove('modo-resultado');
+    document.getElementById('header-jogo').classList.add('hidden');
+    for (const id of ['barra-tempo-wrapper', 'painel-streetview', 'painel-status', 'barra-acao']) {
+        document.getElementById(id).classList.remove('hidden');
     }
+    document.body.classList.remove('tempo-urgente');
+    document.getElementById('btn-marcar-centro').disabled = false;
+    setTimeout(() => map.invalidateSize({ animate: false }), 50);
+}
 
-    map.on('click', function(evento) {
-        if (jogoFinalizado) return;
-        if (!limitesBrasil.contains(evento.latlng)) {
-            mostrarAvisoMapa('Fora da região válida.');
-            return;
-        }
-        palpiteJogador = evento.latlng;
-        tempoEsgotadoSemPalpite = false;
-        if (marcadorPalpite) map.removeLayer(marcadorPalpite);
-        marcadorPalpite = L.marker(palpiteJogador).addTo(map);
-    });
-
-    window.mostrarRegiaoDoDia = function() {
-        if (partidasRestantes <= 0) {
-            if (window.Toast) window.Toast.warning('Limite diário atingido', 'Você já atingiu o limite diário de partidas!');
-            setTimeout(() => { window.location.href = 'hub_brazilguessr.html'; }, 1200);
-            return;
-        }
-
-        document.getElementById('tela-inicio').classList.add('opacity-0', 'pointer-events-none');
-        
-        const regioes = Object.keys(bancoLocais);
-        regiaoSorteada = regioes[Math.floor(Math.random() * regioes.length)];
-        
-        document.getElementById('nome-regiao').innerText = regiaoSorteada;
-        document.getElementById('badge-regiao').innerText = regiaoSorteada.toUpperCase();
-        
-        const popupRegiao = document.getElementById('tela-regiao');
-        popupRegiao.classList.remove('hidden');
-        popupRegiao.classList.add('flex');
-
-        setTimeout(() => map.invalidateSize({ animate: false }), 50);
-    };
-
-    window.comecarPartida = function() {
-        document.getElementById('tela-regiao').classList.remove('flex');
-        document.getElementById('tela-regiao').classList.add('hidden');
-        document.getElementById('tela-inicio').style.display = 'none';
-
-        document.getElementById('main-game-container').classList.remove('modo-resultado');
-        document.getElementById('painel-streetview').style.display = 'block';
-        document.getElementById('barra-acao').style.display = 'flex';
-        
-        iniciarNovaRodada();
-        setTimeout(() => map.invalidateSize({ animate: false }), 100);
-    };
-
-    function iniciarNovaRodada() {
-        if (marcadorPalpite) map.removeLayer(marcadorPalpite);
-        if (marcadorReal) map.removeLayer(marcadorReal);
-        if (linhaConexao) map.removeLayer(linhaConexao);
-        
-        palpiteJogador = null;
-        jogoFinalizado = false;
-        tempoEsgotadoSemPalpite = false;
-        const btnEnviar = document.getElementById('btn-enviar');
-        btnEnviar.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> Confirmar Palpite`;
-        btnEnviar.onclick = window.verificarPalpite;
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-
-        const listaLocaisDaRegiao = bancoLocais[regiaoSorteada];
-        const indicesDisponiveis = listaLocaisDaRegiao
-            .map((_, indice) => indice)
-            .filter(indice => !locaisJaSorteadosPorRegiao[regiaoSorteada].has(indice));
-
-        if (indicesDisponiveis.length === 0) {
-            locaisJaSorteadosPorRegiao[regiaoSorteada].clear();
-            salvarSorteados();
-        }
-
-        const indicesRecarregados = listaLocaisDaRegiao
-            .map((_, indice) => indice)
-            .filter(indice => !locaisJaSorteadosPorRegiao[regiaoSorteada].has(indice));
-        const indiceAleatorio = indicesRecarregados[Math.floor(Math.random() * indicesRecarregados.length)];
-        localAtual = listaLocaisDaRegiao[indiceAleatorio];
-        locaisJaSorteadosPorRegiao[regiaoSorteada].add(indiceAleatorio);
-        salvarSorteados();
-
-        const iframe = document.getElementById('sv-iframe');
-        iframe.src = `https://www.google.com/maps?cbll=${localAtual.lat},${localAtual.lng}&layer=c&cbp=12,${localAtual.heading},0,0,0&output=svembed`;
-
-        map.setView([-14.2350, -51.9253], 4);
-        setTimeout(() => map.invalidateSize({ animate: false }), 50);
-
-        clearInterval(intervaloCronometro);
-        tempoRestante = 120;
-        atualizarInterfaceTempo();
-        intervaloCronometro = setInterval(contarTempo, 1000);
+function ativarModoMapaResultado() {
+    document.getElementById('main-game').classList.add('modo-resultado');
+    document.getElementById('header-jogo').classList.remove('hidden');
+    for (const id of ['barra-tempo-wrapper', 'painel-streetview', 'painel-status', 'barra-acao']) {
+        document.getElementById(id).classList.add('hidden');
     }
+    interfaceJogo.painel('mapa');
+    interfaceJogo.tela('mapa');
+    setTimeout(() => {
+        map.invalidateSize({ animate: false });
+        if (marcadorPalpite && marcadorReal) map.fitBounds(L.featureGroup([marcadorPalpite, marcadorReal]).getBounds().pad(0.3));
+        else if (localAtual) map.setView([localAtual.lat, localAtual.lng], 6);
+    }, 60);
+}
 
-    function contarTempo() {
-        if (tempoRestante > 0 && !jogoFinalizado) {
-            tempoRestante--;
-            atualizarInterfaceTempo();
-        } else if (tempoRestante <= 0 && !jogoFinalizado) {
-            clearInterval(intervaloCronometro);
-            tempoEsgotadoSemPalpite = !palpiteJogador;
-            window.verificarPalpite();
-        }
-    }
+function voltarAoInicio() {
+    clearInterval(intervaloCronometro);
+    encerrarCarregamentoPaisagem();
+    restaurarInterfaceCompleta();
+    interfaceJogo.tela('inicio');
+    document.getElementById('sv-iframe').src = 'about:blank';
+    if (estatisticasCarregadas && partidasRestantes <= 0) irParaHub();
+}
 
-    function atualizarInterfaceTempo() {
-        const minutos = Math.floor(tempoRestante / 60).toString().padStart(2, '0');
-        const segundos = (tempoRestante % 60).toString().padStart(2, '0');
-        document.getElementById('cronometro').innerText = `${minutos}:${segundos}`;
-        const porcentagem = (tempoRestante / 120) * 100;
-        document.getElementById('barra-tempo').style.width = `${porcentagem}%`;
-    }
+// ------------------------------------------------------------------
+// Mapa (Leaflet)
+// ------------------------------------------------------------------
+const map = L.map('map', {
+    zoomControl: false,
+    maxBounds: limitesBrasil,
+    maxBoundsViscosity: 1.0,
+    minZoom: 3,
+    maxZoom: 20,
+    zoomSnap: 0.25,
+    zoomDelta: 0.5,
+    worldCopyJump: false
+}).setView([-14.2350, -51.9253], 4);
+L.control.zoom({ position: 'topright' }).addTo(map);
+L.control.scale({ position: 'bottomleft', imperial: false, maxWidth: 100 }).addTo(map);
+window.brazilGuessrMap = map;
 
-    function calcularPontuacao(distanciaKm) {
-        if (distanciaKm <= 0.05) return 5000; 
-        if (distanciaKm > 3000) return 0;
-        const pontos = 5000 * Math.exp(-distanciaKm / 300);
-        return Math.round(pontos);
-    }
-
-    window.verificarPalpite = async function() {
-        if (jogoFinalizado) return;
-
-        const semPalpite = !palpiteJogador;
-        if (semPalpite) tempoEsgotadoSemPalpite = true;
-
-        jogoFinalizado = true;
-        clearInterval(intervaloCronometro);
-
-        const coordenadaRealLatLng = L.latLng(localAtual.lat, localAtual.lng);
-        const distanciaKm = semPalpite ? null : map.distance(palpiteJogador, coordenadaRealLatLng) / 1000;
-
-        pontosDaRodada = tempoEsgotadoSemPalpite ? 0 : calcularPontuacao(distanciaKm);
-        pontosTotais += pontosDaRodada;
-        document.getElementById('placar-total').innerText = pontosTotais.toString();
-
-        marcadorReal = L.marker(coordenadaRealLatLng).addTo(map)
-            .bindPopup(`<b>${localAtual.nome}</b><br>Você ${semPalpite ? 'não marcou palpite' : `errou por ${distanciaKm.toFixed(1)} km.`}`)
-            .openPopup();
-
-        if (!semPalpite) {
-            linhaConexao = L.polyline([palpiteJogador, coordenadaRealLatLng], {
-                color: '#f59e0b', weight: 3, dashArray: '6, 8'
-            }).addTo(map);
-        }
-
-        if (!semPalpite && marcadorPalpite) {
-            const grupoMarcadores = new L.featureGroup([marcadorPalpite, marcadorReal].filter(m => m !== null));
-            map.fitBounds(grupoMarcadores.getBounds().pad(0.3));
-        } else {
-            map.setView(coordenadaRealLatLng, 6);
-        }
-
-        // Salvar pontuação
-        try {
-            await api.post(`/jogos/${jogoId}/pontuacao`, { pontuacao: pontosDaRodada });
-        } catch (err) {
-            console.error('Erro ao salvar pontos', err);
-        }
-
-        partidasRestantes--;
-        partidasHoje++;
-        document.getElementById('header-partidas-restantes').innerText = `Tentativas Restantes: ${partidasRestantes}`;
-
-        const diffStr = semPalpite ? 'Sem palpite' : `${distanciaKm.toFixed(1)} km`;
-        document.getElementById('resultado-local').innerText = localAtual.nome;
-        document.getElementById('resultado-rodada').innerText = pontosDaRodada.toString();
-        document.getElementById('resultado-total').innerText = pontosTotais.toString();
-        document.getElementById('resultado-diferenca').innerText = diffStr;
-
-        const btnProxima = document.getElementById('btn-proxima-rodada');
-        if (partidasRestantes <= 0) {
-            btnProxima.innerText = "Ver Resultados Finais";
-            btnProxima.onclick = () => window.location.href = 'hub_brazilguessr.html';
-        } else {
-            btnProxima.innerText = `Próxima Rodada (${partidasRestantes} restantes)`;
-        }
-
-        document.getElementById('tela-resultado').classList.remove('hidden');
-        document.getElementById('tela-resultado').classList.add('flex');
-    };
-
-    window.proximaRodada = function() {
-        if (partidasRestantes <= 0) {
-            window.location.href = 'hub_brazilguessr.html';
-        } else {
-            document.getElementById('tela-resultado').classList.remove('flex');
-            document.getElementById('tela-resultado').classList.add('hidden');
-            window.mostrarRegiaoDoDia();
-        }
-    };
-
-    window.fecharResultadoEVerMapa = function() {
-        document.getElementById('tela-resultado').classList.remove('flex');
-        document.getElementById('tela-resultado').classList.add('hidden');
-        
-        document.getElementById('main-game-container').classList.add('modo-resultado');
-        document.getElementById('painel-streetview').style.display = 'none';
-        document.getElementById('barra-acao').style.display = 'none';
-        
-        setTimeout(() => map.invalidateSize({ animate: false }), 50);
-
-        // Altera botão enviar para "Próxima Rodada" ou voltar
-        document.getElementById('barra-acao').style.display = 'flex';
-        document.getElementById('btn-enviar').innerHTML = partidasRestantes <= 0 
-            ? `<i data-lucide="rotate-ccw" class="w-5 h-5"></i> Voltar ao Início`
-            : `Próxima Rodada <i data-lucide="arrow-right" class="w-5 h-5"></i>`;
-        document.getElementById('btn-enviar').onclick = window.proximaRodada;
-
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    };
+let camadaMapa = null;
+let geracaoMapa = 0;
+let mapaCarregamentoTimeout = null;
+const creditosMapa = '<a href="https://openfreemap.org/">OpenFreeMap</a> © <a href="https://openmaptiles.org/">OpenMapTiles</a> · Dados <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+const mapaEstados = L.geoJSON(malhaEstados, {
+    style: { color: '#a69d83', weight: 1, fillColor: '#e4dec9', fillOpacity: 1 },
+    attribution: '<a href="https://www.naturalearthdata.com/">Natural Earth</a>'
 });
+const rotulosEstados = L.layerGroup();
+for (const estado of malhaEstados.features) {
+    const p = estado.properties;
+    L.marker([p.latitude, p.longitude], {
+        icon: L.divIcon({ className: 'state-label', html: p.postal, iconSize: [22, 14], iconAnchor: [11, 7] }),
+        interactive: false, keyboard: false
+    }).addTo(rotulosEstados);
+}
+
+async function trocarMapa(tipo) {
+    const simplificado = tipo === 'estados';
+    const geracao = ++geracaoMapa;
+    clearTimeout(mapaCarregamentoTimeout);
+    document.getElementById('btn-mapa-estados').setAttribute('aria-pressed', String(simplificado));
+    document.getElementById('btn-mapa-ruas').setAttribute('aria-pressed', String(!simplificado));
+    document.getElementById('mapa-indisponivel').classList.add('hidden');
+    document.getElementById('mapa-carregando').classList.toggle('hidden', simplificado);
+    if (camadaMapa) {
+        map.removeLayer(camadaMapa);
+        camadaMapa = null;
+    }
+    if (simplificado) {
+        mapaEstados.addTo(map);
+        rotulosEstados.addTo(map);
+        return;
+    }
+    map.removeLayer(mapaEstados);
+    map.removeLayer(rotulosEstados);
+    const falha = () => {
+        if (geracao !== geracaoMapa) return;
+        clearTimeout(mapaCarregamentoTimeout);
+        document.getElementById('mapa-carregando').classList.add('hidden');
+        document.getElementById('mapa-indisponivel').classList.remove('hidden');
+    };
+    try {
+        mapaCarregamentoTimeout = setTimeout(falha, 15000);
+        const novaCamada = await criarCamadaRuas(creditosMapa);
+        if (geracao !== geracaoMapa) return;
+        clearTimeout(mapaCarregamentoTimeout);
+        camadaMapa = novaCamada;
+        let errosDaCamada = 0;
+        camadaMapa.on('loading', () => {
+            if (geracao !== geracaoMapa) return;
+            errosDaCamada = 0;
+            clearTimeout(mapaCarregamentoTimeout);
+            mapaCarregamentoTimeout = setTimeout(falha, 15000);
+        });
+        camadaMapa.on('load', () => {
+            if (geracao !== geracaoMapa || errosDaCamada) return;
+            clearTimeout(mapaCarregamentoTimeout);
+            document.getElementById('mapa-carregando').classList.add('hidden');
+            document.getElementById('mapa-indisponivel').classList.add('hidden');
+        });
+        camadaMapa.on('tileerror', evento => {
+            if (geracao !== geracaoMapa) return;
+            errosDaCamada++;
+            console.warn('Falha ao carregar cartografia:', evento.error);
+            falha();
+        });
+        camadaMapa.addTo(map);
+    } catch (erro) {
+        console.warn('Não foi possível abrir o mapa detalhado.', erro);
+        falha();
+    }
+}
+trocarMapa('ruas');
+document.getElementById('btn-mapa-estados').addEventListener('click', () => trocarMapa('estados'));
+document.getElementById('btn-mapa-ruas').addEventListener('click', () => trocarMapa('ruas'));
+document.getElementById('btn-recarregar-mapa').addEventListener('click', () => trocarMapa('ruas'));
+document.getElementById('btn-usar-estados').addEventListener('click', () => trocarMapa('estados'));
+
+document.getElementById('btn-ampliar-palpite').addEventListener('click', () => {
+    if (!palpiteJogador || jogoFinalizado) return;
+    map.setView(palpiteJogador, Math.max(18, map.getZoom()));
+    interfaceJogo.anunciar('Mapa aproximado no seu palpite.');
+});
+
+let avisoMapaTimeout = null;
+function mostrarAvisoMapa(mensagem) {
+    const avisoMapa = document.getElementById('aviso-mapa');
+    avisoMapa.innerText = mensagem;
+    avisoMapa.classList.remove('hidden');
+    clearTimeout(avisoMapaTimeout);
+    avisoMapaTimeout = setTimeout(() => avisoMapa.classList.add('hidden'), 2200);
+}
+
+function registrarPalpite(evento) {
+    if (jogoFinalizado) return;
+    if (!limitesBrasil.contains(evento.latlng)) {
+        mostrarAvisoMapa('Essa região não é brasileira.');
+        return;
+    }
+    palpiteJogador = evento.latlng;
+    tempoEsgotadoSemPalpite = false;
+    if (marcadorPalpite) map.removeLayer(marcadorPalpite);
+    marcadorPalpite = L.marker(palpiteJogador, { icon: iconePalpite }).addTo(map);
+    interfaceJogo.palpite(true);
+}
+map.on('click', registrarPalpite);
+
+// ------------------------------------------------------------------
+// Fluxo de telas
+// ------------------------------------------------------------------
+function nomeRegiao(regiao) {
+    return regiao === 'centro-oeste' ? 'Centro-Oeste' : regiao.charAt(0).toUpperCase() + regiao.slice(1);
+}
+
+function mostrarRegiaoDoDia() {
+    if (!estatisticasCarregadas) return;
+    if (partidasRestantes <= 0) {
+        avisar('warning', 'Limite diário atingido', 'Você já usou suas 10 tentativas de hoje. Volte amanhã!');
+        setTimeout(irParaHub, 1200);
+        return;
+    }
+    clearInterval(intervaloCronometro);
+    restaurarInterfaceCompleta();
+    regiaoSorteada = regioesDoJogo[Math.floor(Math.random() * regioesDoJogo.length)];
+    const nome = nomeRegiao(regiaoSorteada);
+    document.getElementById('nome-regiao').innerText = nome;
+    document.getElementById('badge-regiao').innerText = nome.toUpperCase();
+    interfaceJogo.tela('regiao');
+}
+
+function comecarPartida() {
+    restaurarInterfaceCompleta();
+    interfaceJogo.tela('partida');
+    interfaceJogo.painel('paisagem');
+    iniciarNovaRodada();
+    setTimeout(() => map.invalidateSize({ animate: false }), 100);
+}
+
+function iniciarNovaRodada() {
+    interfaceJogo.palpite(false);
+    for (const camada of [marcadorPalpite, marcadorReal, linhaConexao]) if (camada) map.removeLayer(camada);
+    marcadorPalpite = null;
+    marcadorReal = null;
+    linhaConexao = null;
+    palpiteJogador = null;
+    jogoFinalizado = false;
+    trocaEmAndamento = false;
+    tempoEsgotadoSemPalpite = false;
+
+    // Sorteio sem repetição até esgotar a região.
+    const lista = bancoLocais[regiaoSorteada];
+    const sorteados = locaisJaSorteadosPorRegiao[regiaoSorteada];
+    let disponiveis = lista.filter(local => !sorteados.has(local.id));
+    if (disponiveis.length === 0) {
+        sorteados.clear();
+        disponiveis = lista.slice();
+    }
+    if (disponiveis.length > 1) disponiveis = disponiveis.filter(local => local.id !== ultimoLocalId);
+    localAtual = disponiveis[Math.floor(Math.random() * disponiveis.length)];
+    ultimoLocalId = localAtual.id;
+    sorteados.add(localAtual.id);
+    salvarSorteados();
+
+    document.getElementById('paisagem-carregando-texto').innerText = 'Abrindo a paisagem em 360°…';
+    carregarPaisagem();
+    atualizarTentativas();
+
+    interfaceJogo.enquadrarMapa = true;
+    setTimeout(() => {
+        if (document.getElementById('map').offsetWidth > 0) {
+            map.fitBounds(limitesBrasil, { padding: [18, 18], animate: false });
+            interfaceJogo.enquadrarMapa = false;
+        }
+    }, 60);
+    setTimeout(() => map.invalidateSize({ animate: false }), 50);
+
+    clearInterval(intervaloCronometro);
+    tempoRestante = 120;
+    atualizarInterfaceTempo();
+    intervaloCronometro = setInterval(contarTempo, 1000);
+}
+
+function contarTempo() {
+    if (jogoFinalizado) return;
+    tempoRestante = Math.max(0, tempoRestante - 1);
+    atualizarInterfaceTempo();
+    if (tempoRestante === 0) {
+        clearInterval(intervaloCronometro);
+        tempoEsgotadoSemPalpite = !palpiteJogador;
+        interfaceJogo.anunciar('O tempo acabou. Confira o local correto.');
+        verificarPalpite();
+    }
+}
+
+function atualizarInterfaceTempo() {
+    const minutos = Math.floor(tempoRestante / 60).toString().padStart(2, '0');
+    const segundos = (tempoRestante % 60).toString().padStart(2, '0');
+    document.getElementById('cronometro').innerText = `${minutos}:${segundos}`;
+    document.getElementById('barra-tempo').style.width = `${(tempoRestante / 120) * 100}%`;
+    document.querySelector('.clock-metric').classList.toggle('urgent', tempoRestante <= 30);
+    document.body.classList.toggle('tempo-urgente', tempoRestante <= 30);
+    if (tempoRestante === 30) interfaceJogo.anunciar('Restam 30 segundos.');
+}
+
+function calcularPontuacao(distanciaKm) {
+    if (distanciaKm <= 0.05) return 5000;
+    if (distanciaKm > 3000) return 0;
+    return Math.round(5000 * Math.exp(-distanciaKm / 300));
+}
+
+function atualizarModalResultado(distanciaTexto) {
+    const estado = dadosEstados[localAtual.uf];
+    const bomResultado = pontosDaRodada >= 4000;
+    document.getElementById('resultado-local').innerText = localAtual.nome;
+    document.getElementById('mapa-resultado-local').innerText = localAtual.nome;
+    document.getElementById('resultado-rodada').innerText = pontosDaRodada.toLocaleString('pt-BR');
+    document.getElementById('resultado-total').innerText = pontosTotais.toLocaleString('pt-BR');
+    document.getElementById('resultado-distancia').innerText = distanciaTexto;
+    document.getElementById('resultado-diferenca').innerText = distanciaTexto;
+    document.getElementById('resultado-geografia').innerText = `${estado.nome} · Região ${nomeRegiao(estado.regiao)}`;
+
+    const descoberta = curiosidadesLocais[localAtual.id];
+    document.getElementById('resultado-curiosidade').innerText = descoberta?.texto
+        || (localAtual.cidade === estado.capital ? descobertasRegioes[estado.regiao] : `${estado.nome} tem como capital ${estado.capital}.`);
+    const fonte = document.getElementById('resultado-fonte');
+    fonte.href = descoberta?.fonte || 'https://educa.ibge.gov.br/criancas/brasil/2850-nosso-territorio/19637-divisao-territorial.html';
+    fonte.innerText = descoberta?.instituicao || 'IBGE Educa';
+
+    document.getElementById('resultado-eyebrow').innerText = bomResultado
+        ? 'COPERO: EXCELENTE LEITURA DAS PISTAS!'
+        : pontosDaRodada > 0 ? 'COPERO: CADA PISTA AJUDA A IR MAIS LONGE.' : 'COPERO: VAMOS DESCOBRIR JUNTOS!';
+    document.getElementById('titulo-resultado').innerHTML = bomResultado ? 'Olhar de<br>explorador!' : 'O Brasil<br>surpreende.';
+
+    const copero = document.getElementById('copero-resultado');
+    const pose = bomResultado ? 'comemorando' : pontosDaRodada >= 1500 ? 'bussola' : 'apresentando';
+    copero.src = `${ASSETS}copero-explorador-${pose}.webp`;
+    copero.alt = {
+        comemorando: 'Copero explorador comemora sua descoberta com os braços levantados',
+        bussola: 'Copero explorador observa as pistas com sua bússola',
+        apresentando: 'Copero explorador convida você para uma nova exploração'
+    }[pose];
+    interfaceJogo.tela('resultado');
+    copero.classList.remove('copero-reage');
+    void copero.offsetWidth;
+    copero.classList.add('copero-reage');
+}
+
+async function verificarPalpite() {
+    if (jogoFinalizado || trocaEmAndamento) return;
+    const semPalpite = !palpiteJogador;
+    if (semPalpite) tempoEsgotadoSemPalpite = true;
+
+    jogoFinalizado = true;
+    clearInterval(intervaloCronometro);
+    encerrarCarregamentoPaisagem();
+    document.getElementById('btn-trocar-local').disabled = true;
+    document.getElementById('btn-enviar').disabled = true;
+    document.getElementById('btn-marcar-centro').disabled = true;
+
+    const coordenadaReal = L.latLng(localAtual.lat, localAtual.lng);
+    const distanciaKm = semPalpite ? null : map.distance(palpiteJogador, coordenadaReal) / 1000;
+
+    pontosDaRodada = tempoEsgotadoSemPalpite ? 0 : calcularPontuacao(distanciaKm);
+
+    marcadorReal = L.marker(coordenadaReal, { icon: iconeReal }).addTo(map)
+        .bindPopup(`<b>${localAtual.nome}</b><br>Você ${semPalpite ? 'não marcou palpite' : `errou por ${distanciaKm.toFixed(1)} km.`}`)
+        .openPopup();
+
+    if (!semPalpite) {
+        linhaConexao = L.polyline([palpiteJogador, coordenadaReal], { color: '#b38d28', weight: 3, dashArray: '6, 8' }).addTo(map);
+        map.fitBounds(L.featureGroup([marcadorPalpite, marcadorReal]).getBounds().pad(0.3));
+    } else {
+        map.setView(coordenadaReal, 6);
+    }
+
+    if (await registrarRodada(pontosDaRodada)) {
+        pontosTotais += pontosDaRodada;
+    }
+    atualizarPlacarTotal();
+
+    atualizarModalResultado(semPalpite
+        ? 'Sem palpite'
+        : `${distanciaKm.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} km`);
+}
+
+function novaExploracao() {
+    if (partidasRestantes <= 0) irParaHub();
+    else mostrarRegiaoDoDia();
+}
+
+document.getElementById('btn-fechar-resultado').addEventListener('click', ativarModoMapaResultado);
+document.getElementById('btn-voltar-inicio-header').addEventListener('click', voltarAoInicio);
+document.getElementById('btn-iniciar').addEventListener('click', mostrarRegiaoDoDia);
+document.getElementById('btn-comecar').addEventListener('click', comecarPartida);
+document.getElementById('btn-voltar-regiao').addEventListener('click', voltarAoInicio);
+document.getElementById('btn-sair-partida').addEventListener('click', irParaHub);
+document.getElementById('btn-inicio-resultado').addEventListener('click', voltarAoInicio);
+document.getElementById('btn-enviar').addEventListener('click', verificarPalpite);
+document.getElementById('btn-trocar-local').addEventListener('click', pedirTrocaLocal);
+document.getElementById('btn-nova-exploracao').addEventListener('click', novaExploracao);
+document.getElementById('btn-reabrir-resultado').addEventListener('click', () => interfaceJogo.tela('resultado'));
+document.getElementById('btn-centralizar').addEventListener('click', () => map.fitBounds(limitesBrasil, { padding: [18, 18] }));
+document.getElementById('btn-marcar-centro').addEventListener('click', () => registrarPalpite({ latlng: map.getCenter() }));
+
+atualizarPlacarTotal();
+atualizarTentativas();

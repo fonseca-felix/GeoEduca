@@ -1,0 +1,100 @@
+id,nome_original,regiao_original,regiao_corrigida,nome_atual,status,motivo,lat,lng,conferido_em
+local-001,"Teatro Amazonas - Manaus, AM",norte,norte,"Teatro Amazonas · Manaus, AM",ativo,,-3.1302,-60.0234,2026-10-27
+local-002,"Encontro das Águas - Manaus, AM",norte,norte,,retirado,Street View não disponível na conferência,-3.1386,-59.9051,2026-10-27
+local-003,"Mercado Ver-o-Peso - Belém, PA",norte,norte,"Mercado Ver-o-Peso · Belém, PA",ativo,,-1.4522,-48.5037,2026-10-27
+local-004,"Estação das Docas - Belém, PA",norte,norte,"Belém, PA",ativo,,-1.4518,-48.5025,2026-10-27
+local-005,"Palácio Rio Branco - Salvador, BA",norte,nordeste,"Palácio Rio Branco · Salvador, BA",ativo,,-12.9722,-38.5109,2026-10-27
+local-006,"Praça da República - Belém, PA",norte,norte,"Belém, PA",ativo,,-1.4563,-48.5021,2026-10-27
+local-007,"Centro Histórico - Parintins, AM",norte,norte,"Parintins, AM",ativo,,-2.6284,-56.7358,2026-10-27
+local-008,"Orla de Santarém - Santarém, PA",norte,norte,"Santarém, PA",ativo,,-2.4433,-54.7084,2026-10-27
+local-009,"Catedral Nossa Senhora do Carmo - Macapá, AP",norte,norte,"Macapá, AP",ativo,,0.0335,-51.0539,2026-10-27
+local-010,"Marco Zero do Equador - Macapá, AP",norte,norte,,retirado,Street View não disponível na conferência,0.0006,-51.0853,2026-10-27
+local-011,"Praia da Praia - Palmas, TO",norte,norte,"Palmas, TO",ativo,,-10.1842,-48.3337,2026-10-27
+local-012,"Mirante da Cidade - Rio Branco, AC",norte,norte,"Rio Branco, AC",ativo,,-9.9742,-67.8101,2026-10-27
+local-013,"Praça São Sebastião - Porto Velho, RO",norte,norte,"Porto Velho, RO",ativo,,-8.7675,-63.9031,2026-10-27
+local-014,Cachoeira do Teotônio - RO,norte,norte,,retirado,Street View não disponível na conferência,-10.5709,-62.734,2026-10-27
+local-015,Alter do Chão - Pará,norte,norte,,retirado,Street View não disponível na conferência,-2.5022,-54.9508,2026-10-27
+local-016,"Mercado Central - Manaus, AM",norte,norte,,retirado,Cena comercial sem boas pistas geográficas,-3.1371,-60.0229,2026-10-27
+local-017,"Serra do Tepequém - Amajari, RR",norte,norte,,retirado,Street View não disponível na conferência,3.7258,-61.7397,2026-10-27
+local-018,"Centro de Boa Vista - Boa Vista, RR",norte,norte,"Boa Vista, RR",ativo,,2.8204,-60.672,2026-10-27
+local-019,Floresta Nacional do Tapajós - PA,norte,norte,,retirado,Street View não disponível na conferência,-2.8983,-54.9375,2026-10-27
+local-020,"Parque do Mocambo - Macapá, AP",norte,norte,"Macapá, AP",ativo,,0.0533,-51.0602,2026-10-27
+local-021,"Pelourinho - Salvador, BA",nordeste,nordeste,"Pelourinho · Salvador, BA",ativo,,-12.9716,-38.5089,2026-10-27
+local-022,"Elevador Lacerda - Salvador, BA",nordeste,nordeste,"Salvador, BA",ativo,,-12.9753,-38.5129,2026-10-27
+local-023,"Praia de Ponta Negra - Natal, RN",nordeste,nordeste,"Natal, RN",ativo,,-5.8856,-35.1719,2026-10-27
+local-024,"Forte dos Reis Magos - Natal, RN",nordeste,nordeste,,retirado,Street View não disponível na conferência,-5.7619,-35.194,2026-10-27
+local-025,"Marco Zero - Recife, PE",nordeste,nordeste,"Recife, PE",ativo,,-8.0632,-34.8715,2026-10-27
+local-026,"Praia de Boa Viagem - Recife, PE",nordeste,nordeste,,retirado,Street View não disponível na conferência,-8.1378,-34.9015,2026-10-27
+local-027,"Centro Histórico - São Luís, MA",nordeste,nordeste,"São Luís, MA",ativo,,-2.5309,-44.3028,2026-10-27
+local-028,"Praia do Meio - São Luís, MA",nordeste,nordeste,"São Luís, MA",ativo,,-2.4956,-44.2783,2026-10-27
+local-029,"Praia do Futuro - Fortaleza, CE",nordeste,nordeste,,retirado,Street View não disponível na conferência,-3.7172,-38.4684,2026-10-27
+local-030,"Mercado Central - Fortaleza, CE",nordeste,nordeste,"Fortaleza, CE",ativo,,-3.7272,-38.531,2026-10-27
+local-031,"Canoa Quebrada - Aracati, CE",nordeste,nordeste,,retirado,Street View não disponível na conferência,-4.5375,-37.7006,2026-10-27
+local-032,"Porto de Galinhas - Ipojuca, PE",nordeste,nordeste,"Ipojuca, PE",ativo,,-8.5026,-35.0087,2026-10-27
+local-033,"Praia de Pipa - Tibau do Sul, RN",nordeste,nordeste,,retirado,Street View não disponível na conferência,-6.2308,-35.0558,2026-10-27
+local-034,"Lençóis Maranhenses - Barreirinhas, MA",nordeste,nordeste,,retirado,Street View não disponível na conferência,-2.4755,-43.1239,2026-10-27
+local-035,"Catedral Metropolitana - Teresina, PI",nordeste,nordeste,"Teresina, PI",ativo,,-5.0922,-42.8008,2026-10-27
+local-036,"Praia do Jacaré - Cabedelo, PB",nordeste,nordeste,"Cabedelo, PB",ativo,,-6.9778,-34.8311,2026-10-27
+local-037,"Centro de João Pessoa - João Pessoa, PB",nordeste,nordeste,"João Pessoa, PB",ativo,,-7.1195,-34.845,2026-10-27
+local-038,"Morro de São Paulo - Cairu, BA",nordeste,nordeste,,retirado,Cena comercial sem boas pistas geográficas,-13.3798,-38.9167,2026-10-27
+local-039,"Avenida Beira Mar - São Luís, MA",nordeste,nordeste,"São Luís, MA",ativo,,-2.5089,-44.3019,2026-10-27
+local-040,"Esplanada dos Ministérios - Brasília, DF",centro-oeste,centro-oeste,,retirado,Cena comercial sem boas pistas geográficas,-15.8005,-47.8642,2026-10-27
+local-041,"Catedral de Brasília - Brasília, DF",centro-oeste,centro-oeste,"Brasília, DF",ativo,,-15.7821,-47.875,2026-10-27
+local-042,"Praça Cívica - Goiânia, GO",centro-oeste,centro-oeste,"Goiânia, GO",ativo,,-16.6732,-49.2559,2026-10-27
+local-043,"Parque Vaca Brava - Goiânia, GO",centro-oeste,centro-oeste,"Goiânia, GO",ativo,,-16.677,-49.2615,2026-10-27
+local-044,"Parque Mãe Bonifácia - Cuiabá, MT",centro-oeste,centro-oeste,"Cuiabá, MT",ativo,,-15.6091,-56.1103,2026-10-27
+local-045,"Arena Pantanal - Cuiabá, MT",centro-oeste,centro-oeste,"Arena Pantanal · Cuiabá, MT",ativo,,-15.6042,-56.1221,2026-10-27
+local-046,"Parque das Nações - Campo Grande, MS",centro-oeste,centro-oeste,"Campo Grande, MS",ativo,,-20.4438,-54.6188,2026-10-27
+local-047,"Morada dos Baís - Campo Grande, MS",centro-oeste,centro-oeste,"Campo Grande, MS",ativo,,-20.4486,-54.6159,2026-10-27
+local-048,"Chapada dos Veadeiros - Alto Paraíso, GO",centro-oeste,centro-oeste,"Alto Paraíso de Goiás, GO",ativo,,-14.1299,-47.5103,2026-10-27
+local-049,Lago de Corumbá - GO,centro-oeste,centro-oeste,,retirado,Street View não disponível na conferência,-17.949,-48.7314,2026-10-27
+local-050,"Bonito - Gruta do Lago Azul, MS",centro-oeste,centro-oeste,,retirado,Cena comercial sem boas pistas geográficas,-21.1289,-56.4806,2026-10-27
+local-051,"Rio da Prata - Jardim, MS",centro-oeste,centro-oeste,"Jardim, MS",ativo,,-21.4805,-56.1483,2026-10-27
+local-052,"Chapada das Mesas - Carolina, MA",centro-oeste,nordeste,"Carolina, MA",ativo,,-7.3311,-47.4744,2026-10-27
+local-053,Cristalina - GO,centro-oeste,centro-oeste,"Cristalina, GO",ativo,,-16.7679,-47.6141,2026-10-27
+local-054,Pirenópolis - GO,centro-oeste,centro-oeste,"Pirenópolis, GO",ativo,,-15.8513,-48.9584,2026-10-27
+local-055,Cáceres - MT,centro-oeste,centro-oeste,"Cáceres, MT",ativo,,-16.0699,-57.6807,2026-10-27
+local-056,"Pantanal Matogrossense - Poconé, MT",centro-oeste,centro-oeste,,retirado,Street View não disponível na conferência,-16.5678,-56.4302,2026-10-27
+local-057,Parque Nacional da Chapada dos Guimarães - MT,centro-oeste,centro-oeste,,retirado,Street View não disponível na conferência,-15.3863,-55.8005,2026-10-27
+local-058,"Portal da Amazônia - Alta Floresta, MT",centro-oeste,centro-oeste,,retirado,Street View não disponível na conferência,-9.8599,-56.0913,2026-10-27
+local-059,"Avenida Paulista - São Paulo, SP",sudeste,sudeste,,retirado,Sobreposição com o cenário do MASP,-23.5615,-46.656,2026-10-27
+local-060,"Parque Ibirapuera - São Paulo, SP",sudeste,sudeste,"Parque Ibirapuera · São Paulo, SP",ativo,,-23.5862,-46.6588,2026-10-27
+local-061,"MASP - São Paulo, SP",sudeste,sudeste,"MASP · São Paulo, SP",ativo,,-23.5617,-46.6558,2026-10-27
+local-062,"Centro Histórico - Santos, SP",sudeste,sudeste,"Santos, SP",ativo,,-23.9604,-46.3338,2026-10-27
+local-063,"Campinas - Centro, SP",sudeste,sudeste,"Campinas, SP",ativo,,-22.9068,-47.0612,2026-10-27
+local-064,"Copacabana - Rio de Janeiro, RJ",sudeste,sudeste,"Copacabana · Rio de Janeiro, RJ",ativo,,-22.9711,-43.1843,2026-10-27
+local-065,"Cristo Redentor - Rio de Janeiro, RJ",sudeste,sudeste,"Cristo Redentor · Rio de Janeiro, RJ",ativo,,-22.9519,-43.2105,2026-10-27
+local-066,"Pão de Açúcar - Rio de Janeiro, RJ",sudeste,sudeste,,retirado,Street View não disponível na conferência,-22.9483,-43.1548,2026-10-27
+local-067,"Centro de Niterói - Niterói, RJ",sudeste,sudeste,"Niterói, RJ",ativo,,-22.8833,-43.1148,2026-10-27
+local-068,"Praça da Liberdade - Belo Horizonte, MG",sudeste,sudeste,"Praça da Liberdade · Belo Horizonte, MG",ativo,,-19.9323,-43.938,2026-10-27
+local-069,"Mirante Mangabeiras - Belo Horizonte, MG",sudeste,sudeste,"Belo Horizonte, MG",ativo,,-19.9362,-43.9134,2026-10-27
+local-070,"Centro Histórico - Ouro Preto, MG",sudeste,sudeste,"Praça Tiradentes · Ouro Preto, MG",ativo,,-20.3856,-43.5036,2026-10-27
+local-071,"Igreja São Francisco - São João del-Rei, MG",sudeste,sudeste,,retirado,Street View não disponível na conferência,-21.1315,-44.2617,2026-10-27
+local-072,"Parque do Sabiá - Uberlândia, MG",sudeste,sudeste,"Uberlândia, MG",ativo,,-18.9357,-48.2818,2026-10-27
+local-073,"Convento da Penha - Vila Velha, ES",sudeste,sudeste,"Vila Velha, ES",ativo,,-20.3323,-40.2876,2026-10-27
+local-074,"Praia de Camburi - Vitória, ES",sudeste,sudeste,,retirado,Street View não disponível na conferência,-20.2889,-40.2484,2026-10-27
+local-075,Centro de Volta Redonda - RJ,sudeste,sudeste,,retirado,Street View não disponível na conferência,-22.5278,-44.1051,2026-10-27
+local-076,"Praça XV - Rio de Janeiro, RJ",sudeste,sudeste,"Rio de Janeiro, RJ",ativo,,-22.9034,-43.1718,2026-10-27
+local-077,Poços de Caldas - MG,sudeste,sudeste,"Poços de Caldas, MG",ativo,,-21.7875,-46.5626,2026-10-27
+local-078,Campos do Jordão - SP,sudeste,sudeste,"Campos do Jordão, SP",ativo,,-22.739,-45.5914,2026-10-27
+local-079,"Ópera de Arame - Curitiba, PR",sul,sul,"Ópera de Arame · Curitiba, PR",ativo,,-25.3853,-49.2765,2026-10-27
+local-080,"Jardim Botânico - Curitiba, PR",sul,sul,,retirado,Street View não disponível na conferência,-25.4455,-49.2366,2026-10-27
+local-081,"Catedral Metropolitana - Curitiba, PR",sul,sul,"Curitiba, PR",ativo,,-25.4284,-49.2733,2026-10-27
+local-082,"Itaipu Binacional - Foz do Iguaçu, PR",sul,sul,,retirado,Street View não disponível na conferência,-25.4485,-54.5833,2026-10-27
+local-083,"Londrina - Lago Igapó, PR",sul,sul,"Londrina, PR",ativo,,-23.3104,-51.1623,2026-10-27
+local-084,"Ponte Hercílio Luz - Florianópolis, SC",sul,sul,"Ponte Hercílio Luz · Florianópolis, SC",ativo,,-27.5934,-48.5636,2026-10-27
+local-085,"Mercado Público - Florianópolis, SC",sul,sul,"Florianópolis, SC",ativo,,-27.5959,-48.5505,2026-10-27
+local-086,"Beto Carrero World - Penha, SC",sul,sul,"Penha, SC",ativo,,-26.7745,-48.6409,2026-10-27
+local-087,"Praia do Rosa - Imbituba, SC",sul,sul,,retirado,Street View não disponível na conferência,-28.0878,-48.6589,2026-10-27
+local-088,"Blumenau - Centro, SC",sul,sul,,retirado,Cena comercial sem boas pistas geográficas,-26.9191,-49.0707,2026-10-27
+local-089,"Estátua do Laçador - Porto Alegre, RS",sul,sul,"Aeroporto Salgado Filho · Porto Alegre, RS",ativo,,-29.9934,-51.1712,2026-10-27
+local-090,"Usina do Gasômetro - Porto Alegre, RS",sul,sul,"Porto Alegre, RS",ativo,,-30.0344,-51.2352,2026-10-27
+local-091,"Parque Farroupilha - Porto Alegre, RS",sul,sul,"Porto Alegre, RS",ativo,,-30.0291,-51.2187,2026-10-27
+local-092,"Caxias do Sul - Centro, RS",sul,sul,"Caxias do Sul, RS",ativo,,-29.1658,-51.1801,2026-10-27
+local-093,"Gramado - Rua Coberta, RS",sul,sul,"Gramado, RS",ativo,,-29.3794,-50.8764,2026-10-27
+local-094,"Pelotas - Centro, RS",sul,sul,"Pelotas, RS",ativo,,-31.7658,-52.338,2026-10-27
+local-095,"Rio Grande - Praia do Cassino, RS",sul,sul,,retirado,Street View não disponível na conferência,-32.1979,-52.163,2026-10-27
+local-096,"Maringá - Parque do Ingá, PR",sul,sul,"Maringá, PR",ativo,,-23.4253,-51.9392,2026-10-27
+local-097,Cascavel - PR,sul,sul,"Cascavel, PR",ativo,,-24.9559,-53.4555,2026-10-27
+local-098,Joinville - SC,sul,sul,"Joinville, SC",ativo,,-26.3043,-48.8456,2026-10-27
+local-099,Santa Maria - RS,sul,sul,"Santa Maria, RS",ativo,,-29.6845,-53.8063,2026-10-27
