@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoEduca — Apresentação Interativa em Loop 3D</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
+  
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+  <!-- Bibliotecas externas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <style>
+    :root {
+      --navy: #0B0A32;
+      --navy-deep: #07061F;
+      --gold: #CCA43B;
+      --gold-light: #ECC765;
+      --gold-dark: #9F7B22;
+      --forest: #233B0B;
+      --paper: #F7F3E9;
+      --muted-foreground: rgba(247, 243, 233, 0.65);
+      --border-color: rgba(204, 164, 59, 0.22);
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-sans: 'Inter', sans-serif;
+      --glow-gold: 0 0 28px rgba(204, 164, 59, 0.4), 0 0 2px rgba(204, 164, 59, 0.8);
+      --gradient-gold: linear-gradient(135deg, #F3D98B 0%, #CCA43B 50%, #94711D 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html {
+      scrollbar-width: none;
+    }
+    html::-webkit-scrollbar {
+      display: none;
+    }
+
+    body {
+      background-color: var(--navy-deep);
+      color: var(--paper);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      overflow-y: scroll;
+      user-select: none;
+    }
+
+    /* Canvas do Globo 3D */
+    #globe-host {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 40%, var(--navy-deep) 100%);
+    }
+
+    /* Header e Ações */
+    .top-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 32px;
+      background: linear-gradient(180deg, rgba(7, 6, 31, 0.85) 0%, transparent 100%);
+      backdrop-filter: blur(8px);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--paper);
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .brand-logo span {
+      color: var(--gold);
+    }
+    .brand-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      background: rgba(204, 164, 59, 0.12);
+      border: 1px solid rgba(204, 164, 59, 0.3);
+      border-radius: 100px;
+      padding: 3px 10px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-action {
+      background: rgba(204, 164, 59, 0.12);
+      border: 1px solid var(--border-color);
+      border-radius: 100px;
+      padding: 9px 18px;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gold);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      backdrop-filter: blur(12px);
+    }
+    .btn-action:hover {
+      background: rgba(204, 164, 59, 0.24);
+      transform: translateY(-2px);
+      box-shadow: var(--glow-gold);
+    }
+    .btn-action.btn-gold {
+      background: var(--gold);
+      color: var(--navy-deep);
+      border-color: var(--gold);
+    }
+    .btn-action.btn-gold:hover {
+      background: var(--gold-light);
+      color: var(--navy-deep);
+    }
+
+    /* Barra de Progresso do Timer de 6 Segundos */
+    .autoplay-timer-bar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      z-index: 60;
+    }
+    .autoplay-timer-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--gradient-gold);
+      box-shadow: 0 0 10px var(--gold);
+      transition: width 0.1s linear;
+    }
+
+    /* Navegação Lateral (Slides) */
+    .slide-nav {
+      position: fixed;
+      right: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .slide-nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--paper);
+    }
+    .slide-nav-label {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+    .slide-nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(247, 243, 233, 0.3);
+      transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .slide-nav-item:hover .slide-nav-label,
+    .slide-nav-item.active .slide-nav-label {
+      opacity: 1;
+      color: var(--gold);
+    }
+    .slide-nav-item.active .slide-nav-dot {
+      width: 14px;
+      height: 14px;
+      background: var(--gold);
+      box-shadow: var(--glow-gold);
+    }
+
+    /* Controle Flutuante Inferior (Autoplay 6s, Pause, Prev/Next) */
+    .playback-controls {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(11, 10, 50, 0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 100px;
+      padding: 8px 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .playback-btn {
+      background: none;
+      border: none;
+      color: var(--paper);
+      font-size: 1rem;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s ease;
+    }
+    .playback-btn:hover {
+      background: rgba(204, 164, 59, 0.2);
+      color: var(--gold);
+    }
+    .playback-btn.play-toggle {
+      background: var(--gold);
+      color: var(--navy-deep);
+    }
+    .playback-btn.play-toggle:hover {
+      background: var(--gold-light);
+      transform: scale(1.08);
+    }
+    .playback-badge {
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    /* Estrutura dos Slides e Camadas de Parallax */
+    .slides-wrapper {
+      position: relative;
+      z-index: 10;
+    }
+
+    .slide-section {
+      position: relative;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    .layer {
+      position: absolute;
+      inset: 0;
+      will-change: transform;
+      transform: translate3d(0, calc(var(--p, 0) * var(--speed, 0) * -60vh), 0);
+    }
+
+    /* Fundo Topográfico */
+    .topo-bg {
+      background-image:
+        linear-gradient(rgba(204, 164, 59, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(204, 164, 59, 0.06) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+
+    /* Letras Gigantes em Movimento Cinético (Marquee) */
+    .marquee-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 16px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .marquee {
+      white-space: nowrap;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(6rem, 18vw, 17rem);
+      line-height: 0.85;
+      letter-spacing: -0.04em;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(204, 164, 59, 0.16);
+      will-change: transform;
+    }
+
+    /* Elementos do Foreground (Pinos, Bússola, Régua) */
+    .foreground-layer {
+      pointer-events: none;
+      z-index: 30;
+    }
+    .tilt {
+      transform-style: preserve-3d;
+      transform: perspective(1000px) rotateX(calc(var(--my, 0) * -10deg)) rotateY(calc(var(--mx, 0) * 12deg));
+      transition: transform 0.25s ease-out;
+    }
+
+    /* Conteúdo Principal */
+    .content-container {
+      position: relative;
+      z-index: 20;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .kicker {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1, h2 {
+      font-family: var(--font-display);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .text-gold-gradient {
+      background: var(--gradient-gold);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Cartões Glassmorphism */
+    .glass {
+      background: linear-gradient(145deg, rgba(11, 10, 50, 0.65), rgba(7, 6, 31, 0.5));
+      backdrop-filter: blur(18px) saturate(140%);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      padding: 24px;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .glass:hover {
+      border-color: rgba(204, 164, 59, 0.45);
+      box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.7), var(--glow-gold);
+    }
+
+    .tag-badge {
+      display: inline-block;
+      border-radius: 100px;
+      border: 1px solid rgba(204, 164, 59, 0.4);
+      background: rgba(204, 164, 59, 0.1);
+      padding: 4px 12px;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    /* Animações de Revelação no Scroll */
+    .reveal > * {
+      opacity: 0;
+      transform: translateY(35px);
+      transition: opacity 0.85s ease, transform 0.85s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .slide-section.in-view .reveal > * {
+      opacity: 1;
+      transform: none;
+    }
+    .slide-section.in-view .reveal > *:nth-child(2) { transition-delay: 0.12s; }
+    .slide-section.in-view .reveal > *:nth-child(3) { transition-delay: 0.24s; }
+    .slide-section.in-view .reveal > *:nth-child(4) { transition-delay: 0.36s; }
+    .slide-section.in-view .reveal > *:nth-child(5) { transition-delay: 0.48s; }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-16px); }
+    }
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.95; }
+    }
+    @keyframes growBar {
+      from { transform: scaleY(0); }
+      to { transform: scaleY(1); }
+    }
+
+    .animate-floaty {
+      animation: floaty 5.5s ease-in-out infinite;
+    }
+    .animate-spin-slow {
+      animation: spinSlow 35s linear infinite;
+    }
+    .animate-twinkle {
+      animation: twinkle 3.5s ease-in-out infinite;
+    }
+    .slide-section.in-view .bar {
+      animation: growBar 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      transform-origin: bottom;
+    }
+
+    /* Estilos de Gráficos e Ícones */
+    .grid-games {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .top-header { padding: 14px 18px; }
+      .brand-tag, .slide-nav { display: none; }
+      .content-container { padding: 0 20px; }
+      .grid-games { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra do Timer do Loop Automático (6 segundos) -->
+  <div class="autoplay-timer-bar-container">
+    <div class="autoplay-timer-bar" id="autoplay-timer-bar"></div>
+  </div>
+
+  <!-- Header Fixo Superior -->
+  <header class="top-header">
+    <a href="dashboard.html" class="brand-logo" title="Voltar ao Painel do Professor">
+      <i class="fa-solid fa-arrow-left" style="font-size: 1rem; opacity: 0.7;"></i>
+      Geo<span>Educa</span>
+      <span class="brand-tag">Apresentação Loop 3D</span>
+    </a>
+
+    <div class="header-actions">
+      <a href="dashboard.html" class="btn-action">
+        <i class="fa-solid fa-table-columns"></i>
+        <span>Painel do Professor</span>
+      </a>
+
+      <button id="btn-export-zip" class="btn-action btn-gold" title="Baixar pacote completo do slide em ZIP">
+        <i class="fa-solid fa-file-zipper"></i>
+        <span>Baixar Código (.ZIP)</span>
+      </button>
+
+      <button id="btn-fullscreen" class="btn-action" title="Modo Tela Cheia (Ideal para sala ou projetor)">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Navegação Lateral dos Slides -->
+  <nav class="slide-nav" id="slide-nav" aria-label="Slides">
+    <!-- Gerado dinamicamente via JS -->
+  </nav>
+
+  <!-- Controles Flutuantes de Reprodução (Loop 6s) -->
+  <div class="playback-controls">
+    <button class="playback-btn" id="btn-prev-slide" title="Slide Anterior (←)">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    
+    <button class="playback-btn play-toggle" id="btn-play-pause" title="Pausar / Retomar Rotação Automática de 6s">
+      <i class="fa-solid fa-pause" id="play-pause-icon"></i>
+    </button>
+    
+    <button class="playback-btn" id="btn-next-slide" title="Próximo Slide (→)">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <div class="playback-badge" id="playback-status-text">
+      <i class="fa-solid fa-rotate" style="margin-right: 4px;"></i> Loop 6s
+    </div>
+  </div>
+
+  <!-- Canvas Three.js do Globo 3D Interativo -->
+  <div id="globe-host"></div>
+  <div class="vignette"></div>
+
+  <!-- Wrapper dos Slides -->
+  <div class="slides-wrapper" id="slides-wrapper">
+
+    <!-- SLIDE 1: HERO -->
+    <section class="slide-section" data-slide="0">
+      <div class="layer topo-bg" style="--speed: -0.5;"></div>
+      <div class="layer marquee-container" style="--speed: -0.3;">
+        <div class="marquee" style="transform: translateX(calc(var(--p,0) * -35vw - 10vw));">GEOGRAFIA · GEOGRAFIA · GEOGRAFIA</div>
+        <div class="marquee" style="transform: translateX(calc(var(--p,0) * 35vw - 40vw));">BRASIL · BRASIL · BRASIL</div>
+      </div>
+      <div class="layer foreground-layer" style="--speed: 0.9;">
+        <div class="tilt" style="position: absolute; left: 6%; top: 70%;">
+          <svg viewBox="0 0 24 34" width="48" height="68"><path d="M12 0C5.4 0 0 5.3 0 11.9 0 20.8 12 34 12 34s12-13.2 12-22.1C24 5.3 18.6 0 12 0z" fill="#CCA43B" /><circle cx="12" cy="12" r="4.5" fill="#07061F" /></svg>
+        </div>
+        <div class="tilt" style="position: absolute; right: 10%; top: 20%;">
+          <svg viewBox="0 0 100 100" width="110" height="110" class="animate-spin-slow" opacity="0.85"><circle cx="50" cy="50" r="46" fill="none" stroke="#CCA43B" stroke-width="2"/><circle cx="50" cy="50" r="38" fill="none" stroke="#CCA43B" stroke-width="0.6" stroke-dasharray="2 3"/><path d="M50 8 L57 50 L50 92 L43 50Z" fill="#CCA43B"/><path d="M8 50 L50 44 L92 50 L50 56Z" fill="#CCA43B" opacity="0.5"/><text x="50" y="24" text-anchor="middle" font-size="9" fill="#F7F3E9" font-family="Space Grotesk">N</text></svg>
+        </div>
+      </div>
+
+      <div class="content-container">
+        <div class="reveal" style="text-align: center; max-width: 850px; margin: 0 auto;">
+          <p class="kicker" style="justify-content: center;"><i class="fa-solid fa-compass"></i> Plataforma Gamificada de Geografia</p>
+          <h1 style="font-size: clamp(3.5rem, 8vw, 6.8rem); line-height: 0.92;">
+            Geo<span class="text-gold-gradient">Educa</span>
+          </h1>
+          <p style="font-family: var(--font-display); font-size: clamp(1.4rem, 2.5vw, 2.4rem); font-weight: 600; margin-top: 18px;">
+            O Brasil e o Mundo nas Pistas
+          </p>
+          <p style="font-size: 1.15rem; color: var(--muted-foreground); margin-top: 20px; line-height: 1.7;">
+            A plataforma interativa que transforma o ensino de Geografia em uma expedição de descobertas através de dados reais, mapas 3D e cenários em 360°.
+          </p>
+          <div style="margin-top: 36px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3em; color: var(--gold); opacity: 0.85;">
+            <i class="fa-solid fa-arrows-spin"></i> Rolando em loop automático (6s por slide)
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: O PROPÓSITO -->
+    <section class="slide-section" data-slide="1">
+      <div class="layer topo-bg" style="--speed: -0.5;"></div>
+      <div class="layer marquee-container" style="--speed: -0.3;">
+        <div class="marquee" style="transform: translateX(calc(var(--p,0) * -35vw - 10vw));">PROPÓSITO · EDUCAÇÃO · METODOLOGIA</div>
+      </div>
+      <div class="content-container">
+        <div class="reveal" style="max-width: 600px;">
+          <p class="kicker"><i class="fa-solid fa-lightbulb"></i> 02 · O Propósito Pedagógico</p>
+          <h2 style="font-size: clamp(2.4rem, 4.5vw, 4rem); line-height: 1.05;">
+            Da Teoria Abstrata à <span class="text-gold-gradient">Exploração Viva</span>
+          </h2>
+          <div style="display: grid; gap: 16px; margin-top: 30px;">
+            <div class="glass tilt">
+              <span class="tag-badge">Paisagens Reais</span>
+              <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">Exploração em Imagens Reais</h3>
+              <p style="font-size: 0.9rem; color: var(--muted-foreground); line-height: 1.6;">Alunos percorrem ruas, biomas e relevos brasileiros em 360°, observando pistas de relevo, clima e arquitetura.</p>
+            </div>
+            <div class="glass tilt" style="margin-left: 28px;">
+              <span class="tag-badge">Investigação</span>
+              <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">Investigação por Dedução</h3>
+              <p style="font-size: 0.9rem; color: var(--muted-foreground); line-height: 1.6;">Sinais de vegetação, placas e coordenadas transformam-se em raciocínio geográfico prático.</p>
+            </div>
+            <div class="glass tilt" style="margin-left: 14px;">
+              <span class="tag-badge">Métricas</span>
+              <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 6px;">Decisão Baseada em Dados</h3>
+              <p style="font-size: 0.9rem; color: var(--muted-foreground); line-height: 1.6;">Cada palpite e resposta alimenta o dashboard do professor com precisão de km e pontuação.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: UNIVERSO DE JOGOS -->
+    <section class="slide-section" data-slide="2">
+      <div class="layer topo-bg" style="--speed: -0.5;"></div>
+      <div class="layer marquee-container" style="--speed: -0.3;">
+        <div class="marquee" style="transform: translateX(calc(var(--p,0) * 35vw - 40vw));">JOGOS · GAMIFICAÇÃO · INTERATIVIDADE</div>
+      </div>
+      <div class="content-container">
+        <div class="reveal" style="max-width: 850px; margin-left: auto;">
+          <div style="text-align: right;">
+            <p class="kicker" style="justify-content: flex-end;"><i class="fa-solid fa-gamepad"></i> 03 · Universo de Jogos</p>
+            <h2 style="font-size: clamp(2.4rem, 4.5vw, 4rem);">
+              Ecossistema <span class="text-gold-gradient">Gamificado</span>
+            </h2>
+          </div>
+          <div class="grid-games">
+            <div class="glass tilt">
+              <span class="tag-badge">360° Street View</span>
+              <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 6px;">BrazilGuessr</h3>
+              <p style="font-size: 0.85rem; color: var(--muted-foreground); line-height: 1.5;">Exploração em 360 graus com Google Street View e palpite em mapa Leaflet de alta resolução.</p>
+            </div>
+            <div class="glass tilt">
+              <span class="tag-badge">Enigmas</span>
+              <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 6px;">Detetive Brasil</h3>
+              <p style="font-size: 0.85rem; color: var(--muted-foreground); line-height: 1.5;">Enigmas geográficos, coordenadas, patrimônio histórico e cartas investigativas.</p>
+            </div>
+            <div class="glass tilt">
+              <span class="tag-badge">Cartografia</span>
+              <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 6px;">GeoBr & GeoMundo</h3>
+              <p style="font-size: 0.85rem; color: var(--muted-foreground); line-height: 1.5;">Capitais, estados, relevo, hidrografia e geopolítica em desafios dinâmicos.</p>
+            </div>
+            <div class="glass tilt">
+              <span class="tag-badge">Modelagem 3D</span>
+              <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 6px;">Placas Tectônicas 3D</h3>
+              <p style="font-size: 0.85rem; color: var(--muted-foreground); line-height: 1.5;">Visualização tridimensional das camadas da Terra, limites convergentes e dorsais oceânicas.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: MASCOTE COPERO -->
+    <section class="slide-section" data-slide="3">
+      <div class="layer topo-bg" style="--speed: -0.5;"></div>
+      <div class="layer marquee-container" style="--speed: -0.3;">
+        <div class="marquee" style="transform: translateX(calc(var(--p,0) * -35vw - 10vw));">COPERO · EXPLORAÇÃO · BIOMAS</div>
+      </div>
+      <div class="content-container">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: center; gap: 40px;">
+          <div class="reveal">
+            <p class="kicker"><i class="fa-solid fa-paw"></i> 04 · Mascote & Narrativa</p>
+            <h2 style="font-size: clamp(2.4rem, 4.5vw, 4rem);">
+              Copero <span class="text-gold-gradient">Explorador</span>
+            </h2>
+            <p style="font-size: 1.1rem; color: var(--muted-foreground); margin-top: 18px; line-height: 1.7;">
+              A capivara exploradora que guia o estudante em cada expedição. Traz feedbacks positivos, dicas com rigor científico e curiosidades integradas ao acervo do <strong>IBGE Educa</strong>.
+            </p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 28px;">
+              <div class="glass tilt">
+                <p style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: var(--gold);">27</p>
+                <p style="font-size: 0.85rem; color: var(--muted-foreground);">Unidades Federativas com dados reais</p>
+              </div>
+              <div class="glass tilt">
+                <p style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: var(--gold);">6</p>
+                <p style="font-size: 0.85rem; color: var(--muted-foreground);">Biomas Brasileiros mapeados</p>
+              </div>
+            </div>
+          </div>
+          <div class="tilt" style="text-align: center;">
+            <img src="../assets/copero.png" alt="Copero Explorador" class="animate-floaty" style="width: 100%; max-width: 360px; filter: drop-shadow(0 25px 35px rgba(0,0,0,0.6));" onerror="this.src='../assets/personagens/copero.png'">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: PAINEL DO PROFESSOR -->
+    <section class="slide-section" data-slide="4">
+      <div class="layer topo-bg" style="--speed: -0.5;"></div>
+      <div class="layer marquee-container" style="--speed: -0.3;">
+        <div class="marquee" style="transform: translateX(calc(var(--p,0) * 35vw - 40vw));">PROFESSOR · MÉTRICAS · RESULTADOS</div>
+      </div>
+      <div class="content-container">
+        <div class="reveal" style="max-width: 850px;">
+          <p class="kicker"><i class="fa-solid fa-chart-line"></i> 05 · Inteligência Pedagógica</p>
+          <h2 style="font-size: clamp(2.4rem, 4.5vw, 4rem);">
+            Painel do <span class="text-gold-gradient">Professor</span>
+          </h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 26px;">
+            <div class="glass tilt" style="grid-column: 1 / -1;">
+              <p style="font-family: var(--font-display); font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 14px;">Precisão e engajamento médio por turma (GeoEduca Analytics)</p>
+              <div style="display: flex; align-items: flex-end; gap: 12px; height: 120px;">
+                <div class="bar" style="flex: 1; height: 50%; background: var(--gold); border-radius: 6px 6px 0 0;"></div>
+                <div class="bar" style="flex: 1; height: 75%; background: var(--gold); border-radius: 6px 6px 0 0;"></div>
+                <div class="bar" style="flex: 1; height: 60%; background: var(--gold); border-radius: 6px 6px 0 0;"></div>
+                <div class="bar" style="flex: 1; height: 92%; background: var(--gold); border-radius: 6px 6px 0 0;"></div>
+                <div class="bar" style="flex: 1; height: 70%; background: var(--gold); border-radius: 6px 6px 0 0;"></div>
+                <div class="bar" style="flex: 1; height: 98%; background: var(--gold); border-radius: 6px 6px 0 0;"></div>
+                <div class="bar" style="flex: 1; height: 85%; background: var(--gold); border-radius: 6px 6px 0 0;"></div>
+              </div>
+            </div>
+            <div class="glass tilt">
+              <p style="font-family: var(--font-display); font-size: 3rem; font-weight: 800; color: var(--gold);">10</p>
+              <p style="font-size: 0.9rem; color: var(--muted-foreground);">Tentativas diárias por aluno (controle gamificado de excessos)</p>
+            </div>
+            <div class="glass tilt">
+              <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 6px;">Ranking de Turmas</h3>
+              <p style="font-size: 0.85rem; color: var(--muted-foreground);">Competição cooperativa saudável entre salas, séries e turnos.</p>
+            </div>
+            <div class="glass tilt">
+              <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 6px;">Leitor de Provas com IA</h3>
+              <p style="font-size: 0.85rem; color: var(--muted-foreground);">Correção automática de gabaritos físicos via câmera com geração de notas.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: TECNOLOGIA -->
+    <section class="slide-section" data-slide="5">
+      <div class="layer topo-bg" style="--speed: -0.5;"></div>
+      <div class="layer marquee-container" style="--speed: -0.3;">
+        <div class="marquee" style="transform: translateX(calc(var(--p,0) * -35vw - 10vw));">TECNOLOGIA · WEBGL · THREEJS · FIRESTORE</div>
+      </div>
+      <div class="content-container">
+        <div class="reveal" style="text-align: center; max-width: 800px; margin: 0 auto;">
+          <p class="kicker" style="justify-content: center;"><i class="fa-solid fa-microchip"></i> 06 · Arquitetura & Inovação</p>
+          <h2 style="font-size: clamp(2.4rem, 4.5vw, 4rem);">
+            Tecnologia de <span class="text-gold-gradient">Ponta</span>
+          </h2>
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 36px;">
+            <div class="glass tilt" style="width: 170px;">
+              <p style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--gold);">Leaflet</p>
+              <p style="font-size: 0.8rem; color: var(--muted-foreground); margin-top: 4px;">Mapas Interativos</p>
+            </div>
+            <div class="glass tilt" style="width: 170px;">
+              <p style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--gold);">Three.js</p>
+              <p style="font-size: 0.8rem; color: var(--muted-foreground); margin-top: 4px;">Visualização 3D</p>
+            </div>
+            <div class="glass tilt" style="width: 170px;">
+              <p style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--gold);">Protomaps</p>
+              <p style="font-size: 0.8rem; color: var(--muted-foreground); margin-top: 4px;">Vetores em Canvas</p>
+            </div>
+            <div class="glass tilt" style="width: 170px;">
+              <p style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--gold);">Node.js</p>
+              <p style="font-size: 0.8rem; color: var(--muted-foreground); margin-top: 4px;">API RESTful</p>
+            </div>
+            <div class="glass tilt" style="width: 170px;">
+              <p style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--gold);">Firebase</p>
+              <p style="font-size: 0.8rem; color: var(--muted-foreground); margin-top: 4px;">Banco em Tempo Real</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: FECHAMENTO / RECONEXÃO EM LOOP -->
+    <section class="slide-section" data-slide="6">
+      <div class="layer topo-bg" style="--speed: -0.5;"></div>
+      <div class="layer marquee-container" style="--speed: -0.3;">
+        <div class="marquee" style="transform: translateX(calc(var(--p,0) * 35vw - 40vw));">EXPEDIÇÃO · DESCOBERTA · GEOEDUCA</div>
+      </div>
+      <div class="content-container">
+        <div class="reveal" style="text-align: center; max-width: 900px; margin: 0 auto;">
+          <p class="kicker" style="justify-content: center;"><i class="fa-solid fa-graduation-cap"></i> 07 · Fechamento & Futuro</p>
+          <h2 style="font-size: clamp(2.5rem, 5.5vw, 4.8rem); line-height: 1.05;">
+            Cada paisagem é uma aula. <span class="text-gold-gradient">Cada palpite, uma descoberta.</span>
+          </h2>
+          <p style="font-size: 1.2rem; color: var(--muted-foreground); margin-top: 24px;">
+            GeoEduca: Transformando salas de aula em expedições geográficas inesquecíveis.
+          </p>
+          <div style="margin-top: 40px; display: flex; justify-content: center; gap: 16px;">
+            <a href="dashboard.html" class="btn-action btn-gold">
+              <i class="fa-solid fa-house"></i> Ir para o Painel
+            </a>
+            <button onclick="scrollToSlide(0)" class="btn-action">
+              <i class="fa-solid fa-rotate-left"></i> Reiniciar Apresentação
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: CÓPIA DO SLIDE 1 (Garante o Loop Infinito Sem Cortes no Scroll) -->
+    <section class="slide-section" data-slide="7" aria-hidden="true">
+      <div class="layer topo-bg" style="--speed: -0.5;"></div>
+      <div class="content-container">
+        <div class="reveal" style="text-align: center; max-width: 850px; margin: 0 auto;">
+          <p class="kicker" style="justify-content: center;"><i class="fa-solid fa-compass"></i> Plataforma Gamificada de Geografia</p>
+          <h1 style="font-size: clamp(3.5rem, 8vw, 6.8rem); line-height: 0.92;">
+            Geo<span class="text-gold-gradient">Educa</span>
+          </h1>
+          <p style="font-family: var(--font-display); font-size: clamp(1.4rem, 2.5vw, 2.4rem); font-weight: 600; margin-top: 18px;">
+            O Brasil e o Mundo nas Pistas
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // -------------------------------------------------------------
+    // 1. CONFIGURAÇÃO DOS SLIDES E CONTROLES
+    // -------------------------------------------------------------
+    const TOTAL_SLIDES = 7;
+    const SLIDE_DURATION_MS = 6000; // 6 Segundos por slide!
+    const LABELS = ["Início", "Propósito", "Jogos", "Copero", "Professor", "Tecnologia", "Fechamento"];
+
+    let currentSlide = 0;
+    let isAutoplayActive = true;
+    let autoplayTimer = null;
+    let timerProgressInterval = null;
+    let timerStartTime = Date.now();
+
+    const progressRef = { current: 0 };
+    let lenis = null;
+
+    // Gerar botões de navegação lateral
+    const navContainer = document.getElementById('slide-nav');
+    LABELS.forEach((label, idx) => {
+      const btn = document.createElement('button');
+      btn.className = `slide-nav-item ${idx === 0 ? 'active' : ''}`;
+      btn.setAttribute('aria-label', label);
+      btn.innerHTML = `
+        <span class="slide-nav-label">${label}</span>
+        <span class="slide-nav-dot"></span>
+      `;
+      btn.addEventListener('click', () => {
+        scrollToSlide(idx);
+        restartAutoplayTimer();
+      });
+      navContainer.appendChild(btn);
+    });
+
+    // -------------------------------------------------------------
+    // 2. INICIALIZAÇÃO DO LENIS (SMOOTH PARALLAX SCROLL)
+    // -------------------------------------------------------------
+    lenis = new Lenis({
+      lerp: 0.08,
+      wheelMultiplier: 0.9,
+      smoothWheel: true
+    });
+
+    const sections = Array.from(document.querySelectorAll('.slide-section'));
+
+    function updateScrollEffects(scroll) {
+      const vh = window.innerHeight;
+      
+      // Loop contínuo: ao passar de 7*vh, volta ao topo sem salto perceptível
+      if (scroll >= TOTAL_SLIDES * vh) {
+        lenis.scrollTo(scroll - TOTAL_SLIDES * vh, { immediate: true, force: true });
+        return;
+      }
+
+      progressRef.current = scroll / (TOTAL_SLIDES * vh);
+
+      sections.forEach((s, idx) => {
+        const p = Math.max(-1.5, Math.min(1.5, (scroll - idx * vh) / vh));
+        s.style.setProperty('--p', p.toFixed(4));
+        s.classList.toggle('in-view', Math.abs(p) < 0.65);
+      });
+
+      const activeIdx = Math.round(scroll / vh) % TOTAL_SLIDES;
+      if (activeIdx !== currentSlide) {
+        currentSlide = activeIdx;
+        updateNavDots(currentSlide);
+      }
+    }
+
+    lenis.on('scroll', ({ scroll }) => updateScrollEffects(scroll));
+
+    // Mouse tilt Parallax
+    window.addEventListener('mousemove', (e) => {
+      const mx = ((e.clientX / window.innerWidth) * 2 - 1).toFixed(3);
+      const my = ((e.clientY / window.innerHeight) * 2 - 1).toFixed(3);
+      document.documentElement.style.setProperty('--mx', mx);
+      document.documentElement.style.setProperty('--my', my);
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    function updateNavDots(activeIdx) {
+      const items = navContainer.querySelectorAll('.slide-nav-item');
+      items.forEach((item, idx) => {
+        item.classList.toggle('active', idx === activeIdx);
+      });
+    }
+
+    function scrollToSlide(idx) {
+      currentSlide = idx % TOTAL_SLIDES;
+      lenis.scrollTo(currentSlide * window.innerHeight, { duration: 1.5 });
+      updateNavDots(currentSlide);
+    }
+
+    // -------------------------------------------------------------
+    // 3. AUTOPLAY TIMER (6 SEGUNDOS POR SLIDE EM LOOP)
+    // -------------------------------------------------------------
+    const timerBar = document.getElementById('autoplay-timer-bar');
+    const playPauseBtn = document.getElementById('btn-play-pause');
+    const playPauseIcon = document.getElementById('play-pause-icon');
+    const playbackStatusText = document.getElementById('playback-status-text');
+
+    function advanceSlideLoop() {
+      const next = (currentSlide + 1) % TOTAL_SLIDES;
+      scrollToSlide(next);
+      timerStartTime = Date.now();
+    }
+
+    function startAutoplay() {
+      isAutoplayActive = true;
+      timerStartTime = Date.now();
+      playPauseIcon.className = 'fa-solid fa-pause';
+      playbackStatusText.innerHTML = '<i class="fa-solid fa-rotate" style="margin-right:4px;"></i> Loop 6s';
+
+      if (autoplayTimer) clearInterval(autoplayTimer);
+      autoplayTimer = setInterval(advanceSlideLoop, SLIDE_DURATION_MS);
+
+      if (timerProgressInterval) clearInterval(timerProgressInterval);
+      timerProgressInterval = setInterval(() => {
+        if (!isAutoplayActive) return;
+        const elapsed = Date.now() - timerStartTime;
+        const pct = Math.min(100, (elapsed / SLIDE_DURATION_MS) * 100);
+        timerBar.style.width = pct + '%';
+      }, 50);
+    }
+
+    function pauseAutoplay() {
+      isAutoplayActive = false;
+      playPauseIcon.className = 'fa-solid fa-play';
+      playbackStatusText.innerHTML = '<i class="fa-solid fa-circle-pause" style="margin-right:4px;"></i> Pausado';
+      if (autoplayTimer) clearInterval(autoplayTimer);
+      if (timerProgressInterval) clearInterval(timerProgressInterval);
+      timerBar.style.width = '0%';
+    }
+
+    function restartAutoplayTimer() {
+      if (isAutoplayActive) {
+        startAutoplay();
+      }
+    }
+
+    playPauseBtn.addEventListener('click', () => {
+      if (isAutoplayActive) {
+        pauseAutoplay();
+      } else {
+        startAutoplay();
+      }
+    });
+
+    document.getElementById('btn-next-slide').addEventListener('click', () => {
+      advanceSlideLoop();
+      restartAutoplayTimer();
+    });
+
+    document.getElementById('btn-prev-slide').addEventListener('click', () => {
+      const prev = (currentSlide - 1 + TOTAL_SLIDES) % TOTAL_SLIDES;
+      scrollToSlide(prev);
+      restartAutoplayTimer();
+    });
+
+    // Teclas de atalho: setas esquerda/direita ou espaço para pausar
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        advanceSlideLoop();
+        restartAutoplayTimer();
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        const prev = (currentSlide - 1 + TOTAL_SLIDES) % TOTAL_SLIDES;
+        scrollToSlide(prev);
+        restartAutoplayTimer();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        playPauseBtn.click();
+      }
+    });
+
+    // Iniciar autoplay de 6 segundos
+    startAutoplay();
+
+    // -------------------------------------------------------------
+    // 4. GLOBO 3D INTERATIVO (THREE.JS)
+    // -------------------------------------------------------------
+    function initGlobe() {
+      const host = document.getElementById('globe-host');
+      if (!host) return;
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      host.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.z = 6;
+
+      // Textura Procedural dos Continentes e Relevo
+      const c = document.createElement('canvas');
+      c.width = 1024;
+      c.height = 512;
+      const g = c.getContext('2d');
+      g.fillStyle = '#0B0A32';
+      g.fillRect(0, 0, 1024, 512);
+
+      const blobs = [
+        [330, 300, 70], [360, 240, 50], [300, 200, 40], [250, 140, 60], [200, 120, 45], // Américas
+        [530, 150, 50], [560, 250, 60], [580, 330, 50], // Europa / África
+        [700, 150, 90], [760, 200, 70], [800, 260, 40], // Ásia
+        [860, 360, 45] // Oceania
+      ];
+
+      for (const [x, y, r] of blobs) {
+        for (let i = 0; i < 260; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const d = Math.random() * r;
+          const gr = g.createRadialGradient(
+            x + Math.cos(a) * d, y + Math.sin(a) * d * 0.8, 0,
+            x + Math.cos(a) * d, y + Math.sin(a) * d * 0.8, 14
+          );
+          gr.addColorStop(0, 'rgba(60, 90, 25, 0.55)');
+          gr.addColorStop(1, 'rgba(35, 59, 11, 0)');
+          g.fillStyle = gr;
+          g.fillRect(x + Math.cos(a) * d - 14, y + Math.sin(a) * d * 0.8 - 14, 28, 28);
+        }
+      }
+
+      // Linhas de Grade Douradas
+      g.strokeStyle = 'rgba(204, 164, 59, 0.25)';
+      g.lineWidth = 1;
+      for (let i = 0; i <= 1024; i += 64) {
+        g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 512); g.stroke();
+      }
+      for (let i = 0; i <= 512; i += 64) {
+        g.beginPath(); g.moveTo(0, i); g.lineTo(1024, i); g.stroke();
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+
+      const globe = new THREE.Group();
+      scene.add(globe);
+
+      const sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(1.5, 96, 96),
+        new THREE.MeshStandardMaterial({
+          map: tex,
+          bumpMap: tex,
+          bumpScale: 0.04,
+          roughness: 0.8,
+          metalness: 0.1
+        })
+      );
+      globe.add(sphere);
+
+      // Partículas Douradas em Nuvem ao Redor do Globo
+      const pts = [];
+      for (let i = 0; i < 1800; i++) {
+        const u = Math.random() * 2 - 1;
+        const t = Math.random() * Math.PI * 2;
+        const s = Math.sqrt(1 - u * u);
+        pts.push(1.53 * s * Math.cos(t), 1.53 * u, 1.53 * s * Math.sin(t));
+      }
+      const pg = new THREE.BufferGeometry();
+      pg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+      globe.add(new THREE.Points(pg, new THREE.PointsMaterial({
+        color: 0xcca43b,
+        size: 0.012,
+        transparent: true,
+        opacity: 0.7
+      })));
+
+      // Pinos Orbitantes Dourados
+      const pins = new THREE.Group();
+      for (let i = 0; i < 6; i++) {
+        const pin = new THREE.Mesh(
+          new THREE.ConeGeometry(0.05, 0.16, 12),
+          new THREE.MeshStandardMaterial({ color: 0xcca43b, emissive: 0x6a5010 })
+        );
+        const a = (i / 6) * Math.PI * 2;
+        pin.position.set(Math.cos(a) * 2.1, Math.sin(a * 2) * 0.4, Math.sin(a) * 2.1);
+        pin.rotation.x = Math.PI;
+        pins.add(pin);
+      }
+      scene.add(pins);
+
+      // Efeito Atmosférico (Fresnel Glow)
+      const atmo = new THREE.Mesh(
+        new THREE.SphereGeometry(1.75, 64, 64),
+        new THREE.ShaderMaterial({
+          transparent: true,
+          side: THREE.BackSide,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          vertexShader: `
+            varying vec3 vN;
+            void main(){
+              vN = normalize(normalMatrix * normal);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `,
+          fragmentShader: `
+            varying vec3 vN;
+            void main(){
+              float i = pow(max(0.62 - dot(vN, vec3(0, 0, 1.0)), 0.0), 4.0);
+              gl_FragColor = vec4(0.8, 0.64, 0.23, 1.0) * i * 0.7;
+            }
+          `
+        })
+      );
+      scene.add(atmo);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+      const sun = new THREE.DirectionalLight(0xfff1d0, 2.2);
+      sun.position.set(-4, 2, 5);
+      scene.add(sun);
+
+      // Keyframes por slide: [x, y, z(cam), tiltX, rotY offset]
+      const keys = [
+        [0, 0, 6, 0.2, 0],              // Slide 0: Centro
+        [2.2, 0.2, 5, 0.3, 1.8],        // Slide 1: Direita
+        [-2.4, 0, 7.5, 0.1, 3],         // Slide 2: Esquerda
+        [2.3, -0.3, 4.6, 0.45, 2.2],    // Slide 3: Copero
+        [-2.2, 0.3, 6.5, 0.2, 4],       // Slide 4: Painel Professor
+        [0, -2.2, 5, 0.6, 5],           // Slide 5: Tecnologia
+        [0, 0, 9, 0.1, 6.28],           // Slide 6: Fechamento
+        [0, 0, 6, 0.2, 6.28]            // Loop suave
+      ];
+
+      const lerp = (a, b, t) => a + (b - a) * t;
+      let spin = 0;
+
+      function renderLoop() {
+        const p = progressRef.current * TOTAL_SLIDES;
+        const i = Math.min(6, Math.floor(p));
+        const t = p - i;
+        const k0 = keys[i] || keys[0];
+        const k1 = keys[i + 1] || keys[0];
+
+        globe.position.x = lerp(k0[0], k1[0], t);
+        globe.position.y = lerp(k0[1], k1[1], t);
+        camera.position.z = lerp(k0[2], k1[2], t);
+        globe.rotation.x = lerp(k0[3], k1[3], t);
+
+        spin += 0.003;
+        globe.rotation.y = spin + lerp(k0[4], k1[4], t);
+        pins.rotation.y = -spin * 1.5;
+
+        renderer.render(scene, camera);
+        requestAnimationFrame(renderLoop);
+      }
+      renderLoop();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', initGlobe);
+
+    // -------------------------------------------------------------
+    // 5. TELA CHEIA E EXPORTAÇÃO ZIP
+    // -------------------------------------------------------------
+    const fullscreenBtn = document.getElementById('btn-fullscreen');
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    document.getElementById('btn-export-zip').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-export-zip');
+      const origText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando ZIP...';
+      btn.disabled = true;
+
+      try {
+        const zip = new JSZip();
+        // Incluir o próprio arquivo HTML completo
+        const htmlContent = document.documentElement.outerHTML;
+        zip.file("apresentacao_geoeduca.html", htmlContent);
+        zip.file("LEIA-ME.txt", "GeoEduca — Apresentação Interativa em Loop 3D.\nAbra o arquivo 'apresentacao_geoeduca.html' em qualquer navegador web para assistir.");
+        
+        const blob = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "geoeduca-apresentacao-loop.zip";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error("Erro ao gerar ZIP:", err);
+        alert("Erro ao empacotar arquivos. Verifique a conexão.");
+      } finally {
+        btn.innerHTML = origText;
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

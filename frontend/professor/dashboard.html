@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
@@ -127,6 +127,34 @@
       <!-- Stats -->
       <div class="stats-grid" id="stats-container">
         <!-- populated by dashboard.js -->
+      </div>
+
+      <!-- Card da Apresentação em Loop 3D -->
+      <div class="panel" style="margin-bottom: 1.75rem; background: linear-gradient(135deg, #0B0A32 0%, #15144a 60%, #233B0B 100%); color: #F7F3E9; border: 1px solid rgba(204, 164, 59, 0.35); position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(11, 10, 50, 0.25);">
+        <div style="position: absolute; right: -20px; bottom: -30px; opacity: 0.15; pointer-events: none;">
+          <svg width="220" height="220" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="#CCA43B" stroke-width="1.5"/></svg>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; position: relative; z-index: 2;">
+          <div style="max-width: 650px;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(204, 164, 59, 0.18); border: 1px solid rgba(204, 164, 59, 0.35); border-radius: 100px; padding: 4px 14px; font-size: 0.75rem; font-weight: 700; color: #CCA43B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem;">
+              <i class="fa-solid fa-arrows-spin"></i> Apresentação em Loop Automático (6s)
+            </div>
+            <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.5rem;">
+              Apresentação Interativa do <span style="color: #CCA43B;">GeoEduca</span>
+            </h2>
+            <p style="font-size: 0.9rem; opacity: 0.85; line-height: 1.5; color: #F7F3E9;">
+              Pitch deck cinematográfico com Parallax Scrolling, Globo 3D rotativo e rotação contínua de 6 segundos por slide. Ideal para feiras, reuniões pedagógicas e apresentação aos alunos.
+            </p>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+            <a href="apresentacao.html" class="btn btn-primary" style="background: #CCA43B; color: #0B0A32; border: none; font-weight: 700; padding: 0.75rem 1.4rem; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; border-radius: 100px; box-shadow: 0 4px 15px rgba(204, 164, 59, 0.4);">
+              <i class="fa-solid fa-play"></i> Iniciar Apresentação 3D
+            </a>
+            <a href="apresentacao.html" target="_blank" class="btn btn-outline" style="border-color: rgba(255, 255, 255, 0.3); color: #FFFFFF; padding: 0.75rem 1.2rem; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; border-radius: 100px;">
+              <i class="fa-solid fa-up-right-from-square"></i> Abrir em Nova Guia
+            </a>
+          </div>
+        </div>
       </div>
 
       <!-- Main grid: activities + rooms -->
