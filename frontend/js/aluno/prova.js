@@ -176,10 +176,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('btn-confirm-exam');
     if (!btn) return;
 
-    btn.onclick = () => {
+    btn.onclick = async () => {
       closeModal('exam-modal');
       const modal = document.getElementById('exam-taking-modal');
       if (!modal) return;
+
+      // Solicitar Tela Cheia Nativa do Navegador
+      const docEl = document.documentElement;
+      const requestFS = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+      if (requestFS) {
+        try {
+          await requestFS.call(docEl);
+        } catch (err) {
+          console.warn('Fullscreen bloqueado ou cancelado pelo usuário:', err);
+        }
+      }
 
       document.getElementById('exam-taking-title').textContent = exam.titulo;
       const subtitle = document.getElementById('exam-taking-subtitle');
@@ -199,15 +210,125 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('exam-modal').classList.add('active');
   };
 
-  document.addEventListener('visibilitychange', () => {
-    if (isTakingExam && document.visibilityState === 'hidden') {
-      if (!questoesPenalizadas.has(currentQuestionIndex)) {
-        questoesPenalizadas.add(currentQuestionIndex);
-        Toast.error('Violação Anti-Cola!', 'Você saiu da página. A questão atual foi anulada (-0,25 pt).');
-        updatePaginationButtons(); // Update UI to show penalty overlay
-      }
+  // ─── SISTEMA ANTI-COLA AVANÇADO (ABAS VOADORAS, GEMINI, TELAS DIVIDIDAS) ───
+  function penalizeCurrentQuestion(reason) {
+    if (!isTakingExam) return;
+    if (!questoesPenalizadas.has(currentQuestionIndex)) {
+      questoesPenalizadas.add(currentQuestionIndex);
+      Toast.error('Violação Anti-Cola!', `Tentativa de consulta externa detectada (${reason}). A questão atual foi anulada (-0,25 pt).`);
+      updatePaginationButtons();
+    }
+  }
+
+  // 1. Perda de Foco da Janela (detecta cliques no Gemini side panel, abas voadoras, janelas secundárias)
+  window.addEventListener('blur', () => {
+    if (!isTakingExam) return;
+    penalizeCurrentQuestion('Painel de IA / Aba flutuante / Janela externa');
+    const shield = document.getElementById('focus-lost-shield');
+    if (shield) shield.classList.add('active');
+  });
+
+  window.addEventListener('focus', () => {
+    if (!isTakingExam) return;
+    // Remove o shield de perda de foco se estiver em tela cheia
+    const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+    if (isFS) {
+      const shield = document.getElementById('focus-lost-shield');
+      if (shield) shield.classList.remove('active');
     }
   });
+
+  // 2. Mudança de Visibilidade (minimizar ou mudar de aba)
+  document.addEventListener('visibilitychange', () => {
+    if (isTakingExam && document.visibilityState === 'hidden') {
+      penalizeCurrentQuestion('Navegador minimizado / Troca de aba');
+      const shield = document.getElementById('focus-lost-shield');
+      if (shield) shield.classList.add('active');
+    }
+  });
+
+  // 3. Monitoramento de Tela Cheia Obrigatória
+  function handleFullscreenChange() {
+    if (!isTakingExam) return;
+    const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+    const fsOverlay = document.getElementById('fullscreen-required-overlay');
+    if (!isFS) {
+      penalizeCurrentQuestion('Saída do modo tela cheia');
+      if (fsOverlay) fsOverlay.classList.add('active');
+    } else {
+      if (fsOverlay) fsOverlay.classList.remove('active');
+      const shield = document.getElementById('focus-lost-shield');
+      if (shield) shield.classList.remove('active');
+    }
+  }
+
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+  document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+
+  // 4. Bloqueio de Botão Direito (Context Menu)
+  document.addEventListener('contextmenu', (e) => {
+    if (isTakingExam) {
+      e.preventDefault();
+      Toast.error('Ação Bloqueada', 'O botão direito está desativado no ambiente de prova.');
+      return false;
+    }
+  });
+
+  // 5. Bloqueio de Copiar, Recortar, Colar e Arrastar
+  ['copy', 'cut', 'paste', 'dragstart'].forEach(evt => {
+    document.addEventListener(evt, (e) => {
+      if (isTakingExam) {
+        e.preventDefault();
+        Toast.error('Ação Bloqueada', 'Copiar/Colar está desativado durante a avaliação.');
+        return false;
+      }
+    });
+  });
+
+  // 6. Bloqueio de Atalhos de Teclado (DevTools, Copiar, Inspecionar, etc.)
+  document.addEventListener('keydown', (e) => {
+    if (!isTakingExam) return;
+    const key = e.key.toLowerCase();
+
+    // Bloquear F12 e atalhos de desenvolvedor
+    if (key === 'f12' || ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i', 'j', 'c'].includes(key))) {
+      e.preventDefault();
+      penalizeCurrentQuestion('Tentativa de abrir DevTools');
+      return false;
+    }
+
+    // Bloquear Ctrl+C, Ctrl+V, Ctrl+A, Ctrl+U (código fonte), Ctrl+P (imprimir), Ctrl+S
+    if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x', 'a', 'u', 'p', 's'].includes(key)) {
+      e.preventDefault();
+      Toast.error('Ação Bloqueada', 'Atalhos de teclado estão desativados na prova.');
+      return false;
+    }
+  });
+
+  // Funções globais de recuperação de tela
+  window.recoverExamFocus = () => {
+    const shield = document.getElementById('focus-lost-shield');
+    if (shield) shield.classList.remove('active');
+    window.focus();
+  };
+
+  window.reenterFullscreen = async () => {
+    const docEl = document.documentElement;
+    const requestFS = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+    if (requestFS) {
+      try {
+        await requestFS.call(docEl);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    const fsOverlay = document.getElementById('fullscreen-required-overlay');
+    if (fsOverlay) fsOverlay.classList.remove('active');
+    const shield = document.getElementById('focus-lost-shield');
+    if (shield) shield.classList.remove('active');
+    window.focus();
+  };
 
   function updatePaginationButtons() {
     if (!currentProva || !currentProva.questoes) return;
@@ -332,6 +453,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       isTakingExam = false;
+      if (document.fullscreenElement) {
+        const exitFS = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+        if (exitFS) {
+          try { await exitFS.call(document); } catch (e) {}
+        }
+      }
       if (!isForced) {
         Toast.success('Sucesso!', 'Prova enviada com sucesso! Redirecionando...');
         setTimeout(() => {

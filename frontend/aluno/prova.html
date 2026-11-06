@@ -89,6 +89,57 @@
     .penalized-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); backdrop-filter: blur(2px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; display: none; }
     .penalized-overlay.active { display: flex; }
     .penalized-msg { background: #fee2e2; color: #ef4444; padding: 1.5rem 2rem; border-radius: 8px; font-weight: 700; text-align: center; border: 1px solid #fca5a5; max-width: 80%; display: flex; flex-direction: column; gap: 0.5rem; align-items: center; }
+    
+    /* Anti-cola avançado e proteção de conteúdo */
+    .exam-fullscreen-overlay {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    
+    .fullscreen-required-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.97);
+      backdrop-filter: blur(14px);
+      z-index: 10001;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      color: #fff;
+    }
+    .fullscreen-required-overlay.active {
+      display: flex;
+    }
+
+    .focus-lost-shield {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(16px);
+      z-index: 25;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      border-radius: 12px;
+      color: #fff;
+      text-align: center;
+    }
+    .focus-lost-shield.active {
+      display: flex;
+    }
   </style>
 </head>
 <body>
@@ -138,16 +189,16 @@
     
     <ul class="warning-list">
       <li>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-        O tempo começará a contar assim que você clicar em "Iniciar" e não pode ser pausado.
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+        <strong>Tela Cheia Bloqueada:</strong> A prova roda em tela cheia obrigatória. Sair da tela cheia anula a questão atual (-0,25 pt).
+      </li>
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+        <strong>Proibido Abas Flutuantes e IA:</strong> Painéis laterais de IA (Gemini/Copilot) e janelas paralelas são detectados e bloqueados no ato.
       </li>
       <li>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
-        Navegar para fora da página ou fechar a aba encerrará a prova automaticamente.
-      </li>
-      <li>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        Certifique-se de ter uma conexão estável com a internet.
+        <strong>Cópia e Atalhos Desativados:</strong> Botão direito, seleção de texto e atalhos de desenvolvedor estão desabilitados.
       </li>
     </ul>
 
@@ -181,8 +232,34 @@
     </div>
   </div>
   
+  <!-- Bloqueio de Tela Cheia -->
+  <div class="fullscreen-required-overlay" id="fullscreen-required-overlay">
+    <div style="background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 2.5rem; max-width: 520px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #fef3c7; color: #d97706; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+      </div>
+      <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.75rem;">Tela Cheia Obrigatória!</h2>
+      <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+        O modo tela cheia foi desativado. Para garantir a segurança contra abas externas e painéis de IA, retorne à tela cheia para continuar.
+      </p>
+      <button class="btn-exam primary" style="width: 100%; padding: 0.85rem;" onclick="reenterFullscreen()">Reativar Tela Cheia</button>
+    </div>
+  </div>
+
   <div class="exam-main-container">
-    <div class="exam-question-card">
+    <div class="exam-question-card" translate="no">
+      <!-- Shield quando a janela perde foco para painéis de IA ou janelas externas -->
+      <div class="focus-lost-shield" id="focus-lost-shield">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+        </div>
+        <h3 style="font-size: 1.35rem; font-weight: 700; color: #f87171; margin-bottom: 0.5rem;">Foco da Prova Perdido!</h3>
+        <p style="max-width: 480px; color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.25rem;">
+          Detectamos clique fora da avaliação (painel lateral de IA como Gemini/Copilot, aba flutuante ou janela externa). O conteúdo foi ocultado e a questão foi anulada (-0,25 pt).
+        </p>
+        <button class="btn-exam primary" onclick="recoverExamFocus()">Retornar à Prova</button>
+      </div>
+
       <div class="penalized-overlay" id="penalized-overlay">
         <div class="penalized-msg">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>

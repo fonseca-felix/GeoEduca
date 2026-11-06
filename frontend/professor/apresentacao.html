@@ -362,12 +362,22 @@
     }
 
     .text-gold-gradient {
-      background: var(--gradient-gold);
+      background: linear-gradient(135deg, #FFF5D0 0%, #F5CE62 50%, #E5A922 100%);
       background-size: 200% 200%;
       animation: shine 4s linear infinite;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 2px 10px rgba(7, 6, 31, 0.95));
+      filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.95));
+    }
+
+    .content-card-glass {
+      background: linear-gradient(145deg, rgba(11, 10, 50, 0.88) 0%, rgba(7, 6, 31, 0.94) 100%);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid rgba(216, 177, 74, 0.4);
+      border-radius: 26px;
+      padding: 36px 40px;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }
 
     .reveal {
@@ -673,22 +683,22 @@
       </div>
       <div class="content-container">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: center; gap: 40px;">
-          <div class="reveal">
+          <div class="reveal content-card-glass">
             <p class="kicker"><i class="fa-solid fa-paw"></i> 04 · Mascote & Narrativa</p>
-            <h2 style="font-size: clamp(2.4rem, 4.5vw, 4rem);">
+            <h2 style="font-size: clamp(2.4rem, 4.5vw, 4rem); color: #FFFFFF; text-shadow: 0 4px 20px rgba(0,0,0,0.9);">
               Copero <span class="text-gold-gradient">Explorador</span>
             </h2>
-            <p style="font-size: 1.1rem; color: var(--muted-foreground); margin-top: 18px; line-height: 1.7;">
-              A capivara exploradora que guia o estudante em cada expedição. Traz feedbacks positivos, dicas com rigor científico e curiosidades integradas ao acervo do <strong>IBGE Educa</strong>.
+            <p style="font-size: 1.15rem; color: #F7F3E9; font-weight: 500; margin-top: 18px; line-height: 1.75; text-shadow: 0 2px 10px rgba(0,0,0,0.95);">
+              A capivara exploradora que guia o estudante em cada expedição. Traz feedbacks positivos, dicas com rigor científico e curiosidades integradas ao acervo do <strong style="color: var(--gold-light);">IBGE Educa</strong>.
             </p>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 28px;">
-              <div class="glass tilt">
+              <div class="glass tilt" style="background: rgba(7, 6, 31, 0.8); border-color: rgba(216, 177, 74, 0.35);">
                 <p style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: var(--gold);">27</p>
-                <p style="font-size: 0.85rem; color: var(--muted-foreground);">Unidades Federativas com dados reais</p>
+                <p style="font-size: 0.85rem; color: #F7F3E9; opacity: 0.9;">Unidades Federativas com dados reais</p>
               </div>
-              <div class="glass tilt">
+              <div class="glass tilt" style="background: rgba(7, 6, 31, 0.8); border-color: rgba(216, 177, 74, 0.35);">
                 <p style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: var(--gold);">6</p>
-                <p style="font-size: 0.85rem; color: var(--muted-foreground);">Biomas Brasileiros mapeados</p>
+                <p style="font-size: 0.85rem; color: #F7F3E9; opacity: 0.9;">Biomas Brasileiros mapeados</p>
               </div>
             </div>
           </div>
@@ -1096,45 +1106,7 @@
         opacity: 0.7
       })));
 
-      // Pinos Orbitantes Dourados (Anexados ao Globo)
-      const pins = new THREE.Group();
-      for (let i = 0; i < 6; i++) {
-        const pin = new THREE.Mesh(
-          new THREE.ConeGeometry(0.05, 0.16, 12),
-          new THREE.MeshStandardMaterial({ color: 0xcca43b, emissive: 0x6a5010 })
-        );
-        const a = (i / 6) * Math.PI * 2;
-        pin.position.set(Math.cos(a) * 2.1, Math.sin(a * 2) * 0.4, Math.sin(a) * 2.1);
-        pin.rotation.x = Math.PI;
-        pins.add(pin);
-      }
-      globe.add(pins);
-
-      // Efeito Atmosférico Suave no Globo (Fresnel Rim Glow anexado ao Globo)
-      const atmo = new THREE.Mesh(
-        new THREE.SphereGeometry(1.54, 48, 48),
-        new THREE.ShaderMaterial({
-          transparent: true,
-          side: THREE.BackSide,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-          vertexShader: `
-            varying vec3 vNormal;
-            void main(){
-              vNormal = normalize(normalMatrix * normal);
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `,
-          fragmentShader: `
-            varying vec3 vNormal;
-            void main(){
-              float edge = pow(1.0 - abs(vNormal.z), 3.0);
-              gl_FragColor = vec4(0.85, 0.70, 0.25, 1.0) * edge * 0.35;
-            }
-          `
-        })
-      );
-      globe.add(atmo);
+      // (Pinos e atmosfera brilhante removidos para eliminar o ofuscamento dos textos)
 
       scene.add(new THREE.AmbientLight(0xffffff, 0.5));
       const sun = new THREE.DirectionalLight(0xfff1d0, 2.2);
@@ -1171,7 +1143,7 @@
 
         spin += 0.006;
         globe.rotation.y = spin + lerp(k0[4], k1[4], e);
-        pins.rotation.y = -spin * 1.5;
+        // pins removed
 
         renderer.render(scene, camera);
         requestAnimationFrame(renderLoop);

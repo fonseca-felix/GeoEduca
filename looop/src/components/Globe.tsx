@@ -61,27 +61,7 @@ export function Globe({ progressRef }: { progressRef: { current: number } }) {
       pg.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
       globe.add(new THREE.Points(pg, new THREE.PointsMaterial({ color: 0xcca43b, size: 0.012, transparent: true, opacity: 0.7 })));
 
-      // Orbiting pins
-      const pins = new THREE.Group();
-      for (let i = 0; i < 6; i++) {
-        const pin = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.16, 12), new THREE.MeshStandardMaterial({ color: 0xcca43b, emissive: 0x6a5010 }));
-        const a = (i / 6) * Math.PI * 2;
-        pin.position.set(Math.cos(a) * 2.1, Math.sin(a * 2) * 0.4, Math.sin(a) * 2.1);
-        pin.rotation.x = Math.PI;
-        pins.add(pin);
-      }
-      scene.add(pins);
-
-      // Atmosphere (fresnel)
-      const atmo = new THREE.Mesh(
-        new THREE.SphereGeometry(1.75, 64, 64),
-        new THREE.ShaderMaterial({
-          transparent: true, side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false,
-          vertexShader: `varying vec3 vN; void main(){ vN = normalize(normalMatrix*normal); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
-          fragmentShader: `varying vec3 vN; void main(){ float i = pow(max(0.62 - dot(vN, vec3(0,0,1.0)), 0.0), 4.0); gl_FragColor = vec4(0.8,0.64,0.23,1.0)*i*0.7; }`,
-        }),
-      );
-      scene.add(atmo);
+// pins and blinding atmo removed
 
       scene.add(new THREE.AmbientLight(0xffffff, 0.5));
       const sun = new THREE.DirectionalLight(0xfff1d0, 2.2);
@@ -102,12 +82,12 @@ export function Globe({ progressRef }: { progressRef: { current: number } }) {
         const a = keys[i]!, b = keys[i + 1]!;
         spin += 0.006;
         globe.position.set(lerp(a[0], b[0], e), lerp(a[1], b[1], e), 0);
-        atmo.position.copy(globe.position);
-        pins.position.copy(globe.position);
+        
+        
         camera.position.z = lerp(a[2], b[2], e);
         globe.rotation.x = lerp(a[3], b[3], e);
         globe.rotation.y = spin + lerp(a[4], b[4], e);
-        pins.rotation.y -= 0.004;
+        
         renderer.render(scene, camera);
         raf = requestAnimationFrame(tick);
       };
