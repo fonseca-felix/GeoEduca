@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../../firebase/firebase-admin');
 const { authenticateToken, requireProfessor } = require('../middleware/auth');
+const { getAlunosBySalaId } = require('../utils/envioHelpers');
 
 const router = express.Router();
 
@@ -136,11 +137,9 @@ router.delete('/:id', authenticateToken, requireProfessor, async (req, res) => {
             return res.status(404).json({ error: 'Sala não encontrada' });
         }
         
-        // Verificar se há alunos na sala
-        const alunosRef = db.collection('alunos');
-        const alunos = await alunosRef.where('salaId', '==', id).limit(1).get();
-        
-        if (!alunos.empty) {
+        // Verificar se há alunos na sala (tanto por salaId quanto por array de salas)
+        const alunosNaSala = await getAlunosBySalaId(db, id);
+        if (alunosNaSala.length > 0) {
             return res.status(400).json({ error: 'Não é possível remover sala com alunos. Remova os alunos primeiro.' });
         }
         
@@ -201,12 +200,39 @@ router.post('/entrar', authenticateToken, async (req, res) => {
         const sala = salasSnap.docs[0];
         const salaData = sala.data();
         
-        await db.collection('alunos').doc(alunoId).update({
+        const alunoRef = db.collection('alunos').doc(alunoId);
+        const alunoDoc = await alunoRef.get();
+        if (!alunoDoc.exists) {
+            return res.status(404).json({ error: 'Aluno não encontrado.' });
+        }
+        
+        const alunoData = alunoDoc.data() || {};
+        let salas = Array.isArray(alunoData.salas) ? [...alunoData.salas] : [];
+        let salasNomes = Array.isArray(alunoData.salasNomes) ? [...alunoData.salasNomes] : [];
+
+        if (alunoData.salaId && !salas.includes(alunoData.salaId)) {
+            salas.push(alunoData.salaId);
+            salasNomes.push(alunoData.salaNome || 'Turma');
+        }
+
+        if (!salas.includes(sala.id)) {
+            salas.push(sala.id);
+            salasNomes.push(salaData.nome);
+        }
+        
+        await alunoRef.update({
             salaId: sala.id,
-            salaNome: salaData.nome
+            salaNome: salaData.nome,
+            salas,
+            salasNomes
         });
         
-        res.json({ message: 'Você entrou na turma com sucesso!', sala: { id: sala.id, nome: salaData.nome } });
+        res.json({
+            message: 'Você entrou na turma com sucesso!',
+            sala: { id: sala.id, nome: salaData.nome },
+            salas,
+            salasNomes
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao tentar entrar na turma' });
@@ -218,9 +244,13 @@ router.get('/:id/relatorio', authenticateToken, requireProfessor, async (req, re
     try {
         const { id } = req.params;
         
-        // 1. Pegar alunos
-        const alunosSnap = await db.collection('alunos').where('salaId', '==', id).get();
-        const alunos = alunosSnap.docs.map(d => ({ id: d.id, nome: d.data().nome, rm: d.data().rm }));
+        // 1. Pegar alunos (tanto por salaId quanto por array salas)
+        const alunosSnapshots = await getAlunosBySalaId(db, id);
+        const alunos = alunosSnapshots.map(d => ({
+            id: d.id,
+            nome: d.data().nome,
+            rm: d.data().rm
+        }));
         
         // 2. Pegar contagem de provas enviadas para a sala (não importa qual)
         const provasEnviadasSnap = await db.collection('provas_enviadas').where('salaId', '==', id).get();
@@ -234,7 +264,6 @@ router.get('/:id/relatorio', authenticateToken, requireProfessor, async (req, re
         });
 
         // 3. Pegar respostas das provas para a sala
-        // Note: As respostas têm 'alunoId' mas não necessariamente 'salaId', precisamos filtrar por aluno
         for (const aluno of alunos) {
             const respsSnap = await db.collection('prova_respostas').where('alunoId', '==', aluno.id).get();
             if (provasPorAluno[aluno.id]) {

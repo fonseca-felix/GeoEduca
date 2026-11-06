@@ -317,7 +317,7 @@
       line-height: 0.85;
       letter-spacing: -0.04em;
       color: transparent;
-      -webkit-text-stroke: 1px rgba(216, 177, 74, 0.30);
+      -webkit-text-stroke: 1px rgba(216, 177, 74, 0.12);
       will-change: transform;
     }
 
@@ -367,6 +367,18 @@
       animation: shine 4s linear infinite;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 10px rgba(7, 6, 31, 0.95));
+    }
+
+    .reveal {
+      position: relative;
+      z-index: 25;
+    }
+    .reveal h1, .reveal h2 {
+      text-shadow: 0 4px 25px rgba(7, 6, 31, 0.98), 0 2px 6px rgba(7, 6, 31, 0.95);
+    }
+    .reveal p {
+      text-shadow: 0 2px 14px rgba(7, 6, 31, 0.98), 0 1px 3px rgba(7, 6, 31, 0.95);
     }
 
     /* Cartões Glassmorphism com animação bob de flutuação */
@@ -1084,7 +1096,7 @@
         opacity: 0.7
       })));
 
-      // Pinos Orbitantes Dourados
+      // Pinos Orbitantes Dourados (Anexados ao Globo)
       const pins = new THREE.Group();
       for (let i = 0; i < 6; i++) {
         const pin = new THREE.Mesh(
@@ -1096,33 +1108,33 @@
         pin.rotation.x = Math.PI;
         pins.add(pin);
       }
-      scene.add(pins);
+      globe.add(pins);
 
-      // Efeito Atmosférico (Fresnel Glow)
+      // Efeito Atmosférico Suave no Globo (Fresnel Rim Glow anexado ao Globo)
       const atmo = new THREE.Mesh(
-        new THREE.SphereGeometry(1.75, 64, 64),
+        new THREE.SphereGeometry(1.54, 48, 48),
         new THREE.ShaderMaterial({
           transparent: true,
           side: THREE.BackSide,
           blending: THREE.AdditiveBlending,
           depthWrite: false,
           vertexShader: `
-            varying vec3 vN;
+            varying vec3 vNormal;
             void main(){
-              vN = normalize(normalMatrix * normal);
+              vNormal = normalize(normalMatrix * normal);
               gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
             }
           `,
           fragmentShader: `
-            varying vec3 vN;
+            varying vec3 vNormal;
             void main(){
-              float i = pow(max(0.62 - dot(vN, vec3(0, 0, 1.0)), 0.0), 4.0);
-              gl_FragColor = vec4(0.8, 0.64, 0.23, 1.0) * i * 0.7;
+              float edge = pow(1.0 - abs(vNormal.z), 3.0);
+              gl_FragColor = vec4(0.85, 0.70, 0.25, 1.0) * edge * 0.35;
             }
           `
         })
       );
-      scene.add(atmo);
+      globe.add(atmo);
 
       scene.add(new THREE.AmbientLight(0xffffff, 0.5));
       const sun = new THREE.DirectionalLight(0xfff1d0, 2.2);

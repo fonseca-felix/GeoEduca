@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { db } = require('../../firebase/firebase-admin');
 const { authenticateToken, requireProfessor, requireAluno } = require('../middleware/auth');
+const { getAlunosBySalaId } = require('../utils/envioHelpers');
 
 const router = express.Router();
 
@@ -177,12 +178,16 @@ router.get('/', authenticateToken, requireProfessor, async (req, res) => {
         const alunos = [];
         snapshot.forEach(doc => {
             const data = doc.data();
+            const salas = Array.isArray(data.salas) ? data.salas : (data.salaId ? [data.salaId] : []);
+            const salasNomes = Array.isArray(data.salasNomes) ? data.salasNomes : (data.salaNome ? [data.salaNome] : []);
             alunos.push({
                 id: doc.id,
                 rm: data.rm,
                 nome: data.nome,
-                salaId: data.salaId,
-                salaNome: data.salaNome,
+                salaId: data.salaId || (salas.length > 0 ? salas[0] : null),
+                salaNome: data.salaNome || (salasNomes.length > 0 ? salasNomes[0] : null),
+                salas,
+                salasNomes,
                 senhaVisivel: data.senhaVisivel || null,
                 createdAt: data.createdAt
             });
@@ -199,18 +204,21 @@ router.get('/', authenticateToken, requireProfessor, async (req, res) => {
 router.get('/sala/:salaId', authenticateToken, requireProfessor, async (req, res) => {
     try {
         const { salaId } = req.params;
-        const alunosRef = db.collection('alunos');
-        const snapshot = await alunosRef.where('salaId', '==', salaId).get();
+        const docs = await getAlunosBySalaId(db, salaId);
         
         const alunos = [];
-        snapshot.forEach(doc => {
+        docs.forEach(doc => {
             const data = doc.data();
+            const salas = Array.isArray(data.salas) ? data.salas : (data.salaId ? [data.salaId] : []);
+            const salasNomes = Array.isArray(data.salasNomes) ? data.salasNomes : (data.salaNome ? [data.salaNome] : []);
             alunos.push({
                 id: doc.id,
                 rm: data.rm,
                 nome: data.nome,
-                salaId: data.salaId,
-                salaNome: data.salaNome,
+                salaId: data.salaId || (salas.length > 0 ? salas[0] : null),
+                salaNome: data.salaNome || (salasNomes.length > 0 ? salasNomes[0] : null),
+                salas,
+                salasNomes,
                 senhaVisivel: data.senhaVisivel || null
             });
         });
@@ -259,8 +267,13 @@ router.post('/entrar-sala', authenticateToken, requireAluno, async (req, res) =>
         salas.push(salaId);
         salasNomes.push(salaData.nome);
         
-        await alunoRef.update({ salas, salasNomes });
-        res.json({ message: 'Entrou na turma com sucesso', salas, salasNomes });
+        await alunoRef.update({ 
+            salas, 
+            salasNomes,
+            salaId: salaId,
+            salaNome: salaData.nome
+        });
+        res.json({ message: 'Entrou na turma com sucesso', salas, salasNomes, salaId, salaNome: salaData.nome });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao entrar na turma' });
@@ -383,6 +396,8 @@ router.post('/', authenticateToken, requireProfessor, async (req, res) => {
             senhaVisivel: senha,
             salaId,
             salaNome: salaData.nome,
+            salas: [salaId],
+            salasNomes: [salaData.nome],
             createdAt: new Date().toISOString()
         };
         
@@ -444,6 +459,8 @@ router.put('/:id', authenticateToken, requireProfessor, async (req, res) => {
             if (!sala.exists) {
                 return res.status(404).json({ error: 'Sala não encontrada' });
             }
+            updates.salaId = salaId;
+            updates.salaNome = sala.data().nome;
             updates.salas = [salaId];
             updates.salasNomes = [sala.data().nome];
         }

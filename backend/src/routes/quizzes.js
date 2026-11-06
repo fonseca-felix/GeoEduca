@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../../firebase/firebase-admin');
 const { authenticateToken, requireProfessor, requireAluno } = require('../middleware/auth');
+const { getAlunosBySalaId } = require('../utils/envioHelpers');
 
 const router = express.Router();
 
@@ -73,8 +74,8 @@ router.post('/enviar', authenticateToken, requireProfessor, async (req, res) => 
 
         let targets = [];
         if (salaId) {
-            const alunosSnap = await db.collection('alunos').where('salaId', '==', salaId).get();
-            targets = alunosSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const alunosDocs = await getAlunosBySalaId(db, salaId);
+            targets = alunosDocs.map(d => ({ id: d.id, ...d.data() }));
         } else if (Array.isArray(alunoIds) && alunoIds.length > 0) {
             targets = await getAlunoDocsByIds(alunoIds);
         } else if (alunoId) {
@@ -372,11 +373,10 @@ router.get('/:id/resultados/sala/:salaId', authenticateToken, requireProfessor, 
     try {
         const { id, salaId } = req.params;
 
-        const alunosRef = db.collection('alunos');
-        const alunos = await alunosRef.where('salaId', '==', salaId).get();
+        const alunosDocs = await getAlunosBySalaId(db, salaId);
 
         const resultados = [];
-        for (const alunoDoc of alunos.docs) {
+        for (const alunoDoc of alunosDocs) {
             const respostasRef = db.collection('quiz_respostas');
             const resposta = await respostasRef
                 .where('quizId', '==', id)
@@ -424,9 +424,9 @@ router.get('/:id/relatorioDetalhado/sala/:salaId', authenticateToken, requirePro
         });
 
         // 3. Buscar alunos da sala
-        const alunosSnapshot = await db.collection('alunos').where('salaId', '==', salaId).get();
+        const alunosDocs = await getAlunosBySalaId(db, salaId);
         const alunosMap = {};
-        alunosSnapshot.forEach(doc => {
+        alunosDocs.forEach(doc => {
             alunosMap[doc.id] = { id: doc.id, nome: doc.data().nome };
         });
 

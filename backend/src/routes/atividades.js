@@ -1,7 +1,7 @@
 const express = require('express');
 const { db } = require('../../firebase/firebase-admin');
 const { authenticateToken, requireProfessor, requireAluno } = require('../middleware/auth');
-const { getAlunoDocsByIds, normalizeAlunoIds } = require('../utils/envioHelpers');
+const { getAlunoDocsByIds, normalizeAlunoIds, getAlunoDocsBySalaId } = require('../utils/envioHelpers');
 
 const router = express.Router();
 
@@ -30,8 +30,7 @@ async function criarEnviosAtividade({ atividadeId, salaId, alunoId, alunoIds, da
     if (ids.length > 0) {
         targets = await getAlunoDocsByIds(db, ids);
     } else if (salaId) {
-        const alunosSnap = await db.collection('alunos').where('salaId', '==', salaId).get();
-        targets = alunosSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        targets = await getAlunoDocsBySalaId(db, salaId);
     }
 
     if (!targets.length) {

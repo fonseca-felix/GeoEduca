@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../../firebase/firebase-admin');
 const { authenticateToken, requireProfessor, requireAluno } = require('../middleware/auth');
+const { getAlunosBySalaId } = require('../utils/envioHelpers');
 const { gerarCasoDetetive } = require('../services/geminiService');
 
 const router = express.Router();
@@ -118,14 +119,14 @@ router.get('/relatorio/:salaId', authenticateToken, requireProfessor, async (req
     try {
         const { salaId } = req.params;
 
-        // Buscar alunos da sala
-        const alunosSnap = await db.collection('alunos').where('salaId', '==', salaId).get();
-        if (alunosSnap.empty) {
+        // Buscar alunos da sala (salaId ou salas array)
+        const alunosDocs = await getAlunosBySalaId(db, salaId);
+        if (!alunosDocs.length) {
             return res.json({ salaId, alunos: [], totalPartidas: 0 });
         }
 
         const alunosMap = {};
-        alunosSnap.forEach(doc => { alunosMap[doc.id] = doc.data(); });
+        alunosDocs.forEach(doc => { alunosMap[doc.id] = doc.data(); });
 
         // Buscar todas as partidas e filtrar pela sala em memória
         const partidasSnap = await db.collection('detetive_partidas').get();

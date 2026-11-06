@@ -119,7 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const filtered = alunos.filter(a => {
       const matchSearch = a.nome.toLowerCase().includes(searchTerm) || a.rm.includes(searchTerm);
-      const matchRoom = roomFilter === '' || a.salaId === roomFilter;
+      const studentRooms = Array.isArray(a.salas) && a.salas.length > 0 ? a.salas : (a.salaId ? [a.salaId] : []);
+      const matchRoom = roomFilter === '' || studentRooms.includes(roomFilter);
       return matchSearch && matchRoom;
     });
 
@@ -139,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </td>
           <td style="font-family: monospace; color: #4b5563;">${a.rm}</td>
-          <td style="font-weight: 500; color: #374151;">${a.salaNome}</td>
+          <td style="font-weight: 500; color: #374151;">${(a.salasNomes && a.salasNomes.length > 0) ? a.salasNomes.join(', ') : (a.salaNome || 'Sem turma')}</td>
           <td>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <div style="flex: 1; height: 6px; background: #e5e7eb; border-radius: 999px; min-width: 80px;">
@@ -200,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('editStudentIdDb').value = aluno.id;
     document.getElementById('editStudentName').value = aluno.nome;
     document.getElementById('editStudentRm').value = aluno.rm;
-    document.getElementById('editStudentRoom').value = aluno.salaId;
+    document.getElementById('editStudentRoom').value = aluno.salaId || (aluno.salas && aluno.salas[0]) || '';
     document.getElementById('editStudentPassword').value = aluno.senhaVisivel || '';
 
     Modal.open('editStudentModal');

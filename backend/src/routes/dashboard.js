@@ -25,8 +25,11 @@ router.get('/', authenticateToken, requireProfessor, async (req, res) => {
         // Contagem de alunos por sala
         const alunosPorSala = {};
         alunosSnap.forEach(doc => {
-            const { salaId } = doc.data();
-            if (salaId) alunosPorSala[salaId] = (alunosPorSala[salaId] || 0) + 1;
+            const d = doc.data();
+            const studentRooms = Array.isArray(d.salas) && d.salas.length > 0 ? d.salas : (d.salaId ? [d.salaId] : []);
+            studentRooms.forEach(sId => {
+                alunosPorSala[sId] = (alunosPorSala[sId] || 0) + 1;
+            });
         });
 
         // Top salas com mais alunos

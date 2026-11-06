@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../../firebase/firebase-admin');
 const { authenticateToken, requireProfessor, requireAluno } = require('../middleware/auth');
+const { getAlunosBySalaId } = require('../utils/envioHelpers');
 
 const router = express.Router();
 
@@ -75,8 +76,8 @@ router.post('/enviar', authenticateToken, requireProfessor, async (req, res) => 
 
         let targets = [];
         if (salaId) {
-            const alunosSnap = await db.collection('alunos').where('salaId', '==', salaId).get();
-            targets = alunosSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const alunosDocs = await getAlunosBySalaId(db, salaId);
+            targets = alunosDocs.map(d => ({ id: d.id, ...d.data() }));
         } else if (Array.isArray(alunoIds) && alunoIds.length > 0) {
             targets = await getAlunoDocsByIds(alunoIds);
         } else if (alunoId) {
@@ -392,11 +393,10 @@ router.get('/:id/respostas/sala/:salaId', authenticateToken, requireProfessor, a
     try {
         const { id, salaId } = req.params;
 
-        const alunosRef = db.collection('alunos');
-        const alunos = await alunosRef.where('salaId', '==', salaId).get();
+        const alunosDocs = await getAlunosBySalaId(db, salaId);
 
         const resultado = [];
-        for (const alunoDoc of alunos.docs) {
+        for (const alunoDoc of alunosDocs) {
             const respostasRef = db.collection('prova_respostas');
             const resposta = await respostasRef
                 .where('provaId', '==', id)

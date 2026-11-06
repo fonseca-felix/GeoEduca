@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../../firebase/firebase-admin');
 const { authenticateToken, requireProfessor, requireAluno } = require('../middleware/auth');
+const { getAlunosBySalaId } = require('../utils/envioHelpers');
 
 const router = express.Router();
 
@@ -172,14 +173,14 @@ router.get('/:id/resultados-professor/:salaId', authenticateToken, requireProfes
     try {
         const { id, salaId } = req.params;
         
-        // Buscar alunos da sala
-        const alunosSnap = await db.collection('alunos').where('salaId', '==', salaId).get();
-        if (alunosSnap.empty) {
+        // Buscar alunos da sala (salaId ou salas array)
+        const alunosDocs = await getAlunosBySalaId(db, salaId);
+        if (!alunosDocs.length) {
             return res.json([]);
         }
 
         const alunosMap = {};
-        alunosSnap.forEach(doc => {
+        alunosDocs.forEach(doc => {
             alunosMap[doc.id] = doc.data();
         });
 
@@ -252,10 +253,12 @@ router.get('/:id/resultados-completos', authenticateToken, requireProfessor, asy
         const alunosStats = {};
         alunosSnap.forEach(doc => {
             const data = doc.data();
+            const studentRooms = Array.isArray(data.salas) && data.salas.length > 0 ? data.salas : (data.salaId ? [data.salaId] : []);
             alunosStats[doc.id] = {
                 alunoId: doc.id,
                 alunoNome: data.nome,
-                salaId: data.salaId,
+                salaId: data.salaId || studentRooms[0] || null,
+                salas: studentRooms,
                 total: 0,
                 semanal: 0,
                 mensal: 0,
@@ -284,10 +287,12 @@ router.get('/:id/resultados-completos', authenticateToken, requireProfessor, asy
                 if (diffDays <= 180) alunosStats[aId].semestral += pts;
                 if (diffDays <= 365) alunosStats[aId].anual += pts;
                 
-                const sId = alunosStats[aId].salaId;
-                if (sId && salasMap[sId]) {
-                    salasMap[sId].totalPts += pts;
-                }
+                const sRooms = alunosStats[aId].salas || [];
+                sRooms.forEach(sId => {
+                    if (salasMap[sId]) {
+                        salasMap[sId].totalPts += pts;
+                    }
+                });
             }
         });
 
@@ -297,7 +302,7 @@ router.get('/:id/resultados-completos', authenticateToken, requireProfessor, asy
         const porSala = {};
         Object.keys(salasMap).forEach(sId => {
             porSala[sId] = Object.values(alunosStats)
-                .filter(a => a.salaId === sId)
+                .filter(a => a.salas.includes(sId) || a.salaId === sId)
                 .sort((a, b) => b.total - a.total);
         });
 

@@ -63,14 +63,18 @@ router.post('/', csrfProtection, async (req, res) => {
         process.env.JWT_SECRET || 'geoeduca_secret_default_key_2026',
         { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
       );
+      const userSalas = Array.isArray(alunoData.salas) ? alunoData.salas : (alunoData.salaId ? [alunoData.salaId] : []);
+      const userSalasNomes = Array.isArray(alunoData.salasNomes) ? alunoData.salasNomes : (alunoData.salaNome ? [alunoData.salaNome] : []);
       return res.json({
         token,
         usuario: {
           id: aluno.id,
           rm: alunoData.rm,
           nome: alunoData.nome,
-          salaId: alunoData.salaId,
-          salaNome: alunoData.salaNome,
+          salaId: alunoData.salaId || userSalas[0] || null,
+          salaNome: alunoData.salaNome || userSalasNomes[0] || null,
+          salas: userSalas,
+          salasNomes: userSalasNomes,
           tipo: 'aluno'
         }
       });

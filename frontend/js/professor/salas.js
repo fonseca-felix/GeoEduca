@@ -53,7 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Count alunos per sala
       const contagemPorSala = {};
       alunosData.forEach(a => {
-        contagemPorSala[a.salaId] = (contagemPorSala[a.salaId] || 0) + 1;
+        const studentRooms = Array.isArray(a.salas) && a.salas.length > 0 ? a.salas : (a.salaId ? [a.salaId] : []);
+        studentRooms.forEach(rId => {
+          contagemPorSala[rId] = (contagemPorSala[rId] || 0) + 1;
+        });
       });
       
       const sorted = sortSalas(salasData);
