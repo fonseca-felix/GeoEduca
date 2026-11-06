@@ -6,24 +6,10 @@ const { sendProfessorWelcomeEmail, sendPasswordResetCodeEmail } = require('../se
 // Nova função unificada de Login
 const login = async (req, res) => {
     try {
-        const { identificador, senha, 'g-recaptcha-response': recaptchaResponse } = req.body;
+        const { identificador, senha } = req.body;
 
         if (!identificador || !senha) {
             return res.status(400).json({ error: 'Identificador e senha são obrigatórios' });
-        }
-
-        // Verify reCAPTCHA if secret is set (skip on 2nd step when codigoVerificacao is being submitted)
-        const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
-        if (recaptchaSecret) {
-            if (!recaptchaResponse) {
-                return res.status(400).json({ error: 'Validação de reCAPTCHA é obrigatória' });
-            }
-            const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecret}&response=${recaptchaResponse}`;
-            const response = await fetch(verifyUrl, { method: 'POST' });
-            const recaptchaData = await response.json();
-            if (!recaptchaData.success) {
-                return res.status(400).json({ error: 'Falha na validação do reCAPTCHA' });
-            }
         }
 
         // 1. Checar Master Admin

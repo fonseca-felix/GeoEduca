@@ -97,7 +97,6 @@ label>span{font-family:var(--font-display);font-size:.875rem;font-weight:500}
 footer{position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 24px 40px;gap:16px;flex-wrap:wrap}
 svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 </style>
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
 
@@ -182,7 +181,6 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
             </button>
           </div>
         </label>
-        <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" style="margin-bottom: 15px;"></div>
         <p id="login-error" style="color:#ef4444;font-size:.85rem;margin:0;display:none"></p>
         <button class="submit gold-glow" type="submit" id="submit-btn">Entrar na Plataforma</button>
       </form>
@@ -242,7 +240,6 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
             </button>
           </div>
         </label>
-        <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" style="margin-bottom: 15px;"></div>
         <p id="admin-login-error" style="color:#ef4444;font-size:.85rem;margin:0;display:none"></p>
         <button class="submit gold-glow" type="submit" id="admin-submit-btn" style="background:var(--primary); color:white;">Entrar como Escola</button>
       </form>
@@ -384,7 +381,7 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
     }
 
     try {
-      var data = await api.post('/auth/login', { identificador: credential, senha: senha, "g-recaptcha-response": grecaptcha.getResponse() });
+      var data = await api.post('/auth/login', { identificador: credential, senha: senha });
       Auth.save(data.token, data.usuario);
 
       if (data.usuario.tipo === 'master') {
@@ -474,8 +471,7 @@ svg{stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-l
     try {
       var data = await api.post('/auth/login', {
         identificador: credential,
-        senha: senha,
-        "g-recaptcha-response": (typeof grecaptcha !== 'undefined' && grecaptcha.getResponse) ? grecaptcha.getResponse() : ''
+        senha: senha
       });
 
       Auth.save(data.token, data.usuario);
