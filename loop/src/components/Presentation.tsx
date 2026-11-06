@@ -258,8 +258,14 @@ export function Presentation() {
     const loop = (t: number) => { lenis.raf(t); raf = requestAnimationFrame(loop); };
     raf = requestAnimationFrame(loop);
     update(window.scrollY);
+    const auto = window.setInterval(() => {
+      const vh = window.innerHeight;
+      const next = Math.round(lenis.scroll / vh) + 1;
+      lenis.scrollTo(next * vh, { duration: 1.6, force: true });
+    }, 6000);
     return () => {
       cancelAnimationFrame(raf);
+      clearInterval(auto);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("mousemove", onMouse);
       lenis.destroy();
@@ -272,7 +278,7 @@ export function Presentation() {
   return (
     <main className="relative bg-navy-deep">
       <Globe progressRef={progress} />
-      <div className="pointer-events-none fixed inset-0 z-[2] bg-[radial-gradient(ellipse_at_center,transparent_40%,var(--navy-deep)_100%)]" />
+      <div className="pointer-events-none fixed inset-0 z-[2] bg-[radial-gradient(ellipse_at_center,transparent_30%,var(--navy-deep)_95%)]" />
 
       <header className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-5">
         <span className="font-display text-lg font-bold">Geo<span className="text-gold">Educa</span></span>
@@ -280,6 +286,8 @@ export function Presentation() {
           {zipping ? "Gerando…" : "📦 Baixar Código (.ZIP)"}
         </button>
       </header>
+
+      <div className="fixed inset-x-0 bottom-0 z-50 h-1 bg-paper/10"><div key={active} className="progress-bar h-full bg-gold glow-gold" /></div>
 
       <nav className="fixed right-6 top-1/2 z-50 flex -translate-y-1/2 flex-col gap-4" aria-label="Slides">
         {LABELS.map((l, i) => (

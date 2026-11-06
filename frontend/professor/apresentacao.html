@@ -21,17 +21,17 @@
     :root {
       --navy: #0B0A32;
       --navy-deep: #07061F;
-      --gold: #CCA43B;
-      --gold-light: #ECC765;
-      --gold-dark: #9F7B22;
+      --gold: #D8B14A;
+      --gold-light: #F4CE6F;
+      --gold-dark: #A37E22;
       --forest: #233B0B;
       --paper: #F7F3E9;
-      --muted-foreground: rgba(247, 243, 233, 0.65);
-      --border-color: rgba(204, 164, 59, 0.22);
+      --muted-foreground: rgba(247, 243, 233, 0.90);
+      --border-color: rgba(216, 177, 74, 0.45);
       --font-display: 'Space Grotesk', sans-serif;
       --font-sans: 'Inter', sans-serif;
-      --glow-gold: 0 0 28px rgba(204, 164, 59, 0.4), 0 0 2px rgba(204, 164, 59, 0.8);
-      --gradient-gold: linear-gradient(135deg, #F3D98B 0%, #CCA43B 50%, #94711D 100%);
+      --glow-gold: 0 0 28px rgba(216, 177, 74, 0.5), 0 0 2px rgba(216, 177, 74, 0.9);
+      --gradient-gold: linear-gradient(135deg, #F8E5A8 0%, #D8B14A 50%, #9E7A1C 100%);
     }
 
     * {
@@ -70,7 +70,7 @@
       inset: 0;
       z-index: 2;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 40%, var(--navy-deep) 100%);
+      background: radial-gradient(ellipse at center, transparent 30%, var(--navy-deep) 95%);
     }
 
     /* Header e Ações */
@@ -317,7 +317,7 @@
       line-height: 0.85;
       letter-spacing: -0.04em;
       color: transparent;
-      -webkit-text-stroke: 1px rgba(204, 164, 59, 0.16);
+      -webkit-text-stroke: 1px rgba(216, 177, 74, 0.30);
       will-change: transform;
     }
 
@@ -358,34 +358,41 @@
       font-family: var(--font-display);
       font-weight: 800;
       letter-spacing: -0.03em;
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.75);
     }
 
     .text-gold-gradient {
       background: var(--gradient-gold);
+      background-size: 200% 200%;
+      animation: shine 4s linear infinite;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    /* Cartões Glassmorphism */
+    /* Cartões Glassmorphism com animação bob de flutuação */
     .glass {
-      background: linear-gradient(145deg, rgba(11, 10, 50, 0.65), rgba(7, 6, 31, 0.5));
-      backdrop-filter: blur(18px) saturate(140%);
+      background: linear-gradient(145deg, rgba(14, 13, 56, 0.88), rgba(7, 6, 31, 0.82));
+      backdrop-filter: blur(20px) saturate(145%);
       border: 1px solid var(--border-color);
       border-radius: 18px;
-      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       padding: 24px;
       transition: transform 0.3s ease, border-color 0.3s ease;
+      animation: bob 5s ease-in-out infinite;
+    }
+    .glass:nth-child(2n) {
+      animation-delay: -2.5s;
     }
     .glass:hover {
-      border-color: rgba(204, 164, 59, 0.45);
-      box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.7), var(--glow-gold);
+      border-color: rgba(216, 177, 74, 0.7);
+      box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.75), var(--glow-gold);
     }
 
     .tag-badge {
       display: inline-block;
       border-radius: 100px;
-      border: 1px solid rgba(204, 164, 59, 0.4);
-      background: rgba(204, 164, 59, 0.1);
+      border: 1px solid rgba(216, 177, 74, 0.5);
+      background: rgba(216, 177, 74, 0.15);
       padding: 4px 12px;
       font-family: var(--font-display);
       font-size: 0.75rem;
@@ -394,21 +401,40 @@
       margin-bottom: 12px;
     }
 
-    /* Animações de Revelação no Scroll */
+    /* Animações de Revelação no Scroll com Efeito Pop & Desfoque */
     .reveal > * {
       opacity: 0;
       transform: translateY(35px);
       transition: opacity 0.85s ease, transform 0.85s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
     .slide-section.in-view .reveal > * {
-      opacity: 1;
-      transform: none;
+      animation: pop 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) both;
     }
     .slide-section.in-view .reveal > *:nth-child(2) { transition-delay: 0.12s; }
     .slide-section.in-view .reveal > *:nth-child(3) { transition-delay: 0.24s; }
     .slide-section.in-view .reveal > *:nth-child(4) { transition-delay: 0.36s; }
     .slide-section.in-view .reveal > *:nth-child(5) { transition-delay: 0.48s; }
 
+    @keyframes pop {
+      from {
+        opacity: 0;
+        transform: translateY(35px) scale(0.88);
+        filter: blur(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: none;
+      }
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes shine {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
     @keyframes floaty {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-16px); }
@@ -433,7 +459,7 @@
       animation: spinSlow 35s linear infinite;
     }
     .animate-twinkle {
-      animation: twinkle 3.5s ease-in-out infinite;
+      animation: twinkle 2.5s ease-in-out infinite;
     }
     .slide-section.in-view .bar {
       animation: growBar 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
@@ -1122,16 +1148,17 @@
         const p = progressRef.current * TOTAL_SLIDES;
         const i = Math.min(6, Math.floor(p));
         const t = p - i;
+        const e = t * t * (3 - 2 * t);
         const k0 = keys[i] || keys[0];
         const k1 = keys[i + 1] || keys[0];
 
-        globe.position.x = lerp(k0[0], k1[0], t);
-        globe.position.y = lerp(k0[1], k1[1], t);
-        camera.position.z = lerp(k0[2], k1[2], t);
-        globe.rotation.x = lerp(k0[3], k1[3], t);
+        globe.position.x = lerp(k0[0], k1[0], e);
+        globe.position.y = lerp(k0[1], k1[1], e);
+        camera.position.z = lerp(k0[2], k1[2], e);
+        globe.rotation.x = lerp(k0[3], k1[3], e);
 
-        spin += 0.003;
-        globe.rotation.y = spin + lerp(k0[4], k1[4], t);
+        spin += 0.006;
+        globe.rotation.y = spin + lerp(k0[4], k1[4], e);
         pins.rotation.y = -spin * 1.5;
 
         renderer.render(scene, camera);

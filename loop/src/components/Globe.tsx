@@ -100,7 +100,7 @@ export function Globe({ progressRef }: { progressRef: { current: number } }) {
         const i = Math.min(6, Math.floor(p)), t = p - i;
         const e = t * t * (3 - 2 * t);
         const a = keys[i]!, b = keys[i + 1]!;
-        spin += 0.0015;
+        spin += 0.006;
         globe.position.set(lerp(a[0], b[0], e), lerp(a[1], b[1], e), 0);
         atmo.position.copy(globe.position);
         pins.position.copy(globe.position);
