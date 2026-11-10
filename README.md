@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![GeoEduca Banner](docs/screenshots/apresentacao-3d.png)
+![GeoEduca Banner](docs/screenshots/landing-page.jpg)
 
 <br/>
 
@@ -57,14 +57,14 @@ O **GeoEduca** é um ecossistema educacional completo desenvolvido para transfor
 ### 🌐 Apresentação Interativa em Loop 3D
 *Globo terrestre WebGL renderizado com Three.js e animação fluida por scroll com Lenis.*
 <br/>
-<img src="docs/screenshots/apresentacao-3d.png" alt="Apresentação Loop 3D GeoEduca" width="85%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+<img src="docs/screenshots/apresentacao-3d.jpg" alt="Apresentação Loop 3D GeoEduca" width="85%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
 
 <br/><br/>
 
 ### 📝 Ambiente de Provas Digitais & Anti-Cheat
-*Interface limpa, intuitiva, com bloqueio estrito contra cola e inteligências artificiais.*
+*Interface com proteção multicamadas: tela cheia obrigatória, detecção de perda de foco e anulação automática de questões em caso de cola.*
 <br/>
-<img src="docs/screenshots/prova-digital.png" alt="Interface de Provas GeoEduca" width="85%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+<img src="docs/screenshots/prova-anticheat.png" alt="Interface de Provas e Bloqueio Anti-Cola GeoEduca" width="85%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
 
 </div>
 
