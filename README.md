@@ -217,10 +217,15 @@ O GeoEduca está configurado para deploy imediato no **Render** (ou serviços si
 
 Projeto desenvolvido no âmbito do curso técnico em Desenvolvimento de Sistemas — **SENAI**:
 
+### 👨‍💻 Desenvolvedores
 - **Félix Fonseca** — [@fonseca-felix](https://github.com/fonseca-felix)
 - **Luiz Felipe Barros** — [@LuizFelipeBarros](https://github.com/LuizFelipeBarros)
 - **Pietro Mantuan** — [@mantuanpietro](https://github.com/mantuanpietro)
 - **Joaquim Neto** — [@JoaquimNeto17](https://github.com/JoaquimNeto17)
+
+### 👨‍🏫 Orientação & Instrutores SENAI
+- **João Paulo Lepinski** — [@jplepinsk1](https://github.com/jplepinsk1)
+- **Rafael Ribas** — [@profRafaelRibas](https://github.com/profRafaelRibas)
 
 ---
 
