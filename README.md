@@ -70,14 +70,14 @@ O **GeoEduca** é um ecossistema educacional completo desenvolvido para transfor
 
 ---
 
-## 🦫 O Mascote Oficial: Copero Explorador
+## 🦫 O Mascote Oficial: Copero
 
 <div align="center">
-  <img src="docs/screenshots/copero-explorador.webp" alt="Copero Explorador" width="280px" />
-  <p><em>"Copero Explorador — Guiando os estudantes em cada expedição pelo território brasileiro."</em></p>
+  <img src="docs/screenshots/copero-oficial.png" alt="Copero — Mascote Oficial GeoEduca" width="260px" />
+  <p><em>"Copero — O mascote oficial do GeoEduca, trazendo carisma, apoio e incentivo para os estudantes em cada etapa da jornada pedagógica."</em></p>
 </div>
 
-O **Copero** é a capivara exploradora oficial do GeoEduca. Equipado com colete, bússola e mapas, o personagem acompanha o estudante durante toda a sua jornada pedagógica:
+O **Copero** é a simpática capivara mascote oficial do GeoEduca. Criado com uma identidade visual acolhedora e divertida, o personagem acompanha o estudante durante toda a sua experiência na plataforma:
 - **Feedbacks Positivos e Didáticos:** Comemora vitórias, acolhe erros e traz explicações com rigor científico.
 - **Rigor Científico:** Dados reais das **27 Unidades Federativas** e dos **6 Biomas Brasileiros** (Amazônia, Caatinga, Cerrado, Mata Atlântica, Pampa e Pantanal).
 
