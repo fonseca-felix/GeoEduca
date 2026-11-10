@@ -2,9 +2,13 @@
 
 <div align="center">
 
-![GeoEduca Banner](docs/screenshots/landing-page.jpg)
+![Demonstração da Plataforma GeoEduca](docs/videos/demonstracao.gif)
 
 <br/>
+
+<sub>🎬 <strong>Demonstração da Plataforma em Ação</strong> · <a href="docs/videos/demonstracao.mp4">Baixar Vídeo em Alta Definição (1080p MP4)</a></sub>
+
+<br/><br/>
 
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-4.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
@@ -53,6 +57,13 @@ O **GeoEduca** é um ecossistema educacional completo desenvolvido para transfor
 ## 📸 Capturas de Tela
 
 <div align="center">
+
+### 🌍 Landing Page Imersiva
+*Fundo espacial com rotação 3D do planeta Terra em WebGL.*
+<br/>
+<img src="docs/screenshots/landing-page.jpg" alt="Landing Page GeoEduca" width="85%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+
+<br/><br/>
 
 ### 🌐 Apresentação Interativa em Loop 3D
 *Globo terrestre WebGL renderizado com Three.js e animação fluida por scroll com Lenis.*
