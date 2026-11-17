@@ -269,6 +269,7 @@ router.get('/:id/resultados-completos', authenticateToken, requireProfessor, asy
         });
 
         const now = new Date();
+        const partidas = [];
 
         pontuacoesSnap.forEach(doc => {
             const data = doc.data();
@@ -276,6 +277,7 @@ router.get('/:id/resultados-completos', authenticateToken, requireProfessor, asy
 
             if (alunosStats[aId]) {
                 const pts = data.pontuacao || 0;
+                partidas.push({ alunoId:aId, alunoNome:alunosStats[aId].alunoNome, salaId:alunosStats[aId].salaId, pontuacao:pts, data:data.data, tempo:data.tempo || null, pct:data.pct ?? null });
                 const pDate = new Date(data.data);
                 const diffTime = Math.abs(now - pDate);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -307,6 +309,7 @@ router.get('/:id/resultados-completos', authenticateToken, requireProfessor, asy
         });
 
         res.json({
+            partidas,
             global: globalRanking,
             salas: salasRanking,
             porSala: porSala,
@@ -359,6 +362,38 @@ router.post('/:id/pontuacao', authenticateToken, requireAluno, async (req, res) 
 
         if (pontuacao === undefined || pontuacao === null) {
             return res.status(400).json({ error: 'Pontuação é obrigatória' });
+        }
+
+        const jogosEditados = { 'geoedit-1':60, 'geoedit-4':60, 'geoedit-5':60, 'geoedit-6':50, 'geoedit-7':50, 'geoedit-8':50, 'geoedit-9':270, 'geoedit-10':500 };
+        if (Object.prototype.hasOwnProperty.call(jogosEditados, id)) {
+            const valor = Number(pontuacao);
+            const partidaId = req.body.partidaId;
+            if (!Number.isInteger(valor) || valor < 0 || valor > jogosEditados[id] || typeof partidaId !== 'string' || !/^[a-f0-9-]{36}$/i.test(partidaId)) {
+                return res.status(400).json({ error: 'Pontuação ou identificador de partida inválido.' });
+            }
+            const crypto = require('crypto');
+            const chave = crypto.createHash('sha256').update(`${alunoId}:${id}:${partidaId}`).digest('hex');
+            const docRef = db.collection('jogo_pontuacoes').doc(`editado_${chave}`);
+            try {
+                const existente = await docRef.get();
+                if (existente.exists) {
+                    if (existente.data().pontuacao !== valor) return res.status(409).json({error:'Esta partida já possui outro resultado.'});
+                    return res.status(200).json({message:'Pontuação já registrada.', pontuacao:valor});
+                }
+                const hoje = new Date();
+                const inicioDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()).toISOString();
+                const historico = await db.collection('jogo_pontuacoes').where('jogoId','==',id).where('alunoId','==',alunoId).get();
+                let jogadasHoje = 0;
+                historico.forEach(doc => { if (doc.data().data >= inicioDia) jogadasHoje++; });
+                if (jogadasHoje >= 10) return res.status(403).json({error:'Limite diário de 10 partidas atingido.'});
+                await docRef.create({ jogoId:id, alunoId, pontuacao:valor, data:new Date().toISOString(), pct:Number.isFinite(req.body.pct) && req.body.pct >= 0 && req.body.pct <= 100 ? req.body.pct : null, tempo:typeof req.body.tempo === 'string' && req.body.tempo.length <= 20 ? req.body.tempo : null });
+            } catch (error) {
+                if (error.code !== 6 && error.code !== 'already-exists') throw error;
+                const anterior = await docRef.get();
+                if (!anterior.exists || anterior.data().pontuacao !== valor) return res.status(409).json({error:'Esta partida já possui outro resultado.'});
+                return res.status(200).json({message:'Pontuação já registrada.', pontuacao:valor});
+            }
+            return res.status(201).json({message:'Pontuação registrada com sucesso', pontuacao:valor});
         }
 
         if (id !== 'brazilguessr') {
