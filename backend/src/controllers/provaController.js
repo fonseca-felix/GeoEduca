@@ -3,12 +3,16 @@ const { db } = require('../../firebase/firebase-admin');
 const listarProvas = async (req, res) => {
     try {
         const snapshot = await db.collection('provas').get();
+        let docs = snapshot.docs;
+        if (req.user && req.user.tipo === 'prof') {
+            docs = docs.filter(doc => doc.data().professorId === req.user.id);
+        }
         const provas = [];
-        for (const doc of snapshot.docs) {
+        for (const doc of docs) {
             const d = doc.data();
             const questoesSnapshot = await db.collection('prova_questoes').where('provaId', '==', doc.id).get();
             const questoes = questoesSnapshot.docs.map(qDoc => ({ id: qDoc.id, ...qDoc.data() }));
-            provas.push({ id: doc.id, titulo: d.titulo, imagem: d.imagem, rubrica: d.rubrica, questoes, createdAt: d.createdAt });
+            provas.push({ id: doc.id, titulo: d.titulo, imagem: d.imagem, rubrica: d.rubrica, professorId: d.professorId, questoes, createdAt: d.createdAt });
         }
         res.json(provas);
     } catch (error) {
@@ -20,11 +24,12 @@ const listarProvas = async (req, res) => {
 const criarProva = async (req, res) => {
     try {
         const { titulo, imagem, rubrica, questoes } = req.body;
+        const professorId = req.user ? req.user.id : null;
         if (!titulo || !questoes?.length) return res.status(400).json({ error: 'Título e questões são obrigatórios' });
 
         const novaProva = {
             titulo, imagem: imagem || 'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg',
-            rubrica: rubrica || '', createdAt: new Date().toISOString()
+            rubrica: rubrica || '', professorId, createdAt: new Date().toISOString()
         };
         const provaRef = await db.collection('provas').add(novaProva);
         for (const q of questoes) {

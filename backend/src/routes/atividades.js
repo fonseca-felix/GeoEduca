@@ -63,12 +63,16 @@ async function criarEnviosAtividade({ atividadeId, salaId, alunoId, alunoIds, da
     return { enviados: enviados.length };
 }
 
-// GET - Listar todas as atividades (professor vê todas)
+// GET - Listar todas as atividades (professor vê apenas as suas)
 router.get('/', authenticateToken, async (req, res) => {
     try {
         const snapshot = await db.collection('atividades').get();
+        let docs = snapshot.docs;
+        if (req.user && req.user.tipo === 'prof') {
+            docs = docs.filter(doc => doc.data().professorId === req.user.id);
+        }
         const atividades = [];
-        snapshot.forEach(doc => {
+        docs.forEach(doc => {
             const d = doc.data();
             atividades.push({
                 id: doc.id,
@@ -80,6 +84,7 @@ router.get('/', authenticateToken, async (req, res) => {
                 salaNome: d.salaNome || '',
                 dataEntrega: d.dataEntrega || '',
                 dataAula: d.dataAula || '',
+                professorId: d.professorId,
                 createdAt: d.createdAt
             });
         });
@@ -228,6 +233,7 @@ router.post('/', authenticateToken, requireProfessor, async (req, res) => {
             salaNome,
             dataEntrega: dataEntrega || '',
             dataAula: dataAula || '',
+            professorId,
             createdAt: new Date().toISOString()
         };
 
@@ -415,6 +421,10 @@ router.put('/:id', authenticateToken, requireProfessor, async (req, res) => {
         if (!atividade.exists) {
             return res.status(404).json({ error: 'Atividade não encontrada' });
         }
+
+        if (req.user.tipo === 'prof' && atividade.data().professorId && atividade.data().professorId !== req.user.id) {
+            return res.status(403).json({ error: 'Você não tem permissão para editar esta atividade.' });
+        }
         
         const updates = {};
         if (titulo) updates.titulo = titulo;
@@ -442,6 +452,10 @@ router.delete('/:id', authenticateToken, requireProfessor, async (req, res) => {
         
         if (!atividade.exists) {
             return res.status(404).json({ error: 'Atividade não encontrada' });
+        }
+
+        if (req.user.tipo === 'prof' && atividade.data().professorId && atividade.data().professorId !== req.user.id) {
+            return res.status(403).json({ error: 'Você não tem permissão para excluir esta atividade.' });
         }
         
         await atividadeRef.delete();

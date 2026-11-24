@@ -3,9 +3,13 @@ const { db } = require('../../firebase/firebase-admin');
 const listarAtividades = async (req, res) => {
     try {
         const snapshot = await db.collection('atividades').get();
-        const atividades = snapshot.docs.map(doc => {
+        let docs = snapshot.docs;
+        if (req.user && req.user.tipo === 'prof') {
+            docs = docs.filter(doc => doc.data().professorId === req.user.id);
+        }
+        const atividades = docs.map(doc => {
             const d = doc.data();
-            return { id: doc.id, titulo: d.titulo, tipo: d.tipo, imagem: d.imagem, link: d.link, descricao: d.descricao, createdAt: d.createdAt };
+            return { id: doc.id, titulo: d.titulo, tipo: d.tipo, imagem: d.imagem, link: d.link, descricao: d.descricao, professorId: d.professorId, createdAt: d.createdAt };
         });
         res.json(atividades);
     } catch (error) {
@@ -54,13 +58,14 @@ const listarMinhasAtividades = async (req, res) => {
 const criarAtividade = async (req, res) => {
     try {
         const { titulo, tipo, imagem, link, descricao } = req.body;
+        const professorId = req.user ? req.user.id : null;
         if (!titulo || !tipo || !link) {
             return res.status(400).json({ error: 'Título, tipo e link são obrigatórios' });
         }
         const novaAtividade = {
             titulo, tipo,
             imagem: imagem || 'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg',
-            link, descricao: descricao || '', createdAt: new Date().toISOString()
+            link, descricao: descricao || '', professorId, createdAt: new Date().toISOString()
         };
         const docRef = await db.collection('atividades').add(novaAtividade);
         res.status(201).json({ id: docRef.id, ...novaAtividade });

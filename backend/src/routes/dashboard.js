@@ -4,25 +4,43 @@ const { authenticateToken, requireProfessor } = require('../middleware/auth');
 
 const router = express.Router();
 
-// GET /api/dashboard - Resumo geral para a professora
+// GET /api/dashboard - Resumo geral para a professora/professor
 router.get('/', authenticateToken, requireProfessor, async (req, res) => {
     try {
+        const profId = req.user.id;
+
         // Buscar em paralelo para performance
-        const [alunosSnap, salasSnap, quizzesSnap, atividadesSnap, provasSnap] = await Promise.all([
+        const [alunosSnap, salasSnap, quizzesSnap, atividadesSnap, provasSnap, respostasSnap, respostasProvaSnap] = await Promise.all([
             db.collection('alunos').get(),
             db.collection('salas').get(),
             db.collection('quizzes').get(),
-            db.collection('atividades').orderBy('createdAt', 'desc').limit(50).get(),
+            db.collection('atividades').orderBy('createdAt', 'desc').get(),
             db.collection('provas').get(),
+            db.collection('quiz_respostas').get(),
+            db.collection('prova_respostas').get()
         ]);
 
+        // Manter alunos e salas globais da escola (alunos mantidos em suas devidas salas)
         const totalAlunos = alunosSnap.size;
         const totalSalas = salasSnap.size;
-        const totalQuizzes = quizzesSnap.size;
-        const totalAtividades = atividadesSnap.size;
-        const totalProvas = provasSnap.size;
 
-        // Contagem de alunos por sala
+        // Filtrar Provas, Quizzes e Atividades pertencentes a ESTE professor
+        const profProvasDocs = provasSnap.docs.filter(d => d.data().professorId === profId);
+        const profQuizzesDocs = quizzesSnap.docs.filter(d => d.data().professorId === profId);
+        const profAtividadesDocs = atividadesSnap.docs.filter(d => d.data().professorId === profId);
+
+        const totalProvas = profProvasDocs.length;
+        const totalQuizzes = profQuizzesDocs.length;
+        const totalAtividades = profAtividadesDocs.length;
+
+        const profProvaIds = new Set(profProvasDocs.map(d => d.id));
+        const profQuizIds = new Set(profQuizzesDocs.map(d => d.id));
+
+        // Respostas apenas de provas e quizzes deste professor
+        const totalRespostasQuiz = respostasSnap.docs.filter(d => profQuizIds.has(d.data().quizId)).length;
+        const totalRespostasProva = respostasProvaSnap.docs.filter(d => profProvaIds.has(d.data().provaId)).length;
+
+        // Contagem de alunos por sala (salas mantidas para todos)
         const alunosPorSala = {};
         alunosSnap.forEach(doc => {
             const d = doc.data();
@@ -56,26 +74,17 @@ router.get('/', authenticateToken, requireProfessor, async (req, res) => {
 
         const topSalas = salasComAlunos.slice(0, 6);
 
-        // Atividades recentes (últimas 5 criadas)
-        const atividadesRecentes = [];
-        atividadesSnap.forEach(doc => {
+        // Atividades recentes DESTE professor (últimas 5 criadas)
+        const atividadesRecentes = profAtividadesDocs.slice(0, 5).map(doc => {
             const d = doc.data();
-            atividadesRecentes.push({
+            return {
                 id: doc.id,
                 titulo: d.titulo,
                 tipo: d.tipo,
                 salaNome: d.salaNome || '',
                 createdAt: d.createdAt,
-            });
+            };
         });
-
-        // Contar respostas de quizzes para calcular total de participações
-        const respostasSnap = await db.collection('quiz_respostas').get();
-        const totalRespostasQuiz = respostasSnap.size;
-
-        // Contar respostas de provas
-        const respostasProvaSnap = await db.collection('prova_respostas').get();
-        const totalRespostasProva = respostasProvaSnap.size;
 
         res.json({
             stats: {
@@ -88,7 +97,7 @@ router.get('/', authenticateToken, requireProfessor, async (req, res) => {
                 totalRespostasProva,
             },
             topSalas,
-            atividadesRecentes: atividadesRecentes.slice(0, 5),
+            atividadesRecentes,
         });
     } catch (error) {
         console.error('Erro no dashboard:', error);

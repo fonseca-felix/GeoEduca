@@ -3,12 +3,16 @@ const { db } = require('../../firebase/firebase-admin');
 const listarQuizzes = async (req, res) => {
     try {
         const snapshot = await db.collection('quizzes').get();
+        let docs = snapshot.docs;
+        if (req.user && req.user.tipo === 'prof') {
+            docs = docs.filter(doc => doc.data().professorId === req.user.id);
+        }
         const quizzes = [];
-        for (const doc of snapshot.docs) {
+        for (const doc of docs) {
             const d = doc.data();
             const perguntasSnapshot = await db.collection('quiz_perguntas').where('quizId', '==', doc.id).get();
             const perguntas = perguntasSnapshot.docs.map(pDoc => ({ id: pDoc.id, ...pDoc.data() }));
-            quizzes.push({ id: doc.id, titulo: d.titulo, imagem: d.imagem, perguntas, createdAt: d.createdAt });
+            quizzes.push({ id: doc.id, titulo: d.titulo, imagem: d.imagem, professorId: d.professorId, perguntas, createdAt: d.createdAt });
         }
         res.json(quizzes);
     } catch (error) {
@@ -48,10 +52,11 @@ const listarQuizzesDisponiveis = async (req, res) => {
 const criarQuiz = async (req, res) => {
     try {
         const { titulo, imagem, perguntas } = req.body;
+        const professorId = req.user ? req.user.id : null;
         if (!titulo || !perguntas?.length) {
             return res.status(400).json({ error: 'Título e perguntas são obrigatórios' });
         }
-        const novoQuiz = { titulo, imagem: imagem || 'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg', createdAt: new Date().toISOString() };
+        const novoQuiz = { titulo, imagem: imagem || 'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg', professorId, createdAt: new Date().toISOString() };
         const quizRef = await db.collection('quizzes').add(novoQuiz);
         for (const p of perguntas) {
             await db.collection('quiz_perguntas').add({ quizId: quizRef.id, texto: p.texto, opcoes: p.opcoes, correta: p.correta, valor: p.valor || 1 });

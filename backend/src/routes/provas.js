@@ -38,13 +38,19 @@ router.get('/', authenticateToken, async (req, res) => {
             });
         });
 
-        const provas = snapshot.docs.map(doc => {
+        let docs = snapshot.docs;
+        if (req.user && req.user.tipo === 'prof') {
+            docs = docs.filter(doc => doc.data().professorId === req.user.id);
+        }
+
+        const provas = docs.map(doc => {
             const data = doc.data();
             return {
                 id: doc.id,
                 titulo: data.titulo,
                 imagem: data.imagem,
                 rubrica: data.rubrica,
+                professorId: data.professorId,
                 questoes: questoesByProva.get(doc.id) || [],
                 createdAt: data.createdAt
             };
@@ -236,6 +242,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, requireProfessor, async (req, res) => {
     try {
         const { titulo, imagem, rubrica, questoes } = req.body;
+        const professorId = req.user.id;
 
         if (!titulo || !questoes || !questoes.length) {
             return res.status(400).json({ error: 'Título e questões são obrigatórios' });
@@ -245,6 +252,7 @@ router.post('/', authenticateToken, requireProfessor, async (req, res) => {
             titulo,
             imagem: imagem || 'https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg',
             rubrica: rubrica || '',
+            professorId,
             createdAt: new Date().toISOString()
         };
 
@@ -560,6 +568,10 @@ router.put('/:id', authenticateToken, requireProfessor, async (req, res) => {
             return res.status(404).json({ error: 'Prova não encontrada' });
         }
 
+        if (req.user.tipo === 'prof' && prova.data().professorId && prova.data().professorId !== req.user.id) {
+            return res.status(403).json({ error: 'Você não tem permissão para editar esta prova.' });
+        }
+
         const updates = {};
         if (titulo) updates.titulo = titulo;
         if (imagem) updates.imagem = imagem;
@@ -584,6 +596,10 @@ router.delete('/:id', authenticateToken, requireProfessor, async (req, res) => {
 
         if (!prova.exists) {
             return res.status(404).json({ error: 'Prova não encontrada' });
+        }
+
+        if (req.user.tipo === 'prof' && prova.data().professorId && prova.data().professorId !== req.user.id) {
+            return res.status(403).json({ error: 'Você não tem permissão para excluir esta prova.' });
         }
 
         await provaRef.delete();
