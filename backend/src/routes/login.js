@@ -12,18 +12,21 @@ router.post('/', csrfProtection, async (req, res) => {
     // Determine login type based on provided fields
     const { email, nome, password, rm } = req.body;
 
-    // Professor login (email + password)
+    // Professor login (nome ou email + password)
     if ((email || nome) && password) {
-      if (!email || !password) {
-        return res.status(400).json({ error: 'Email e senha são obrigatórios' });
-      }
-      const professoresRef = db.collection('professores');
-      const professorQuery = email ? professoresRef.where('email', '==', email) : professoresRef.where('nome', '==', nome);
-      const snapshot = await professorQuery.limit(1).get();
-      if (snapshot.empty) {
+      const ident = (email || nome).trim();
+      const allSnap = await db.collection('professores').get();
+      const identLower = ident.toLowerCase();
+      const professor = allSnap.docs.find(d => {
+        const data = d.data();
+        const pNome = (data.nome || '').trim().toLowerCase();
+        const pEmail = (data.email || '').trim().toLowerCase();
+        return pNome === identLower || pEmail === identLower;
+      });
+
+      if (!professor) {
         return res.status(401).json({ error: 'Credenciais inválidas' });
       }
-      const professor = snapshot.docs[0];
       const professorData = professor.data();
       const senhaValida = await bcrypt.compare(password, professorData.senha);
       if (!senhaValida) {

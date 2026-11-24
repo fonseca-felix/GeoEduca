@@ -71,15 +71,18 @@ const login = async (req, res) => {
             });
         }
 
-        // 3. Tentar na coleção professores (por email exato ou case-insensitive / emailRecuperacao)
+        // 3. Tentar na coleção professores (por nome exato, case-insensitive, ou email)
         const allProfsSnap = await db.collection('professores').get();
         const identLower = identificador.trim().toLowerCase();
         const profDoc = allProfsSnap.docs.find(d => {
             const data = d.data();
+            const profNome = (data.nome || '').trim().toLowerCase();
+            const profEmail = (data.email || '').trim().toLowerCase();
+            const profEmailRecup = (data.emailRecuperacao || '').trim().toLowerCase();
             return (
-                data.email === identificador.trim() ||
-                (data.email || '').toLowerCase() === identLower ||
-                (data.emailRecuperacao || '').toLowerCase() === identLower
+                profNome === identLower ||
+                profEmail === identLower ||
+                profEmailRecup === identLower
             );
         });
 

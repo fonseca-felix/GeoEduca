@@ -553,7 +553,7 @@
         const data = await api.get('/escola/professores/' + profId);
         
         document.getElementById('prof-nome').textContent = data.nome;
-        document.getElementById('prof-email').innerHTML = `<i class="fa-solid fa-envelope"></i> Login institucional: ${data.email}`;
+        document.getElementById('prof-email').innerHTML = `<i class="fa-solid fa-user-tag"></i> Login de acesso: <strong>${data.nome || data.email}</strong>`;
         
         document.getElementById('stat-alunos').textContent = data.totalAlunos || 0;
         document.getElementById('stat-provas-feitas').textContent = data.totalProvasFeitas !== undefined ? data.totalProvasFeitas : 0;

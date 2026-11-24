@@ -2,56 +2,71 @@ const { db } = require('../../firebase/firebase-admin');
 const bcrypt = require('bcryptjs');
 
 const escolaController = {
-  // Cria um novo professor vinculado à escola
+  // Cria um novo professor vinculado à escola (login via Nome)
   createProfessor: async (req, res) => {
     try {
       const escolaId = req.user.id;
-      const { nome, email, senha } = req.body;
+      const { nome, senha } = req.body;
 
-      if (!nome || !email || !senha) {
-        return res.status(400).json({ error: 'Nome, email e senha são obrigatórios' });
+      if (!nome || !senha) {
+        return res.status(400).json({ error: 'Nome do professor e senha inicial são obrigatórios.' });
       }
 
-      const cleanEmail = email.trim().toLowerCase();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      const cleanNome = nome.trim();
+      if (cleanNome.length < 3) {
         return res.status(400).json({
-          error: 'Informe um endereço de e-mail válido.'
+          error: 'O nome do professor deve ter no mínimo 3 caracteres.'
         });
       }
 
-      if (senha.length < 8 || senha.length > 20 || !/[A-Z]/.test(senha) || !/[!@#$%^&*(),.?":{}|<>\-+=_]/.test(senha)) {
+      if (cleanNome.length > 80) {
+        return res.status(400).json({
+          error: 'O nome do professor não pode ultrapassar 80 caracteres.'
+        });
+      }
+
+      // Validação de senha
+      if (senha.length < 8 || senha.length > 20 || !/[A-Z]/.test(senha) || !/[-!@#$%^&*(),.?":{}|<>+=_]/.test(senha)) {
         return res.status(400).json({
           error: 'A senha deve ter entre 8 e 20 caracteres, pelo menos 1 letra maiúscula e 1 caractere especial.'
         });
       }
 
-      // Check if email already exists
+      // Verificar se já existe um professor com esse nome (suporta acentuação, 'ç', espaços múltiplos e case-insensitive)
       const allProfsSnap = await db.collection('professores').get();
-      const emailExists = allProfsSnap.docs.some(doc => {
+      const normalizedNovoNome = cleanNome.toLowerCase().replace(/\s+/g, ' ');
+
+      const nomeExiste = allProfsSnap.docs.some(doc => {
         const d = doc.data();
-        return (d.email || '').toLowerCase() === cleanEmail;
+        const existingNome = (d.nome || '').trim().toLowerCase().replace(/\s+/g, ' ');
+        return existingNome === normalizedNovoNome;
       });
-      if (emailExists) {
-        return res.status(400).json({ error: 'Este e-mail já está cadastrado para outro professor.' });
+
+      if (nomeExiste) {
+        return res.status(400).json({
+          error: `Já existe um professor cadastrado com o nome "${cleanNome}". Por favor, informe um nome diferente ou adicione um sobrenome para diferenciar.`
+        });
       }
 
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(senha, salt);
 
       const novoProf = {
-        nome: nome.trim(),
-        email: cleanEmail,
+        nome: cleanNome,
+        email: cleanNome, // O login de acesso passa a ser o próprio nome
+        emailRecuperacao: cleanNome,
         senha: hashedPassword,
         escolaId,
+        tipo: 'prof',
         emailVerificado: true,
-        criadoEm: new Date().toISOString(),
+        criadoEm: new Date().toISOString()
       };
 
       const docRef = await db.collection('professores').add(novoProf);
 
       res.status(201).json({
         id: docRef.id,
-        message: 'Professor cadastrado com sucesso!'
+        message: `Professor(a) "${cleanNome}" cadastrado com sucesso! O login de acesso é o próprio nome.`
       });
     } catch (error) {
       console.error('Erro ao criar professor:', error);
