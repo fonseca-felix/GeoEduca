@@ -116,9 +116,13 @@ function buildProfessorSidebar(basePath = '../') {
       </a>
 
       <span class="sidebar-nav-label">Sistema</span>
-      <a class="sidebar-nav-item" href="${basePath}professor/apresentacao.html" data-tooltip="Apresentação em Loop">
+      <a class="sidebar-nav-item" href="${basePath}professor/apresentacao.html" data-tooltip="Apresentação em Loop 3D">
         <span class="sidebar-nav-icon">${NAV_ICONS.apresentacao}</span>
         <span class="sidebar-nav-text">Apresentação 3D</span>
+      </a>
+      <a class="sidebar-nav-item" href="${basePath}professor/video_loop2.html" data-tooltip="Vídeo Loop 2">
+        <span class="sidebar-nav-icon">${NAV_ICONS.apresentacao}</span>
+        <span class="sidebar-nav-text">Vídeo Loop 2</span>
       </a>
       <a class="sidebar-nav-item" href="${basePath}professor/sobre.html" data-tooltip="Sobre o GeoEduca">
         <span class="sidebar-nav-icon">${NAV_ICONS.sobre}</span>
