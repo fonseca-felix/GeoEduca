@@ -314,6 +314,7 @@ const escolaController = {
         totalProfessores: profDocs.length,
         totalAlunos: alunosSnap.size,
         totalSalas: salasSnap.size,
+        totalProvas: provasSnap.size,
         totalProvasCriadas: provasSnap.size,
         totalProvasRealizadas: provaRespSnap.size,
         totalQuizzes: quizzesSnap.size,
