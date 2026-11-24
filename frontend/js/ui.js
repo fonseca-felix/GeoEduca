@@ -300,6 +300,31 @@ const Sidebar = {
         item.classList.add('active');
       }
     });
+
+    // Theme toggle button in sidebar
+    sidebar.querySelectorAll('[data-action="toggle-theme"]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        if (typeof Theme !== 'undefined' && Theme.toggle) {
+          Theme.toggle();
+        }
+      };
+    });
+
+    // Logout button in sidebar
+    sidebar.querySelectorAll('[data-action="logout"]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        if (typeof Auth !== 'undefined' && Auth.logout) {
+          Auth.logout();
+        }
+      };
+    });
+
+    // Sync theme UI immediately
+    if (typeof Theme !== 'undefined' && Theme.updateUI) {
+      Theme.updateUI();
+    }
   }
 };
 
