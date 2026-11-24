@@ -480,7 +480,7 @@
         }
 
         list.innerHTML = profs.map(p => {
-          return '<div class="prof-card" onclick="verDetalhes(\'' + p.id + '\')">' +
+          return '<div class="prof-card" onclick="verDetalhes(\'' + p.id + '\')" title="Clique para ver os alunos e detalhes deste professor">' +
             '<div>' +
               '<h3 style="font-family:var(--font-display);color:var(--primary);display:flex;align-items:center;flex-wrap:wrap;gap:8px;">' +
                 p.nome + ' <span style="font-size:0.75rem;padding:3px 8px;border-radius:999px;background:rgba(204,164,59,0.12);color:var(--primary);border:1px solid rgba(204,164,59,0.3);"><i class="fa-solid fa-chalkboard-user"></i> Professor</span>' +
@@ -488,11 +488,13 @@
               '<p style="font-size:0.875rem;color:var(--muted-foreground);margin-top:6px;"><i class="fa-solid fa-envelope" style="margin-right:6px;"></i>Login: ' + p.email + '</p>' +
             '</div>' +
             '<div style="text-align:right;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">' +
-              '<span style="font-size:0.9rem;"><strong style="color:var(--foreground);font-size:1.15rem;">' + (p.totalAlunos || 0) + '</strong> Alunos</span>' +
-              '<span style="font-size:0.9rem;"><strong style="color:var(--foreground);font-size:1.15rem;">' + (p.totalProvas || 0) + '</strong> Provas</span>' +
-              '<button type="button" class="btn" style="padding:7px 14px;font-size:0.82rem;" onclick="openModalResetSenha(event, \'' + p.id + '\', \'' + p.nome.replace(/'/g, "\\'") + '\')">' +
+              '<span style="font-size:0.9rem;background:var(--secondary);padding:6px 12px;border-radius:8px;border:1px solid var(--border);"><strong style="color:var(--foreground);font-size:1.15rem;">' + (p.totalAlunos || 0) + '</strong> <span style="color:var(--muted-foreground);font-size:0.85rem;">Alunos</span></span>' +
+              '<span style="font-size:0.9rem;background:rgba(204,164,59,0.1);padding:6px 12px;border-radius:8px;border:1px solid rgba(204,164,59,0.25);"><strong style="color:var(--primary);font-size:1.15rem;">' + (p.totalProvasFeitas !== undefined ? p.totalProvasFeitas : 0) + '</strong> <span style="color:var(--muted-foreground);font-size:0.85rem;">Provas Feitas</span></span>' +
+              '<span style="font-size:0.9rem;background:var(--secondary);padding:6px 12px;border-radius:8px;border:1px solid var(--border);"><strong style="color:var(--foreground);font-size:1.15rem;">' + (p.totalProvas || 0) + '</strong> <span style="color:var(--muted-foreground);font-size:0.85rem;">Provas Criadas</span></span>' +
+              '<button type="button" class="btn" style="padding:8px 14px;font-size:0.82rem;" onclick="openModalResetSenha(event, \'' + p.id + '\', \'' + p.nome.replace(/'/g, "\\'") + '\')">' +
                 '<i class="fa-solid fa-key"></i> Redefinir Senha' +
               '</button>' +
+              '<span style="color:var(--primary);font-size:0.9rem;"><i class="fa-solid fa-chevron-right"></i></span>' +
             '</div>' +
           '</div>';
         }).join('');

@@ -136,14 +136,16 @@ const escolaController = {
     }
   },
 
-  // Lista os professores da escola
+  // Lista os professores da escola com contagem real de alunos e provas feitas
   getProfessores: async (req, res) => {
     try {
       const escolaId = req.user.id;
-      const [allProfsSnap, alunosSnap, provasSnap] = await Promise.all([
+      const [allProfsSnap, alunosSnap, provasSnap, provasEnvSnap, provaRespSnap] = await Promise.all([
         db.collection('professores').get(),
         db.collection('alunos').get(),
-        db.collection('provas').get()
+        db.collection('provas').get(),
+        db.collection('provas_enviadas').get(),
+        db.collection('prova_respostas').get()
       ]);
 
       const profDocs = req.user.tipo === 'master'
@@ -156,12 +158,42 @@ const escolaController = {
       const singleProf = profDocs.length === 1;
       const professores = profDocs.map(doc => {
         const data = doc.data();
-        const alunosCount = singleProf
-          ? alunosSnap.size
-          : alunosSnap.docs.filter(a => a.data().profId === doc.id).length;
-        const provasCount = singleProf
-          ? provasSnap.size
-          : provasSnap.docs.filter(p => p.data().profId === doc.id).length;
+        const profId = doc.id;
+
+        // Envios de prova feitos por este professor
+        const envios = provasEnvSnap.docs.filter(d => d.data().professorId === profId);
+        const alunoIdsSet = new Set(envios.map(d => d.data().alunoId));
+        const provaIdsSet = new Set(envios.map(d => d.data().provaId));
+        const salaIdsSet = new Set(envios.map(d => d.data().salaId).filter(Boolean));
+
+        if (Array.isArray(data.salas)) {
+          data.salas.forEach(sId => salaIdsSet.add(sId));
+        }
+
+        if (salaIdsSet.size > 0) {
+          alunosSnap.docs.forEach(aDoc => {
+            const aData = aDoc.data();
+            const aSalas = Array.isArray(aData.salas) ? aData.salas : (aData.salaId ? [aData.salaId] : []);
+            if (aSalas.some(sId => salaIdsSet.has(sId))) {
+              alunoIdsSet.add(aDoc.id);
+            }
+          });
+        }
+
+        let alunosCount = alunoIdsSet.size;
+        let provasCount = provaIdsSet.size;
+        if (singleProf && alunosCount === 0) alunosCount = alunosSnap.size;
+        if (singleProf && provasCount === 0) provasCount = provasSnap.size;
+
+        // Provas respondidas/feitas
+        const respostas = provaRespSnap.docs.filter(r => {
+          const rData = r.data();
+          return provaIdsSet.has(rData.provaId) || (alunoIdsSet.has(rData.alunoId) && alunoIdsSet.size > 0);
+        });
+
+        const provasFeitasCount = singleProf && respostas.length === 0
+          ? provaRespSnap.size
+          : respostas.length;
 
         return {
           id: doc.id,
@@ -171,7 +203,8 @@ const escolaController = {
           emailVerificado: true,
           criadoEm: data.criadoEm,
           totalAlunos: alunosCount,
-          totalProvas: provasCount
+          totalProvas: provasCount,
+          totalProvasFeitas: provasFeitasCount
         };
       });
 
@@ -207,53 +240,142 @@ const escolaController = {
     }
   },
   
-  // Detalhes do professor (usado pela Escola)
+  // Detalhes completos do professor (usado pela Escola)
   getProfessorDetalhes: async (req, res) => {
-      try {
-        const escolaId = req.user.id;
-        const profId = req.params.id;
-        
-        const profDoc = await db.collection('professores').doc(profId).get();
-        const profEscolaId = profDoc.exists ? (profDoc.data().escolaId || 'escola_ce399') : null;
-        if (!profDoc.exists || (req.user.tipo !== 'master' && profEscolaId !== escolaId)) {
-            return res.status(404).json({ error: 'Professor não encontrado ou não pertence a esta escola' });
-        }
-        
-        const data = profDoc.data();
-        const [alunosSnap, provasSnap, salasSnap, atividadesSnap, quizzesSnap] = await Promise.all([
-            db.collection('alunos').get(),
-            db.collection('provas').get(),
-            db.collection('salas').get(),
-            db.collection('atividades').get(),
-            db.collection('quizzes').get()
-        ]);
-        
-        const alunos = [];
-        alunosSnap.forEach(a => alunos.push({ id: a.id, ...a.data() }));
-        
-        const provas = [];
-        provasSnap.forEach(p => provas.push({ id: p.id, ...p.data() }));
-        
-        const salas = [];
-        salasSnap.forEach(s => salas.push({ id: s.id, ...s.data() }));
-        
-        res.json({
-            id: profDoc.id,
-            nome: data.nome,
-            email: data.email,
-            emailVerificado: true,
-            totalAlunos: alunos.length,
-            totalProvas: provas.length,
-            totalAtividades: atividadesSnap.size + quizzesSnap.size,
-            alunos,
-            provas,
-            salas
-        });
-        
-      } catch (error) {
-        console.error('Erro ao buscar detalhes do professor:', error);
-        res.status(500).json({ error: 'Erro ao buscar detalhes' });
+    try {
+      const escolaId = req.user.id;
+      const profId = req.params.id;
+      
+      const profDoc = await db.collection('professores').doc(profId).get();
+      const profEscolaId = profDoc.exists ? (profDoc.data().escolaId || 'escola_ce399') : null;
+      if (!profDoc.exists || (req.user.tipo !== 'master' && profEscolaId !== escolaId)) {
+        return res.status(404).json({ error: 'Professor não encontrado ou não pertence a esta escola' });
       }
+      
+      const data = profDoc.data();
+      const [
+        alunosSnap,
+        provasSnap,
+        salasSnap,
+        atividadesSnap,
+        quizzesSnap,
+        provasEnvSnap,
+        provaRespSnap,
+        atividadesEnvSnap,
+        quizzesEnvSnap
+      ] = await Promise.all([
+        db.collection('alunos').get(),
+        db.collection('provas').get(),
+        db.collection('salas').get(),
+        db.collection('atividades').get(),
+        db.collection('quizzes').get(),
+        db.collection('provas_enviadas').where('professorId', '==', profId).get(),
+        db.collection('prova_respostas').get(),
+        db.collection('atividades_enviadas').where('professorId', '==', profId).get(),
+        db.collection('quizzes_enviados').where('professorId', '==', profId).get()
+      ]);
+
+      const enviosProvas = provasEnvSnap.docs.map(d => d.data());
+      const alunoIdsSet = new Set(enviosProvas.map(d => d.alunoId));
+      const provaIdsSet = new Set(enviosProvas.map(d => d.provaId));
+      const salaIdsSet = new Set(enviosProvas.map(d => d.salaId).filter(Boolean));
+
+      atividadesEnvSnap.docs.forEach(d => {
+        const dt = d.data();
+        if (dt.alunoId) alunoIdsSet.add(dt.alunoId);
+        if (dt.salaId) salaIdsSet.add(dt.salaId);
+      });
+      quizzesEnvSnap.docs.forEach(d => {
+        const dt = d.data();
+        if (dt.alunoId) alunoIdsSet.add(dt.alunoId);
+        if (dt.salaId) salaIdsSet.add(dt.salaId);
+      });
+
+      if (Array.isArray(data.salas)) {
+        data.salas.forEach(sId => salaIdsSet.add(sId));
+      }
+
+      if (salaIdsSet.size > 0) {
+        alunosSnap.docs.forEach(aDoc => {
+          const aData = aDoc.data();
+          const aSalas = Array.isArray(aData.salas) ? aData.salas : (aData.salaId ? [aData.salaId] : []);
+          if (aSalas.some(sId => salaIdsSet.has(sId))) {
+            alunoIdsSet.add(aDoc.id);
+          }
+        });
+      }
+
+      // Alunos filtrados e mapeados com quantidade de provas feitas
+      const alunos = alunosSnap.docs
+        .filter(d => alunoIdsSet.has(d.id))
+        .map(d => {
+          const aData = d.data();
+          const respsAluno = provaRespSnap.docs.filter(r => {
+            const rData = r.data();
+            return rData.alunoId === d.id && (provaIdsSet.has(rData.provaId) || provaIdsSet.size === 0);
+          });
+
+          return {
+            id: d.id,
+            nome: aData.nome,
+            rm: aData.rm,
+            salaNome: aData.salaNome || (aData.salasNomes ? aData.salasNomes[0] : ''),
+            provasFeitas: respsAluno.length,
+            notaMedia: respsAluno.length > 0
+              ? (respsAluno.reduce((acc, cur) => acc + (Number(cur.data().notaAutomatica) || 0), 0) / respsAluno.length).toFixed(1)
+              : null
+          };
+        });
+
+      // Ordenar alunos pelo nome
+      alunos.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+
+      // Provas mapeadas com total enviadas e total feitas
+      const provas = provasSnap.docs
+        .filter(d => provaIdsSet.has(d.id))
+        .map(d => {
+          const pData = d.data();
+          const envs = enviosProvas.filter(e => e.provaId === d.id);
+          const resps = provaRespSnap.docs.filter(r => r.data().provaId === d.id);
+          return {
+            id: d.id,
+            titulo: pData.titulo,
+            rubrica: pData.rubrica || '',
+            totalEnviadas: envs.length,
+            totalFeitas: resps.length,
+            createdAt: pData.createdAt
+          };
+        });
+
+      // Salas mapeadas
+      const salas = salasSnap.docs
+        .filter(d => salaIdsSet.has(d.id))
+        .map(s => ({
+          id: s.id,
+          nome: s.data().nome,
+          serie: s.data().serie,
+          turma: s.data().turma
+        }));
+
+      const totalProvasFeitas = provaRespSnap.docs.filter(r => provaIdsSet.has(r.data().provaId)).length;
+
+      res.json({
+        id: profDoc.id,
+        nome: data.nome,
+        email: data.email,
+        emailVerificado: true,
+        totalAlunos: alunos.length,
+        totalProvas: provas.length,
+        totalProvasFeitas: totalProvasFeitas,
+        totalAtividades: atividadesEnvSnap.size + quizzesEnvSnap.size,
+        alunos,
+        provas,
+        salas
+      });
+    } catch (error) {
+      console.error('Erro ao buscar detalhes do professor:', error);
+      res.status(500).json({ error: 'Erro ao buscar detalhes' });
+    }
   }
 };
 
