@@ -212,24 +212,117 @@ const escolaController = {
     }
   },
 
-  // Estatísticas da Escola
+  // Estatísticas completas da Escola para o Dashboard Administrativo com Gráficos
   getStats: async (req, res) => {
     try {
       const escolaId = req.user.id;
-      const [allProfsSnap, alunosSnap, provasSnap] = await Promise.all([
+      const [
+        allProfsSnap,
+        alunosSnap,
+        salasSnap,
+        provasSnap,
+        provaRespSnap,
+        quizzesSnap,
+        atividadesSnap
+      ] = await Promise.all([
         db.collection('professores').get(),
         db.collection('alunos').get(),
-        db.collection('provas').get()
+        db.collection('salas').get(),
+        db.collection('provas').get(),
+        db.collection('prova_respostas').get(),
+        db.collection('quizzes').get(),
+        db.collection('atividades').get()
       ]);
 
       const profDocs = req.user.tipo === 'master'
         ? allProfsSnap.docs
         : allProfsSnap.docs.filter(d => (d.data().escolaId || 'escola_ce399') === escolaId);
 
+      // Mapeamento de Alunos por Turma
+      const SALA_ORDER = [
+        '6º Ano A', '6º Ano B', '7º Ano A', '7º Ano B',
+        '8º Ano A', '8º Ano B', '9º Ano A', '9º Ano B',
+        '1ª Série A', '1ª Série B', '2ª Série A', '2ª Série B',
+        '3ª Série A', '3ª Série B'
+      ];
+
+      const alunoSalaMap = {};
+      const alunosPorSalaMap = {};
+      alunosSnap.forEach(d => {
+        const dt = d.data();
+        const sala = dt.salaNome || (dt.salasNomes ? dt.salasNomes[0] : 'Outros');
+        alunoSalaMap[d.id] = sala;
+        alunosPorSalaMap[sala] = (alunosPorSalaMap[sala] || 0) + 1;
+      });
+
+      const turmasLabels = Object.keys(alunosPorSalaMap).sort((a, b) => {
+        const ia = SALA_ORDER.indexOf(a);
+        const ib = SALA_ORDER.indexOf(b);
+        if (ia !== -1 && ib !== -1) return ia - ib;
+        if (ia !== -1) return -1;
+        if (ib !== -1) return 1;
+        return a.localeCompare(b);
+      });
+      const turmasAlunosData = turmasLabels.map(l => alunosPorSalaMap[l] || 0);
+
+      // Provas respondidas por Turma
+      const respsPorSalaMap = {};
+      provaRespSnap.forEach(r => {
+        const dt = r.data();
+        const sala = alunoSalaMap[dt.alunoId] || 'Outros';
+        respsPorSalaMap[sala] = (respsPorSalaMap[sala] || 0) + 1;
+      });
+      const turmasRespostasData = turmasLabels.map(l => respsPorSalaMap[l] || 0);
+
+      // Faixas de Desempenho / Notas das avaliações
+      const faixasNotas = {
+        excelente: 0, // >= 8.0
+        bom: 0,       // 6.0 a 7.9
+        regular: 0,   // 4.0 a 5.9
+        atencao: 0    // < 4.0
+      };
+      provaRespSnap.forEach(r => {
+        const dt = r.data();
+        const nota = dt.notaManual !== null && dt.notaManual !== undefined
+          ? Number(dt.notaManual)
+          : (dt.notaAutomatica !== undefined ? Number(dt.notaAutomatica) : null);
+        if (nota !== null && !isNaN(nota)) {
+          if (nota >= 8) faixasNotas.excelente++;
+          else if (nota >= 6) faixasNotas.bom++;
+          else if (nota >= 4) faixasNotas.regular++;
+          else faixasNotas.atencao++;
+        }
+      });
+
+      // Professores resumo
+      const professoresResumo = profDocs.map(doc => {
+        const dt = doc.data();
+        const pId = doc.id;
+        const provasProf = provasSnap.docs.filter(p => p.data().professorId === pId);
+        const pIds = new Set(provasProf.map(p => p.id));
+        const respsProf = provaRespSnap.docs.filter(r => pIds.has(r.data().provaId)).length;
+        return {
+          id: pId,
+          nome: dt.nome,
+          email: dt.email,
+          provasCriadas: provasProf.length,
+          provasFeitas: respsProf
+        };
+      });
+
       res.json({
         totalProfessores: profDocs.length,
         totalAlunos: alunosSnap.size,
-        totalProvas: provasSnap.size
+        totalSalas: salasSnap.size,
+        totalProvasCriadas: provasSnap.size,
+        totalProvasRealizadas: provaRespSnap.size,
+        totalQuizzes: quizzesSnap.size,
+        totalAtividades: atividadesSnap.size,
+        turmasLabels,
+        turmasAlunosData,
+        turmasRespostasData,
+        faixasNotas,
+        professoresResumo
       });
     } catch (error) {
       console.error('Erro ao buscar estatísticas da escola:', error);
