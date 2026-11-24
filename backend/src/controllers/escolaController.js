@@ -170,45 +170,27 @@ const escolaController = {
             return pEscId === escolaId;
           });
 
-      const singleProf = profDocs.length === 1;
       const professores = profDocs.map(doc => {
         const data = doc.data();
         const profId = doc.id;
 
-        // Envios de prova feitos por este professor
-        const envios = provasEnvSnap.docs.filter(d => d.data().professorId === profId);
-        const alunoIdsSet = new Set(envios.map(d => d.data().alunoId));
-        const provaIdsSet = new Set(envios.map(d => d.data().provaId));
-        const salaIdsSet = new Set(envios.map(d => d.data().salaId).filter(Boolean));
+        // Provas criadas por este professor
+        const profProvas = provasSnap.docs.filter(d => d.data().professorId === profId);
+        const provaIdsSet = new Set(profProvas.map(d => d.id));
 
-        if (Array.isArray(data.salas)) {
-          data.salas.forEach(sId => salaIdsSet.add(sId));
-        }
-
-        if (salaIdsSet.size > 0) {
-          alunosSnap.docs.forEach(aDoc => {
+        // Alunos disponíveis para este professor (384 alunos da escola, ou filtrado se tiver turmas específicas)
+        let alunosCount = alunosSnap.size;
+        if (Array.isArray(data.salas) && data.salas.length > 0) {
+          const profSalasSet = new Set(data.salas);
+          alunosCount = alunosSnap.docs.filter(aDoc => {
             const aData = aDoc.data();
             const aSalas = Array.isArray(aData.salas) ? aData.salas : (aData.salaId ? [aData.salaId] : []);
-            if (aSalas.some(sId => salaIdsSet.has(sId))) {
-              alunoIdsSet.add(aDoc.id);
-            }
-          });
+            return aSalas.some(sId => profSalasSet.has(sId));
+          }).length;
         }
 
-        let alunosCount = alunoIdsSet.size;
-        let provasCount = provaIdsSet.size;
-        if (singleProf && alunosCount === 0) alunosCount = alunosSnap.size;
-        if (singleProf && provasCount === 0) provasCount = provasSnap.size;
-
-        // Provas respondidas/feitas
-        const respostas = provaRespSnap.docs.filter(r => {
-          const rData = r.data();
-          return provaIdsSet.has(rData.provaId) || (alunoIdsSet.has(rData.alunoId) && alunoIdsSet.size > 0);
-        });
-
-        const provasFeitasCount = singleProf && respostas.length === 0
-          ? provaRespSnap.size
-          : respostas.length;
+        // Provas respondidas/feitas deste professor
+        const provasFeitasCount = provaRespSnap.docs.filter(r => provaIdsSet.has(r.data().provaId)).length;
 
         return {
           id: doc.id,
@@ -218,7 +200,7 @@ const escolaController = {
           emailVerificado: true,
           criadoEm: data.criadoEm,
           totalAlunos: alunosCount,
-          totalProvas: provasCount,
+          totalProvas: profProvas.length,
           totalProvasFeitas: provasFeitasCount
         };
       });
@@ -290,87 +272,72 @@ const escolaController = {
         db.collection('quizzes_enviados').where('professorId', '==', profId).get()
       ]);
 
+      // Provas criadas por este professor
+      const profProvas = provasSnap.docs.filter(d => d.data().professorId === profId);
+      const provaIdsSet = new Set(profProvas.map(d => d.id));
       const enviosProvas = provasEnvSnap.docs.map(d => d.data());
-      const alunoIdsSet = new Set(enviosProvas.map(d => d.alunoId));
-      const provaIdsSet = new Set(enviosProvas.map(d => d.provaId));
-      const salaIdsSet = new Set(enviosProvas.map(d => d.salaId).filter(Boolean));
 
-      atividadesEnvSnap.docs.forEach(d => {
-        const dt = d.data();
-        if (dt.alunoId) alunoIdsSet.add(dt.alunoId);
-        if (dt.salaId) salaIdsSet.add(dt.salaId);
-      });
-      quizzesEnvSnap.docs.forEach(d => {
-        const dt = d.data();
-        if (dt.alunoId) alunoIdsSet.add(dt.alunoId);
-        if (dt.salaId) salaIdsSet.add(dt.salaId);
-      });
-
-      if (Array.isArray(data.salas)) {
-        data.salas.forEach(sId => salaIdsSet.add(sId));
-      }
-
-      if (salaIdsSet.size > 0) {
-        alunosSnap.docs.forEach(aDoc => {
+      // Alunos disponíveis para este professor (todos os 384 da escola, ou filtrado por turmas se houver)
+      let alunosDocs = alunosSnap.docs;
+      if (Array.isArray(data.salas) && data.salas.length > 0) {
+        const profSalasSet = new Set(data.salas);
+        alunosDocs = alunosSnap.docs.filter(aDoc => {
           const aData = aDoc.data();
           const aSalas = Array.isArray(aData.salas) ? aData.salas : (aData.salaId ? [aData.salaId] : []);
-          if (aSalas.some(sId => salaIdsSet.has(sId))) {
-            alunoIdsSet.add(aDoc.id);
-          }
+          return aSalas.some(sId => profSalasSet.has(sId));
         });
       }
 
-      // Alunos filtrados e mapeados com quantidade de provas feitas
-      const alunos = alunosSnap.docs
-        .filter(d => alunoIdsSet.has(d.id))
-        .map(d => {
-          const aData = d.data();
-          const respsAluno = provaRespSnap.docs.filter(r => {
-            const rData = r.data();
-            return rData.alunoId === d.id && (provaIdsSet.has(rData.provaId) || provaIdsSet.size === 0);
-          });
-
-          return {
-            id: d.id,
-            nome: aData.nome,
-            rm: aData.rm,
-            salaNome: aData.salaNome || (aData.salasNomes ? aData.salasNomes[0] : ''),
-            provasFeitas: respsAluno.length,
-            notaMedia: respsAluno.length > 0
-              ? (respsAluno.reduce((acc, cur) => acc + (Number(cur.data().notaAutomatica) || 0), 0) / respsAluno.length).toFixed(1)
-              : null
-          };
+      // Alunos mapeados com quantidade de provas feitas deste professor
+      const alunos = alunosDocs.map(d => {
+        const aData = d.data();
+        const respsAluno = provaRespSnap.docs.filter(r => {
+          const rData = r.data();
+          return rData.alunoId === d.id && provaIdsSet.has(rData.provaId);
         });
+
+        return {
+          id: d.id,
+          nome: aData.nome,
+          rm: aData.rm,
+          salaNome: aData.salaNome || (aData.salasNomes ? aData.salasNomes[0] : ''),
+          provasFeitas: respsAluno.length,
+          notaMedia: respsAluno.length > 0
+            ? (respsAluno.reduce((acc, cur) => acc + (Number(cur.data().notaAutomatica) || 0), 0) / respsAluno.length).toFixed(1)
+            : null
+        };
+      });
 
       // Ordenar alunos pelo nome
       alunos.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
 
-      // Provas mapeadas com total enviadas e total feitas
-      const provas = provasSnap.docs
-        .filter(d => provaIdsSet.has(d.id))
-        .map(d => {
-          const pData = d.data();
-          const envs = enviosProvas.filter(e => e.provaId === d.id);
-          const resps = provaRespSnap.docs.filter(r => r.data().provaId === d.id);
-          return {
-            id: d.id,
-            titulo: pData.titulo,
-            rubrica: pData.rubrica || '',
-            totalEnviadas: envs.length,
-            totalFeitas: resps.length,
-            createdAt: pData.createdAt
-          };
-        });
+      // Provas criadas por este professor com métricas de envio e resposta
+      const provas = profProvas.map(d => {
+        const pData = d.data();
+        const envs = enviosProvas.filter(e => e.provaId === d.id);
+        const resps = provaRespSnap.docs.filter(r => r.data().provaId === d.id);
+        return {
+          id: d.id,
+          titulo: pData.titulo,
+          rubrica: pData.rubrica || '',
+          totalEnviadas: envs.length,
+          totalFeitas: resps.length,
+          createdAt: pData.createdAt
+        };
+      });
 
-      // Salas mapeadas
-      const salas = salasSnap.docs
-        .filter(d => salaIdsSet.has(d.id))
-        .map(s => ({
-          id: s.id,
-          nome: s.data().nome,
-          serie: s.data().serie,
-          turma: s.data().turma
-        }));
+      // Salas da escola
+      let salasDocs = salasSnap.docs;
+      if (Array.isArray(data.salas) && data.salas.length > 0) {
+        const profSalasSet = new Set(data.salas);
+        salasDocs = salasSnap.docs.filter(s => profSalasSet.has(s.id));
+      }
+      const salas = salasDocs.map(s => ({
+        id: s.id,
+        nome: s.data().nome,
+        serie: s.data().serie,
+        turma: s.data().turma
+      }));
 
       const totalProvasFeitas = provaRespSnap.docs.filter(r => provaIdsSet.has(r.data().provaId)).length;
 
