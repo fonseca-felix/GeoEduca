@@ -82,7 +82,7 @@ const escolaController = {
       }
 
       const profEscolaId = profDoc.data().escolaId || 'escola_ce399';
-      if (profEscolaId !== escolaId) {
+      if (req.user.tipo !== 'master' && profEscolaId !== escolaId) {
         return res.status(403).json({ error: 'Acesso negado: Este professor não pertence à sua escola.' });
       }
 
@@ -117,7 +117,7 @@ const escolaController = {
       const cleanEmail = emailRecuperacao.trim().toLowerCase();
       const profDoc = await db.collection('professores').doc(profId).get();
       const profEscolaId = profDoc.exists ? (profDoc.data().escolaId || 'escola_ce399') : null;
-      if (!profDoc.exists || profEscolaId !== escolaId) {
+      if (!profDoc.exists || (req.user.tipo !== 'master' && profEscolaId !== escolaId)) {
         return res.status(404).json({ error: 'Professor não encontrado' });
       }
 
@@ -146,10 +146,12 @@ const escolaController = {
         db.collection('provas').get()
       ]);
 
-      const profDocs = allProfsSnap.docs.filter(d => {
-        const pEscId = d.data().escolaId || 'escola_ce399';
-        return pEscId === escolaId;
-      });
+      const profDocs = req.user.tipo === 'master'
+        ? allProfsSnap.docs
+        : allProfsSnap.docs.filter(d => {
+            const pEscId = d.data().escolaId || 'escola_ce399';
+            return pEscId === escolaId;
+          });
 
       const singleProf = profDocs.length === 1;
       const professores = profDocs.map(doc => {
@@ -190,7 +192,9 @@ const escolaController = {
         db.collection('provas').get()
       ]);
 
-      const profDocs = allProfsSnap.docs.filter(d => (d.data().escolaId || 'escola_ce399') === escolaId);
+      const profDocs = req.user.tipo === 'master'
+        ? allProfsSnap.docs
+        : allProfsSnap.docs.filter(d => (d.data().escolaId || 'escola_ce399') === escolaId);
 
       res.json({
         totalProfessores: profDocs.length,
@@ -211,7 +215,7 @@ const escolaController = {
         
         const profDoc = await db.collection('professores').doc(profId).get();
         const profEscolaId = profDoc.exists ? (profDoc.data().escolaId || 'escola_ce399') : null;
-        if (!profDoc.exists || profEscolaId !== escolaId) {
+        if (!profDoc.exists || (req.user.tipo !== 'master' && profEscolaId !== escolaId)) {
             return res.status(404).json({ error: 'Professor não encontrado ou não pertence a esta escola' });
         }
         

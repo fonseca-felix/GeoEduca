@@ -65,9 +65,19 @@ const Auth = {
       return null;
     }
     const user = this.getUser();
-    if (expectedTipo && user?.tipo !== expectedTipo) {
-      window.location.href = '/index.html';
+    if (!user) {
+      window.location.href = this.getLoginUrl();
       return null;
+    }
+    if (expectedTipo) {
+      const allowed = Array.isArray(expectedTipo) ? [...expectedTipo] : [expectedTipo];
+      if (allowed.includes('escola') && !allowed.includes('master')) {
+        allowed.push('master');
+      }
+      if (!allowed.includes(user.tipo)) {
+        window.location.href = this.getLoginUrl();
+        return null;
+      }
     }
     return user;
   },

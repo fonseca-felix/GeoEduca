@@ -3,9 +3,9 @@ const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
 const escolaController = require('../controllers/escolaController');
 
-// Middleware para verificar se é Escola
+// Middleware para verificar se é Escola ou Master
 const checkEscola = (req, res, next) => {
-  if (req.user && req.user.tipo === 'escola') {
+  if (req.user && (req.user.tipo === 'escola' || req.user.tipo === 'master')) {
     next();
   } else {
     res.status(403).json({ error: 'Acesso negado: Requer privilégios de Escola' });

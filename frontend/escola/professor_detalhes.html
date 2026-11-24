@@ -171,6 +171,12 @@
       const user = Auth.requireAuth('escola');
       if (!user) return;
       document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildEscolaSidebar('../'));
+      const nameEl = document.getElementById('sidebar-user-name');
+      if (nameEl) nameEl.textContent = user.nome || 'Escola';
+      const roleEl = document.getElementById('sidebar-user-role');
+      if (roleEl) roleEl.textContent = user.tipo === 'master' ? 'Admin Master' : 'Escola';
+      const avatarEl = document.getElementById('sidebar-user-avatar');
+      if (avatarEl) avatarEl.textContent = Auth.getInitials(user.nome || 'Escola');
       if (typeof Sidebar !== 'undefined' && Sidebar.init) Sidebar.init();
       
       const themeBtn = document.querySelector('[data-action="toggle-theme"]');
@@ -215,7 +221,7 @@
         isValid = false;
       }
 
-      if (/[!@#$%^&*(),.?":{}|<>-+=_]/.test(pass)) {
+      if (/[-!@#$%^&*(),.?":{}|<>+=_]/.test(pass)) {
         ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 caractere especial (!@#$%)';
       } else {
         ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)';

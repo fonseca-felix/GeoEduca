@@ -294,7 +294,7 @@
         isValid = false;
       }
 
-      if (/[!@#$%^&*(),.?":{}|<>-+=_]/.test(pass)) {
+      if (/[-!@#$%^&*(),.?":{}|<>+=_]/.test(pass)) {
         ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 caractere especial (!@#$%)';
       } else {
         ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)';
@@ -329,7 +329,7 @@
         isValid = false;
       }
 
-      if (/[!@#$%^&*(),.?":{}|<>-+=_]/.test(pass)) {
+      if (/[-!@#$%^&*(),.?":{}|<>+=_]/.test(pass)) {
         ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-check rule-pass"></i> Pelo menos 1 caractere especial (!@#$%)';
       } else {
         ruleSpecial.innerHTML = '<i class="fa-solid fa-circle-xmark rule-fail"></i> Pelo menos 1 caractere especial (!@#$%)';
@@ -342,121 +342,168 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      if (typeof Theme !== 'undefined' && Theme.init) Theme.init();
-      const user = Auth.requireAuth('escola');
-      if (!user) return;
-      document.querySelector('.layout').insertAdjacentHTML('afterbegin', buildEscolaSidebar('../'));
-      if (typeof Sidebar !== 'undefined' && Sidebar.init) Sidebar.init();
-      
-      const themeBtn = document.querySelector('[data-action="toggle-theme"]');
-      if(themeBtn) themeBtn.addEventListener('click', () => Theme.toggle());
-      const logoutBtn = document.querySelector('[data-action="logout"]');
-      if(logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
+      try {
+        if (typeof Theme !== 'undefined' && Theme.init) Theme.init();
+        const user = Auth.requireAuth('escola');
+        if (!user) return;
 
-      loadProfessores();
-
-      document.getElementById('prof-email').addEventListener('input', validateProfPassword);
-      document.getElementById('prof-senha').addEventListener('input', validateProfPassword);
-      document.getElementById('reset-prof-senha').addEventListener('input', validateNewPassword);
-
-      document.getElementById('form-add').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!validateProfPassword()) return;
-
-        const btn = document.getElementById('btn-cadastrar');
-        const nome = document.getElementById('prof-nome').value;
-        const email = document.getElementById('prof-email').value;
-        const senha = document.getElementById('prof-senha').value;
-
-        try {
-          btn.disabled = true;
-          btn.textContent = 'Cadastrando...';
-          clearFormFeedback('add-feedback');
-
-          const res = await api.post('/escola/professor', { nome, email, senha });
-          showFormFeedback('add-feedback', res.message || 'Professor cadastrado com sucesso!', false);
-          Toast.success('Professor cadastrado', res.message || 'Professor cadastrado com sucesso!');
-
-          setTimeout(() => {
-            document.getElementById('modal-add').classList.remove('active');
-            document.getElementById('form-add').reset();
-            clearFormFeedback('add-feedback');
-            validateProfPassword();
-            loadProfessores();
-          }, 900);
-        } catch (err) {
-          const msg = err.message || 'Erro ao cadastrar';
-          showFormFeedback('add-feedback', msg, true);
-          Toast.error('Erro no cadastro', msg);
-        } finally {
-          btn.textContent = 'Cadastrar Professor';
-          validateProfPassword();
+        // Injeta a Sidebar da Escola
+        const layoutEl = document.querySelector('.layout');
+        if (layoutEl) {
+          layoutEl.insertAdjacentHTML('afterbegin', buildEscolaSidebar('../'));
+          
+          const nameEl = document.getElementById('sidebar-user-name');
+          if (nameEl) nameEl.textContent = user.nome || 'Escola';
+          const roleEl = document.getElementById('sidebar-user-role');
+          if (roleEl) roleEl.textContent = user.tipo === 'master' ? 'Admin Master' : 'Escola';
+          const avatarEl = document.getElementById('sidebar-user-avatar');
+          if (avatarEl) avatarEl.textContent = Auth.getInitials(user.nome || 'Escola');
         }
-      });
 
-      document.getElementById('form-reset-senha').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!validateNewPassword()) return;
+        if (typeof Sidebar !== 'undefined' && Sidebar.init) Sidebar.init();
+        
+        const themeBtn = document.querySelector('[data-action="toggle-theme"]');
+        if (themeBtn) themeBtn.addEventListener('click', () => Theme.toggle());
+        const logoutBtn = document.querySelector('[data-action="logout"]');
+        if (logoutBtn) logoutBtn.addEventListener('click', () => Auth.logout());
 
-        const id = document.getElementById('reset-prof-id').value;
-        const novaSenha = document.getElementById('reset-prof-senha').value;
-        const btn = document.getElementById('btn-salvar-senha');
+        loadProfessores();
 
-        try {
-          btn.disabled = true;
-          btn.textContent = 'Salvando...';
-          clearFormFeedback('reset-senha-feedback');
+        const emailInp = document.getElementById('prof-email');
+        if (emailInp) emailInp.addEventListener('input', validateProfPassword);
+        const senhaInp = document.getElementById('prof-senha');
+        if (senhaInp) senhaInp.addEventListener('input', validateProfPassword);
+        const resetSenhaInp = document.getElementById('reset-prof-senha');
+        if (resetSenhaInp) resetSenhaInp.addEventListener('input', validateNewPassword);
 
-          const res = await api.put('/escola/professores/' + id + '/senha', { novaSenha });
-          showFormFeedback('reset-senha-feedback', res.message || 'Senha redefinida com sucesso!', false);
-          Toast.success('Senha redefinida', res.message || 'Senha do professor redefinida com sucesso!');
+        const formAdd = document.getElementById('form-add');
+        if (formAdd) {
+          formAdd.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!validateProfPassword()) return;
 
-          setTimeout(() => {
-            document.getElementById('modal-reset-senha').classList.remove('active');
-            clearFormFeedback('reset-senha-feedback');
-            document.getElementById('reset-prof-senha').value = '';
-            loadProfessores();
-          }, 900);
-        } catch (err) {
-          const msg = err.message || 'Erro ao redefinir senha';
-          showFormFeedback('reset-senha-feedback', msg, true);
-          Toast.error('Erro', msg);
-        } finally {
-          btn.disabled = false;
-          btn.textContent = 'Salvar Nova Senha';
-          validateNewPassword();
+            const btn = document.getElementById('btn-cadastrar');
+            const nome = document.getElementById('prof-nome').value;
+            const email = document.getElementById('prof-email').value;
+            const senha = document.getElementById('prof-senha').value;
+
+            try {
+              btn.disabled = true;
+              btn.textContent = 'Cadastrando...';
+              clearFormFeedback('add-feedback');
+
+              const res = await api.post('/escola/professor', { nome, email, senha });
+              showFormFeedback('add-feedback', res.message || 'Professor cadastrado com sucesso!', false);
+              Toast.success('Professor cadastrado', res.message || 'Professor cadastrado com sucesso!');
+
+              setTimeout(() => {
+                document.getElementById('modal-add').classList.remove('active');
+                document.getElementById('form-add').reset();
+                clearFormFeedback('add-feedback');
+                validateProfPassword();
+                loadProfessores();
+              }, 900);
+            } catch (err) {
+              const msg = err.message || 'Erro ao cadastrar';
+              showFormFeedback('add-feedback', msg, true);
+              Toast.error('Erro no cadastro', msg);
+            } finally {
+              btn.textContent = 'Cadastrar Professor';
+              validateProfPassword();
+            }
+          });
         }
-      });
+
+        const formReset = document.getElementById('form-reset-senha');
+        if (formReset) {
+          formReset.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!validateNewPassword()) return;
+
+            const id = document.getElementById('reset-prof-id').value;
+            const novaSenha = document.getElementById('reset-prof-senha').value;
+            const btn = document.getElementById('btn-salvar-senha');
+
+            try {
+              btn.disabled = true;
+              btn.textContent = 'Salvando...';
+              clearFormFeedback('reset-senha-feedback');
+
+              const res = await api.put('/escola/professores/' + id + '/senha', { novaSenha });
+              showFormFeedback('reset-senha-feedback', res.message || 'Senha redefinida com sucesso!', false);
+              Toast.success('Senha redefinida', res.message || 'Senha do professor redefinida com sucesso!');
+
+              setTimeout(() => {
+                document.getElementById('modal-reset-senha').classList.remove('active');
+                clearFormFeedback('reset-senha-feedback');
+                document.getElementById('reset-prof-senha').value = '';
+                loadProfessores();
+              }, 900);
+            } catch (err) {
+              const msg = err.message || 'Erro ao redefinir senha';
+              showFormFeedback('reset-senha-feedback', msg, true);
+              Toast.error('Erro', msg);
+            } finally {
+              btn.disabled = false;
+              btn.textContent = 'Salvar Nova Senha';
+              validateNewPassword();
+            }
+          });
+        }
+      } catch (e) {
+        console.error('Erro ao inicializar página de professores:', e);
+      }
     });
 
     async function loadProfessores() {
       const list = document.getElementById('prof-list');
+      if (!list) return;
       try {
+        list.innerHTML = `
+          <div style="display:flex;align-items:center;gap:12px;color:var(--muted-foreground);padding:24px 0;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size:1.4rem;color:var(--primary);"></i>
+            <span>Carregando lista de professores...</span>
+          </div>`;
+
         const profs = await api.get('/escola/professores');
-        if (profs.length === 0) {
-          list.innerHTML = '<p style="color:var(--muted-foreground)">Nenhum professor cadastrado ainda.</p>';
+        if (!Array.isArray(profs) || profs.length === 0) {
+          list.innerHTML = `
+            <div style="background:var(--card);border:1px dashed var(--border);border-radius:12px;padding:48px 24px;text-align:center;">
+              <i class="fa-solid fa-chalkboard-user" style="font-size:2.8rem;color:var(--muted-foreground);margin-bottom:14px;display:block;"></i>
+              <h3 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:8px;">Nenhum professor cadastrado</h3>
+              <p style="color:var(--muted-foreground);font-size:0.95rem;margin-bottom:20px;max-width:420px;margin-left:auto;margin-right:auto;">
+                Cadastre seus professores para que eles possam criar turmas, quizzes, jogos e gerenciar seus alunos.
+              </p>
+              <button class="btn" onclick="openModalAddProf()"><i class="fa-solid fa-plus"></i> Cadastrar Primeiro Professor</button>
+            </div>`;
           return;
         }
 
         list.innerHTML = profs.map(p => {
           return '<div class="prof-card" onclick="verDetalhes(\'' + p.id + '\')">' +
             '<div>' +
-              '<h3 style="font-family:var(--font-display);color:var(--primary);display:flex;align-items:center;flex-wrap:wrap;gap:6px;">' +
+              '<h3 style="font-family:var(--font-display);color:var(--primary);display:flex;align-items:center;flex-wrap:wrap;gap:8px;">' +
                 p.nome + ' <span style="font-size:0.75rem;padding:3px 8px;border-radius:999px;background:rgba(204,164,59,0.12);color:var(--primary);border:1px solid rgba(204,164,59,0.3);"><i class="fa-solid fa-chalkboard-user"></i> Professor</span>' +
               '</h3>' +
-              '<p style="font-size:0.875rem;color:var(--muted-foreground);margin-top:4px;">Login: ' + p.email + '</p>' +
+              '<p style="font-size:0.875rem;color:var(--muted-foreground);margin-top:6px;"><i class="fa-solid fa-envelope" style="margin-right:6px;"></i>Login: ' + p.email + '</p>' +
             '</div>' +
-            '<div style="text-align:right;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">' +
-              '<span><strong style="color:var(--foreground)">' + (p.totalAlunos || 0) + '</strong> Alunos</span>' +
-              '<span><strong style="color:var(--foreground)">' + (p.totalProvas || 0) + '</strong> Provas</span>' +
-              '<button type="button" class="btn" style="padding:6px 12px;font-size:0.8rem;" onclick="openModalResetSenha(event, \'' + p.id + '\', \'' + p.nome.replace(/'/g, "\\'") + '\')">' +
+            '<div style="text-align:right;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">' +
+              '<span style="font-size:0.9rem;"><strong style="color:var(--foreground);font-size:1.15rem;">' + (p.totalAlunos || 0) + '</strong> Alunos</span>' +
+              '<span style="font-size:0.9rem;"><strong style="color:var(--foreground);font-size:1.15rem;">' + (p.totalProvas || 0) + '</strong> Provas</span>' +
+              '<button type="button" class="btn" style="padding:7px 14px;font-size:0.82rem;" onclick="openModalResetSenha(event, \'' + p.id + '\', \'' + p.nome.replace(/'/g, "\\'") + '\')">' +
                 '<i class="fa-solid fa-key"></i> Redefinir Senha' +
               '</button>' +
             '</div>' +
           '</div>';
         }).join('');
       } catch (err) {
-        list.innerHTML = '<p style="color:red">Erro ao carregar lista</p>';
+        console.error('Erro ao carregar professores:', err);
+        list.innerHTML = `
+          <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:20px;color:#ef4444;">
+            <p style="font-weight:600;margin-bottom:6px;"><i class="fa-solid fa-triangle-exclamation"></i> Falha ao carregar a lista de professores</p>
+            <p style="font-size:0.875rem;color:var(--foreground);margin-bottom:12px;">${err.message || 'Erro inesperado na conexão com o servidor'}</p>
+            <button class="btn" style="padding:6px 14px;font-size:0.85rem;" onclick="loadProfessores()"><i class="fa-solid fa-rotate-right"></i> Tentar novamente</button>
+          </div>`;
       }
     }
 
