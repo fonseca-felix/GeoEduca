@@ -1,263 +1,126 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22></circle><line x1=%222%22 y1=%2212%22 x2=%2222%22 y2=%2212%22></line><path d=%22M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z%22></path></svg>" />
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROTA 27 — Explorador IA | GeoEduca</title>
+    <title>ROTA 27 | GeoEduca</title>
     <meta name="description" content="Assistente de IA para estudos avançados em Geografia. Gere aulas, flashcards, quizzes e vídeos com inteligência artificial.">
-
-    <!-- Google Fonts -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23cca43b%22 stroke-width=%222%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22/><path d=%22M2 12h20M12 2c-6 7-6 13 0 20M12 2c6 7 6 13 0 20%22/></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-    <!-- GeoEduca Design System -->
     <link rel="stylesheet" href="../css/tokens.css" />
     <link rel="stylesheet" href="../css/base.css" />
     <link rel="stylesheet" href="../css/components.css" />
     <link rel="stylesheet" href="../css/animations.css?v=2" />
     <link rel="stylesheet" href="../css/sidebar.css" />
     <link rel="stylesheet" href="../css/darkmode.css" />
-
-    <!-- Rota 27 Styles -->
     <link rel="stylesheet" href="../css/rota27.css" />
+    <link rel="stylesheet" href="../css/rota27-etapa1.css?v=20261124-refino2" />
+    <link rel="stylesheet" href="../css/rota27-etapa2.css?v=20261124-refino2" />
+    <link rel="stylesheet" href="../css/rota27-etapa3.css?v=20261124-refino2" />
+    <link rel="stylesheet" href="../css/rota27-etapa-final.css?v=20261124-refino2" />
+    <link rel="stylesheet" href="../css/rota27-dark.css?v=1" />
 </head>
-<body>
-
-<div class="app-layout" id="app-layout">
+<body><div class="app-layout" id="app-layout">
     <!-- Sidebar injetada via JS -->
-
-    <main class="app-main rota27-page">
-
-        <!-- Page Header -->
-        <header class="app-header" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:28px;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Abrir menu">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div>
-                    <div style="font-size:0.7rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--color-text-muted); margin-bottom:2px;">Inteligência Artificial</div>
-                    <h1 class="page-title" style="margin:0; color:var(--color-text-primary); font-size:1.4rem; display:flex; align-items:center; gap:10px;">
-                        Rota <span style="color:var(--gold);">27</span>
-                        
-                    </h1>
+    <main class="app-main rota27-page r27-home-v2">
+        <!-- Cabeçalho (Etapa 1: visual aprovado) -->
+        <header class="app-header r27-app-header">
+            <div class="r27-header-left">
+                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Abrir menu" type="button"><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+                <div class="r27-header-title">
+                    <div class="r27-eyebrow">INTELIGÊNCIA ARTIFICIAL</div>
+                    <h1 class="r27-page-name">Rota <span>27</span></h1>
                 </div>
             </div>
-
-            <div class="user-profile" id="profile-btn" style="cursor:pointer;">
-                <div class="avatar" style="background:var(--navy);">
-                    <span id="user-initial">A</span>
+            <div class="r27-mobile-brand" aria-hidden="true">
+                    <svg class="r27-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c-6 7-6 13 0 20M12 2c6 7 6 13 0 20"/></svg>
+                    <div><div class="r27-brand-name">GeoEduca</div><div class="r27-brand-sub">ÁREA DO ALUNO</div></div>
+                </div>
+            <div class="r27-header-actions">
+                <div id="hero-tentativas-box" class="r27-attempts-pill" aria-live="polite">
+                    <svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m13 2-9 12h7l-1 8 10-12h-7z"/></svg>
+                    <span id="hero-tentativas-texto">Tentativas restantes: carregando...</span>
+                </div>
+                <div class="user-profile" id="profile-btn" style="cursor:pointer;">
+                    <div class="avatar" style="background:var(--navy);"><span id="user-initial">A</span></div>
                 </div>
             </div>
         </header>
-
-        <!-- Hero Section -->
+        <div class="r27-mobile-meta" style="display:none;">
+            <h2 class="r27-page-name">Rota <span>27</span></h2>
+            <!-- O contador real usa o mesmo ID e é reposicionado pelo CSS mobile. -->
+        </div>
+        <!-- Capa minimalista: preserva inputTema e os fluxos originais da IA. -->
         <section class="r27-hero" aria-label="Pesquisa de tema">
-
-            <div class="r27-hero-badge">
-                <i class="fa-solid fa-microchip-ai"></i>
-                Powered by Gemini AI
-            </div>
-
-            <h1 class="r27-hero-title">
-                Estude qualquer tema<br>com <span>IA geográfica</span>
-            </h1>
-
-            <p class="r27-hero-sub">
-                Digite um tema e escolha como explorar — aulas completas, flashcards interativos,
-                quizzes, mídias ou vídeos curados pela inteligência artificial.
-            </p>
-
-            <!-- Usos restantes grande -->
-            <div id="hero-tentativas-box" style="background: rgba(204, 164, 59, 0.15); border: 1px solid rgba(204, 164, 59, 0.3); border-radius: 16px; padding: 16px 32px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 32px; gap: 12px; color: var(--gold);">
-                <i class="fa-solid fa-bolt" style="font-size: 1.5rem;"></i>
-                <span id="hero-tentativas-texto" style="font-size: 1.25rem; font-weight: 700;">Tentativas Restantes: Carregando...</span>
-            </div>
-
-            <!-- Search Bar -->
+            <div class="r27-hero-badge">APRENDA EXPLORANDO</div>
+            <h2 class="r27-hero-title">Qual será sua próxima <span>descoberta?</span></h2>
+            <p class="r27-hero-sub">Escolha um tema e explore a Geografia do seu jeito.</p>
             <div class="r27-search-wrap">
-                <i class="fa-solid fa-magnifying-glass r27-search-icon"></i>
-                <input
-                    type="text"
-                    id="inputTema"
-                    class="r27-search-input"
-                    placeholder="Ex: Biomas brasileiros, Clima Semiárido, Tigres Asiáticos..."
-                    autocomplete="off"
-                >
+                <label for="inputTema" class="r27-visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">Tema de Geografia</label>
+                <svg class="r27-icon r27-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
+                <input type="text" id="inputTema" class="r27-search-input"
+                    placeholder="Ex.: Biomas brasileiros, Clima Semiárido..." autocomplete="off">
+                <button class="r27-search-guide" type="button" title="Escolher uma ferramenta" aria-label="Escolher como explorar o tema" onclick="document.getElementById('r27-tools').scrollIntoView({behavior:'smooth',block:'start'})">
+                    <svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15m-6-6 6 6-6 6"/></svg>
+                </button>
             </div>
-
-            <!-- Error -->
-            <div id="errorContainer" class="r27-error hidden">
-                <i class="fa-solid fa-circle-exclamation"></i>
+            <div id="errorContainer" class="r27-error hidden" role="alert">
+                <svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v6m0 4h.01"/></svg>
                 <span id="errorText"></span>
-                <button onclick="ocultarErro()" style="margin-left:auto; background:none; border:none; cursor:pointer; color:inherit; font-size:1rem;">
-                    <i class="fa-solid fa-xmark"></i>
+                <button type="button" onclick="ocultarErro()" aria-label="Fechar aviso" style="margin-left:auto; background:none; border:none; cursor:pointer; color:inherit; font-size:1rem;">
+                    <svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg>
                 </button>
             </div>
         </section>
-
-        <!-- Cards Section -->
-        <div class="r27-section-label">
-            <i class="fa-solid fa-grid-2" style="font-size:0.7rem;"></i>
-            Escolha uma ferramenta
-        </div>
-
+        <!-- Escolha das ferramentas originais, callbacks preservados -->
+        <div class="r27-section-label" id="r27-tools">ESCOLHA COMO EXPLORAR</div>
         <div class="r27-cards-grid">
-
-            <!-- Card 1 — Aula Completa -->
-            <div class="r27-card" id="card-aula"
-                 style="--card-accent: var(--navy); --card-icon-bg: rgba(11,10,50,0.07);"
-                 onclick="buscarDados('/gerarestudo', renderizarEstudo)"
-                 role="button" tabindex="0" aria-label="Gerar Aula Completa">
-                <div class="r27-card-inner">
-                    <div class="r27-card-icon-wrap">
-                        <i class="fa-solid fa-book-open-reader"></i>
-                    </div>
-                    <div>
-                        <h2 class="r27-card-title">Aula Completa</h2>
-                        <p class="r27-card-desc">Material didático aprofundado com tópicos, exemplos práticos e resumo executivo do tema.</p>
-                    </div>
-                </div>
-                <div class="r27-card-footer">
-                    <button class="r27-card-cta" tabindex="-1">
-                        <i class="fa-solid fa-compass-drafting"></i>
-                        Gerar Aula
-                    </button>
-                </div>
+            <div class="r27-card" id="card-aula" onclick="buscarDados('/gerarestudo', renderizarEstudo)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" aria-label="Gerar Aula Completa">
+                <div class="r27-card-inner"><div class="r27-card-icon-wrap"><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 7v14M3 4h4a5 5 0 0 1 5 5 5 5 0 0 1 5-5h4v15h-4a5 5 0 0 0-5 2 5 5 0 0 0-5-2H3z"/></svg></div><div><h2 class="r27-card-title">Aula Completa</h2><p class="r27-card-desc">Estude o tema com explicações, exemplos e resumos.</p></div></div>
+                <div class="r27-card-footer"><button type="button" class="r27-card-cta" tabindex="-1">Gerar Aula</button><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></div>
             </div>
-
-            <!-- Card 2 — Flashcards -->
-            <div class="r27-card" id="card-flash"
-                 style="--card-accent: var(--gold); --card-icon-bg: rgba(204,164,59,0.1);"
-                 onclick="buscarDados('/gerarflashcards', renderizarFlashcards)"
-                 role="button" tabindex="0" aria-label="Gerar Flashcards">
-                <div class="r27-card-inner">
-                    <div class="r27-card-icon-wrap" style="color:var(--gold);">
-                        <i class="fa-solid fa-layer-group"></i>
-                    </div>
-                    <div>
-                        <h2 class="r27-card-title">Flashcards</h2>
-                        <p class="r27-card-desc">Cartões interativos de memorização com perguntas e respostas rápidas para revisão.</p>
-                    </div>
-                </div>
-                <div class="r27-card-footer">
-                    <button class="r27-card-cta" style="background:var(--gold);" tabindex="-1">
-                        <i class="fa-solid fa-clone"></i>
-                        Criar Flashcards
-                    </button>
-                </div>
+            <div class="r27-card" id="card-flash" onclick="buscarDados('/gerarflashcards', renderizarFlashcards)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" aria-label="Gerar Flashcards">
+                <div class="r27-card-inner"><div class="r27-card-icon-wrap"><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="7" y="7" width="14" height="14" rx="2"/><path d="M17 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2M11 12h6M11 16h4"/></svg></div><div><h2 class="r27-card-title">Flashcards</h2><p class="r27-card-desc">Revise os conceitos com perguntas e respostas.</p></div></div>
+                <div class="r27-card-footer"><button type="button" class="r27-card-cta" tabindex="-1">Criar Flashcards</button><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></div>
             </div>
-
-            <!-- Card 3 — Quiz -->
-            <div class="r27-card" id="card-quiz"
-                 style="--card-accent: var(--color-info); --card-icon-bg: rgba(37,99,235,0.08);"
-                 onclick="buscarDados('/gerarquiz', renderizarQuiz)"
-                 role="button" tabindex="0" aria-label="Gerar Quiz">
-                <div class="r27-card-inner">
-                    <div class="r27-card-icon-wrap" style="color:var(--color-info);">
-                        <i class="fa-solid fa-circle-question"></i>
-                    </div>
-                    <div>
-                        <h2 class="r27-card-title">Quiz</h2>
-                        <p class="r27-card-desc">5 questões inéditas de múltipla escolha com gabarito comentado sobre o tema.</p>
-                    </div>
-                </div>
-                <div class="r27-card-footer">
-                    <button class="r27-card-cta" style="background:var(--color-info);" tabindex="-1">
-                        <i class="fa-solid fa-list-check"></i>
-                        Iniciar Quiz
-                    </button>
-                </div>
+            <div class="r27-card" id="card-quiz" onclick="buscarDados('/gerarquiz', renderizarQuiz)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" aria-label="Gerar Quiz">
+                <div class="r27-card-inner"><div class="r27-card-icon-wrap"><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M8 10l1 1 2-2m2 1h3M8 15l1 1 2-2m2 1h3"/></svg></div><div><h2 class="r27-card-title">Quiz</h2><p class="r27-card-desc">Teste seus conhecimentos com questões comentadas.</p></div></div>
+                <div class="r27-card-footer"><button type="button" class="r27-card-cta" tabindex="-1">Iniciar Quiz</button><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></div>
             </div>
-
-            <!-- Card 4 — Mapas & Mídias -->
-            <div class="r27-card" id="card-mapas"
-                 style="--card-accent: var(--color-danger); --card-icon-bg: rgba(225,29,72,0.08);"
-                 onclick="buscarDados('/gerarmapas', renderizarMapas)"
-                 role="button" tabindex="0" aria-label="Gerar Mapas e Mídias">
-                <div class="r27-card-inner">
-                    <div class="r27-card-icon-wrap" style="color:var(--color-danger);">
-                        <i class="fa-solid fa-map-location-dot"></i>
-                    </div>
-                    <div>
-                        <h2 class="r27-card-title">Mapas &amp; Mídias</h2>
-                        <p class="r27-card-desc">Termos de busca otimizados para mapas, cartografias e imagens em fontes confiáveis.</p>
-                    </div>
-                </div>
-                <div class="r27-card-footer">
-                    <button class="r27-card-cta" style="background:var(--color-danger);" tabindex="-1">
-                        <i class="fa-solid fa-images"></i>
-                        Explorar Mídias
-                    </button>
-                </div>
+            <div class="r27-card" id="card-mapas" onclick="buscarDados('/gerarmapas', renderizarMapas)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" aria-label="Gerar Mapas e Mídias">
+                <div class="r27-card-inner"><div class="r27-card-icon-wrap"><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/></svg></div><div><h2 class="r27-card-title">Mapas &amp; Mídias</h2><p class="r27-card-desc">Encontre mapas, imagens e infográficos sobre o tema.</p></div></div>
+                <div class="r27-card-footer"><button type="button" class="r27-card-cta" tabindex="-1">Explorar Mídias</button><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></div>
             </div>
-
-            <!-- Card 5 — Vídeos -->
-            <div class="r27-card" id="card-videos"
-                 style="--card-accent: #dc2626; --card-icon-bg: rgba(220,38,38,0.08);"
-                 onclick="buscarDados('/gerarvideos', renderizarVideos)"
-                 role="button" tabindex="0" aria-label="Recomendar Vídeos">
-                <div class="r27-card-inner">
-                    <div class="r27-card-icon-wrap" style="color:#dc2626;">
-                        <i class="fa-brands fa-youtube"></i>
-                    </div>
-                    <div>
-                        <h2 class="r27-card-title">Vídeos</h2>
-                        <p class="r27-card-desc">Curadoria automática de vídeos e canais confiáveis do YouTube sobre o assunto.</p>
-                    </div>
-                </div>
-                <div class="r27-card-footer">
-                    <button class="r27-card-cta" style="background:#dc2626;" tabindex="-1">
-                        <i class="fa-brands fa-youtube"></i>
-                        Ver Vídeos
-                    </button>
-                </div>
+            <div class="r27-card" id="card-videos" onclick="buscarDados('/gerarvideos', renderizarVideos)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" aria-label="Recomendar Vídeos">
+                <div class="r27-card-inner"><div class="r27-card-icon-wrap"><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg></div><div><h2 class="r27-card-title">Vídeos</h2><p class="r27-card-desc">Explore sugestões de vídeos educativos.</p></div></div>
+                <div class="r27-card-footer"><button type="button" class="r27-card-cta" tabindex="-1">Ver Vídeos</button><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></div>
             </div>
-
         </div>
 
+        
         <!-- Loader -->
         <div id="loader" class="r27-loader hidden" role="status" aria-live="polite">
             <div class="r27-spinner-ring"></div>
-            <p class="r27-loader-text">Processando com IA — aguarde...</p>
-            <div class="r27-loader-skeletons">
-                <div class="r27-skeleton"></div>
-                <div class="r27-skeleton"></div>
-                <div class="r27-skeleton"></div>
-            </div>
+            <p class="r27-loader-text">Processando com IA, aguarde...</p>
+            <div class="r27-loader-skeletons"><div class="r27-skeleton"></div><div class="r27-skeleton"></div><div class="r27-skeleton"></div></div>
         </div>
-
-        <!-- Result Panel -->
         <section id="painelResultado" class="r27-result-panel hidden" aria-live="polite">
-            <div class="r27-result-header">
-                <h3 id="tituloResultado" class="r27-result-title">Resultado</h3>
-                <button onclick="fecharPainel()" class="r27-result-close" aria-label="Fechar resultado">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <div class="r27-result-body">
-                <div id="conteudoResultado"></div>
-            </div>
+            <div class="r27-result-header"><h3 id="tituloResultado" class="r27-result-title">Resultado</h3>
+                <button type="button" onclick="fecharPainel()" class="r27-result-close" aria-label="Fechar resultado"><svg class="r27-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+            <div class="r27-result-body"><div id="conteudoResultado"></div></div>
         </section>
-
     </main>
 </div>
-
 <!-- GeoEduca Scripts -->
 <script src="../js/api.js"></script>
 <script src="../js/auth.js"></script>
 <script src="../js/theme.js"></script>
 <script src="../js/ui.js"></script>
 <script src="../js/sidebar.js"></script>
-<script src="../js/darkmode.js"></script>
-
-<!-- Rota 27 Logic -->
 <script src="../js/aluno/rota27.js"></script>
-
-</body>
-</html>
-
+<script src="../js/rota27-etapa2.js?v=20261124-refino2"></script>
+<script src="../js/rota27-etapa3.js?v=20261124-refino2"></script>
+<script src="../js/rota27-etapa-final.js?v=20261124-refino2"></script>
+</body></html>

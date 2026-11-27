@@ -1,0 +1,16 @@
+GeoEduca · Desafio da Posição · Layout aprovado
+
+Abra index.html ou desafio_posicao.html em um servidor web local.
+
+Inclui o banco de 30 perguntas, 5 questões aleatórias por rodada, 10 pontos por acerto,
+mapa original dos 27 UFs, cronômetro, mascote orientador aprovado na abertura,
+registro local de resultado e botão de nova rodada.
+
+Nesta versão de layout, a resposta é selecionada e confirmada no botão “Confirmar”.
+A imagem aprovada também apresenta os botões Dica e Pular: por isso ambos estão funcionais.
+Dica elimina uma alternativa incorreta uma vez por questão; Pular avança sem pontuação.
+Não há descontos de pontos.
+
+Arquivos: index.html, desafio_posicao.html, game.js, style.css e assets.
+O arquivo original do mapa SVG e o mascote aprovado foram preservados.
+A ligação “Outros jogos” pressupõe jogos.html na estrutura da plataforma.

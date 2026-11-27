@@ -1,0 +1,59 @@
+GEOEDUCA | PACOTE DE IMPLANTAÇÃO DOS 8 JOGOS
+Versão: V5, com acesso padrão ao Caça-Palavras
+Data de preparação: 16/11/2026
+
+INCLUSO
+- Caça-Palavras
+- Complete a Capital
+- Desafio da Posição
+- Fronteiras com Cronômetro
+- Bandeira e Estado
+- Hidrografias
+- Memória dos Biomas
+- Ordenando por Região
+
+CAMINHOS DE ENTRADA (relativos à pasta onde os jogos forem extraídos)
+- Caça-Palavras: Caca_Palavras/index.html
+- Complete a Capital: Complete_a_Capital/index.html
+- Desafio da Posição: Desafio_da_Posicao/index.html
+- Fronteiras com Cronômetro: Fronteiras_com_Cronometro/index.html
+- Bandeira e Estado: Bandeira_e_Estado/index.html
+- Hidrografias: Hidrografias/index.html
+- Memória dos Biomas: Memoria_dos_Biomas/index.html
+- Ordenando por Região: Ordenando_por_Regiao/index.html
+
+O index.html do Caça-Palavras é um REDIRECIONAMENTO para caca_palavras.html; não modifica o jogo.
+Os demais index.html são originais do pacote V5.
+
+INSTRUÇÃO DE UPLOAD
+1. Faça backup do diretório de jogos já instalado no servidor.
+2. Extraia o ZIP localmente, mantendo cada uma das 8 pastas com seus respectivos assets, CSS, JS e HTML.
+3. Envie as 8 pastas para o diretório de jogos da plataforma via gerenciador de arquivos/FTP.
+4. Atualize os links do menu da plataforma para <PastaDoJogo>/index.html.
+5. Teste entrada, partida, conclusão, retorno, login e ranking com uma conta de teste antes de liberar aos alunos.
+
+PONTOS DE INTEGRAÇÃO QUE EXIGEM CONFERÊNCIA NA PLATAFORMA
+- Caça-Palavras e Complete a Capital possuem referencias a ../js/api.js, ../js/auth.js, ../js/theme.js,
+  ../js/ui.js, ../js/sidebar.js, ../js/aluno/character.js e ../js/darkmode.js. Esses scripts NÃO fazem
+  parte deste ZIP. As pastas de destino devem ser configuradas para que os caminhos relativos encontrem
+  os arquivos reais da plataforma. Nao crie arquivos ficticios com esses nomes.
+- Caça-Palavras, Complete a Capital, Desafio da Posição e Fronteiras com Cronômetro usam o link
+  jogos.html para voltar aos outros jogos. Esse arquivo não acompanha os quatro jogos.
+  Ajuste o destino dessa navegação conforme a rota verdadeira da plataforma.
+- Autenticação, ranking em backend, permissões de acesso e rotas de produção NÃO foram homologados
+  neste ambiente; exigem teste de integração na plataforma real.
+- Fronteiras com Cronômetro tem uma ação no código de apagar o histórico local armazenado neste
+  navegador, mediante confirmação do usuário. Verifique se é apropriada ao ambiente de alunos.
+
+VERIFICAÇÕES NO PACOTE
+- Integridade ZIP por CRC: verificação automática.
+- Todos os caminhos locais internos de arquivos HTML, CSS, JS e imagens principais existentes,
+  exceto as dependências externas listadas acima.
+- Imagens raster válidas pela biblioteca Pillow.
+- Sintaxe dos JavaScripts avaliada com node --check.
+- Conteúdos, vestuários, imagens e regras originais da V5 preservados.
+- Testes de carregamento em navegador não puderam ser realizados nesta sessão por bloqueio do ambiente.
+
+IMPORTANTE
+Este arquivo é preparado para implantação, mas não equivale à homologação final da integração
+com a plataforma. Faça a validação funcional em homologação antes de disponibilizar aos alunos.

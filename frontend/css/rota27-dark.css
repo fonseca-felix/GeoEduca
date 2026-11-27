@@ -1,0 +1,122 @@
+/* =============================================================
+   GEOEDUCA / ROTA 27 — DARK MODE
+   Overrides hardcoded light colors from etapa1/2/3/final.
+   Must be loaded after all other rota27-*.css files.
+   ============================================================= */
+html[data-theme="dark"] .rota27-page.r27-home-v2 {
+  --d-bg: #15142c;
+  --d-paper: #1d1c39;
+  --d-raised: #25244a;
+  --d-soft: #2c2a4f;
+  --d-border: #36354c;
+  --d-ink: #f8f4eb;
+  --d-muted: #bab9cc;
+  --d-gold: #e0b44a;
+  --d-gold-soft: rgba(224, 180, 74, .14);
+  --d-gold-border: rgba(224, 180, 74, .45);
+  --d-ok-bg: rgba(78, 138, 110, .18);
+  --d-ok-ink: #8fd3ad;
+  --d-err-bg: rgba(197, 123, 117, .18);
+  --d-err-ink: #f0a59b;
+  --r27-gold: var(--d-gold);
+}
+
+/* ---------- Local variables of each screen ---------- */
+html[data-theme="dark"] .r27-home-v2 .r27-aula-screen {
+  --r27-paper: var(--d-paper);
+  --r27-nav: var(--d-ink);
+  --r27-line: var(--d-border);
+  --r27-ink: var(--d-ink);
+  color: var(--d-ink);
+}
+html[data-theme="dark"] .r27-home-v2 .r27-flash-screen {
+  --rf-navy: var(--d-ink);
+  --rf-border: var(--d-border);
+  --rf-paper: var(--d-paper);
+  color: var(--d-ink);
+}
+html[data-theme="dark"] .r27-home-v2 .r27-final-screen {
+  --r27f-navy: var(--d-ink);
+  --r27f-paper: var(--d-paper);
+  --r27f-border: var(--d-border);
+  color: var(--d-ink);
+}
+
+/* ---------- Home ---------- */
+html[data-theme="dark"] .r27-home-v2 .r27-hero-badge,
+html[data-theme="dark"] .r27-home-v2 .r27-hero-title span { color: var(--d-gold); }
+html[data-theme="dark"] .r27-home-v2 .r27-search-wrap { border-color: var(--d-border); box-shadow: none; }
+html[data-theme="dark"] .r27-home-v2 .r27-search-input::placeholder { color: #8d8ca6; }
+html[data-theme="dark"] .r27-home-v2 .r27-search-guide { color: #0b0a32; }
+html[data-theme="dark"] .r27-home-v2 .r27-card:hover { box-shadow: 0 12px 26px rgba(0, 0, 0, .35); }
+html[data-theme="dark"] .r27-home-v2 #hero-tentativas-box[style*="#ff4d4d"] {
+  background: var(--d-err-bg) !important; color: var(--d-err-ink) !important;
+}
+html[data-theme="dark"] .r27-home-v2 .r27-result-panel,
+html[data-theme="dark"] .r27-home-v2 .r27-loader {
+  background: var(--d-paper); border-color: var(--d-border); color: var(--d-ink);
+}
+html[data-theme="dark"] .r27-home-v2 .r27-result-title { color: var(--d-ink); }
+html[data-theme="dark"] .r27-home-v2 .r27-skeleton { background: var(--d-soft); }
+
+/* ---------- Aula (etapa 2) ---------- */
+html[data-theme="dark"] .r27-home-v2 :is(
+  .r27-aula-chapter, .r27-aula-curiosities, .r27-aula-goal, .r27-aula-metrics,
+  .r27-aula-summary, .r27-aula-placeholder, .r27-aula-photo
+) {
+  background: var(--d-paper); border-color: var(--d-border); color: var(--d-ink);
+}
+html[data-theme="dark"] .r27-home-v2 .r27-aula-title-icon { background: var(--d-gold-soft); color: var(--d-gold); }
+html[data-theme="dark"] .r27-home-v2 .r27-aula-progress-track { background: var(--d-soft); }
+html[data-theme="dark"] .r27-home-v2 .r27-aula-progress-fill { background: var(--d-gold); }
+
+/* ---------- Flashcards (etapa 3) ---------- */
+html[data-theme="dark"] .r27-home-v2 .r27-flash-topic,
+html[data-theme="dark"] .r27-home-v2 .r27-flash-count,
+html[data-theme="dark"] .r27-home-v2 .r27-flash-icon {
+  background: var(--d-gold-soft); border-color: var(--d-gold-border); color: var(--d-gold);
+}
+html[data-theme="dark"] .r27-home-v2 .r27-flash-item { background: var(--d-paper); border-color: var(--d-border); color: var(--d-ink); }
+html[data-theme="dark"] .r27-home-v2 .r27-flash-item.selected { background: var(--d-gold-soft); border-color: var(--d-gold); color: var(--d-ink); }
+html[data-theme="dark"] .r27-home-v2 .r27-flash-arrow { background: var(--d-raised); border-color: var(--d-border); color: var(--d-ink); }
+html[data-theme="dark"] .r27-home-v2 .r27-flash-arrow:not(:disabled):hover { background: var(--d-soft); }
+html[data-theme="dark"] .r27-home-v2 .r27-flash-face { background: var(--d-paper); border-color: var(--d-gold-border); color: var(--d-ink); }
+html[data-theme="dark"] .r27-home-v2 .r27-flash-reverse { background: var(--d-raised); color: var(--d-ink); }
+html[data-theme="dark"] .r27-home-v2 .r27-flash-track { background: var(--d-soft); }
+
+/* ---------- Quiz / Mídias / Vídeos (etapa final) ---------- */
+html[data-theme="dark"] .r27-home-v2 .r27-final-icon,
+html[data-theme="dark"] .r27-home-v2 .r27-final-pill,
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-topic,
+html[data-theme="dark"] .r27-home-v2 .r27-media-item-number {
+  background: var(--d-gold-soft); border-color: var(--d-gold-border); color: var(--d-gold);
+}
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-progress { background: var(--d-soft); }
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-choice,
+html[data-theme="dark"] .r27-home-v2 .r27-media-item {
+  background: var(--d-raised); border-color: var(--d-border); color: var(--d-ink);
+}
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-choice:hover:not(:disabled) { background: var(--d-soft); border-color: var(--d-gold); }
+html[data-theme="dark"] .r27-home-v2 .r27-media-item.selected { background: var(--d-gold-soft); border-color: var(--d-gold); }
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-letter { background: var(--d-soft); border-color: var(--d-border); color: var(--d-gold); }
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-choice.correct,
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-feedback { background: var(--d-ok-bg); border-color: #4e8a6e; color: var(--d-ink); }
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-choice.incorrect,
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-feedback.error { background: var(--d-err-bg); border-color: #c57b75; color: var(--d-ink); }
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-choice.correct .r27-quiz-letter { background: var(--d-ok-bg); color: var(--d-ok-ink); border-color: #4e8a6e; }
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-choice.incorrect .r27-quiz-letter { background: var(--d-err-bg); color: var(--d-err-ink); border-color: #c57b75; }
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-step { background: var(--d-raised); border-color: var(--d-border); color: var(--d-muted); }
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-step.active { background: var(--d-gold-soft); border-color: var(--d-gold); color: var(--d-gold); }
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-step.wrong { background: var(--d-err-bg); border-color: #c57b75; color: var(--d-err-ink); }
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-stat { border-color: var(--d-border); color: var(--d-muted); }
+html[data-theme="dark"] .r27-home-v2 .r27-quiz-stat strong,
+html[data-theme="dark"] .r27-home-v2 .r27-media-description h3 { color: var(--d-ink); }
+
+/* ---------- Shared buttons ---------- */
+html[data-theme="dark"] .r27-home-v2 :is(.r27-aula-next, .r27-flash-primary, .r27-final-primary) { color: #0b0a32; }
+html[data-theme="dark"] .r27-home-v2 :is(.r27-aula-back, .r27-flash-back, .r27-final-back, .r27-flash-secondary, .r27-final-secondary) {
+  background: var(--d-raised); color: var(--d-ink); border-color: var(--d-border);
+}
+html[data-theme="dark"] .r27-home-v2 :is(.r27-aula-back, .r27-flash-back, .r27-final-back, .r27-flash-secondary, .r27-final-secondary):hover {
+  background: var(--d-soft); border-color: var(--d-gold);
+}

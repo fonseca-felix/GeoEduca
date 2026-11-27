@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b0a32">
+  <meta name="description" content="Desafio da Posição, jogo geográfico do GeoEduca sobre a localização dos estados brasileiros.">
+  <title>Desafio da Posição | GeoEduca</title>
+  <link rel="icon" type="image/svg+xml" href="assets/brand-brasil.svg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preload" href="assets/copero-orientador-musculos.png" as="image">
+</head>
+<body data-screen="telaInicial">
+  <a class="skip-link" href="#conteudo">Ir ao conteúdo</a>
+  <header class="site-header">
+    <div class="brand" aria-label="GeoEduca: Desafio da Posição">
+      <span class="brand-map" aria-hidden="true"></span>
+      <span class="brand-label"><span class="brand-home">DESAFIO<br>DA POSIÇÃO</span><span class="brand-play">GEOEDUCA</span><span class="brand-line"></span></span>
+    </div>
+    <div class="header-right">
+      <span class="header-mode">Geografia do Brasil</span>
+      <a class="header-link" href="jogos.html">Outros jogos <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="conteudo">
+    <section class="screen home-screen" id="tela-inicio" aria-labelledby="titulo-inicio">
+      <div class="home-shape" aria-hidden="true"></div>
+      <div class="home-copy">
+        <p class="eyebrow">UM DESAFIO DE GEOGRAFIA</p>
+        <h1 id="titulo-inicio">Pense no mapa.<br>Acerte a posição.</h1>
+        <p class="home-lead">Teste seus conhecimentos sobre a localização dos estados brasileiros em cinco perguntas de múltipla escolha.</p>
+        <button class="primary-button" id="btn-iniciar" type="button">Começar desafio <span aria-hidden="true">→</span></button>
+        <p class="cover-meta">30 perguntas no banco <span aria-hidden="true">·</span> 5 por rodada</p>
+      </div>
+      <img class="home-mascot" src="assets/copero-orientador-musculos.png" alt="Copero orientador com os dois braços erguidos e os punhos fechados, vestindo uniforme azul-marinho e dourado">
+    </section>
+    <section class="screen play-screen" id="tela-jogo" aria-labelledby="titulo-jogo" hidden>
+      <div class="play-head">
+        <div class="play-intro">
+          <p class="eyebrow">DESAFIO GEOGRÁFICO · BRASIL</p>
+          <h1 id="titulo-jogo">Desafio da Posição</h1>
+          <p class="lead">Teste seus conhecimentos de localização geográfica.</p>
+        </div>
+        <div class="round-status" aria-label="Indicadores da partida" aria-live="polite">
+          <div class="status-unit"><span class="status-icon" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 3h8v3h3v3a5 5 0 0 1-4 5h-1v4h4v3H6v-3h4v-4H9a5 5 0 0 1-4-5V6h3zM8 8H7v1a3 3 0 0 0 2 3M16 8h1v1a3 3 0 0 1-2 3"/></svg></span><span class="status-copy"><span class="status-label">PONTUAÇÃO</span><span class="status-value"><strong id="game-score">0</strong><small>/ 50 pts</small></span></span></div>
+          <div class="status-unit"><span class="status-icon" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 7 9-4 9 4-9 4-9-4Zm0 5 9 4 9-4M3 17l9 4 9-4"/></svg></span><span class="status-copy"><span class="status-label">PROGRESSO</span><span class="status-value"><strong id="game-progress">1</strong><small>/ 5</small></span></span></div>
+          <div class="status-unit status-time"><span class="status-icon" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v5l3 2M9 2h6"/></svg></span><span class="status-copy"><span class="status-label">TEMPO</span><span class="status-value"><strong id="game-time">00:00</strong></span></span></div>
+          <div class="status-unit status-goal"><span class="status-icon" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span><span class="status-copy"><span class="status-label">META</span><span class="status-value"><strong>5</strong><small>questões</small></span></span></div>
+        </div>
+      </div>
+      <div class="play-layout"><article class="game-card-body"><div class="game-content-panel" id="play-area" aria-live="polite"></div></article></div>
+    </section>
+  </main>
+  <noscript><p class="noscript-message">Ative o JavaScript para jogar Desafio da Posição.</p></noscript>
+  <script src="game.js" defer></script>
+</body>
+</html>

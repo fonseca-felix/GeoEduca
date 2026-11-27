@@ -444,10 +444,7 @@ function initPage(tipo) {
      }
   }
 
-  // Theme toggle
-  document.querySelectorAll('[data-action="toggle-theme"]').forEach(btn => {
-    btn.addEventListener('click', () => Theme.toggle());
-  });
+  // Theme toggle is bound once in Sidebar.init() (onclick); binding again here toggled twice per click.
 
   // Logout
   document.querySelectorAll('[data-action="logout"]').forEach(btn => {

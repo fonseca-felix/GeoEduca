@@ -1,0 +1,48 @@
+GEOEDUCA — HIDROGRAFIAS
+
+Jogo independente, organizado em pastas convencionais:
+  html/  páginas do jogo e retorno
+  css/   estilos compartilhados da série e estilos do jogo
+  js/    lógica e dados de perguntas
+  assets/personagens/ arte do Copero marinheiro
+
+COMO ABRIR
+Abra html/hidrografias.html em um navegador. Para executar por um servidor local,
+abra um terminal nesta pasta e rode: python -m http.server 8000
+Depois acesse http://localhost:8000/html/hidrografias.html
+
+COMO FUNCIONA
+- 5 respostas corretas completam o desafio. Cada acerto vale 10 pontos; total de 50.
+- Etapa fácil: 2 alternativas. Etapa média: 3 alternativas. Desafio final: 4 nomes de rios.
+- Uma resposta errada apresenta explicação e uma nova pista no mesmo nível.
+- A dica pode ser aberta nas duas primeiras etapas. Não há limite de tempo.
+- O cronômetro registra o tempo ativo respondendo; a leitura da explicação não conta.
+- Ao terminar, a revisão mostra os rios visitados, com as pistas erradas primeiro.
+- O resultado usa o registro existente do GeoEduca em localStorage, chave
+  geoeduca_results, preservando o gameId 6 e os campos nome, sala, pontuacao,
+  tempo, data e pct.
+
+Integração
+Este pacote contém somente Hidrografias e uma página de retorno local.
+Se instalado dentro de uma plataforma, ajuste os links para o catálogo na página
+html/jogos.html. Nenhum serviço externo ou dependência de instalação é necessário.
+
+FONTES DE CONTEÚDO
+- Agência Nacional de Águas e Saneamento Básico — Rio Amazonas:
+  https://www.gov.br/ana/pt-br/panorama-das-aguas/divisoes-hidrograficas/rios-do-brasil/rio-amazonas/rio-amazonas/
+- Ministério da Integração e do Desenvolvimento Regional — apelido Velho Chico:
+  https://www.gov.br/mdr/pt-br/noticias/velho-chico-completa-523-anos
+- Agência Nacional de Águas e Saneamento Básico — nascente do São Francisco:
+  https://www.gov.br/ana/pt-br/assuntos/noticias-e-eventos/noticias/nova-comissao-atuara-na-implementacao-do-produtor-de-agua-no-trecho-mineiro-da-bacia-do-rio-sao-francisco
+- Itaipu Binacional — formação e reservatório do Rio Paraná:
+  https://www.itaipu.gov.br/energia/reservatorio/rio-parana
+- Agência Nacional de Águas e Saneamento Básico — Rio Tocantins e Usina de Tucuruí:
+  https://www.gov.br/ana/pt-br/sala-de-situacao/tocantins/saiba-mais-tocantins/rio-doce-saiba-mais
+- G20 Brasil — encontro dos rios Negro e Solimões em Manaus:
+  https://www.gov.br/g20/pt-br/sobre-o-g20/cidades-sede/manaus-am
+- Serviço Geológico do Brasil — Rio Paraguai e Pantanal:
+  https://sgb.gov.br/w/chuvas-recentes-podem-favorecer-recuperacao-dos-niveis-do-rio-paraguai-no-pantanal
+- Ministério dos Transportes — Hidrovia Paraguai-Paraná:
+  https://www.gov.br/transportes/pt-br/assuntos/dados-de-transportes/sistema-de-transportes/bacia-do-paraguai/
+
+As frases do jogo são paráfrases curtas dessas fontes para uso didático.

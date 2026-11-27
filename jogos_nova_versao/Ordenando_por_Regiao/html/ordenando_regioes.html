@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b0a32">
+  <meta name="description" content="Descubra a região dos estados e monte o mapa do Brasil com o Copero.">
+  <title>Ordenando por Região · GeoEduca</title>
+  <link rel="icon" href="../assets/brand-brasil.svg">
+  <link rel="stylesheet" href="../css/serie.css">
+  <link rel="stylesheet" href="../css/ordenando-regioes.css">
+  <script src="../js/dados-regioes.js" defer></script>
+  <script src="../js/ordenando-regioes.js" defer></script>
+  <link rel="stylesheet" href="../css/geoeduca-harmonia.css">
+</head>
+<body class="ge-harmony ge-regiao" data-screen="abertura">
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+  <header class="cabecalho">
+    <div class="marca" aria-label="Ordenando por Região"><span>ORDENANDO<br>POR REGIÃO</span><span class="marca-mapa" aria-hidden="true"></span></div>
+    <div class="metricas" hidden>
+      <img class="avatar" src="../assets/personagens/copero-cartografo-avatar.webp" width="48" height="48" alt="Copero">
+      <span class="metrica-placar"><strong id="placar">0</strong> de 60 <span>pontos</span></span>
+      <span class="metrica-tempo"><span class="sr-only">Tempo: </span><strong id="tempo">00:00</strong></span>
+      <button class="link-botao" id="abrir-mapa" type="button">Meu mapa <span id="mini-pecas">0/27</span></button>
+    </div>
+    <a class="voltar" href="jogos.html">Voltar ao painel</a>
+  </header>
+  <main id="conteudo">
+    <section class="tela tela-abertura" id="abertura" aria-labelledby="titulo-abertura">
+      <div class="curva" aria-hidden="true"></div>
+      <div class="texto-abertura">
+        <h1 id="titulo-abertura">Cada estado,<br>uma região.</h1>
+        <p>Descubra a região e encaixe mais uma peça no mapa do Brasil.</p>
+        <button class="botao botao-marinho" id="iniciar" type="button">Começar desafio</button>
+        <p class="legenda">5 regiões · Meta de 60 pontos</p>
+      </div>
+      <img class="mascote mascote-abertura" src="../assets/personagens/copero-cartografo-pose-aprovada.png" width="1920" height="1920" alt="Copero com camisa marfim, detalhes verdes e uma rosa dos ventos bordada">
+    </section>
+    <section class="tela tela-partida" id="partida" aria-labelledby="pergunta" hidden>
+      <div class="ge-play-head" aria-label="Identificação do desafio">
+  <div class="ge-play-head-intro">
+    <p class="ge-play-eyebrow">GEOGRAFIA DO BRASIL</p>
+    <h2 class="ge-play-title">Ordenando por Região</h2>
+    <p class="ge-play-desc">Encontre a região de cada estado e complete seu mapa.</p>
+  </div>
+  <div class="ge-play-accent" aria-hidden="true"><span></span><span></span><span></span></div>
+</div>
+      <div class="rodada">
+        <div class="cartao-estado" id="cartao-estado">
+          <p class="rotulo">ESTADO DA RODADA</p>
+          <h2 id="estado"></h2>
+          <p class="sigla" id="sigla"></p>
+        </div>
+        <div class="cartao-mapa" id="cartao-mapa" hidden>
+          <div class="mapa-cabecalho"><span class="rotulo" id="rotulo-encaixe">MAIS UMA PEÇA NO MAPA</span><span class="contador-pecas" id="pecas">0 de 27</span></div>
+          <div class="mapa-container" id="mapa-partida"></div>
+          <p class="mapa-legenda" id="mapa-legenda"></p>
+        </div>
+        <div class="respostas">
+          <p class="rodada-numero" id="numero-rodada"></p>
+          <h1 id="pergunta" tabindex="-1" aria-describedby="estado sigla">Em qual região fica?</h1>
+          <div class="opcoes" id="opcoes" role="group" aria-labelledby="pergunta"></div>
+          <div class="feedback-area" id="feedback-area" hidden>
+            <p id="feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+            <button class="botao botao-marinho proximo" type="button" id="proximo">Próximo estado</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="tela tela-resultado" id="resultado" aria-labelledby="titulo-resultado" hidden>
+      <div class="texto-resultado">
+        <h1 id="titulo-resultado" tabindex="-1">Você conhece<br>as regiões!</h1>
+        <div class="resultado-metricas">
+          <div><strong id="resultado-pontos">60</strong><span>pontos</span></div>
+          <div><strong id="resultado-acertos">6</strong><span>acertos</span></div>
+          <div><strong id="resultado-tempo">00:00</strong><span>tempo</span></div>
+        </div>
+        <p class="resumo-mapa" id="resumo-mapa"></p>
+        <button class="botao" id="repetir" type="button">Jogar novamente</button>
+        <div class="resultado-links">
+          <button class="link-botao" id="ver-mapa-final" type="button">Ver meu mapa</button>
+          <button class="link-botao" id="revisar" type="button">Revisar estados</button>
+          <a class="voltar" href="jogos.html">Voltar ao painel</a>
+        </div>
+        <p class="aviso" id="aviso-salvar" role="status" hidden>Não foi possível salvar o resultado neste navegador. A partida foi concluída.</p>
+      </div>
+      <img class="mascote mascote-resultado" src="../assets/personagens/copero-cartografo-pose-aprovada-recorte.png" width="1920" height="1920" alt="Copero comemorando com os punhos erguidos">
+    </section>
+  </main>
+  <dialog id="mapa-dialog" aria-labelledby="titulo-mapa">
+    <div class="dialog-cabecalho"><p>SEU QUEBRA-CABEÇA DO BRASIL</p><form method="dialog"><button class="fechar" type="submit" aria-label="Fechar mapa">×</button></form></div>
+    <h2 id="titulo-mapa">Um estado de cada vez.</h2>
+    <p class="intro-dialog" id="resumo-mapa-dialog"></p>
+    <div class="mapa-container mapa-grande" id="mapa-completo"></div>
+    <p class="dica-mapa">As peças continuam ao jogar novamente nesta sessão.</p>
+    <ul class="pecas-lista" id="pecas-lista"></ul>
+  </dialog>
+  <dialog id="revisao" aria-labelledby="titulo-revisao">
+    <div class="dialog-cabecalho"><p>RESUMO DA PARTIDA</p><form method="dialog"><button class="fechar" type="submit" aria-label="Fechar revisão">×</button></form></div>
+    <h2 id="titulo-revisao">Cada estado, sua região.</h2>
+    <p class="intro-dialog" id="resumo-revisao"></p>
+    <ul class="lista-revisao" id="lista-revisao"></ul>
+  </dialog>
+  <noscript><p class="aviso-sem-js">Ative o JavaScript para jogar.</p></noscript>
+</body>
+</html>

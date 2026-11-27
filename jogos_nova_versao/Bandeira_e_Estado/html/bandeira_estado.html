@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0a32">
+  <meta name="description" content="Descubra os estados brasileiros pelas pistas do Copero e revele suas bandeiras.">
+  <title>Bandeira e Estado · GeoEduca</title>
+  <link rel="icon" href="../assets/brand-brasil.svg">
+  <link rel="stylesheet" href="../css/serie.css">
+  <link rel="stylesheet" href="../css/bandeira.css">
+  <script src="../js/motor-jogos.js" defer></script>
+  <script src="../js/bandeira.js" defer></script>
+  <link rel="stylesheet" href="../css/geoeduca-harmonia.css">
+</head>
+<body class="bandeira-page ge-harmony ge-bandeira" data-screen="telaInicial">
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+  <header class="site-header">
+    <div class="brand"><span class="brand-map" aria-hidden="true"></span><span>BANDEIRA<br>E ESTADO<span class="brand-line"></span></span></div>
+    <div class="header-right">
+      <span class="header-mode">Pistas e bandeiras</span>
+      <div class="question-progress" aria-hidden="true"><span id="questionProgressFill"></span></div>
+      <span class="header-progress"><strong id="placar">0</strong> de 60 pts</span>
+      <img class="quiz-avatar" src="../assets/personagens/copero-bandeira-avatar.webp" width="48" height="48" alt="Copero">
+      <a class="text-button voltar" href="jogos.html">Voltar ao painel</a>
+    </div>
+  </header>
+  <main id="conteudo">
+    <section id="abertura" class="screen home-screen" aria-labelledby="titulo-abertura">
+      <div class="home-shape" aria-hidden="true"></div>
+      <div class="home-copy">
+        <p class="bandeira-kicker">GEOGRAFIA DO BRASIL</p>
+        <h1 id="titulo-abertura" tabindex="-1">Que estado<br>é esse?</h1>
+        <p class="bandeira-lead">Leia a pista do Copero, descubra o estado e revele sua bandeira.</p>
+        <button class="primary-button navy-button" id="iniciar" type="button">Começar desafio <span aria-hidden="true">→</span></button>
+        <p class="cover-meta">4 alternativas <span aria-hidden="true">·</span> Meta de 60 pontos</p>
+        <p id="falha" role="alert" hidden>Não foi possível carregar o jogo. Confira se os arquivos foram extraídos juntos.</p>
+      </div>
+      <img class="home-mascot" src="../assets/personagens/copero-bandeira-pose-aprovada.png" width="1920" height="1920" alt="Copero com jaqueta azul-marinho e marfim">
+    </section>
+    <section id="partida" class="screen quiz-screen" aria-label="Partida" hidden>
+      <h1 id="active-game-title" hidden>Bandeira e Estado</h1>
+      <div class="ge-play-head" aria-label="Identificação do desafio">
+  <div class="ge-play-head-intro">
+    <p class="ge-play-eyebrow">GEOGRAFIA DO BRASIL</p>
+    <h2 class="ge-play-title">Bandeira e Estado</h2>
+    <p class="ge-play-desc">Observe as pistas, escolha o estado e descubra sua bandeira.</p>
+  </div>
+  <div class="ge-play-accent" aria-hidden="true"><span></span><span></span><span></span></div>
+</div>
+      <div id="game-container"></div>
+    </section>
+    <section id="resultado" class="screen result-screen" aria-labelledby="titulo-resultado" hidden>
+      <div class="result-copy">
+        <p class="bandeira-kicker">BANDEIRA E ESTADO</p>
+        <h1 id="titulo-resultado" tabindex="-1">Desafio concluído!</h1>
+        <div class="result-stats">
+          <div><strong id="pontos-final"></strong><span>pontos</span></div>
+          <div><strong id="percentual-final"></strong><span>da meta</span></div>
+          <div><strong id="tempo-final"></strong><span>tempo</span></div>
+        </div>
+        <div class="result-actions">
+          <button class="primary-button" id="repetir" type="button">Jogar novamente <span aria-hidden="true">→</span></button>
+          <button class="text-button" id="revisar" type="button">Revisar bandeiras</button>
+          <a class="text-button" href="jogos.html">Voltar ao painel</a>
+        </div>
+      </div>
+      <img class="result-mascot" src="../assets/personagens/copero-bandeira-pose-aprovada-recorte.png" width="1920" height="1920" alt="Copero comemorando com os punhos levantados">
+    </section>
+  </main>
+  <dialog id="revisao" aria-labelledby="titulo-revisao">
+    <div class="dialog-head">
+      <p class="eyebrow">RESUMO DA PARTIDA</p>
+      <form method="dialog"><button class="close-button" type="submit" aria-label="Fechar revisão">×</button></form>
+    </div>
+    <h2 id="titulo-revisao">Bandeiras da partida</h2>
+    <p id="resumo-revisao"></p>
+    <ul id="lista-revisao" class="lista-revisao"></ul>
+  </dialog>
+  <noscript><p class="noscript-message">Ative o JavaScript para jogar.</p></noscript>
+</body>
+</html>

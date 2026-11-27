@@ -1,0 +1,146 @@
+.metricas .link-botao{font-size:12px;padding:6px 0;color:var(--marfim);text-decoration:none;line-height:1.3}
+#mini-pecas{display:block;color:var(--dourado);font-size:15px;font-weight:700}
+.metricas{gap:clamp(14px,2.4vw,38px)}
+.metricas>span{padding-left:clamp(14px,2.4vw,38px)}
+.tela-partida{padding-top:127px;padding-bottom:27px;display:flex;align-items:center}
+.rodada{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);align-items:center;gap:clamp(24px,5vw,85px);width:100%;max-width:1300px;margin:0 auto}
+.cartao-estado,.cartao-mapa{border:1px solid #c5a355;border-radius:17px;background:repeating-radial-gradient(ellipse at 0 0,transparent 0 25px,#a48a3520 26px 27px),#f2ead7;min-width:0}
+.cartao-estado{min-height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:25px;padding:35px 24px;text-align:center}
+.rotulo{font-size:11px;letter-spacing:.12em;font-weight:700;color:var(--verde);line-height:1.3}
+.cartao-estado .rotulo{background:var(--verde);color:var(--marfim);border-radius:30px;padding:9px 16px}
+#estado{font-size:clamp(33px,4.4vw,65px);line-height:1.08;text-wrap:balance;color:var(--marinho);overflow-wrap:break-word}
+.sigla{padding:4px 15px;background:var(--marinho);color:var(--marfim);border-radius:8px;font-size:22px;font-weight:700;letter-spacing:.04em}
+.rodada-numero{color:#595363;font-size:11px;font-weight:700;letter-spacing:.12em;margin-bottom:7px}
+.respostas h1{font-size:clamp(27px,3.7vw,49px);letter-spacing:-.035em}
+.opcoes{display:grid;gap:10px;margin-top:20px}
+.opcoes button{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px;border:1.5px solid var(--marinho);border-radius:10px;background:transparent;color:var(--marinho);padding:9px 17px;font:700 clamp(16px,1.85vw,24px)/1.15 var(--titulo);text-align:left}
+.opcoes button:hover:not(:disabled){background:#ebe4d3}
+.opcoes .correta{background:#e4edcf;border-color:var(--verde);color:var(--verde)}
+.opcoes .errada{background:#f6e3dc;border-color:#943b2d;color:#853b30}
+.feedback-area{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:15px}
+#feedback{font-size:14px;font-weight:700;color:var(--verde);max-width:32ch}
+#feedback.erro{color:#853b30}
+.proximo{min-height:44px;font-size:15px;padding:10px 17px;border-radius:8px}
+.cartao-mapa{padding:18px 22px 14px;background:#f1ead8}
+.mapa-cabecalho{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.contador-pecas{color:var(--marinho);font-size:12px;font-weight:700;white-space:nowrap}
+.mapa-container{color:var(--marinho);max-width:440px;margin:0 auto}
+.mapa-container svg{display:block;width:100%;height:auto;max-height:min(54svh,420px);overflow:visible}
+.peca-mapa{fill:#e1d8c5;stroke:#b3a58a;stroke-width:1;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.peca-mapa.encaixada{fill:var(--dourado);stroke:var(--marinho);stroke-width:1.1}
+.peca-mapa.nova{fill:var(--verde);stroke:var(--marfim);stroke-width:1.8;transform-box:fill-box;transform-origin:center;animation:encaixar .7s cubic-bezier(.22,1,.36,1) both}
+@keyframes encaixar{0%{transform:translate(0,-24px) rotate(-7deg) scale(1.13);opacity:.15}65%{transform:translate(0,2px) rotate(1deg) scale(.98);opacity:1}100%{transform:none;opacity:1}}
+.mapa-legenda{font-size:13px;color:var(--verde);font-weight:700;text-align:center;margin-top:8px}
+.mapa-grande{max-width:450px;margin:12px auto}
+.mapa-grande svg{max-height:48svh}
+.intro-dialog{font-size:14px;line-height:1.5}
+.dica-mapa{font-size:12px;color:#62594b;margin-top:8px}
+#mapa-dialog{width:min(640px,calc(100% - 28px))}
+.dialog-cabecalho{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.dialog-cabecalho>p{font-size:10px;color:var(--verde);font-weight:700;letter-spacing:.12em}
+.dialog-cabecalho form{margin:0}
+.pecas-lista{display:flex;flex-wrap:wrap;gap:7px;list-style:none;margin:15px 0 0;padding:0}
+.pecas-lista li{font-size:12px;border:1px solid #d1c6ac;border-radius:7px;padding:5px 9px;color:var(--verde)}
+.lista-revisao{padding:0;list-style:none;display:grid;gap:7px;margin:15px 0 0}
+.lista-revisao li{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:12px;border:1px solid #d1c6ac;border-radius:9px;font-size:14px}
+.lista-revisao strong,.lista-revisao small{display:block}
+.lista-revisao small{color:#5e5660;margin-top:3px;font-size:12px}
+.lista-revisao .selo{font-size:11px;font-weight:700;color:var(--verde)}
+.lista-revisao .rever{background:#f2e7ca;border-color:#b69a55}
+.lista-revisao .rever .selo{color:#74510a}
+.resumo-mapa{margin-bottom:24px;font-size:14px;line-height:1.45;color:#d1cbdc;max-width:43ch}
+.resultado-links{gap:8px 20px}
+@media(max-width:900px){
+  .metricas{gap:15px;font-size:13px}
+  .metricas>span{padding-left:15px}
+  .cartao-estado{min-height:320px}
+  .respostas h1{font-size:31px}
+  #estado{font-size:41px}
+}
+@media(max-width:600px){
+  .metricas{gap:12px;font-size:10px}
+  .metricas>span{padding-left:12px}
+  .metricas strong{font-size:17px}
+  .metricas .link-botao{font-size:10px;min-height:44px}
+  .metrica-placar>span{display:block}
+  #mini-pecas{font-size:12px}
+  .tela-partida{padding:94px 20px 22px;align-items:flex-start}
+  .rodada{grid-template-columns:minmax(0,1fr);gap:19px}
+  .cartao-estado{min-height:180px;padding:22px 18px;gap:14px}
+  .cartao-estado .rotulo{font-size:9px;padding:6px 12px}
+  #estado{font-size:clamp(28px,9vw,42px)}
+  .sigla{font-size:17px;padding:3px 13px}
+  .rodada-numero{font-size:10px;margin-bottom:4px}
+  .respostas h1{font-size:clamp(24px,7.1vw,32px)}
+  .opcoes{margin-top:13px;gap:8px}
+  .opcoes button{min-height:45px;font-size:18px;padding:9px 14px}
+  .feedback-area{margin-top:12px}
+  .proximo{font-size:14px;min-height:45px}
+  .cartao-mapa{padding:12px 15px}
+  .mapa-container svg{max-height:25svh}
+  .mapa-grande svg{max-height:42svh}
+  .mapa-cabecalho .rotulo{font-size:9px}
+  .mapa-legenda{font-size:12px}
+  .cartao-mapa:not([hidden]) + .respostas .opcoes{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cartao-mapa:not([hidden]) + .respostas .opcoes button{font-size:16px;padding-inline:10px}
+  .cartao-mapa:not([hidden]) + .respostas .opcoes button:last-child{grid-column:1/-1}
+  .resumo-mapa{margin-bottom:19px;font-size:12px}
+  .resultado-links{gap:6px 18px}
+}
+
+
+/* ===============================================================
+   GEOEDUCA · PADRÃO COMPARATIVO 2026 · VERSÃO 1
+   Harmonização exclusivamente visual. Não altera regras nem JS.
+   Cores oficiais: marinho, dourado, creme e verde.
+   =============================================================== */
+:root{
+  --geo-azul:#0b0a32;
+  --geo-dourado:#cca43b;
+  --geo-creme:#f7f3e9;
+  --geo-verde:#233b0b;
+  --geo-raio:12px;
+  --geo-fonte-titulo:Georgia,'Times New Roman',serif;
+  --geo-fonte-texto:Arial,Helvetica,sans-serif;
+}
+button,a,input,select{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--geo-dourado);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+/* Ordenando por Região: tipografia e ações consistentes */
+:root{--titulo:var(--geo-fonte-titulo);--marinho:var(--geo-azul);--dourado:var(--geo-dourado);--marfim:var(--geo-creme)}
+:is(.texto-abertura,.texto-resultado) h1,.respostas h1,#estado{font-family:var(--geo-fonte-titulo)}
+:is(.botao,.botao-marinho,.proximo,.opcoes button){border-radius:var(--geo-raio)}
+.cabecalho .metricas>.avatar{display:none!important}
+.metricas{gap:clamp(10px,2vw,24px)}
+@media(max-width:700px){.botao{min-height:44px}}
+
+
+/*
+  GeoEduca | Copero, alinhamento das aberturas (2026-11)
+  Apenas enquadramento, escala e posição. Nenhuma imagem, regra ou mecânica alterada.
+  Referência: aberturas aprovadas dos quatro jogos recentes.
+*/
+
+.tela-abertura .mascote-abertura {
+  width:min(48vw,670px);
+  height:min(80svh,680px);
+  right:3vw;
+  bottom:0;
+  object-fit:contain;
+  object-position:right bottom;
+}
+@media (max-width:900px) and (min-width:601px) {
+  .tela-abertura .mascote-abertura {width:min(52vw,500px);height:min(75svh,600px);right:2vw;bottom:0;}
+}
+@media (max-width:600px) {
+  .tela-abertura .mascote-abertura {width:min(75vw,300px);height:min(40svh,335px);right:0;bottom:0;object-position:right bottom;}
+}
+@media (max-width:600px) and (max-height:630px) {
+  .tela-abertura .mascote-abertura {height:min(37svh,280px);width:min(73vw,275px);right:0;bottom:0;}
+}
+
+/* Ajuste visual da imagem aprovada: fundo marinho integrado sem editar a arte. */
+.mascote-abertura[src*="pose-aprovada"], .mascote-resultado[src*="pose-aprovada"] { mix-blend-mode:lighten; }

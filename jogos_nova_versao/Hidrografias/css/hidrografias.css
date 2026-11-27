@@ -1,0 +1,115 @@
+.jogo{background:var(--papel)}
+.barra-jogo{min-height:86px;background:var(--marinho);color:#fff;padding:10px clamp(18px,4vw,56px);display:flex;align-items:center;justify-content:space-between;gap:20px}
+.barra-jogo .marca-nome{color:#fff}
+.painel-metricas{display:flex;align-items:center;gap:clamp(12px,2vw,26px);font-size:clamp(16px,2vw,22px);font-weight:800}
+.painel-metricas small{font-size:.68em;font-weight:600}.painel-metricas time{font-variant-numeric:tabular-nums;color:var(--ouro-claro)}
+.avatar{width:54px;height:54px;object-fit:cover;object-position:50% 24%;border-radius:50%;background:#fff3d2}
+.divisor{height:32px;width:1px;background:#ffffff55}
+.jogo-conteudo{max-width:1260px;min-height:calc(100svh - 86px);margin:auto;padding:clamp(22px,4vw,52px);display:grid;grid-template-columns:minmax(265px,.8fr) minmax(0,1.2fr);align-items:center;gap:clamp(26px,4vw,58px)}
+.coluna-rio{display:grid;gap:16px}
+.etapas{display:flex;gap:8px;list-style:none;padding:0;margin:0}
+.etapas li{display:flex;align-items:center;gap:7px;flex:1;padding:10px 11px;border:1px solid #d8d3c8;border-radius:10px;color:#77758d;font-size:13px;font-weight:700}
+.etapas li span{font-size:11px}.etapas li[aria-current=step]{background:var(--marinho);border-color:var(--marinho);color:white}.etapas li.completa{background:#e9efd9;border-color:#c5d6a6;color:#35542e}
+.acertos-contagem{display:flex;justify-content:space-between;align-items:center;color:#58566b;font-size:14px}
+.acertos-contagem strong{font-size:17px;color:var(--marinho)}
+.acertos-contagem small{font-size:13px;font-weight:500}
+.cartao-rio{position:relative;min-height:380px;overflow:hidden;border:3px solid var(--ouro);border-radius:24px;padding:28px 24px 36px;background:#fffdf7;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.etiqueta-rio{padding:9px 18px;border-radius:999px;background:var(--ouro-claro);color:var(--marinho);font-size:13px;font-weight:900;letter-spacing:.075em;text-transform:uppercase}
+.ondas{width:132px;margin:30px 0 10px;fill:none;stroke:var(--agua);stroke-width:7;stroke-linecap:round}
+.cartao-rio h2{position:relative;z-index:1;font:900 clamp(30px,3.5vw,43px)/1.04 var(--serif);margin:0;max-width:12ch}
+.cartao-rio>p{position:relative;z-index:1;max-width:29ch;margin:12px auto 0;font:700 18px/1.35 var(--serif);color:#45435e}
+.linha-agua{position:absolute;left:-4%;right:-4%;bottom:-24px;height:68px;background:repeating-linear-gradient(174deg,transparent 0 15px,#d4e4dc 16px 23px,transparent 24px 35px);opacity:.8}
+.dica-area{margin-top:18px;z-index:1}
+.botao-dica{border:0;background:transparent;color:var(--agua);font-weight:800;text-decoration:underline;text-decoration-color:var(--ouro);text-underline-offset:4px;cursor:pointer}
+.dica-area p{font-size:13px;font-weight:600;line-height:1.4;color:#55536a}
+.pergunta-area{align-self:center}
+.pergunta-meta{display:flex;justify-content:space-between;gap:10px;color:#747187;font-size:13px;font-weight:800}
+.pergunta-area h1{font:900 clamp(28px,3.4vw,42px)/1.05 var(--serif);letter-spacing:-.02em;margin:14px 0 20px}
+.opcoes{display:grid;grid-template-columns:1fr;gap:11px}
+.opcao{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:11px 15px;border:2px solid var(--marinho);border-radius:14px;background:transparent;color:var(--marinho);text-align:left;font:700 clamp(16px,1.6vw,19px)/1.22 var(--serif);cursor:pointer;transition:background .15s,color .15s,transform .15s}
+.opcao:hover:not(:disabled){background:#ede7d9;transform:translateY(-1px)}
+.opcao .letra{flex:0 0 30px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#e9e2d3;font:800 14px var(--sans)}
+.opcao:disabled{cursor:default}
+.opcao.correta{background:#e6f0d8;border-color:#41682e;color:#294b1f}
+.opcao.correta .letra{background:#477234;color:#fff}
+.opcao.errada{background:#f5e5df;border-color:#98473b;color:#782f29}
+.opcao.errada .letra{background:#98473b;color:#fff}
+.feedback-area{margin-top:17px;padding:14px 16px;border-radius:15px;background:#ece9de}
+.feedback-area>strong{display:block;font-size:17px}.feedback-area>strong.certo{color:#356129}.feedback-area>strong.erro{color:#873e32}
+.feedback-area p{line-height:1.4;margin:7px 0;font-size:14px}
+.feedback-area .mensagem-nivel{color:#646177;font-size:13px;font-weight:700}
+.feedback-area .botao{min-height:46px;padding:9px 18px;margin-top:4px;font-size:15px}
+.dialog-revisao li.rever{color:#80372e}
+.retorno{min-height:100svh;display:grid;place-items:center;background:var(--papel);padding:24px}
+.retorno main{max-width:520px;padding:40px;border-radius:24px;background:white;box-shadow:0 12px 50px #0b0a3215}
+.retorno p{font-size:20px;line-height:1.4}
+@media(max-width:900px){.jogo-conteudo{grid-template-columns:minmax(240px,.75fr) minmax(0,1.25fr);gap:25px;padding:24px}.cartao-rio{min-height:330px}}
+@media(max-width:650px){.barra-jogo{min-height:72px;padding:9px 14px;gap:9px}.barra-jogo .marca-nome{font-size:16px}.abertura .voltar{white-space:nowrap;font-size:14px}.marca-mapa{width:25px;height:29px}.painel-metricas{gap:9px;font-size:15px}.avatar{width:40px;height:40px}.divisor{height:25px}.painel-metricas small{font-size:10px}.jogo-conteudo{min-height:calc(100svh - 72px);grid-template-columns:1fr;gap:19px;padding:19px 17px 26px;align-content:start}.coluna-rio{gap:10px}.etapas li{padding:8px 7px;font-size:11px;justify-content:center}.cartao-rio{min-height:230px;padding:20px 18px 29px;border-width:2px;border-radius:19px}.ondas{width:95px;margin:15px 0 7px;stroke-width:6}.cartao-rio h2{font-size:30px}.cartao-rio h2.titulo-desafio{max-width:none;font-size:28px}.cartao-rio>p{font-size:16px;margin-top:8px}.dica-area{margin-top:10px}.dica-area p{margin:5px 0}.pergunta-meta{font-size:12px}.pergunta-area h1{font-size:29px;margin:10px 0 15px}.opcoes{gap:9px}.opcao{min-height:52px;padding:9px 11px;border-radius:12px;font-size:16px}.opcao .letra{flex-basis:27px;width:27px;height:27px}.feedback-area{margin-top:12px;padding:12px}.retorno main{padding:27px}}
+@media(max-width:360px){.painel-metricas{gap:6px;font-size:13px}.avatar{width:34px;height:34px}.barra-jogo .marca-nome{font-size:14px}.etapas li{font-size:10px;gap:4px}.etapas li span{font-size:9px}}
+
+
+/* ===============================================================
+   GEOEDUCA · PADRÃO COMPARATIVO 2026 · VERSÃO 1
+   Harmonização exclusivamente visual. Não altera regras nem JS.
+   Cores oficiais: marinho, dourado, creme e verde.
+   =============================================================== */
+:root{
+  --geo-azul:#0b0a32;
+  --geo-dourado:#cca43b;
+  --geo-creme:#f7f3e9;
+  --geo-verde:#233b0b;
+  --geo-raio:12px;
+  --geo-fonte-titulo:Georgia,'Times New Roman',serif;
+  --geo-fonte-texto:Arial,Helvetica,sans-serif;
+}
+button,a,input,select{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--geo-dourado);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+/* Hidrografias: tipografia, cabeçalho e ação consistentes */
+:root{--serif:var(--geo-fonte-titulo);--ouro:var(--geo-dourado);--papel:var(--geo-creme);--marinho:var(--geo-azul)}
+:is(.texto-abertura,.texto-resultado) h1,.pergunta-area h1,.marca-nome{font-family:var(--geo-fonte-titulo)}
+:is(.botao,.botao-marinho,.botao-dica,.opcoes button){border-radius:var(--geo-raio)}
+.barra-jogo{min-height:80px}
+.barra-jogo .painel-metricas .avatar{display:none!important}
+.painel-metricas{gap:clamp(10px,2vw,22px)}
+@media(max-width:700px){.barra-jogo{min-height:72px}.botao{min-height:44px}}
+
+
+/*
+  GeoEduca | Copero, alinhamento das aberturas (2026-11)
+  Apenas enquadramento, escala e posição. Nenhuma imagem, regra ou mecânica alterada.
+  Referência: aberturas aprovadas dos quatro jogos recentes.
+*/
+
+.abertura-conteudo {position:relative;}
+.abertura .copero-abertura {
+  position:fixed;
+  width:min(48vw,670px);
+  height:min(80svh,680px);
+  min-height:0;
+  right:3vw;
+  bottom:0;
+  margin:0;
+  display:block;
+  pointer-events:none;
+}
+.abertura .copero-abertura img {
+  width:100%; height:100%; max-width:none;
+  object-fit:contain; object-position:right bottom;
+}
+@media (max-width:900px) and (min-width:721px) {
+  .abertura .copero-abertura {width:min(52vw,500px);height:min(75svh,600px);right:2vw;bottom:0;}
+}
+@media (max-width:720px) {
+  .abertura .copero-abertura {width:min(75vw,300px);height:min(40svh,335px);right:0;bottom:0;min-height:0;margin:0;}
+}
+@media (max-width:600px) and (max-height:630px) {
+  .abertura .copero-abertura {height:min(37svh,280px);width:min(73vw,275px);right:0;bottom:0;}
+}
+
+
+/* Máscara técnica de fundo sobre a arte aprovada: não altera o PNG nem as feições. */
+.abertura .copero-abertura img[src*="pose-aprovada"], .copero-resultado img[src*="pose-aprovada"] { -webkit-mask-image:url("../assets/personagens/copero-marinheiro-pose-aprovada-mask.png"); mask-image:url("../assets/personagens/copero-marinheiro-pose-aprovada-mask.png"); -webkit-mask-size:contain; mask-size:contain; -webkit-mask-position:right bottom; mask-position:right bottom; -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat; mix-blend-mode:normal; }

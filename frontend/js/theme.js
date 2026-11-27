@@ -22,6 +22,12 @@ const Theme = {
   },
 
   toggle() {
+    // Several pages bind more than one click handler to the same button;
+    // ignore repeated calls from the same click so the theme doesn't flip back.
+    const now = Date.now();
+    if (now - (this._lastToggle || 0) < 300) return this.current();
+    this._lastToggle = now;
+
     const current = this.current();
     const next = (current === 'dark') ? 'light' : 'dark';
     this.apply(next);
