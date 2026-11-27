@@ -36,11 +36,25 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="exam-actions">
           <span class="status-badge ${status}">
-            ${status === 'available' ? 'Liberada' : status === 'graded' ? 'Corrigida' : 'Agendada'}
+            ${status === 'available' ? 'Liberada' : (exam.nota !== null && exam.nota !== undefined) ? 'Corrigida' : 'Entregue'}
           </span>
           ${status === 'available'
             ? `<button class="btn-exam primary" onclick="confirmExam('${exam.id}')">Iniciar Prova</button>`
-            : `<div style="font-size:0.95rem;color:#059669;margin-top:0.25rem;">${exam.realizada ? 'Concluída' : ''}</div>`
+            : (exam.nota !== null && exam.nota !== undefined)
+              ? `<div style="margin-top:0.35rem; display:flex; flex-direction:column; align-items:flex-end; gap:0.4rem;">
+                   <div style="display:flex; align-items:center; gap:0.5rem;">
+                     <span style="font-size:1.1rem; font-weight:800; color:#15803d; background:#dcfce7; padding:0.25rem 0.75rem; border-radius:8px; border:1px solid #86efac; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                       Nota: ${Number(exam.nota) % 1 === 0 ? Number(exam.nota).toFixed(0) : Number(exam.nota).toFixed(1)}
+                     </span>
+                     <span style="font-size:0.75rem; color:#15803d; font-weight:700; background:#f0fdf4; border:1px solid #bbf7d0; padding:0.2rem 0.5rem; border-radius:6px;">Concluída</span>
+                   </div>
+                   <button class="btn-exam outline" onclick="openStudentExamReview('${exam.id}')" style="font-size:0.75rem; padding:0.4rem 0.75rem; border-color:#10b981; color:#065f46; background:#f0fdf4; display:inline-flex; align-items:center; gap:0.4rem; font-weight:700; border-radius:6px; cursor:pointer; box-shadow:0 1px 2px rgba(16,185,129,0.1);" title="Ver correção detalhada e notas por questão">
+                     <i class="fa-solid fa-file-circle-check"></i> Ver Correção & Feedback
+                   </button>
+                 </div>`
+              : `<div style="font-size:0.85rem; color:#d97706; background:#fef3c7; border:1px solid #fde68a; padding:0.3rem 0.6rem; border-radius:6px; margin-top:0.25rem; font-weight:600;">
+                   <i class="fa-solid fa-clock"></i> Aguardando Correção
+                 </div>`
           }
         </div>
       </div>
@@ -476,6 +490,149 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const submitBtn = document.getElementById('btn-submit-prova');
   if (submitBtn) submitBtn.addEventListener('click', submitProva);
+
+  
+  window.openModal = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('active');
+    el.classList.add('open');
+  };
+
+  window.openStudentExamReview = async function(provaId) {
+    try {
+      Toast.info('Carregando correção...', 'Buscando os detalhes e pontuações da prova.');
+      const data = await api.get('/provas/' + provaId + '/minha-correcao');
+      if (!data) {
+        Toast.error('Erro', 'Dados da prova corrigida não encontrados.');
+        return;
+      }
+
+      const modalTitle = document.getElementById('review-exam-title');
+      if (modalTitle) modalTitle.textContent = data.titulo || 'Correção da Prova';
+
+      const finalGradeEl = document.getElementById('review-final-grade');
+      if (finalGradeEl) {
+        const gradeVal = Number(data.notaFinal ?? 0);
+        finalGradeEl.textContent = gradeVal % 1 === 0 ? gradeVal.toFixed(0) : gradeVal.toFixed(1);
+      }
+
+      // Feedback do Professor
+      const feedbackBanner = document.getElementById('review-teacher-feedback');
+      const feedbackText = document.getElementById('review-feedback-text');
+      if (feedbackBanner && feedbackText) {
+        if (data.feedback && data.feedback.trim()) {
+          feedbackText.textContent = data.feedback;
+          feedbackBanner.style.display = 'block';
+        } else {
+          feedbackBanner.style.display = 'none';
+        }
+      }
+
+      // Badges de resumo
+      const summaryBadges = document.getElementById('review-summary-badges');
+      if (summaryBadges) {
+        const questoes = data.questoes || [];
+        const totalObj = questoes.filter(q => q.tipo === 'alternativa').length;
+        const acertosObj = questoes.filter(q => q.tipo === 'alternativa' && q.acertou).length;
+        const totalDisc = questoes.filter(q => q.tipo !== 'alternativa').length;
+
+        summaryBadges.innerHTML = [
+          totalObj > 0 ? `<span style="font-size:0.8rem; font-weight:700; background:#e0f2fe; color:#0369a1; padding:0.35rem 0.7rem; border-radius:8px; border:1px solid #bae6fd;"><i class="fa-solid fa-list-check"></i> Objetivas: ${acertosObj}/${totalObj} acertos</span>` : '',
+          totalDisc > 0 ? `<span style="font-size:0.8rem; font-weight:700; background:#fef3c7; color:#b45309; padding:0.35rem 0.7rem; border-radius:8px; border:1px solid #fde68a;"><i class="fa-solid fa-pen-nib"></i> ${totalDisc} discursiva${totalDisc > 1 ? 's' : ''} avaliada${totalDisc > 1 ? 's' : ''}</span>` : '',
+          data.penalidades > 0 ? `<span style="font-size:0.8rem; font-weight:700; background:#fee2e2; color:#b91c1c; padding:0.35rem 0.7rem; border-radius:8px; border:1px solid #fca5a5;"><i class="fa-solid fa-triangle-exclamation"></i> Penalidades: -${data.penalidades} pts</span>` : ''
+        ].filter(Boolean).join('');
+      }
+
+      // Lista de questões avaliadas
+      const container = document.getElementById('review-questions-container');
+      if (container) {
+        const letters = ['A', 'B', 'C', 'D', 'E'];
+        const questoes = data.questoes || [];
+
+        container.innerHTML = questoes.map((q, idx) => {
+          const isObj = q.tipo === 'alternativa';
+          const maxPts = q.valorOriginal ?? 1;
+          const assignedPts = Number(q.notaAtribuida ?? (q.acertou ? maxPts : 0));
+          const isFull = assignedPts >= maxPts;
+          const isZero = assignedPts <= 0;
+
+          const badgeBg = isFull ? '#dcfce7' : isZero ? '#fee2e2' : '#fef3c7';
+          const badgeBorder = isFull ? '#86efac' : isZero ? '#fca5a5' : '#fde68a';
+          const badgeColor = isFull ? '#15803d' : isZero ? '#b91c1c' : '#b45309';
+
+          let bodyHtml = '';
+
+          if (isObj) {
+            const opcoes = q.opcoes || [];
+            bodyHtml = `
+              <div style="display:flex; flex-direction:column; gap:0.5rem; margin-top:0.75rem;">
+                ${opcoes.map((opt, oIdx) => {
+                  const letter = letters[oIdx] || '-';
+                  const isStudentPick = String(opt).trim() === String(q.respostaAluno || '').trim();
+                  const isOfficialGabarito = String(opt).trim() === String(q.gabarito || '').trim();
+
+                  let optBg = '#ffffff';
+                  let optBorder = '#e2e8f0';
+                  let tag = '';
+
+                  if (isStudentPick && q.acertou) {
+                    optBg = '#f0fdf4';
+                    optBorder = '#86efac';
+                    tag = '<span style="font-size:0.75rem; font-weight:700; color:#15803d; background:#dcfce7; padding:0.2rem 0.5rem; border-radius:4px; margin-left:auto;"><i class="fa-solid fa-check"></i> Sua Resposta (Correta)</span>';
+                  } else if (isStudentPick && !q.acertou) {
+                    optBg = '#fef2f2';
+                    optBorder = '#fca5a5';
+                    tag = '<span style="font-size:0.75rem; font-weight:700; color:#b91c1c; background:#fee2e2; padding:0.2rem 0.5rem; border-radius:4px; margin-left:auto;"><i class="fa-solid fa-xmark"></i> Sua Resposta</span>';
+                  } else if (isOfficialGabarito) {
+                    optBg = '#f0fdf4';
+                    optBorder = '#86efac';
+                    tag = '<span style="font-size:0.75rem; font-weight:700; color:#15803d; background:#dcfce7; padding:0.2rem 0.5rem; border-radius:4px; margin-left:auto;"><i class="fa-solid fa-check"></i> Gabarito Correto</span>';
+                  }
+
+                  return `
+                    <div style="display:flex; align-items:center; gap:0.75rem; padding:0.6rem 0.85rem; border-radius:8px; border:1px solid ${optBorder}; background:${optBg};">
+                      <span style="font-weight:700; font-size:0.85rem; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#f1f5f9; color:#475569;">${letter}</span>
+                      <span style="font-size:0.9rem; color:#1e293b; font-weight:${isStudentPick ? '600' : '400'};">${escapeHtml(opt)}</span>
+                      ${tag}
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `;
+          } else {
+            // Discursiva
+            bodyHtml = `
+              <div style="margin-top:0.75rem;">
+                <div style="font-size:0.8rem; font-weight:700; color:#64748b; margin-bottom:0.35rem;">Sua Resposta Escrita:</div>
+                <div style="padding:0.75rem 1rem; border-radius:8px; border:1px solid #cbd5e1; background:#f8fafc; font-size:0.95rem; color:#1e293b; white-space:pre-wrap; line-height:1.5;">${q.respostaAluno ? escapeHtml(q.respostaAluno) : '<em style="color:#94a3b8;">Nenhuma resposta digitada.</em>'}</div>
+              </div>
+            `;
+          }
+
+          return `
+            <div style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:1.25rem; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap;">
+                <div style="font-weight:700; font-size:0.95rem; color:#0f172a; flex:1;">
+                  <span style="color:#64748b; margin-right:0.35rem;">Questão ${idx + 1}.</span> ${escapeHtml(q.texto)}
+                </div>
+                <div style="font-size:0.85rem; font-weight:700; background:${badgeBg}; border:1px solid ${badgeBorder}; color:${badgeColor}; padding:0.25rem 0.65rem; border-radius:8px; display:inline-flex; align-items:center; gap:0.35rem; white-space:nowrap;">
+                  <span>${assignedPts % 1 === 0 ? assignedPts.toFixed(0) : assignedPts.toFixed(1)} / ${maxPts % 1 === 0 ? maxPts.toFixed(0) : maxPts.toFixed(1)} pts</span>
+                  ${isObj ? (q.acertou ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>') : ''}
+                </div>
+              </div>
+              ${bodyHtml}
+            </div>
+          `;
+        }).join('');
+      }
+
+      openModal('modal-student-exam-review');
+    } catch (err) {
+      console.error(err);
+      Toast.error('Erro ao abrir correção', err.message || 'Falha na comunicação com o servidor.');
+    }
+  };
 
   async function loadProvas() {
     const provasRes = await api.get('/provas/disponiveis').catch(() => []);

@@ -1,0 +1,51 @@
+ORDENANDO POR REGIÃO · GEOEDUCA
+
+PARA ABRIR
+Extraia o ZIP inteiro e abra index.html no navegador.
+Também é possível abrir html/ordenando_regioes.html diretamente.
+Não é necessário instalar dependências nem ter conexão com a internet.
+
+PASTAS
+html/    Páginas do jogo e retorno da versão avulsa.
+css/     Estilos da série, da partida e da tela de retorno.
+js/      Dados dos estados, peças do mapa e lógica do jogo.
+assets/  Copero, fonte, licença e mapa da marca.
+
+COMO JOGAR
+Escolha a região do estado mostrado. Cada acerto vale 10 pontos.
+A meta é 60 pontos. A partida também termina se os 27 estados forem apresentados.
+Um erro não soma pontos e exibe a região correta.
+Após responder, use Próximo estado para avançar ou Ver resultado para concluir.
+O tempo conta enquanto a questão está aberta para resposta; a leitura do
+feedback e do mapa depois de responder não aumenta esse tempo.
+
+SEU QUEBRA-CABEÇA
+Cada novo estado acertado se encaixa na posição real do mapa.
+Os contornos são os originais do atlas GeoBR, incluindo o Distrito Federal.
+O mapa tem 27 peças, uma para cada unidade da Federação.
+Use Meu mapa durante a partida ou Ver meu mapa no resultado.
+Ao jogar novamente, as peças já conquistadas são mantidas nesta sessão;
+os estados ainda não conquistados aparecem primeiro.
+Cada partida começa com zero pontos, mantendo a meta de 60.
+Um estado já conquistado continua valendo pontos, sem duplicar sua peça.
+Recarregar ou fechar a página reinicia o quebra-cabeça da sessão.
+O mapa respeita a preferência de reduzir movimentos do navegador.
+
+RESULTADOS E INTEGRAÇÃO
+O registro usa geoeduca_results, gameId 5 e os mesmos campos do jogo original:
+aluno, sala, pontuacao, tempo, data e pct.
+O nome e a sala são lidos de geoeduca_user quando disponível.
+A comunicação com servidor continua sendo responsabilidade da plataforma.
+
+Copie html, css, js e assets juntas, mantendo a estrutura relativa.
+O endereço do jogo é html/ordenando_regioes.html.
+Ajuste os links jogos.html do HTML para o endereço do seu painel.
+html/jogos.html é apenas a tela de retorno da versão avulsa.
+O ZIP contém somente o Ordenando por Região.
+
+ARTE E DADOS
+Copero: camisa marfim com detalhes verdes e rosa dos ventos dourada,
+conforme a opção 2 aprovada. Imagem principal: 1920 x 1920, transparente.
+Licença da fonte: assets/fonts/LICENCA.txt.
+Estados, regiões e contornos do Brasil extraídos dos arquivos GeoEduca
+fornecidos pelo usuário, com as coordenadas originais dos 27 estados preservadas.

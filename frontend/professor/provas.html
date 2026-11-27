@@ -99,18 +99,39 @@
     .option-row input[type="radio"] { width: 20px; height: 20px; accent-color: #10b981; }
 
     /* Correção */
-    .student-item { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
-    .student-header { display: flex; justify-content: space-between; font-weight: 600; font-size: 1.1rem; }
-    .student-meta { font-size: 0.875rem; color: #6b7280; display: flex; gap: 1rem; }
-    .student-meta span { display: flex; align-items: center; gap: 0.25rem; }
-    .student-body { margin-top: 0.5rem; padding-top: 1rem; border-top: 1px dashed #e5e7eb; }
-    .correction-item { margin-bottom: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px; border-left: 4px solid #3b82f6; }
-    .correction-q-text { font-weight: 600; margin-bottom: 0.5rem; color: #111827; }
-    .correction-a-text { font-size: 0.95rem; color: #4b5563; background: #fff; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 0.75rem; white-space: pre-wrap; }
-    .grading-row { display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; }
-    .grading-input { width: 80px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; text-align: center; font-weight: 600; }
-    
-    .final-grade-box { margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; background: #ecfeff; border: 1px solid #a5f3fc; padding: 1rem; border-radius: 8px; }
+    .student-grading-card {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;
+      transition: all 0.2s ease; cursor: pointer;
+    }
+    .student-grading-card:hover {
+      border-color: #3b82f6; box-shadow: 0 4px 12px rgba(59,130,246,0.08); transform: translateY(-1px);
+    }
+    .correction-item {
+      margin-bottom: 1.25rem; padding: 1.25rem; background: #fff; border-radius: 12px;
+      border: 1px solid #e2e8f0; border-left: 5px solid #3b82f6; box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .correction-item.correct { border-left-color: #10b981; }
+    .correction-item.incorrect { border-left-color: #ef4444; }
+    .correction-q-text { font-weight: 600; font-size: 1rem; margin-bottom: 0.75rem; color: #0f172a; line-height: 1.5; }
+    .correction-a-text { font-size: 0.95rem; color: #334155; background: #f8fafc; padding: 0.85rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.75rem; white-space: pre-wrap; line-height: 1.5; }
+    .grade-btn-group {
+      display: inline-flex; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1; background: #f1f5f9;
+    }
+    .grade-btn-group button {
+      padding: 7px 14px; font-size: 0.825rem; font-weight: 600; border: none; background: transparent; cursor: pointer; transition: all 0.15s ease; color: #475569;
+    }
+    .grade-btn-group button.active-full {
+      background: #10b981; color: #fff;
+    }
+    .grade-btn-group button.active-zero {
+      background: #ef4444; color: #fff;
+    }
+    .final-grade-banner {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 2px solid #86efac; border-radius: 14px; padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -223,74 +244,116 @@
 
 <!-- Modal Correção -->
 <div class="modal-overlay" id="modal-grading">
-  <div class="modal-content">
+  <div class="modal-content" style="max-width: 840px; width: 95%; min-height: 540px; display: flex; flex-direction: column; max-height: 90vh;">
     <div class="modal-header">
       <h2 class="modal-title" id="grading-title">Corrigir Prova</h2>
       <button class="btn-close" onclick="Modal.close('modal-grading')">&times;</button>
     </div>
-    <div class="modal-body" style="background: #f9fafb;">
+    <div class="modal-body" style="background: #f8fafc; flex: 1; overflow-y: auto; min-height: 420px; padding: 1.75rem;">
       
-      <div class="form-group" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;">
-        <label style="font-weight:600; font-size:0.875rem;">Selecione a Sala:</label>
-        <div class="custom-select-wrapper" id="custom-select-grade-sala" style="flex: 1; max-width: 300px;">
-            <div class="custom-select form-control" id="custom-select-grade-sala-display" tabindex="0">
-                <span id="custom-select-grade-sala-text">Selecione a sala...</span>
-                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-            <div class="custom-select-options" id="custom-select-grade-sala-options">
-                <!-- Injected via JS -->
-            </div>
+      <!-- VIEW 1: Lista de Alunos que Responderam -->
+      <div id="grading-list-view">
+        <div class="form-group" style="margin-bottom: 1.25rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <label style="font-weight:600; font-size:0.875rem; color:#334155;">Filtrar por Sala:</label>
+          <div class="custom-select-wrapper" id="custom-select-grade-sala" style="flex: 1; min-width: 250px; max-width: 340px;">
+              <div class="custom-select form-control" id="custom-select-grade-sala-display" tabindex="0">
+                  <span id="custom-select-grade-sala-text">Selecione a sala...</span>
+                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+              <div class="custom-select-options custom-select-sala-options" id="custom-select-grade-sala-options">
+                  <!-- Injetado via JS -->
+              </div>
+          </div>
+          <input type="hidden" id="gradeSalaSelect" value="" />
         </div>
-        <input type="hidden" id="gradeSalaSelect" value="" />
+
+        <div style="margin-bottom: 1.25rem; position: relative;">
+          <i class="fa-solid fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+          <input type="text" id="gradeSearchInput" class="form-control" placeholder="Buscar aluno por nome ou sala..." style="padding-left: 40px; border-radius: 10px; width: 100%; border: 1px solid #d1d5db;" onkeyup="filterGradingStudents()" />
+        </div>
+
+        <div id="grading-loading" style="text-align:center; padding:3rem; color:#64748b; display:none;">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size:1.75rem; margin-bottom:0.75rem; display:block; color:#3b82f6;"></i>
+          Carregando respostas dos alunos...
+        </div>
+
+        <div id="grading-empty" style="text-align:center; padding:3rem; color:#64748b; display:none; background:#fff; border:1px dashed #cbd5e1; border-radius:12px;">
+          <i class="fa-solid fa-inbox" style="font-size:2rem; margin-bottom:0.75rem; display:block; color:#94a3b8;"></i>
+          Nenhum aluno respondeu a esta prova ainda.
+        </div>
+
+        <div id="students-list-container">
+          <!-- Lista de alunos renderizada via JS -->
+        </div>
       </div>
 
-      <div id="grading-content" style="display:none;">
-        <div style="margin-bottom: 1rem; position: relative;">
-          <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
-          <input type="text" id="gradeSearchInput" class="form-control" placeholder="Buscar aluno por nome..." style="padding-left: 36px; border-radius: 8px; width: 100%; border: 1px solid #d1d5db;" onkeyup="filterGradingStudents()" />
+      <!-- VIEW 2: Detalhe de Correção do Aluno Selecionado -->
+      <div id="grading-detail-view" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid #e2e8f0; flex-wrap:wrap; gap:0.75rem;">
+          <button type="button" class="btn btn-outline" onclick="backToGradingList()" style="gap:0.5rem; font-size:0.875rem;">
+            <i class="fa-solid fa-arrow-left"></i> Voltar à lista de alunos
+          </button>
+          <div id="detail-student-info" style="display:flex; gap:0.75rem; align-items:center; font-weight:600; color:#1e293b;">
+            <!-- Nome do aluno, sala e status injetados via JS -->
+          </div>
         </div>
-        <div id="students-list-container">
-          <!-- Rendered by JS -->
+
+        <!-- Questões do Aluno -->
+        <div id="student-questions-container">
+          <!-- Renderizado via JS -->
+        </div>
+
+        <!-- Banner com a Nota Final e Botões de Ação -->
+        <div class="final-grade-banner" id="grading-action-banner">
+          <div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: #166534;">
+              A nota final é "<span id="display-final-grade" style="color: #15803d; font-size: 1.6rem; font-weight: 800;">0.0</span>"
+            </div>
+            <div style="font-size: 0.85rem; color: #15803d; margin-top: 0.25rem;" id="display-grade-breakdown">
+              Soma: Objetivas (<span id="grade-sub-obj">0</span> pts) + Discursivas (<span id="grade-sub-disc">0</span> pts)<span id="grade-sub-penal"></span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline" id="btn-revisar-grade" onclick="saveStudentGrade('em_revisao')" style="background: #fff; border-color: #cbd5e1; font-weight: 600;">
+              <i class="fa-solid fa-floppy-disk"></i> Revisar
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-concluir-grade" onclick="saveStudentGrade('corrigida')" style="background: #10b981; border-color: #10b981; font-weight: 600; padding: 0 1.5rem;">
+              <i class="fa-solid fa-check"></i> Concluir
+            </button>
+          </div>
         </div>
       </div>
-      
-      <div id="grading-loading" style="text-align:center; padding:2rem; display:none;">
-        Carregando entregas...
-      </div>
-      <div id="grading-empty" style="text-align:center; padding:2rem; color:#6b7280; display:none;">
-        Selecione uma sala para ver as avaliações entregues.
-      </div>
-      
+
     </div>
   </div>
 </div>
 
 <!-- Modal Enviar Prova -->
-<div class="modal-overlay" id="modal-send-prova">
-  <div class="modal-content" style="max-width: 650px; display: flex; flex-direction: column; max-height: 90vh;">
+<div class="modal-overlay" <div class="modal-overlay" id="modal-send-prova">
+  <div class="modal-content" style="max-width: 820px; width: 95%; display: flex; flex-direction: column; min-height: 540px; max-height: 90vh; overflow: visible !important;">
     <div class="modal-header">
       <h2 class="modal-title">Enviar Prova</h2>
       <button class="btn-close" onclick="Modal.close('modal-send-prova')">&times;</button>
     </div>
-    <div class="modal-body" style="overflow-y: auto; flex: 1; min-height: 200px;">
+    <div class="modal-body" style="overflow-y: visible !important; flex: 1; min-height: 340px; padding: 2rem;">
       <div class="form-group">
         <label class="form-label">Destino</label>
-        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-          <label style="display:flex; gap:0.5rem; align-items:center;">
+        <div style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom: 0.5rem;">
+          <label style="display:flex; gap:0.5rem; align-items:center; cursor: pointer; font-weight: 500;">
             <input type="radio" name="sendProvaTargetType" value="sala" checked />
             Sala
           </label>
-          <label style="display:flex; gap:0.5rem; align-items:center;">
+          <label style="display:flex; gap:0.5rem; align-items:center; cursor: pointer; font-weight: 500;">
             <input type="radio" name="sendProvaTargetType" value="alunos" />
             Alunos (um ou vários)
           </label>
         </div>
       </div>
 
-      <div id="sendProvaSalaBlock">
+      <div id="sendProvaSalaBlock" style="min-height: 220px; padding-bottom: 2rem;">
         <div class="form-group">
           <label class="form-label">Selecione a sala</label>
-          <div class="custom-select-wrapper" id="custom-select-send-sala">
+          <div class="custom-select-wrapper" id="custom-select-send-sala" style="width: 100%;">
             <div class="custom-select form-control" id="custom-select-send-sala-display" tabindex="0">
                 <span id="custom-select-send-sala-text">Selecione a sala...</span>
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 10px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -310,7 +373,7 @@
             <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
             <input type="text" id="sendSearchInput" class="form-control" placeholder="Buscar aluno por nome..." style="padding-left: 36px; border-radius: 8px; width: 100%; border: 1px solid #d1d5db;" onkeyup="filterSendStudents()" />
           </div>
-          <div id="sendProvaAlunosList" style="max-height: 260px; overflow:auto; padding:0.75rem; border:1px solid #e5e7eb; border-radius:10px; background:#fff;">
+          <div id="sendProvaAlunosList" style="max-height: 280px; overflow:auto; padding:0.75rem; border:1px solid #e5e7eb; border-radius:10px; background:#fff;">
             <div style="color:#6b7280;">Carregando alunos...</div>
           </div>
         </div>

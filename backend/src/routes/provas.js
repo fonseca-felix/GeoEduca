@@ -138,9 +138,21 @@ router.get('/disponiveis', authenticateToken, requireAluno, async (req, res) => 
         ]);
 
         const respondidasSet = new Set();
+        const respostasMap = new Map();
         respostasAlunoSnap.forEach(rDoc => {
             const rd = rDoc.data();
-            if (rd.provaId) respondidasSet.add(rd.provaId);
+            if (rd.provaId) {
+                respondidasSet.add(rd.provaId);
+                respostasMap.set(rd.provaId, {
+                    id: rDoc.id,
+                    status: rd.status || 'pendente',
+                    notaFinal: rd.notaFinal !== undefined 
+                        ? rd.notaFinal 
+                        : ((rd.notaAutomatica || 0) + (rd.notaManual || 0)),
+                    dataCorrecao: rd.dataCorrecao || null,
+                    feedback: rd.feedback || ''
+                });
+            }
         });
 
         const questoesByProva = new Map();
@@ -176,6 +188,7 @@ router.get('/disponiveis', authenticateToken, requireAluno, async (req, res) => 
             const data = provaSnap.data();
             const provaId = provaSnap.id;
 
+            const respostaInfo = respostasMap.get(provaId);
             provas.push({
                 id: provaId,
                 titulo: data.titulo,
@@ -183,6 +196,9 @@ router.get('/disponiveis', authenticateToken, requireAluno, async (req, res) => 
                 rubrica: data.rubrica,
                 questoes: questoesByProva.get(provaId) || [],
                 realizada: respondidasSet.has(provaId),
+                statusResposta: respostaInfo ? respostaInfo.status : null,
+                nota: respostaInfo && respostaInfo.status === 'corrigida' ? respostaInfo.notaFinal : null,
+                dataCorrecao: respostaInfo ? respostaInfo.dataCorrecao : null,
                 createdAt: data.createdAt
             });
         }
@@ -191,6 +207,99 @@ router.get('/disponiveis', authenticateToken, requireAluno, async (req, res) => 
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao listar provas disponíveis' });
+    }
+});
+
+// GET - Obter resultado e correção detalhada da prova (aluno)
+router.get('/:id/minha-correcao', authenticateToken, requireAluno, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const alunoId = req.user.id;
+
+        const [provaDoc, respostaSnap, questoesSnap] = await Promise.all([
+            db.collection('provas').doc(id).get(),
+            db.collection('prova_respostas')
+                .where('provaId', '==', id)
+                .where('alunoId', '==', alunoId)
+                .limit(1)
+                .get(),
+            db.collection('prova_questoes').where('provaId', '==', id).get()
+        ]);
+
+        if (!provaDoc.exists) {
+            return res.status(404).json({ error: 'Prova não encontrada' });
+        }
+        if (respostaSnap.empty) {
+            return res.status(404).json({ error: 'Você ainda não enviou esta prova.' });
+        }
+
+        const provaData = provaDoc.data();
+        const respostaData = respostaSnap.docs[0].data();
+
+        const questoesMap = new Map();
+        questoesSnap.forEach(qDoc => {
+            const qData = qDoc.data();
+            questoesMap.set(qDoc.id, {
+                id: qDoc.id,
+                texto: qData.texto,
+                tipo: qData.tipo,
+                opcoes: qData.opcoes || null,
+                correta: qData.correta !== undefined ? qData.correta : null,
+                valor: qData.valor !== undefined ? qData.valor : 1
+            });
+        });
+
+        const questoesAvaliadas = (respostaData.respostas || []).map(r => {
+            const questao = questoesMap.get(r.questaoId) || {};
+            const valorMax = questao.valor !== undefined ? questao.valor : 1;
+            const acertou = r.acertou !== undefined ? r.acertou : (r.respostaSelecionada === questao.correta);
+            
+            let pontos = 0;
+            if (r.notaAtribuida !== undefined) {
+                pontos = Number(r.notaAtribuida);
+            } else if (r.tipo === 'alternativa') {
+                pontos = acertou ? valorMax : 0;
+            } else {
+                pontos = Number(r.nota || 0);
+            }
+
+            return {
+                questaoId: r.questaoId,
+                texto: questao.texto || 'Questão',
+                tipo: questao.tipo || r.tipo,
+                opcoes: questao.opcoes || null,
+                gabaritoOficial: questao.correta !== undefined ? questao.correta : null,
+                valorMaximo: valorMax,
+                respostaSelecionada: r.respostaSelecionada !== undefined ? r.respostaSelecionada : null,
+                respostaTexto: r.respostaTexto || null,
+                acertou: acertou,
+                pontosAtribuidos: pontos,
+                feedbackQuestao: r.feedbackQuestao || null,
+                anulada: r.anulada || false
+            };
+        });
+
+        const notaFinal = respostaData.notaFinal !== undefined 
+            ? respostaData.notaFinal 
+            : ((respostaData.notaAutomatica || 0) + (respostaData.notaManual || 0));
+
+        res.json({
+            prova: {
+                id: provaDoc.id,
+                titulo: provaData.titulo,
+                rubrica: provaData.rubrica
+            },
+            status: respostaData.status || 'pendente',
+            notaFinal: notaFinal,
+            feedbackGeral: respostaData.feedback || '',
+            penalidades: respostaData.penalidadeAntiCola || 0,
+            dataEnvio: respostaData.dataEnvio,
+            dataCorrecao: respostaData.dataCorrecao,
+            questoes: questoesAvaliadas
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao buscar correção da prova' });
     }
 });
 
@@ -396,6 +505,85 @@ router.post('/:id/responder', authenticateToken, requireAluno, async (req, res) 
     }
 });
 
+// GET - Todas as respostas de uma prova (com filtro opcional por salaId)
+router.get('/:id/respostas', authenticateToken, requireProfessor, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { salaId } = req.query;
+
+        const respostasSnap = await db.collection('prova_respostas').where('provaId', '==', id).get();
+        if (respostasSnap.empty) {
+            return res.json([]);
+        }
+
+        const salasSnap = await db.collection('salas').get();
+        const salasMap = new Map();
+        salasSnap.forEach(s => salasMap.set(s.id, s.data().nome || 'Sala'));
+
+        const alunoIds = [...new Set(respostasSnap.docs.map(d => d.data().alunoId))];
+        const alunosSnap = await Promise.all(
+            alunoIds.map(aId => db.collection('alunos').doc(aId).get())
+        );
+
+        const alunosMap = new Map();
+        alunosSnap.forEach(aDoc => {
+            if (aDoc.exists) {
+                const aData = aDoc.data();
+                const sId = aData.salaId || (Array.isArray(aData.salas) && aData.salas[0]) || '';
+                alunosMap.set(aDoc.id, {
+                    nome: aData.nome || 'Aluno',
+                    rm: aData.rm || '',
+                    salaId: sId,
+                    salaNome: salasMap.get(sId) || ''
+                });
+            }
+        });
+
+        const resultado = [];
+        respostasSnap.forEach(rDoc => {
+            const rData = rDoc.data();
+            const aluno = alunosMap.get(rData.alunoId) || {
+                nome: 'Aluno',
+                rm: '',
+                salaId: '',
+                salaNome: ''
+            };
+
+            if (salaId && aluno.salaId !== salaId) {
+                return;
+            }
+
+            resultado.push({
+                id: rDoc.id,
+                alunoId: rData.alunoId,
+                alunoNome: aluno.nome,
+                alunoRm: aluno.rm,
+                salaId: aluno.salaId,
+                salaNome: aluno.salaNome,
+                respondeu: true,
+                resposta: {
+                    id: rDoc.id,
+                    ...rData,
+                    notaFinal: rData.notaFinal !== undefined 
+                        ? rData.notaFinal 
+                        : ((rData.notaAutomatica || 0) + (rData.notaManual || 0))
+                }
+            });
+        });
+
+        resultado.sort((a, b) => {
+            const ta = a.resposta.dataEnvio || '';
+            const tb = b.resposta.dataEnvio || '';
+            return tb.localeCompare(ta);
+        });
+
+        res.json(resultado);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao buscar respostas da prova' });
+    }
+});
+
 // GET - Respostas de uma prova por sala (professor)
 router.get('/:id/respostas/sala/:salaId', authenticateToken, requireProfessor, async (req, res) => {
     try {
@@ -412,12 +600,35 @@ router.get('/:id/respostas/sala/:salaId', authenticateToken, requireProfessor, a
                 .limit(1)
                 .get();
 
-            resultado.push({
-                alunoId: alunoDoc.id,
-                alunoNome: alunoDoc.data().nome,
-                respondeu: !resposta.empty,
-                resposta: resposta.empty ? null : { id: resposta.docs[0].id, ...resposta.docs[0].data() }
-            });
+            if (!resposta.empty) {
+                const rDoc = resposta.docs[0];
+                const rData = rDoc.data();
+                resultado.push({
+                    id: rDoc.id,
+                    alunoId: alunoDoc.id,
+                    alunoNome: alunoDoc.data().nome,
+                    alunoRm: alunoDoc.data().rm || '',
+                    salaId: salaId,
+                    respondeu: true,
+                    resposta: {
+                        id: rDoc.id,
+                        ...rData,
+                        notaFinal: rData.notaFinal !== undefined 
+                            ? rData.notaFinal 
+                            : ((rData.notaAutomatica || 0) + (rData.notaManual || 0))
+                    }
+                });
+            } else {
+                resultado.push({
+                    id: null,
+                    alunoId: alunoDoc.id,
+                    alunoNome: alunoDoc.data().nome,
+                    alunoRm: alunoDoc.data().rm || '',
+                    salaId: salaId,
+                    respondeu: false,
+                    resposta: null
+                });
+            }
         }
 
         res.json(resultado);
@@ -532,7 +743,7 @@ router.get('/:id/estatisticas', authenticateToken, requireProfessor, async (req,
 router.put('/respostas/:respostaId/corrigir', authenticateToken, requireProfessor, async (req, res) => {
     try {
         const { respostaId } = req.params;
-        const { notaManual, feedback } = req.body;
+        const { notaManual, notaFinal, status, feedback, respostasAvaliadas } = req.body;
 
         const respostaRef = db.collection('prova_respostas').doc(respostaId);
         const resposta = await respostaRef.get();
@@ -541,14 +752,31 @@ router.put('/respostas/:respostaId/corrigir', authenticateToken, requireProfesso
             return res.status(404).json({ error: 'Resposta não encontrada' });
         }
 
-        await respostaRef.update({
-            notaManual: notaManual || 0,
-            feedback: feedback || '',
-            status: 'corrigida',
+        const data = resposta.data();
+        const updateData = {
+            notaManual: notaManual !== undefined ? Number(notaManual) : (data.notaManual || 0),
+            feedback: feedback !== undefined ? feedback : (data.feedback || ''),
+            status: status || 'corrigida',
             dataCorrecao: new Date().toISOString()
-        });
+        };
 
-        res.json({ message: 'Prova corrigida com sucesso' });
+        if (notaFinal !== undefined) {
+            updateData.notaFinal = Number(notaFinal);
+        } else {
+            updateData.notaFinal = (data.notaAutomatica || 0) + (updateData.notaManual || 0);
+        }
+
+        if (Array.isArray(respostasAvaliadas)) {
+            updateData.respostas = respostasAvaliadas;
+        }
+
+        await respostaRef.update(updateData);
+
+        res.json({
+            message: 'Prova corrigida com sucesso',
+            notaFinal: updateData.notaFinal,
+            status: updateData.status
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao corrigir prova' });

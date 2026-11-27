@@ -1,0 +1,194 @@
+/* GeoEduca | Complete a Capital - identidade visual validada no Caça-Palavras.
+   Azul marinho #0b0a32, dourado #cca43b, verde #233b0b e creme #f7f3e9. */
+:root{--navy:#0b0a32;--gold:#cca43b;--green:#233b0b;--paper:#f7f3e9;--ink:#0b0a32;--muted:#6f6b78;--line:#ded7c7;--pad:clamp(20px,6vw,112px);--title:Georgia,serif;--color-success:#2c6628;--color-danger:#b43d41}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:Arial,Helvetica,sans-serif;color:var(--navy);background:var(--paper);-webkit-font-smoothing:antialiased}
+button,input{font:inherit}button{cursor:pointer}button,a{-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--title);font-weight:700;letter-spacing:-.04em;line-height:1.11}
+[hidden]{display:none!important}
+.skip-link{position:fixed;top:-90px;left:12px;padding:10px 14px;background:var(--navy);color:#fff;z-index:30;border-radius:6px}.skip-link:focus{top:10px}
+.site-header{position:absolute;inset:0 0 auto;z-index:10;min-height:120px;padding:clamp(26px,5svh,52px) var(--pad) 0;display:flex;align-items:flex-start;justify-content:space-between;gap:22px;pointer-events:none}
+.site-header>*{pointer-events:auto}
+.brand{display:flex;align-items:center;gap:12px;font-size:clamp(16px,1.5vw,22px);font-weight:900;line-height:1;color:var(--navy);letter-spacing:-.025em}
+.brand-map{width:clamp(32px,4vw,57px);height:clamp(45px,5.5vw,70px);background:currentColor;mask:url('assets/brand-brasil.svg') center/contain no-repeat;-webkit-mask:url('assets/brand-brasil.svg') center/contain no-repeat}
+.brand-line{display:block;height:3px;width:100%;background:currentColor;margin-top:7px}
+.header-right{display:flex;align-items:center;gap:30px;min-height:50px}
+.header-mode{font-size:12px;color:inherit;opacity:.74;font-weight:700}
+.header-link{font-size:12px;color:inherit;font-weight:700;text-decoration:none;border-bottom:1px solid currentColor;padding:10px 0;display:flex;align-items:center;gap:10px}
+.header-link:hover{opacity:.7}
+.screen{min-height:100svh;position:relative}
+body[data-screen="telaInicial"]{background:var(--gold)}
+.home-screen{overflow:hidden;isolation:isolate;display:flex;align-items:center;background:var(--gold);padding:140px var(--pad) 45px}
+.home-shape{position:absolute;z-index:-1;right:-26vw;top:-39svh;width:77vw;height:186svh;border-radius:55% 0 0 50%;background:var(--navy);transform:rotate(15deg)}
+.home-copy{position:relative;z-index:2;width:57%;max-width:780px;padding:20px 0}
+.eyebrow{font-size:11px;letter-spacing:.17em;text-transform:uppercase;color:#77621c;font-weight:800;margin-bottom:16px}
+.home-copy h1{font-size:clamp(46px,5vw,80px)}
+.home-lead{max-width:500px;line-height:1.6;color:#2a2544;font-size:clamp(15px,1.4vw,20px);margin-top:25px}
+.primary-button{border:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:space-between;gap:40px;min-height:63px;padding:15px 25px;font-size:18px;font-weight:750;background:var(--navy);color:var(--paper);transition:transform .2s,background .2s}
+.primary-button:hover{background:#211f56;transform:translateY(-2px)}
+.primary-button span{font-size:26px}.home-copy .primary-button{margin-top:36px;min-width:335px;max-width:100%}
+.cover-meta{font-size:13px;font-weight:750;margin-top:17px;opacity:.77}.cover-meta span{margin:0 7px}
+.home-mascot{position:absolute;right:3vw;bottom:0;width:clamp(250px,38vw,550px);height:min(70svh,700px);object-fit:contain;object-position:center bottom;pointer-events:none;filter:drop-shadow(0 18px 21px rgba(0,0,0,.16))}
+body[data-screen="partida"]{height:100dvh;min-height:0;overflow:hidden;display:flex;flex-direction:column;background:var(--paper)}
+body[data-screen="partida"] .site-header{position:relative;inset:auto;flex:0 0 auto;height:clamp(67px,10dvh,88px);min-height:0;padding:7px var(--pad);align-items:center;background:var(--navy);color:#f7f3e9}
+body[data-screen="partida"] .brand{color:var(--gold);font-size:clamp(13px,1.25vw,17px);gap:9px}
+body[data-screen="partida"] .brand-map{width:34px;height:42px}
+body[data-screen="partida"] .brand-line{height:2px;margin-top:5px}
+body[data-screen="partida"] .header-mode{font-size:11px;color:#d4d0de}
+body[data-screen="partida"] .header-link{font-size:12px;color:var(--paper);border-color:#9b94ac}
+body[data-screen="partida"] main{flex:1;min-height:0;display:flex;flex-direction:column}
+body[data-screen="partida"] .play-screen{height:100%;flex:1;min-height:0;display:flex;flex-direction:column;padding:clamp(11px,2.6dvh,26px) var(--pad) clamp(10px,2dvh,22px);overflow:hidden}
+.play-head{max-width:1250px;width:100%;margin:0 auto;flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:22px;padding-bottom:clamp(10px,2dvh,20px);border-bottom:1px solid var(--line)}
+.play-intro .eyebrow{font-size:10px;margin-bottom:7px}
+.play-head h1{font-size:clamp(30px,3.4vw,53px)}
+.lead{font-size:clamp(11px,1.1vw,14px);color:#77717d;margin-top:7px;line-height:1.4}
+.round-status{flex:0 0 auto;display:flex;align-items:center;gap:clamp(12px,2vw,30px);padding-bottom:4px}
+.status-unit{display:flex;flex-direction:column;gap:5px;min-width:70px}
+.status-label{font-size:10px;color:#77717d;font-weight:800;letter-spacing:.13em}
+.status-value{display:flex;align-items:baseline;gap:7px;white-space:nowrap}
+.status-value strong{font-size:clamp(24px,2.3vw,36px);font-weight:800;line-height:1}
+.status-value small{font-size:12px;color:#67616c;font-weight:700}
+.status-rule{height:39px;width:1px;background:var(--line)}
+.play-layout{width:100%;max-width:1250px;margin:0 auto;flex:1;min-height:0}
+.game-card-body,.game-content-panel{width:100%;height:100%;min-height:0}
+.game-content-panel{display:flex;align-items:stretch;justify-content:center;flex-direction:column;padding:clamp(12px,2dvh,23px) 0 0;overflow:hidden}
+.capital-layout{width:100%;height:100%;min-height:0;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(340px,.95fr);column-gap:clamp(30px,5vw,90px);align-items:center}
+.capital-prompt,.answer-panel{min-width:0;min-height:0}
+.capital-prompt{display:flex;flex-direction:column;justify-content:center;gap:clamp(11px,2dvh,22px);height:100%;padding:0 0 10px}
+.prompt-topline{font-size:11px;font-weight:800;letter-spacing:.16em;color:#9e7b22;display:flex;align-items:center;gap:9px}
+.prompt-topline:before{content:"";width:8px;height:8px;background:var(--gold);transform:rotate(45deg)}
+.prompt-title{font-size:clamp(22px,2.8vw,42px);font-weight:700;line-height:1.15;max-width:570px}
+.state-block{border-left:5px solid var(--gold);padding:9px 0 9px 24px}
+.region-label{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:#78727e;font-weight:800;margin-bottom:13px}
+.state-name{font-family:Georgia,serif;font-size:clamp(33px,4.4vw,66px);font-weight:700;line-height:1.07;letter-spacing:-.045em;overflow-wrap:break-word}
+.state-sigla{display:inline-block;vertical-align:middle;font-family:Arial,sans-serif;letter-spacing:.08em;font-size:clamp(13px,1.3vw,16px);color:#8a6e2c;border:1px solid #d7c99c;border-radius:6px;padding:6px 10px;margin-top:14px;font-weight:900}
+.puzzle-label{font-size:11px;letter-spacing:.13em;color:#7a747c;font-weight:800}
+.capital-lacuna{font-family:monospace;font-size:clamp(24px,3vw,44px);letter-spacing:clamp(2px,.4vw,6px);font-weight:800;color:#a68122;overflow-wrap:anywhere;line-height:1.2;white-space:pre-wrap;}
+.answer-panel{width:100%;max-width:495px;justify-self:center;display:flex;flex-direction:column;gap:clamp(10px,2dvh,24px);padding:16px 0}
+.answer-kicker{color:#a38025;font-size:11px;letter-spacing:.17em;font-weight:800}
+.answer-title{font-size:clamp(31px,3.1vw,47px);line-height:1.06}
+.answer-help{font-size:14px;color:#77717d;line-height:1.5;max-width:410px}
+.capital-form{display:flex;flex-direction:column;gap:12px}
+.capital-input{width:100%;border:1px solid #c7bb9d;border-radius:9px;background:#fffcf6;outline:none;height:clamp(48px,7dvh,65px);padding:10px 18px;font-weight:750;font-size:clamp(14px,1.3vw,18px);color:var(--navy);transition:border-color .2s,box-shadow .2s}
+.capital-input:focus{border-color:#b28d29;box-shadow:0 0 0 3px rgba(204,164,59,.16)}
+.capital-input::placeholder{color:#908c97;font-weight:500}
+.actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.action-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-radius:7px;padding:10px 16px;background:transparent;border:1px solid #d3c9b7;color:var(--navy);font-weight:750;font-size:13px}
+.action-btn:hover:not(:disabled){background:#eee6d4}
+.action-btn:disabled{opacity:.4;cursor:not-allowed}
+.action-btn.primary{background:var(--navy);border-color:var(--navy);color:var(--paper);flex:1;min-width:128px}
+.action-btn.primary:hover{background:#23214e}
+.feedback-msg{font-size:13px;font-weight:750;min-height:23px;color:#6d6677;line-height:1.35}
+.small-progress{display:flex;flex-direction:column;gap:9px;margin-top:clamp(5px,1.2dvh,16px)}
+.progress-top{font-size:10px;font-weight:800;letter-spacing:.11em;color:#716b77;display:flex;justify-content:space-between}
+.progress-top strong{font-size:12px;letter-spacing:normal;color:var(--navy)}
+.progress-track{height:5px;background:#e1dac8;border-radius:99px;overflow:hidden}
+.progress-track span{display:block;width:0;height:100%;background:var(--gold);transition:width .25s}
+.result-view{width:min(100%,620px);margin:auto;display:flex;flex-direction:column;align-items:center;text-align:center;gap:clamp(12px,2.3dvh,22px)}
+.result-kicker{color:#a17e25;font-weight:900;letter-spacing:.16em;font-size:11px}
+.result-view h2{font-size:clamp(33px,5vw,61px)}
+.result-text{color:#716b76;font-size:14px}
+.result-stats{display:flex;gap:clamp(30px,6vw,60px);border-top:1px solid var(--line);border-bottom:1px solid var(--line);width:100%;justify-content:center;padding:clamp(12px,2dvh,22px) 0}
+.result-stat{display:flex;flex-direction:column;gap:6px}.result-stat strong{font-size:clamp(24px,3vw,40px)}.result-stat span{font-size:11px;letter-spacing:.1em;color:#6e6875;font-weight:800;text-transform:uppercase}
+.result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.result-actions a,.result-actions button{text-decoration:none;background:var(--navy);color:#fff;border:0;border-radius:7px;padding:14px 20px;font-weight:750;font-size:14px;cursor:pointer}
+.result-actions a{background:transparent;color:var(--navy);border:1px solid #cbbf9d}
+.noscript-message{position:fixed;bottom:15px;left:15px;background:#fff;padding:14px;border:1px solid #ccc}
+@media(max-width:850px){
+  .header-mode{display:none}
+  .capital-layout{grid-template-columns:1fr;grid-template-rows:auto auto;gap:clamp(9px,2dvh,25px);align-content:center}
+  .capital-prompt{height:auto;gap:clamp(6px,1.5dvh,15px);padding:0}
+  .prompt-title{font-size:clamp(18px,4vw,29px)}
+  .state-block{padding:5px 0 5px 14px;border-left-width:3px}
+  .state-name{font-size:clamp(28px,5vw,45px)}
+  .region-label{margin-bottom:6px}
+  .state-sigla{margin-top:8px}
+  .capital-lacuna{font-size:clamp(21px,4vw,29px)}
+  .answer-panel{max-width:none;justify-self:stretch;gap:clamp(7px,1.2dvh,12px);padding:0}
+  .answer-title{font-size:clamp(22px,4vw,31px)}
+  .answer-help{display:none}
+}
+@media(max-width:590px){
+  :root{--pad:16px}
+  .site-header{padding:20px var(--pad) 0;min-height:90px;gap:8px}
+  .brand{font-size:16px;gap:8px}.brand-map{width:32px;height:45px}.header-right{gap:8px}.header-link{font-size:11px}
+  .home-screen{padding:118px var(--pad) 0;align-items:flex-start;min-height:100svh}
+  .home-shape{top:auto;right:-27vw;bottom:-36svh;width:128vw;height:82svh;transform:rotate(-18deg);border-radius:50% 50% 0 0}
+  .home-copy{width:100%;padding:3svh 0 0}.home-copy h1{font-size:clamp(39px,10.7vw,56px)}
+  .home-lead{max-width:330px;margin-top:16px;font-size:14px}.home-copy .primary-button{min-width:245px;margin-top:26px;min-height:55px;font-size:15px}
+  .cover-meta{font-size:11px;margin-top:13px}.home-mascot{width:min(57vw,290px);height:min(36svh,300px);bottom:0;right:0}
+  body[data-screen="partida"] .site-header{height:60px;padding:5px var(--pad)}
+  body[data-screen="partida"] .brand{font-size:12px;gap:6px}.site-header .brand-map{width:27px;height:34px}
+  body[data-screen="partida"] .header-link{font-size:10px}.play-head h1{font-size:clamp(24px,6.4vw,31px)}
+  body[data-screen="partida"] .play-screen{padding:8px 12px 8px}
+  .play-head{padding-bottom:8px;align-items:flex-end;gap:8px}
+  .play-intro .eyebrow{font-size:8px;margin-bottom:4px}.lead{display:none}
+  .round-status{gap:8px;padding-bottom:0}.status-unit{min-width:0;gap:3px}.status-rule{height:26px}
+  .status-label{font-size:7px;letter-spacing:.08em}.status-value{gap:3px}.status-value strong{font-size:18px}.status-value small{font-size:8px}
+  .game-content-panel{padding:5px 0 0}.capital-layout{gap:clamp(7px,1.4dvh,14px)}
+  .prompt-topline,.answer-kicker{font-size:9px}
+  .prompt-title{font-size:19px}
+  .state-name{font-size:clamp(27px,7vw,37px)}
+  .region-label{font-size:9px;margin-bottom:3px}
+  .state-sigla{font-size:11px;padding:4px 7px;margin-top:5px}
+  .puzzle-label{font-size:9px}.capital-lacuna{font-size:clamp(19px,5.1vw,27px);letter-spacing:2px}
+  .answer-title{font-size:23px}.capital-input{height:48px;padding:9px 12px;font-size:14px}
+  .actions{gap:6px}.action-btn{min-height:41px;padding:8px 10px;font-size:11px}.action-btn.primary{min-width:100px}
+  .feedback-msg{min-height:20px;font-size:11px}
+  .small-progress{margin-top:2px;gap:6px}
+}
+@media(max-width:370px){
+  .play-head h1{font-size:23px}.state-name{font-size:29px}.actions{gap:4px}
+  .action-btn{padding:7px 7px;font-size:10px}.home-mascot{height:32svh}
+}
+@media(max-height:660px){
+  body[data-screen="partida"] .site-header{height:54px}
+  body[data-screen="partida"] .play-screen{padding-top:7px;padding-bottom:6px}
+  .play-head{padding-bottom:6px}.play-head .lead{display:none}.play-head h1{font-size:clamp(23px,2.5vw,36px)}
+  .capital-layout{gap:8px}.capital-prompt{gap:8px}
+  .answer-panel{gap:8px}.state-name{font-size:clamp(25px,4vw,50px)}
+}
+@media(max-height:470px) and (min-width:650px){
+  body[data-screen="partida"] .site-header{height:43px}
+  .play-head{padding-bottom:4px}.play-head h1{font-size:22px}
+  .capital-layout{grid-template-columns:1fr 1fr;grid-template-rows:auto;gap:12px}
+  .capital-prompt{gap:5px}.prompt-title{font-size:20px}.state-name{font-size:25px}.state-block{padding:4px 0 4px 12px}
+  .answer-panel{gap:5px}.answer-title{font-size:22px}
+  .capital-input{height:35px}.action-btn{min-height:32px;padding:4px 8px}
+  .region-label{margin-bottom:4px}.small-progress{display:none}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+
+
+/* ===============================================================
+   GEOEDUCA · PADRÃO COMPARATIVO 2026 · VERSÃO 1
+   Harmonização exclusivamente visual. Não altera regras nem JS.
+   Cores oficiais: marinho, dourado, creme e verde.
+   =============================================================== */
+:root{
+  --geo-azul:#0b0a32;
+  --geo-dourado:#cca43b;
+  --geo-creme:#f7f3e9;
+  --geo-verde:#233b0b;
+  --geo-raio:12px;
+  --geo-fonte-titulo:Georgia,'Times New Roman',serif;
+  --geo-fonte-texto:Arial,Helvetica,sans-serif;
+}
+button,a,input,select{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--geo-dourado);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+/* Complete a Capital: preservadas as telas aprovadas. */
+:root{--title:var(--geo-fonte-titulo)}
+
+/* GEOEDUCA V4 — apenas escala/posição dos Coperos nas aberturas. */
+@media(min-width:801px){
+  .home-mascot{width:clamp(310px,38vw,550px);height:min(70svh,700px);right:3vw;bottom:0;object-position:center bottom;}
+}
+@media(max-width:800px){
+  .home-mascot{width:min(65vw,310px);height:min(39svh,340px);right:0;bottom:0;object-position:center bottom;}
+}

@@ -1,0 +1,271 @@
+/* GeoEduca | Complete a Capital - identidade visual validada no Caça-Palavras.
+   Azul marinho #0b0a32, dourado #cca43b, verde #233b0b e creme #f7f3e9. */
+:root{--navy:#0b0a32;--gold:#cca43b;--green:#233b0b;--paper:#f7f3e9;--ink:#0b0a32;--muted:#6f6b78;--line:#ded7c7;--pad:clamp(20px,6vw,112px);--title:Georgia,serif;--color-success:#2c6628;--color-danger:#b43d41}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:Arial,Helvetica,sans-serif;color:var(--navy);background:var(--paper);-webkit-font-smoothing:antialiased}
+button,input{font:inherit}button{cursor:pointer}button,a{-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+h1,h2,h3,p{margin:0}h1,h2,h3{font-family:var(--title);font-weight:700;letter-spacing:-.04em;line-height:1.11}
+[hidden]{display:none!important}
+.skip-link{position:fixed;top:-90px;left:12px;padding:10px 14px;background:var(--navy);color:#fff;z-index:30;border-radius:6px}.skip-link:focus{top:10px}
+.site-header{position:absolute;inset:0 0 auto;z-index:10;min-height:120px;padding:clamp(26px,5svh,52px) var(--pad) 0;display:flex;align-items:flex-start;justify-content:space-between;gap:22px;pointer-events:none}
+.site-header>*{pointer-events:auto}
+.brand{display:flex;align-items:center;gap:12px;font-size:clamp(16px,1.5vw,22px);font-weight:900;line-height:1;color:var(--navy);letter-spacing:-.025em}
+.brand-map{width:clamp(32px,4vw,57px);height:clamp(45px,5.5vw,70px);background:currentColor;mask:url('assets/brand-brasil.svg') center/contain no-repeat;-webkit-mask:url('assets/brand-brasil.svg') center/contain no-repeat}
+.brand-line{display:block;height:3px;width:100%;background:currentColor;margin-top:7px}
+.brand-play{display:none}
+body[data-screen="partida"] .brand-home{display:none}
+body[data-screen="partida"] .brand-play{display:block;font-weight:900;letter-spacing:.02em}
+.header-right{display:flex;align-items:center;gap:30px;min-height:50px}
+.header-mode{font-size:12px;color:inherit;opacity:.74;font-weight:700}
+.header-link{font-size:12px;color:inherit;font-weight:700;text-decoration:none;border-bottom:1px solid currentColor;padding:10px 0;display:flex;align-items:center;gap:10px}
+.header-link:hover{opacity:.7}
+.screen{min-height:100svh;position:relative}
+body[data-screen="telaInicial"]{background:var(--gold)}
+.home-screen{overflow:hidden;isolation:isolate;display:flex;align-items:center;background:var(--gold);padding:140px var(--pad) 45px}
+.home-shape{position:absolute;z-index:-1;right:-26vw;top:-39svh;width:77vw;height:186svh;border-radius:55% 0 0 50%;background:var(--navy);transform:rotate(15deg)}
+.home-copy{position:relative;z-index:2;width:57%;max-width:780px;padding:20px 0}
+.eyebrow{font-size:11px;letter-spacing:.17em;text-transform:uppercase;color:#77621c;font-weight:800;margin-bottom:16px}
+.home-copy h1{font-size:clamp(46px,5vw,80px)}
+.home-lead{max-width:500px;line-height:1.6;color:#2a2544;font-size:clamp(15px,1.4vw,20px);margin-top:25px}
+.primary-button{border:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:space-between;gap:40px;min-height:63px;padding:15px 25px;font-size:18px;font-weight:750;background:var(--navy);color:var(--paper);transition:transform .2s,background .2s}
+.primary-button:hover{background:#211f56;transform:translateY(-2px)}
+.primary-button span{font-size:26px}.home-copy .primary-button{margin-top:36px;min-width:335px;max-width:100%}
+.cover-meta{font-size:13px;font-weight:750;margin-top:17px;opacity:.77}.cover-meta span{margin:0 7px}
+.home-mascot{position:absolute;right:3vw;bottom:0;width:clamp(250px,38vw,550px);height:min(70svh,700px);object-fit:contain;object-position:center bottom;pointer-events:none;filter:drop-shadow(0 18px 21px rgba(0,0,0,.16))}
+
+/* GeoEduca — Desafio da Posição. Interface aprovada em 10/11/2026.
+   Tela inicial e imagem do Copero são preservadas.
+   Mapa e todas as questões são os arquivos originais da versão com banco de 30. */
+body[data-screen="partida"]{height:100dvh;min-height:0;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(145deg,#faf5ea 0%,#f7f3e9 65%,#f9f2e7 100%)}
+body[data-screen="partida"] .site-header{position:relative;inset:auto;flex:0 0 auto;height:clamp(56px,8.5dvh,77px);min-height:0;padding:8px var(--pad);align-items:center;background:#0b0a32;color:#f7f3e9}
+body[data-screen="partida"] .brand{color:#d6ad43;font-size:clamp(12px,1.4vw,19px);gap:10px}
+body[data-screen="partida"] .brand-map{width:30px;height:38px}
+body[data-screen="partida"] .brand-line{height:2px;margin-top:5px}
+body[data-screen="partida"] .header-mode{font-size:12px;color:#eee9ef;opacity:.92}
+body[data-screen="partida"] .header-link{color:#fff;font-size:12px;border-color:#ded3e7}
+body[data-screen="partida"] main{min-height:0;flex:1;display:flex;flex-direction:column}
+body[data-screen="partida"] .play-screen{flex:1;min-height:0;display:flex;flex-direction:column;padding:clamp(16px,3dvh,30px) var(--pad) clamp(8px,2dvh,18px);overflow:hidden}
+.play-head{width:100%;max-width:1500px;margin:0 auto;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:clamp(12px,2.5vw,35px);padding-bottom:clamp(12px,2dvh,20px);border-bottom:1px solid #e0d3bb}
+.play-intro{min-width:0;padding-left:clamp(14px,1.5vw,25px);border-left:clamp(4px,.45vw,7px) solid #ad831c}
+.play-intro .eyebrow{color:#99751e;font-size:clamp(9px,.88vw,12px);letter-spacing:.16em;margin-bottom:clamp(4px,.8dvh,9px);font-weight:900}
+.play-head h1{font-family:Georgia,serif;font-size:clamp(26px,3.4vw,56px);line-height:1.05;letter-spacing:-.048em;white-space:nowrap}
+.lead{font-size:clamp(11px,1.1vw,15px);color:#807585;margin-top:clamp(4px,.8dvh,9px);line-height:1.25}
+.round-status{display:grid;grid-template-columns:repeat(4,minmax(0,auto));align-items:center;gap:0;flex:0 0 auto}
+.status-unit{display:flex;align-items:center;gap:clamp(6px,.9vw,12px);padding:3px clamp(9px,1.35vw,21px);border-left:1px solid #d9cbb5;min-width:0}
+.status-unit:first-child{border-left:0}
+.status-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.status-icon{display:flex;align-items:center;justify-content:center;color:#a98423;font-size:clamp(19px,2vw,28px);width:clamp(20px,2vw,31px);flex:0 0 auto;line-height:1}
+.status-copy{display:flex;flex-direction:column;gap:4px;white-space:nowrap}
+.status-label{font-size:clamp(8px,.8vw,11px);color:#646069;letter-spacing:.09em;font-weight:800}
+.status-value{display:flex;align-items:baseline;gap:4px;line-height:1}
+.status-value strong{font-size:clamp(16px,2vw,31px);letter-spacing:-.035em;color:var(--navy);font-weight:850}
+.status-value small{font-size:clamp(9px,.85vw,13px);font-weight:700;color:#575160}
+.play-layout{max-width:1500px;width:100%;margin:0 auto;min-height:0;flex:1}
+.game-card-body,.game-content-panel{height:100%;width:100%;min-height:0}
+.game-content-panel{display:flex;flex-direction:column;min-height:0;padding:clamp(12px,2dvh,21px) 0 0;overflow:hidden}
+.position-layout{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.45fr);align-items:stretch;gap:clamp(22px,4.1vw,67px);min-height:0;flex:1;padding:clamp(7px,1.8dvh,21px) 0}
+.reference-map{margin:0;min-height:0;height:100%;display:flex;flex-direction:column;align-items:center;border-radius:clamp(14px,1.7vw,24px);border:1px solid #decba8;background:linear-gradient(132deg,rgba(255,255,255,.42),rgba(244,235,216,.3));padding:clamp(11px,1.5vw,23px);position:relative;overflow:hidden}
+.reference-map-top{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;flex:0 0 auto;font-size:clamp(10px,.95vw,14px);color:#756c65;letter-spacing:.14em;font-weight:850}
+.reference-map-top>span{display:flex;align-items:center;gap:12px;white-space:nowrap}
+.reference-map-top small{font-size:clamp(9px,.85vw,12px);color:#716b65;font-weight:700;letter-spacing:normal;white-space:nowrap}
+.map-dot{display:block;width:9px;height:9px;background:#c7a03b;transform:rotate(45deg);flex:0 0 9px}
+.reference-map img{width:100%;height:calc(100% - 18px);max-width:100%;min-height:0;object-fit:contain;object-position:center center;mix-blend-mode:multiply}
+.north-mark{position:absolute;right:clamp(15px,2vw,33px);top:clamp(42px,5vw,70px);font-size:clamp(10px,1.1vw,14px);font-weight:850;color:#9c7722;line-height:1.1;text-align:center}
+.answer-panel{min-height:0;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:clamp(12px,2.1dvh,21px)}
+.prompt-topline{font-size:clamp(11px,1.06vw,15px);color:#9e7b22;letter-spacing:.19em;font-weight:850}
+.question-text{border-left:clamp(4px,.45vw,7px) solid #c7a03b;padding:clamp(7px,1dvh,11px) 0 clamp(7px,1dvh,11px) clamp(16px,2.3vw,35px);font-family:Georgia,serif;font-size:clamp(24px,3vw,47px);line-height:1.16;letter-spacing:-.045em;color:var(--navy);margin:0;font-weight:700}
+.options-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(9px,1.6vw,23px);margin-top:clamp(2px,1dvh,10px)}
+.answer-option{width:100%;min-height:clamp(64px,10dvh,99px);display:flex;align-items:center;gap:clamp(9px,1.5vw,21px);border:1.5px solid #d7c4a1;border-radius:clamp(10px,1.1vw,17px);background:rgba(255,255,255,.54);text-align:left;padding:clamp(10px,1.2vw,17px) clamp(12px,1.6vw,24px);color:var(--navy);font-weight:750;transition:background .18s,border-color .18s,box-shadow .18s}
+.answer-option:hover:not(:disabled){background:#fff6e6;border-color:#b18b31;box-shadow:0 4px 15px rgba(19,17,53,.05)}
+.answer-option.selected:not(:disabled){background:#fff0c8;border-color:#b58a27;box-shadow:inset 0 0 0 1px #cca43b}
+.option-marker{width:clamp(34px,3.8vw,54px);height:clamp(34px,3.8vw,54px);flex:0 0 clamp(34px,3.8vw,54px);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:clamp(17px,1.9vw,27px);font-weight:750;border-radius:clamp(8px,.85vw,13px);color:#9a781e;background:linear-gradient(145deg,#f4e2bb,#eee5d5)}
+.option-label{font-family:Georgia,serif;font-size:clamp(14px,1.9vw,28px);font-weight:700;line-height:1.15;overflow-wrap:anywhere}
+.answer-option:disabled{cursor:default}
+.answer-option.eliminated{opacity:.3;text-decoration:line-through;pointer-events:none}
+.answer-option.correct{background:#e6f1d8;border-color:#5d8649;color:#25400c}
+.answer-option.correct .option-marker{background:#cde6b4;color:#284e0e}
+.answer-option.wrong{background:#fae7e4;border-color:#b95950;color:#8e2e31}
+.answer-option.wrong .option-marker{background:#f5cbc6;color:#943a35}
+.game-actions{flex:0 0 auto;width:100%;min-height:clamp(68px,11dvh,100px);display:flex;align-items:center;gap:clamp(10px,1.5vw,22px);border-top:1px solid #e0d3bb;padding:clamp(9px,1.8dvh,19px) clamp(6px,1.1vw,18px)}
+.secondary-actions{display:flex;gap:clamp(7px,1.3vw,20px);align-items:center;flex:0 0 auto}
+.action-outline,.action-confirm{border-radius:clamp(8px,1vw,14px);min-height:clamp(42px,6dvh,63px);font-size:clamp(12px,1.35vw,19px);font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:clamp(6px,.9vw,12px);cursor:pointer;white-space:nowrap;padding:9px clamp(11px,1.5vw,25px)}
+.action-outline{background:transparent;border:1.5px solid #cbb58b;color:var(--navy)}
+.action-outline:hover:not(:disabled){background:#f5eace}
+.action-confirm{margin-left:auto;min-width:clamp(156px,25vw,330px);background:#0b0a32;color:#fff;border:1px solid #0b0a32}
+.action-confirm:hover:not(:disabled){background:#242152}
+.action-outline:disabled,.action-confirm:disabled{opacity:.44;cursor:default}
+.action-icon{font-size:clamp(17px,1.9vw,25px);color:#a17f25;line-height:1}
+.action-confirm span{font-size:1.15em}
+.feedback-msg{flex:1;min-width:0;text-align:center;color:#77707c;font-size:clamp(10px,1vw,13px);line-height:1.3;font-weight:700}
+.feedback-msg:empty::before{content:'Selecione uma alternativa para responder.'}
+.feedback-msg.success{color:#2c6628}.feedback-msg.danger{color:#b43d41}
+.result-view{width:min(100%,620px);margin:auto;display:flex;flex-direction:column;align-items:center;text-align:center;gap:clamp(10px,2dvh,20px)}
+.result-kicker{color:#a17e25;font-weight:900;letter-spacing:.16em;font-size:11px}
+.result-view h2{font-size:clamp(29px,4.2vw,52px)}
+.result-text{color:#716b76;font-size:14px}
+.result-stats{display:flex;gap:clamp(28px,6vw,60px);border-top:1px solid var(--line);border-bottom:1px solid var(--line);width:100%;justify-content:center;padding:clamp(12px,2dvh,20px) 0}
+.result-stat{display:flex;flex-direction:column;gap:6px}.result-stat strong{font-size:clamp(24px,3vw,38px)}.result-stat span{font-size:11px;letter-spacing:.1em;color:#6e6875;font-weight:800;text-transform:uppercase}
+.result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.result-actions a,.result-actions button{text-decoration:none;background:var(--navy);color:#fff;border:0;border-radius:9px;padding:14px 19px;font-weight:750;font-size:14px;cursor:pointer}
+.result-actions a{background:transparent;color:var(--navy);border:1px solid #cbbf9d}
+.noscript-message{position:fixed;bottom:12px;left:12px;background:#fff;padding:14px;border:1px solid #ccc}
+@media(max-width:1190px){
+  .status-goal{display:none}
+  .round-status{grid-template-columns:repeat(3,minmax(0,auto))}
+  .play-head h1{font-size:clamp(28px,3.3vw,42px)}
+  .option-label{font-size:clamp(13px,1.75vw,23px)}
+}
+@media(max-width:850px){
+  :root{--pad:clamp(14px,3vw,27px)}
+  .header-mode{display:none}
+  .play-head{gap:8px}
+  .play-head h1{font-size:clamp(22px,4.5vw,33px)}
+  .status-unit{padding:0 8px}
+  .status-time{display:none}
+  .round-status{grid-template-columns:repeat(2,minmax(0,auto))}
+  .status-icon{display:none}
+  .status-value strong{font-size:clamp(15px,2.8vw,21px)}
+  .position-layout{gap:clamp(10px,2vw,18px);grid-template-columns:minmax(0,.78fr) minmax(0,1.52fr)}
+  .question-text{font-size:clamp(20px,3.4vw,30px)}
+  .option-label{font-size:clamp(12px,2vw,18px)}
+  .answer-option{min-height:clamp(54px,9dvh,78px)}
+  .reference-map{padding:8px}
+}
+@media(max-width:590px){
+  :root{--pad:13px}
+  .site-header{min-height:87px;padding:16px var(--pad) 0}
+  .brand{font-size:15px;gap:8px}
+  .brand-map{width:31px;height:42px}
+  .header-right{gap:8px}.header-mode{display:none}.header-link{font-size:11px}
+  .home-screen{padding:110px var(--pad) 0;align-items:flex-start;min-height:100svh}
+  .home-shape{top:auto;right:-27vw;bottom:-36svh;width:128vw;height:82svh;transform:rotate(-18deg);border-radius:50% 50% 0 0}
+  .home-copy{width:100%;padding:3svh 0 0}.home-copy h1{font-size:clamp(36px,10vw,53px)}
+  .home-lead{max-width:330px;margin-top:15px;font-size:14px}.home-copy .primary-button{min-width:230px;margin-top:25px;min-height:53px;font-size:14px}
+  .cover-meta{font-size:11px;margin-top:12px}.home-mascot{width:min(57vw,280px);height:min(36svh,300px);bottom:0;right:0}
+  body[data-screen="partida"] .site-header{height:52px;padding:4px var(--pad)}
+  body[data-screen="partida"] .brand{font-size:12px;gap:6px}
+  body[data-screen="partida"] .brand-map{width:24px;height:29px}
+  body[data-screen="partida"] .header-link{font-size:10px}
+  body[data-screen="partida"] .play-screen{padding:8px 10px 6px}
+  .play-head{padding-bottom:7px;align-items:flex-end}
+  .play-intro{padding-left:10px;border-left-width:3px}
+  .play-intro .eyebrow{font-size:8px;margin-bottom:2px}
+  .play-head h1{font-size:clamp(18px,4.6vw,25px);white-space:normal}
+  .lead{display:none}
+  .status-label{font-size:7px;letter-spacing:.03em}
+  .status-unit{padding:0 4px}
+  .status-value strong{font-size:17px}
+  .status-value small{font-size:9px}
+  .game-content-panel{padding:5px 0 0}
+  .position-layout{grid-template-columns:minmax(100px,.76fr) minmax(0,1.6fr);gap:7px;align-items:center;padding:5px 0}
+  .reference-map{height:clamp(150px,36dvh,265px);padding:5px;border-radius:11px;align-self:center}
+  .reference-map-top{font-size:7px;letter-spacing:.05em;gap:4px}
+  .reference-map-top>span{gap:5px}
+  .reference-map-top small{display:none}
+  .reference-map img{height:calc(100% - 13px)}
+  .north-mark{display:none}
+  .map-dot{width:5px;height:5px;flex-basis:5px}
+  .answer-panel{gap:7px}
+  .prompt-topline{font-size:9px;letter-spacing:.08em}
+  .question-text{padding:2px 0 2px 7px;border-left-width:3px;font-size:clamp(14px,3.9vw,20px);line-height:1.15}
+  .options-grid{grid-template-columns:1fr;gap:5px;margin-top:1px}
+  .answer-option{min-height:clamp(35px,5.5dvh,47px);padding:5px 7px;border-radius:8px;gap:6px}
+  .option-marker{width:24px;height:24px;flex-basis:24px;font-size:12px;border-radius:6px}
+  .option-label{font-size:clamp(10px,2.9vw,13px)}
+  .game-actions{min-height:50px;padding:5px 0;gap:5px}
+  .secondary-actions{gap:5px}
+  .action-outline,.action-confirm{padding:5px 7px;min-height:36px;font-size:10px;border-radius:7px;gap:4px}
+  .action-icon{font-size:15px}
+  .action-confirm{min-width:101px}
+  .feedback-msg{font-size:9px}
+  .feedback-msg:empty::before{content:''}
+}
+@media(max-width:380px){
+  .status-time,.status-goal{display:none}
+  .play-head h1{font-size:18px}
+  .position-layout{grid-template-columns:100px minmax(0,1fr)}
+  .reference-map{height:clamp(130px,32dvh,190px)}
+  .answer-option{min-height:35px}
+  .option-label{font-size:10px}
+  .feedback-msg:empty{display:none}
+  .action-confirm{min-width:89px}
+}
+@media(max-height:650px){
+  body[data-screen="partida"] .site-header{height:48px}
+  body[data-screen="partida"] .play-screen{padding-top:5px;padding-bottom:5px}
+  .play-head{padding-bottom:5px}
+  .lead{display:none}
+  .position-layout{padding:3px 0}
+  .reference-map{padding:6px}
+  .answer-panel{gap:clamp(5px,1dvh,9px)}
+  .question-text{font-size:clamp(17px,2.3vw,29px)}
+  .answer-option{min-height:clamp(32px,7.2dvh,60px)}
+  .game-actions{min-height:43px;padding:4px 0}
+  .action-outline,.action-confirm{min-height:34px}
+}
+@media(max-height:480px) and (min-width:590px){
+  body[data-screen="partida"] .site-header{height:39px}
+  .play-head h1{font-size:20px}
+  .play-head .eyebrow{font-size:8px}
+  .play-head{padding-bottom:3px}
+  .play-intro{border-left-width:3px}
+  .play-head .status-time{display:none}
+  .position-layout{gap:10px}
+  .reference-map{padding:4px}
+  .question-text{font-size:clamp(16px,2.4vw,22px)}
+  .answer-panel{gap:4px}
+  .options-grid{gap:5px}
+  .answer-option{min-height:38px;padding:4px 8px}
+  .option-marker{height:24px;width:24px;flex-basis:24px;font-size:12px}
+  .option-label{font-size:12px}
+  .game-actions{padding:3px 0;min-height:35px}
+  .action-outline,.action-confirm{min-height:30px;font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+
+/* Uma coluna para o mapa e outra para a resposta em celulares mais altos. */
+@media (max-width:590px) and (min-height:730px){
+ .position-layout{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;gap:12px;align-content:center;align-items:start;justify-items:stretch;padding:8px 0 14px}
+ .reference-map{height:clamp(205px,29dvh,250px);max-width:100%;width:100%;padding:7px;flex-direction:column}
+ .reference-map img{height:calc(100% - 18px)}
+ .answer-panel{gap:9px}
+ .question-text{font-size:clamp(18px,4.8vw,23px);padding:7px 0 7px 10px}
+ .options-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .answer-option{min-height:clamp(47px,6.5dvh,58px);padding:7px;gap:7px}
+ .option-marker{width:26px;height:26px;flex-basis:26px}
+ .option-label{font-size:clamp(11px,3.1vw,14px)}
+}
+
+
+/* ===============================================================
+   GEOEDUCA · PADRÃO COMPARATIVO 2026 · VERSÃO 1
+   Harmonização exclusivamente visual. Não altera regras nem JS.
+   Cores oficiais: marinho, dourado, creme e verde.
+   =============================================================== */
+:root{
+  --geo-azul:#0b0a32;
+  --geo-dourado:#cca43b;
+  --geo-creme:#f7f3e9;
+  --geo-verde:#233b0b;
+  --geo-raio:12px;
+  --geo-fonte-titulo:Georgia,'Times New Roman',serif;
+  --geo-fonte-texto:Arial,Helvetica,sans-serif;
+}
+button,a,input,select{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--geo-dourado);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+/* Desafio da Posição: preservados o mapa e o layout aprovado. */
+:root{--title:var(--geo-fonte-titulo)}
+
+/* GEOEDUCA V4 — apenas escala/posição dos Coperos nas aberturas. */
+@media(min-width:801px){
+  .home-mascot{width:clamp(310px,38vw,550px);height:min(70svh,700px);right:3vw;bottom:0;object-position:center bottom;}
+}
+@media(max-width:800px){
+  .home-mascot{width:min(65vw,310px);height:min(39svh,340px);right:0;bottom:0;object-position:center bottom;}
+}

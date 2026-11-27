@@ -15,10 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('geoeduca_user', JSON.stringify(u));
   } catch (e) { /* ignore */ }
 
-  const games = [
+        const games = [
     {
       id: "'detetive_brasil'", title: 'Detetive do Brasil', category: 'Investigação',
-      image: '../jogos/detetive-brasil/assets/celebracao/copero-detetive.webp',
+      image: '../assets/jogos/detetive_brasil.png',
       icon: '<i class="fa-solid fa-user-secret"></i>',
       gradient: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
       desc: 'Siga pistas culturais e geográficas, interrogue testemunhas e capture o suspeito em até 72 horas com o Copero!',
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       id: "'missao_brasil'", title: 'Missão Brasil', category: 'Geografia',
-      image: '../jogos/missao-brasil/assets/celebracao/classic.webp',
+      image: '../assets/jogos/missao_brasil.png',
       icon: '<i class="fa-solid fa-earth-americas"></i>',
       gradient: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
       desc: 'Explore bandeiras, capitais e biomas dos 27 estados! 3 vidas, 5 segundos por resposta, álbum e conquistas.',
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       id: "'geobr'", title: 'GeoBr · Desafio do Brasil', category: 'Brasil',
-      image: '../jogos/geobr/assets/celebracao/classic.webp',
+      image: '../assets/jogos/geobr.png',
       icon: '<i class="fa-solid fa-flag"></i>',
       gradient: 'linear-gradient(135deg, #047857 0%, #065f46 100%)',
       desc: 'Quanto você conhece do Brasil? Enfrente os desafios de Bandeiras, Capitais e Biomas por região com o Copero!',
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       id: "'geomundo'", title: 'GeoMundo · Jornada Mundial', category: 'Mundo',
-      image: '../jogos/geomundo/assets/celebracao/escot.webp',
+      image: '../assets/jogos/geomundo.png',
       icon: '<i class="fa-solid fa-globe"></i>',
       gradient: 'linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%)',
       desc: 'O mundo é sua próxima descoberta! 7 etapas pelos continentes com mapa interativo Leaflet e exploração de países.',
@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     {
       id: 8, title: 'Caça-Palavras', category: 'Vocabulário',
+      image: '../assets/jogos/caca_palavras.png',
       icon: '<i class="fa-solid fa-magnifying-glass"></i>',
       gradient: 'linear-gradient(135deg, #14b8a6 0%, #0f766e 100%)',
       desc: 'Encontre capitais e estados brasileiros escondidos na grade de letras.',
@@ -104,7 +105,16 @@ document.addEventListener('DOMContentLoaded', () => {
       dificuldade: 'Difícil', tempoMedio: '5 min'
     },
     {
+      id: "'bandeira_estado'", title: 'Bandeira e Estado', category: 'Bandeiras',
+      image: '../jogos/bandeira-e-estado/assets/personagens/copero-bandeira.webp',
+      icon: '<i class="fa-solid fa-flag"></i>',
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+      desc: 'Leia a pista do Copero, descubra o estado correspondente e revele sua bandeira oficial!',
+      dificuldade: 'Médio', tempoMedio: '3 min'
+    },
+    {
       id: "'rosa_ventos'", title: 'Desafio da Rosa dos Ventos', category: 'Orientação',
+      image: '../assets/jogos/desafio_rosa_ventos.png',
       icon: '<i class="fa-regular fa-compass"></i>',
       gradient: 'linear-gradient(135deg, #cca43b 0%, #a3822d 100%)',
       desc: 'Treine seus reflexos e conhecimento geográfico encontrando as direções na Rosa dos Ventos!',
@@ -220,34 +230,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  window.playGame = (id, title) => {
-    
+    window.playGame = (id, title) => {
     if (id === 4) {
-      window.location.href = 'memoria_biomas.html';
+      window.location.href = '../jogos/memoria-dos-biomas/index.html';
       return;
     }
     if (id === 5) {
-      window.location.href = 'ordenando_regioes.html';
+      window.location.href = '../jogos/ordenando-por-regiao/index.html';
       return;
     }
     if (id === 6) {
-      window.location.href = 'hidrografias.html';
+      window.location.href = '../jogos/hidrografias/index.html';
       return;
     }
     if (id === 7) {
-      window.location.href = 'desafio_posicao.html';
+      window.location.href = '../jogos/desafio-da-posicao/index.html';
       return;
     }
     if (id === 8) {
-      window.location.href = 'caca_palavras.html';
+      window.location.href = '../jogos/caca-palavras/index.html';
       return;
     }
     if (id === 9) {
-      window.location.href = 'complete_capital.html';
+      window.location.href = '../jogos/complete-a-capital/index.html';
       return;
     }
     if (id === 10) {
-      window.location.href = 'fronteiras_cronometro.html';
+      window.location.href = '../jogos/fronteiras-com-cronometro/index.html';
+      return;
+    }
+    if (id === 'bandeira_estado') {
+      window.location.href = '../jogos/bandeira-e-estado/index.html';
       return;
     }
 
@@ -268,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     if (id === 'rosa_ventos') {
-      window.location.href = 'jogo_rosa_ventos.html';
+      window.location.href = '../jogos/desafio-rosa-dos-ventos/index.html';
       return;
     }
   };

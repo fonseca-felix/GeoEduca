@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0a32">
+<title>Fronteiras com Cronômetro | GeoEduca</title>
+<link rel="icon" type="image/svg+xml" href="assets/brand-brasil.svg">
+<link rel="stylesheet" href="style.css">
+<link rel="preload" href="assets/copero-fronteiras-musculos.png" as="image">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head><body data-view="home">
+<a href="#conteudo" class="skip-link">Ir ao conteúdo</a>
+<header class="site-header">
+  <div class="brand"><span class="brand-map" aria-hidden="true"></span><div><span class="brand-home">FRONTEIRAS<br>COM CRONÔMETRO</span><span class="brand-play">GEOEDUCA</span><span class="brand-line"></span></div></div>
+  <nav class="header-right"><span class="header-mode">Geografia do Brasil</span><a class="header-link" href="../../aluno/jogos.html">Outros jogos <span aria-hidden="true">↗</span></a></nav>
+</header>
+<main id="conteudo">
+<section id="homeScreen" class="home screen" aria-labelledby="home-title">
+  <div class="home-shape" aria-hidden="true"></div>
+  <div class="home-copy">
+    <p class="eyebrow">DESAFIO GEOGRÁFICO · BRASIL</p>
+    <h1 id="home-title">Conheça os limites.<br>Vença o tempo.</h1>
+    <p class="home-lead">Descubra quais estados fazem fronteira com o território indicado. Você terá <strong>15 segundos</strong> para encontrar os vizinhos a cada rodada.</p>
+    <button id="startBtn" type="button" class="primary-button">Começar desafio <span aria-hidden="true">→</span></button>
+    <div class="cover-meta">6 rodadas <span aria-hidden="true">·</span> 15 segundos por rodada <span aria-hidden="true">·</span> selecione todos os vizinhos</div>
+    <button id="restartBtnHome" type="button" class="history-action" title="Apaga todo o histórico local de resultados do GeoEduca neste navegador">Apagar histórico local de resultados</button>
+  </div>
+  <img class="home-mascot" src="assets/copero-fronteiras-musculos.png" alt="Copero explorador com os dois braços erguidos e os punhos fechados, usando uniforme verde e colete claro">
+</section>
+<section id="gameScreen" class="game screen" aria-label="Partida" style="display:none">
+  <div class="play-screen">
+    <div class="play-head">
+      <div class="play-intro"><p class="eyebrow">DESAFIO GEOGRÁFICO · BRASIL</p><h1>Fronteiras com Cronômetro</h1><p class="lead">Encontre os estados vizinhos antes que o tempo acabe.</p></div>
+      <div class="round-status" aria-label="Indicadores da partida">
+        <div class="status-unit"><span class="status-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8v3h3v3a5 5 0 0 1-4 5h-1v4h4v3H6v-3h4v-4H9a5 5 0 0 1-4-5V6h3zM8 8H7v1a3 3 0 0 0 2 3M16 8h1v1a3 3 0 0 1-2 3"/></svg></span><span class="status-copy"><span class="status-label">PONTUAÇÃO</span><span class="status-value"><strong id="scoreEl">0 <small>pts</small></strong></span></span></div>
+        <div class="status-unit"><span class="status-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 7 9-4 9 4-9 4-9-4Zm0 5 9 4 9-4M3 17l9 4 9-4"/></svg></span><span class="status-copy"><span class="status-label">RODADA</span><span class="status-value"><strong id="roundEl">1 <small>de 6</small></strong></span></span></div>
+        <div class="status-unit status-time"><span class="status-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v5l3 2M9 2h6"/></svg></span><span class="status-copy"><span class="status-label">TEMPO TOTAL</span><span class="status-value"><strong id="totalTimeEl">00:00</strong></span></span></div>
+        <div class="status-unit status-goal"><span class="status-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span><span class="status-copy"><span class="status-label">VIZINHOS</span><span class="status-value"><strong id="goalEl">0 <small>vizinhos</small></strong></span></span></div>
+      </div>
+    </div>
+    <div class="stage-grid">
+      <div class="state-panel">
+        <div class="panel-topline"><span><span class="diamond" aria-hidden="true"></span>ESTADO DA RODADA</span><small id="regionTag">REGIÃO</small></div>
+        <div class="state-middle">
+          <div class="state-overline">ENCONTRE OS VIZINHOS DE</div>
+          <div class="state-icon" id="stateIcon" aria-hidden="true"></div>
+          <h2 class="state-name" id="stateName">Minas Gerais (MG)</h2>
+          <div class="state-meta" id="stateCapital">Capital: Belo Horizonte</div>
+          <p class="state-help">Selecione todas as unidades federativas que fazem fronteira com este estado.</p>
+        </div>
+        <div class="state-bottom">
+          <div class="round-alert"><div class="timer-box"><span class="timer-caption">TEMPO RESTANTE</span><span class="timer-value"><strong id="roundTimerEl">15</strong> <small>s</small></span></div><div class="hit-box"><span>FRONTEIRAS ENCONTRADAS</span><strong id="hitsEl">0</strong></div></div>
+          <div class="round-progress"><div class="progress-head"><span>PROGRESSO DA RODADA</span><strong id="progressText">0 / 0</strong></div><div class="progress-bar"><span id="progressFill" class="progress-fill"></span></div></div>
+          <div id="feedbackEl" class="feedback" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="answers-panel">
+        <div class="answer-topline">RODADA <span id="round-tag">· LOCALIZAÇÃO GEOGRÁFICA</span></div>
+        <h2 class="answer-title">Quais estados fazem fronteira?</h2>
+        <p class="answers-lead">Toque nas siglas dos estados vizinhos. Você pode escolher <strong>mais de uma resposta.</strong></p>
+        <div class="answers-grid" id="answersGrid"></div>
+        <div class="legend"><span><span class="legend-dot correct-dot"></span> +5 por acerto</span><span><span class="legend-dot gold-dot"></span> +10 ao completar</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="resultScreen" class="result screen" style="display:none" aria-labelledby="result-title">
+  <div class="result-card"><div id="starsEl" class="stars" aria-hidden="true"></div>
+    <p class="eyebrow">DESAFIO CONCLUÍDO</p><h2 id="result-title" class="result-title">Sua jornada pelas fronteiras</h2>
+    <p class="result-sub">Você terminou as seis rodadas. Confira seu desempenho e tente mais uma vez para explorar outros estados.</p>
+    <div class="result-grid"><div class="result-item"><strong id="resultScore">0</strong><span>PONTOS</span></div><div class="result-item"><strong id="resultTime">00:00</strong><span>TEMPO</span></div><div class="result-item"><strong id="resultPct">0%</strong><span>APROVEITAMENTO</span></div></div>
+    <div class="result-actions"><button id="playAgainBtn" type="button" class="primary-button">Jogar novamente <span aria-hidden="true">→</span></button><button type="button" id="backHomeBtn" class="secondary-button">Voltar ao início</button></div>
+  </div>
+</section>
+</main>
+<script>
+const estadosBR = [
+  {nome:"Acre",sigla:"AC",capital:"Rio Branco",regiao:"Norte",icon:"<i class='fa-solid fa-tree'></i>"},
+  {nome:"Alagoas",sigla:"AL",capital:"Maceió",regiao:"Nordeste",icon:"<i class='fa-solid fa-umbrella-beach'></i>"},
+  {nome:"Amapá",sigla:"AP",capital:"Macapá",regiao:"Norte",icon:"<i class='fa-solid fa-leaf'></i>"},
+  {nome:"Amazonas",sigla:"AM",capital:"Manaus",regiao:"Norte",icon:"<i class='fa-solid fa-tree'></i>"},
+  {nome:"Bahia",sigla:"BA",capital:"Salvador",regiao:"Nordeste",icon:"<i class='fa-solid fa-drum'></i>"},
+  {nome:"Ceará",sigla:"CE",capital:"Fortaleza",regiao:"Nordeste",icon:"<i class='fa-solid fa-sun'></i>"},
+  {nome:"Espírito Santo",sigla:"ES",capital:"Vitória",regiao:"Sudeste",icon:"<i class='fa-solid fa-mug-hot'></i>"},
+  {nome:"Goiás",sigla:"GO",capital:"Goiânia",regiao:"Centro-Oeste",icon:"<i class='fa-solid fa-wheat-awn'></i>"},
+  {nome:"Maranhão",sigla:"MA",capital:"São Luís",regiao:"Nordeste",icon:"<i class='fa-solid fa-house-chimney'></i>"},
+  {nome:"Mato Grosso",sigla:"MT",capital:"Cuiabá",regiao:"Centro-Oeste",icon:"<i class='fa-solid fa-fish'></i>"},
+  {nome:"Mato Grosso do Sul",sigla:"MS",capital:"Campo Grande",regiao:"Centro-Oeste",icon:"<i class='fa-solid fa-feather'></i>"},
+  {nome:"Minas Gerais",sigla:"MG",capital:"Belo Horizonte",regiao:"Sudeste",icon:"<i class='fa-solid fa-cheese'></i>"},
+  {nome:"Pará",sigla:"PA",capital:"Belém",regiao:"Norte",icon:"<i class='fa-solid fa-cloud-showers-heavy'></i>"},
+  {nome:"Paraíba",sigla:"PB",capital:"João Pessoa",regiao:"Nordeste",icon:"<i class='fa-solid fa-cloud-sun'></i>"},
+  {nome:"Paraná",sigla:"PR",capital:"Curitiba",regiao:"Sul",icon:"<i class='fa-solid fa-tree'></i>"},
+  {nome:"Pernambuco",sigla:"PE",capital:"Recife",regiao:"Nordeste",icon:"<i class='fa-solid fa-umbrella'></i>"},
+  {nome:"Piauí",sigla:"PI",capital:"Teresina",regiao:"Nordeste",icon:"<i class='fa-solid fa-sun'></i>"},
+  {nome:"Rio de Janeiro",sigla:"RJ",capital:"Rio de Janeiro",regiao:"Sudeste",icon:"<i class='fa-solid fa-mountain'></i>"},
+  {nome:"Rio Grande do Norte",sigla:"RN",capital:"Natal",regiao:"Nordeste",icon:"<i class='fa-solid fa-umbrella-beach'></i>"},
+  {nome:"Rio Grande do Sul",sigla:"RS",capital:"Porto Alegre",regiao:"Sul",icon:"<i class='fa-solid fa-mug-hot'></i>"},
+  {nome:"Rondônia",sigla:"RO",capital:"Porto Velho",regiao:"Norte",icon:"<i class='fa-solid fa-train'></i>"},
+  {nome:"Roraima",sigla:"RR",capital:"Boa Vista",regiao:"Norte",icon:"<i class='fa-solid fa-mountain'></i>"},
+  {nome:"Santa Catarina",sigla:"SC",capital:"Florianópolis",regiao:"Sul",icon:"<i class='fa-solid fa-apple-whole'></i>"},
+  {nome:"São Paulo",sigla:"SP",capital:"São Paulo",regiao:"Sudeste",icon:"<i class='fa-solid fa-city'></i>"},
+  {nome:"Sergipe",sigla:"SE",capital:"Aracaju",regiao:"Nordeste",icon:"<i class='fa-solid fa-water'></i>"},
+  {nome:"Tocantins",sigla:"TO",capital:"Palmas",regiao:"Norte",icon:"<i class='fa-solid fa-sun'></i>"},
+  {nome:"Distrito Federal",sigla:"DF",capital:"Brasília",regiao:"Centro-Oeste",icon:"<i class='fa-solid fa-building-columns'></i>"}
+];
+const fronteirasData = {
+  MG:["ES","RJ","SP","GO","MS","BA","PI","TO"],SP:["RJ","MG","MS","PR"],RJ:["SP","MG","ES"],PR:["SP","SC","MS"],SC:["PR","RS"],RS:["SC"],MS:["SP","PR","MG","MT","GO"],MT:["AM","PA","RO","MS","GO","TO"],GO:["MT","MS","MG","TO","BA","DF"],BA:["SE","AL","PE","PI","TO","GO","MG","ES"],AM:["RR","PA","MT","RO","AC"],PA:["AP","AM","RR","MT","TO","MA"],PE:["PB","CE","PI","BA","AL"],CE:["RN","PB","PE","PI"],MA:["PA","TO","PI"],PI:["MA","CE","PE","PB","BA","TO"],RN:["PB","CE"],PB:["RN","PE","CE"],AL:["SE","PE","BA"],SE:["BA","AL"],ES:["MG","RJ","BA"],TO:["PA","MA","PI","BA","GO","MT"],DF:["GO"],RO:["AM","MT","AC"],AC:["AM","RO"],RR:["AM","PA"],AP:["PA"]
+};
+
+const TOTAL_ROUNDS = 6;
+const ROUND_TIME = 15;
+let currentScore = 0;
+let currentRound = 0;
+let secondsElapsed = 0;
+let totalTimerInterval = null;
+let roundTimerInterval = null;
+let roundStates = [];
+let roundState = null;
+let hits = 0;
+let clicked = new Set();
+let roundActive = false;
+
+const $ = (sel) => document.querySelector(sel);
+const scoreEl = $('#scoreEl');
+const roundEl = $('#roundEl');
+const totalTimeEl = $('#totalTimeEl');
+const goalEl = $('#goalEl');
+const stateIcon = $('#stateIcon');
+const stateName = $('#stateName');
+const stateCapital = $('#stateCapital');
+const regionTag = $('#regionTag');
+const roundTimerEl = $('#roundTimerEl');
+const hitsEl = $('#hitsEl');
+const progressText = $('#progressText');
+const progressFill = $('#progressFill');
+const feedbackEl = $('#feedbackEl');
+const answersGrid = $('#answersGrid');
+
+function shuffle(arr){ return [...arr].sort(() => Math.random() - 0.5); }
+function formatTime(s){ const m = String(Math.floor(s/60)).padStart(2,'0'); const sec = String(s%60).padStart(2,'0'); return `${m}:${sec}`; }
+function setView(view){
+  document.body.dataset.view = view;
+  $('#homeScreen').style.display = view === 'home' ? 'grid' : 'none';
+  $('#gameScreen').style.display = view === 'game' ? 'block' : 'none';
+  $('#resultScreen').style.display = view === 'result' ? 'block' : 'none';
+}
+function updateScore(){ scoreEl.innerHTML = `${currentScore} <small>pts</small>`; }
+function updateRoundMeta(goalCount){ roundEl.innerHTML = `${currentRound + 1} <small>de ${TOTAL_ROUNDS}</small>`; goalEl.innerHTML = `${goalCount} <small>vizinhos</small>`; }
+function startTotalTimer(){ clearInterval(totalTimerInterval); totalTimerInterval = setInterval(() => { secondsElapsed++; totalTimeEl.textContent = formatTime(secondsElapsed); }, 1000); }
+function resetGame(){
+  clearInterval(totalTimerInterval); clearInterval(roundTimerInterval);
+  currentScore = 0; currentRound = 0; secondsElapsed = 0; roundStates = shuffle(Object.keys(fronteirasData)).slice(0, TOTAL_ROUNDS);
+  updateScore(); totalTimeEl.textContent = '00:00';
+  feedbackEl.textContent = ''; feedbackEl.className = 'feedback';
+}
+function buildPool(sigla, correct){
+  const extrasNeeded = correct.length <= 2 ? 7 : correct.length <= 4 ? 6 : 5;
+  const extras = shuffle(estadosBR.filter(e => e.sigla !== sigla && !correct.includes(e.sigla))).slice(0, extrasNeeded);
+  return shuffle([...correct.map(s => estadosBR.find(e => e.sigla === s)).filter(Boolean), ...extras]);
+}
+function renderRound(){
+  clearInterval(roundTimerInterval);
+  if(currentRound >= TOTAL_ROUNDS){ finalizarJogo(); return; }
+  const sigla = roundStates[currentRound];
+  const est = estadosBR.find(e => e.sigla === sigla);
+  const correct = fronteirasData[sigla] || [];
+  roundState = {sigla, est, correct};
+  hits = 0; clicked = new Set(); roundActive = true;
+  updateRoundMeta(correct.length);
+  stateIcon.innerHTML = est.icon;
+  stateName.textContent = `${est.nome} (${sigla})`;
+  stateCapital.textContent = `Capital: ${est.capital}`;
+  regionTag.textContent = est.regiao;
+  hitsEl.textContent = '0';
+  progressText.textContent = `0 / ${correct.length}`;
+  progressFill.style.width = '0%';
+  feedbackEl.textContent = '';
+  feedbackEl.className = 'feedback';
+  answersGrid.innerHTML = '';
+  buildPool(sigla, correct).forEach(e => {
+    const btn = document.createElement('button');
+    btn.className = 'sigla-btn';
+    btn.innerHTML = `<strong>${e.sigla}</strong><span>${e.nome}</span>`;
+    btn.title = e.nome;
+    btn.addEventListener('click', () => handleChoice(e, btn));
+    answersGrid.appendChild(btn);
+  });
+  let timeLeft = ROUND_TIME;
+  roundTimerEl.textContent = String(timeLeft);
+  roundTimerInterval = setInterval(() => {
+    timeLeft -= 1;
+    roundTimerEl.textContent = String(timeLeft);
+    if(timeLeft <= 0){
+      clearInterval(roundTimerInterval);
+      roundActive = false;
+      feedbackEl.textContent = `⏰ Tempo esgotado! Você encontrou ${hits} de ${correct.length} fronteiras.`;
+      feedbackEl.className = 'feedback error';
+      setTimeout(() => { currentRound++; renderRound(); }, 1400);
+    }
+  }, 1000);
+}
+function handleChoice(e, btn){
+  if(!roundActive || clicked.has(e.sigla)) return;
+  clicked.add(e.sigla);
+  btn.disabled = true;
+  const correct = roundState.correct;
+  if(correct.includes(e.sigla)){
+    hits += 1;
+    currentScore += 5;
+    updateScore();
+    hitsEl.textContent = String(hits);
+    progressText.textContent = `${hits} / ${correct.length}`;
+    progressFill.style.width = `${(hits / correct.length) * 100}%`;
+    btn.classList.add('correct');
+    feedbackEl.textContent = `✓ ${e.nome} faz fronteira com ${roundState.est.nome}.`;
+    feedbackEl.className = 'feedback success';
+    if(hits === correct.length){
+      roundActive = false;
+      clearInterval(roundTimerInterval);
+      currentScore += 10;
+      updateScore();
+      feedbackEl.textContent = `🏆 Rodada completa! Todos os vizinhos encontrados. +10 pontos de bônus.`;
+      feedbackEl.className = 'feedback success';
+      setTimeout(() => { currentRound++; renderRound(); }, 1300);
+    }
+  } else {
+    btn.classList.add('wrong');
+    feedbackEl.textContent = `✗ ${e.nome} não faz fronteira com ${roundState.est.nome}.`;
+    feedbackEl.className = 'feedback error';
+  }
+}
+function finalizarJogo(){
+  clearInterval(totalTimerInterval); clearInterval(roundTimerInterval);
+  const maxPossible = roundStates.reduce((acc, s) => acc + (fronteirasData[s].length * 5) + 10, 0);
+  const pct = Math.max(0, Math.min(100, Math.round((currentScore / maxPossible) * 100)));
+  let stars = '<i class="fa-regular fa-star"></i>';
+  if(pct >= 85) stars = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+  else if(pct >= 60) stars = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+  else if(pct >= 30) stars = '<i class="fa-solid fa-star"></i>';
+  $('#starsEl').innerHTML = stars;
+  $('#resultScore').textContent = currentScore;
+  $('#resultTime').textContent = formatTime(secondsElapsed);
+  $('#resultPct').textContent = `${pct}%`;
+  setView('result');
+  salvarResultado(currentScore, formatTime(secondsElapsed), pct);
+}
+function salvarResultado(pontos, tempo, pct){
+  try{
+    const hist = JSON.parse(localStorage.getItem('geoeduca_results') || '[]');
+    hist.push({ gameId: 10, aluno: localStorage.getItem('geoeduca_user_name') || 'Aluno', pontuacao: pontos, tempo, pct, data: new Date().toISOString() });
+    localStorage.setItem('geoeduca_results', JSON.stringify(hist));
+  }catch(e){ console.error(e); }
+}
+$('#startBtn').addEventListener('click', () => { resetGame(); setView('game'); startTotalTimer(); renderRound(); });
+$('#restartBtnHome').addEventListener('click', () => { if(!confirm('Esta ação apagará o histórico local de TODOS os jogos GeoEduca neste navegador. Deseja continuar?')) return; localStorage.removeItem('geoeduca_results'); alert('Histórico local limpo neste navegador.'); });
+$('#playAgainBtn').addEventListener('click', () => { resetGame(); setView('game'); startTotalTimer(); renderRound(); });
+$('#backHomeBtn').addEventListener('click', () => { setView('home'); });
+setView('home');
+</script>
+</body></html>

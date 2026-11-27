@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0B0A32">
+  <meta name="description" content="Encontre estados e capitais brasileiras neste caça-palavras do GeoEduca.">
+  <title>Caça-Palavras · GeoEduca</title>
+  <link rel="icon" type="image/svg+xml" href="assets/brand-brasil.svg">
+  <link rel="preload" as="image" href="assets/copero-cartografo-musculos.png" fetchpriority="high">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  <!-- Integração com a plataforma original: mantida quando os arquivos ../js estiverem disponíveis. -->
+  <script src="../../js/api.js" defer></script>
+  <script src="../../js/auth.js" defer></script>
+  <script src="../../js/theme.js" defer></script>
+  <script src="../../js/ui.js" defer></script>
+  <script src="../../js/sidebar.js" defer></script>
+  <script src="../../js/aluno/character.js" defer></script>
+  <script src="../../js/darkmode.js" defer></script>
+</head>
+<body data-screen="telaInicial">
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+  <header class="site-header">
+    <div class="brand" aria-label="GeoEduca, Caça-Palavras">
+      <span class="brand-map" aria-hidden="true"></span>
+      <span>CAÇA<br>PALAVRAS<span class="brand-line"></span></span>
+    </div>
+    <div class="header-right">
+      <span class="header-mode">Geografia do Brasil</span>
+      <a class="header-link" href="../../aluno/jogos.html">Outros jogos <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="conteudo">
+    <!-- Abertura segue a composição dourado + azul-marinho dos jogos de referência. -->
+    <section class="screen home-screen" id="tela-inicio" aria-labelledby="titulo-inicio">
+      <div class="home-shape" aria-hidden="true"></div>
+      <div class="home-copy">
+        <p class="eyebrow home-eyebrow">UM DESAFIO DE GEOGRAFIA</p>
+        <h1 id="titulo-inicio">Cada letra<br>é uma pista.</h1>
+        <p class="home-lead">Encontre capitais e estados brasileiros escondidos entre as letras.</p>
+        <button class="primary-button navy-button" id="btn-iniciar" type="button">Começar desafio <span aria-hidden="true">→</span></button>
+        <p class="cover-meta">Banco de 20 palavras <span aria-hidden="true">·</span> 5 por rodada</p>
+      </div>
+      <img class="home-mascot" src="assets/copero-cartografo-musculos.png" alt="Copero cartógrafo com os dois braços erguidos e os punhos fechados, vestindo uniforme azul e dourado">
+    </section>
+
+    <section class="screen play-screen" id="tela-jogo" aria-labelledby="titulo-jogo" hidden>
+      <div class="play-head">
+        <div class="play-intro">
+          <p class="eyebrow">DESAFIO GEOGRÁFICO <span aria-hidden="true">·</span> BRASIL</p>
+          <h1 id="titulo-jogo">Encontre as palavras.</h1>
+          <p class="lead">Descubra os nomes de estados e capitais escondidos entre as letras.</p>
+        </div>
+        <div class="round-status" aria-live="polite" aria-label="Pontuação e palavras restantes">
+          <div class="status-unit"><span class="status-label">PONTUAÇÃO</span><div class="status-value"><strong id="game-score">0</strong><small>/ 50 pts</small></div></div>
+          <span class="status-rule" aria-hidden="true"></span>
+          <div class="status-unit"><span class="status-label">RESTANTES</span><div class="status-value"><strong id="game-left">5</strong><small>/ 5</small></div></div>
+        </div>
+      </div>
+      <div class="play-layout">
+        <article class="game-card-body" id="game-body-card">
+          <div class="game-content-panel" id="play-area" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <noscript><p class="noscript-message">Ative o JavaScript para jogar Caça-Palavras.</p></noscript>
+<script>
+const j8Palavras = ["ACRE","BELEM","NATAL","GOIAS","CEARA","PARANA","RECIFE","MANAUS","SALVADOR","BRASILIA","AMAZONAS","BAHIA","RORAIMA","AMAPA","SERGIPE","ALAGOAS","PIAUI","PALMAS","MACAPA","CUIABA"];
+
+  let currentScore = 0;
+  let maxScore = 50;
+  let remainingWords = 5;
+  let secondsElapsed = 0;
+  let timerInterval = null;
+  let selectedCells = [];
+  let palavrasUsadas = [];
+  let palavrasPendentes = new Set();
+  let posicoesPalavras = new Map();
+
+  function shuffle(arr) {
+    const novo = [...arr];
+    for (let i = novo.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [novo[i], novo[j]] = [novo[j], novo[i]];
+    }
+    return novo;
+  }
+  function pickRandom(arr, n) { return shuffle(arr).slice(0, n); }
+
+  function formatTime(s) {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+  }
+
+  function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => { secondsElapsed++; }, 1000);
+  }
+
+  // Distribui as 5 palavras da rodada em uma grade de 12x12.
+  function gerarTabuleiro(palavrasDaRodada) {
+    const tamanho = 12;
+    const direcoes = [[0,1],[1,0],[1,1],[1,-1],[0,-1],[-1,0],[-1,-1],[-1,1]];
+    const palavrasOrdenadas = [...palavrasDaRodada].sort((a,b) => b.length - a.length);
+    for (let tentativa = 0; tentativa < 80; tentativa++) {
+      const grade = Array(tamanho * tamanho).fill(null);
+      const posicoes = new Map();
+      let concluido = true;
+      for (const palavra of palavrasOrdenadas) {
+        let inserida = false;
+        for (let passo = 0; passo < 650; passo++) {
+          const [dr,dc] = direcoes[Math.floor(Math.random() * direcoes.length)];
+          const linha = Math.floor(Math.random() * tamanho);
+          const coluna = Math.floor(Math.random() * tamanho);
+          const linhaFinal = linha + dr * (palavra.length - 1);
+          const colunaFinal = coluna + dc * (palavra.length - 1);
+          if (linhaFinal < 0 || linhaFinal >= tamanho || colunaFinal < 0 || colunaFinal >= tamanho) continue;
+          const indices = [...palavra].map((_,i) => (linha + dr*i) * tamanho + coluna + dc*i);
+          if (indices.every((idx,i) => grade[idx] === null || grade[idx] === palavra[i])) {
+            indices.forEach((idx,i) => { grade[idx] = palavra[i]; });
+            posicoes.set(palavra, indices);
+            inserida = true;
+            break;
+          }
+        }
+        if (!inserida) { concluido = false; break; }
+      }
+      if (concluido) {
+        const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        return {
+          grade: grade.map(letra => letra || letras[Math.floor(Math.random() * letras.length)]),
+          posicoes
+        };
+      }
+    }
+    throw new Error('Não foi possível distribuir todas as palavras.');
+  }
+
+  function renderWordSearch() {
+    palavrasUsadas = pickRandom(j8Palavras, 5);
+    palavrasPendentes = new Set(palavrasUsadas);
+    remainingWords = palavrasUsadas.length;
+    selectedCells = [];
+    currentScore = 0;
+    document.getElementById('game-left').textContent = remainingWords;
+    document.getElementById('game-score').textContent = currentScore;
+    const tabuleiro = gerarTabuleiro(palavrasUsadas);
+    const gradeData = tabuleiro.grade;
+    posicoesPalavras = tabuleiro.posicoes;
+
+    const playArea = document.getElementById('play-area');
+    playArea.innerHTML = `
+      <div class="puzzle-layout">
+        <div class="puzzle-board" aria-label="Tabuleiro de letras">
+          <div class="board-heading"><span><i class="board-marker" aria-hidden="true"></i> TABULEIRO DE LETRAS</span><span>12 × 12</span></div>
+          <div class="wordsearch-grid" id="grid-container"></div>
+          <p class="board-hint">Explore o tabuleiro. Cada palavra vale <strong>10 pontos.</strong></p>
+        </div>
+        <aside class="puzzle-side" aria-label="Palavras desta rodada">
+          <div class="side-kicker"><span class="side-star">✳</span> MISSÃO ATUAL</div>
+          <h3 class="side-title">Encontre as <em>5 palavras</em></h3>
+          <p class="side-intro">Selecione as letras na ordem correta para formar cada nome.</p>
+          <div class="words-list" aria-label="Palavras para encontrar">
+            ${palavrasUsadas.map((p,i) => `<span class="word-chip" data-word="${p}"><span class="chip-index">${String(i+1).padStart(2,'0')}</span><span class="chip-word">${p}</span><span class="chip-status" aria-hidden="true"></span></span>`).join('')}
+          </div>
+          <div id="feedback-msg" class="feedback-msg" aria-live="polite"></div>
+          <div class="side-progress"><div class="progress-top"><span>PROGRESSO</span><strong id="progress-count">0 de 5</strong></div><div class="progress-track"><span id="progress-fill"></span></div></div>
+        </aside>
+      </div>
+    `;
+
+    const grid = document.getElementById('grid-container');
+    gradeData.forEach((l, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'word-cell';
+      cell.textContent = l;
+      cell.dataset.idx = i;
+      cell.dataset.letra = l;
+
+      cell.onclick = () => {
+        // Letras cruzadas já encontradas podem ser usadas em outras palavras.
+        cell.classList.add('selected');
+        selectedCells.push(cell);
+        
+        const formada = selectedCells.map(s => s.dataset.letra).join('');
+        const feedbackMsg = document.getElementById('feedback-msg');
+
+        if (palavrasPendentes.has(formada)) {
+          selectedCells.forEach(s => {
+            s.classList.remove('selected');
+            s.classList.add('found');
+          });
+          selectedCells = [];
+          palavrasPendentes.delete(formada);
+          remainingWords = palavrasPendentes.size;
+          document.getElementById('game-left').textContent = remainingWords;
+          currentScore += 10;
+          document.getElementById('game-score').textContent = currentScore;
+
+          const chip = playArea.querySelector(`.word-chip[data-word="${formada}"]`) || [...playArea.querySelectorAll('.word-chip')].find(el => el.textContent === formada);
+          if (chip) chip.classList.add('found');
+          const progressCount = playArea.querySelector('#progress-count');
+          const progressFill = playArea.querySelector('#progress-fill');
+          if (progressCount) progressCount.textContent = `${5 - remainingWords} de 5`;
+          if (progressFill) progressFill.style.width = `${(5 - remainingWords) * 20}%`;
+
+          feedbackMsg.style.color = 'var(--color-success)';
+          feedbackMsg.innerHTML = `✓ "${formada}" encontrado! +10 pontos`;
+
+          if (remainingWords === 0 || currentScore >= maxScore) {
+            setTimeout(finalizarJogo, 1000);
+          }
+        } else if (![...palavrasPendentes].some(p => p.startsWith(formada))) {
+          selectedCells.forEach(s => {
+            s.classList.remove('selected');
+          });
+          selectedCells = [];
+          feedbackMsg.style.color = 'var(--color-danger)';
+          feedbackMsg.innerHTML = `✗ Sequência inválida. Tente novamente.`;
+        }
+      };
+
+      grid.appendChild(cell);
+    });
+  }
+
+  function finalizarJogo() {
+    clearInterval(timerInterval);
+    const playArea = document.getElementById('play-area');
+    const tempo = formatTime(secondsElapsed);
+    const pct = Math.min(100, Math.round((currentScore / maxScore) * 100));
+    
+    let estrelas = '';
+    if (pct >= 85) estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+    else if (pct >= 50) estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i><i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+    else estrelas = '<i class="fa-solid fa-star" style="color:var(--gold);"></i>';
+
+    playArea.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:12px 0;">
+        <div style="font-size:2.8rem;display:flex;gap:6px;">${estrelas}</div>
+        <h2 style="color:var(--navy);font-family:var(--font-display);font-size:1.8rem;font-weight:900;margin:0;">Desafio Concluído!</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:340px;margin-bottom:12px;">
+          <div style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:2rem;font-weight:900;color:var(--color-success)">${currentScore}</div>
+            <div style="font-size:0.65rem;color:var(--color-text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Pontos</div>
+          </div>
+          <div style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:2rem;font-weight:900;color:var(--navy)">${tempo}</div>
+            <div style="font-size:0.65rem;color:var(--color-text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Tempo</div>
+          </div>
+        </div>
+        <div class="result-actions">
+          <button id="btn-nova-rodada" class="btn btn-primary btn-replay" type="button">↻ Nova rodada</button>
+          <a href="../../aluno/jogos.html" class="btn btn-primary" style="padding:12px 18px;border-radius:100px;text-decoration:none;font-weight:700;display:inline-flex;align-items:center;gap:8px;">
+            <i class="fa-solid fa-house"></i> Voltar ao Menu
+          </a>
+        </div>
+      </div>
+    `;
+
+    salvarResultado(currentScore, tempo, pct);
+    playArea.querySelector('#btn-nova-rodada').addEventListener('click', iniciarNovaRodada);
+  }
+
+  function iniciarNovaRodada() {
+    // Nova rodada independente, com 5 palavras sorteadas do banco de 20.
+    clearInterval(timerInterval);
+    secondsElapsed = 0;
+    renderWordSearch();
+    startTimer();
+  }
+
+  function salvarResultado(pontos, tempo, pct) {
+    try {
+      const hist = JSON.parse(localStorage.getItem('geoeduca_results') || '[]');
+      const geoUser = JSON.parse(localStorage.getItem('geoeduca_user') || '{}');
+      const nome = geoUser.name || localStorage.getItem('geoeduca_user_name') || 'Aluno';
+      const sala = geoUser.sala || '';
+      
+      hist.push({
+        gameId: 8,
+        aluno: nome,
+        sala: sala,
+        pontuacao: pontos,
+        tempo: tempo,
+        data: new Date().toISOString(),
+        pct: pct
+      });
+      localStorage.setItem('geoeduca_results', JSON.stringify(hist));
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Integração existente da plataforma: só é chamada se presente.
+    if (typeof initPage === 'function') initPage('aluno');
+    const startButton = document.getElementById('btn-iniciar');
+    startButton.addEventListener('click', () => {
+      document.getElementById('tela-inicio').hidden = true;
+      document.getElementById('tela-jogo').hidden = false;
+      document.body.dataset.screen = 'partida';
+      secondsElapsed = 0;
+      startTimer();
+      renderWordSearch();
+      window.scrollTo(0, 0);
+    }, { once: true });
+  });
+</script>
+</body>
+</html>

@@ -20,6 +20,41 @@ document.addEventListener('DOMContentLoaded', () => {
   // Variável para relatório
   let currentReportQuizId = null;
 
+  // Ordem pedagógica das salas (6º Ano A até Ensino Médio)
+  const SALA_ORDER = [
+    '6º Ano A', '6º Ano B', '7º Ano A', '7º Ano B',
+    '8º Ano A', '8º Ano B', '9º Ano A', '9º Ano B',
+    '1ª Série A', '1ª Série B', '2ª Série A', '2ª Série B',
+    '3ª Série A', '3ª Série B'
+  ];
+
+  function sortSalas(lista) {
+    if (!Array.isArray(lista)) return [];
+    function normalize(str) {
+      return (str || '').toLowerCase().replace(/[º°ª]/g, '').replace(/\s+/g, ' ').trim();
+    }
+    const normalizedOrder = SALA_ORDER.map(normalize);
+
+    function getIndex(nome) {
+      const norm = normalize(nome);
+      const idx = normalizedOrder.indexOf(norm);
+      if (idx !== -1) return idx;
+      for (let i = 0; i < normalizedOrder.length; i++) {
+        if (norm === normalizedOrder[i] || norm.startsWith(normalizedOrder[i])) return i;
+      }
+      return -1;
+    }
+
+    return [...lista].sort((a, b) => {
+      const ia = getIndex(a.nome);
+      const ib = getIndex(b.nome);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return (a.nome || '').localeCompare(b.nome || '', 'pt-BR', { numeric: true, sensitivity: 'base' });
+    });
+  }
+
   async function loadInitialData() {
     try {
       const [quizzesRes, salasRes, alunosRes] = await Promise.all([
@@ -27,9 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
         api.get('/salas'),
         api.get('/alunos')
       ]);
-      quizzes = quizzesRes;
-      salas = salasRes;
-      alunos = alunosRes;
+      quizzes = quizzesRes || [];
+      salas = sortSalas(salasRes);
+      alunos = (alunosRes || []).sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR'));
       
       renderQuizzes();
       populateReportSalas();
@@ -256,8 +291,9 @@ document.addEventListener('DOMContentLoaded', () => {
       container.innerHTML = '<div class="custom-option" data-value="">Nenhuma sala encontrada</div>';
       return;
     }
+    const sortedItems = sortSalas(items);
     container.innerHTML = '<div class="custom-option selected" data-value="">Selecione...</div>' + 
-      items.map(s => `<div class="custom-option" data-value="${s.id}">${s.nome}</div>`).join('');
+      sortedItems.map(s => `<div class="custom-option" data-value="${s.id}">${s.nome}</div>`).join('');
   }
 
   /* ========================================================

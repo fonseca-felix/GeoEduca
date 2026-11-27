@@ -1,0 +1,6 @@
+GeoEduca | Fronteiras com Cronômetro
+Abra index.html (prévia local) ou fronteiras_cronometro.html.
+Assets em assets/. Base visual: padrão aprovado do Desafio da Posição.
+Mecânica preservada: 6 rodadas, 15 segundos, acertos de 5 pontos e bônus de 10.
+A função de limpar histórico local da versão recebida apaga geoeduca_results de todos os jogos neste navegador.
+O banco de vizinhança foi mantido conforme o arquivo enviado, sem revisão geográfica.

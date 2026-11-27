@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0a32">
+  <meta name="description" content="Descubra os rios e suas características, um passo de cada vez.">
+  <title>Hidrografias — GeoEduca</title>
+  <link rel="stylesheet" href="../css/serie.css">
+  <link rel="stylesheet" href="../css/hidrografias.css">
+  <script src="../js/rios.js" defer></script>
+  <script src="../js/hidrografias.js" defer></script>
+  <link rel="stylesheet" href="../css/geoeduca-harmonia.css">
+</head>
+<body class="ge-harmony ge-hidro" data-screen="inicio">
+  <main class="app">
+    <section class="tela abertura" id="inicio" aria-labelledby="titulo-inicial">
+      <header class="marca">
+        <a class="marca-nome" href="../../../aluno/jogos.html" aria-label="Hidrografias — voltar aos jogos">
+          <span>Hidrografias</span><svg class="marca-mapa" viewBox="0 0 60 68" aria-hidden="true"><path d="m8 9 15 2 5-5 9 4 5 7 9 3-2 8 5 6-5 6 1 8-8 4-3 9-8 1-5-6-9 1-4-9-7-5 3-8-5-8 4-7z"/></svg>
+        </a>
+        <a class="voltar" href="../../../aluno/jogos.html">Voltar aos jogos</a>
+      </header>
+      <div class="abertura-conteudo">
+        <div class="texto-abertura">
+          <p class="sobretitulo">Uma viagem pelas águas do Brasil</p>
+          <h1 id="titulo-inicial">O Brasil corre<br>por aqui.</h1>
+          <p>Descubra os rios e suas características, um passo de cada vez.</p>
+          <button class="botao botao-marinho" id="iniciar" type="button">Começar desafio</button>
+          <p class="legenda">Começa fácil <span aria-hidden="true">·</span> 5 acertos <span aria-hidden="true">·</span> Sem tempo limite</p>
+        </div>
+        <div class="copero-abertura" aria-hidden="true"><div class="aro-azul"></div><img src="../assets/personagens/copero-marinheiro-pose-aprovada.png" alt=""></div>
+      </div>
+    </section>
+
+    <section class="tela jogo" id="partida" aria-labelledby="pergunta" hidden>
+      <header class="barra-jogo">
+        <a class="marca-nome" href="../../../aluno/jogos.html" aria-label="Hidrografias — voltar aos jogos">
+          <span>Hidrografias</span><svg class="marca-mapa" viewBox="0 0 60 68" aria-hidden="true"><path d="m8 9 15 2 5-5 9 4 5 7 9 3-2 8 5 6-5 6 1 8-8 4-3 9-8 1-5-6-9 1-4-9-7-5 3-8-5-8 4-7z"/></svg>
+        </a>
+        <div class="painel-metricas">
+          <img class="avatar" src="../assets/personagens/copero-marinheiro-avatar.webp" alt="">
+          <span class="divisor" aria-hidden="true"></span>
+          <strong id="placar" aria-live="polite">0 <small>de 50 pontos</small></strong>
+          <span class="divisor" aria-hidden="true"></span>
+          <time id="tempo" aria-label="Tempo de jogo">00:00</time>
+        </div>
+      </header>
+      <div class="ge-play-head" aria-label="Identificação do desafio">
+  <div class="ge-play-head-intro">
+    <p class="ge-play-eyebrow">GEOGRAFIA DO BRASIL</p>
+    <h2 class="ge-play-title">Hidrografias</h2>
+    <p class="ge-play-desc">Descubra os rios brasileiros e suas características.</p>
+  </div>
+  <div class="ge-play-accent" aria-hidden="true"><span></span><span></span><span></span></div>
+</div>
+      <div class="jogo-conteudo">
+        <aside class="coluna-rio">
+          <ol class="etapas" aria-label="Progressão do desafio">
+            <li id="etapa-1" aria-current="step"><span>01</span> Fácil</li>
+            <li id="etapa-2"><span>02</span> Médio</li>
+            <li id="etapa-3"><span>03</span> Desafio</li>
+          </ol>
+          <div class="acertos-contagem"><span>Acertos</span><strong id="acertos">0 <small>de 5</small></strong></div>
+          <article class="cartao-rio">
+            <span class="etiqueta-rio" id="rio-rotulo">Rio em destaque</span>
+            <svg class="ondas" viewBox="0 0 150 86" aria-hidden="true"><path d="M9 23c27-24 45 24 71 0s42 23 61 0M9 45c27-24 45 24 71 0s42 23 61 0M9 67c27-24 45 24 71 0s42 23 61 0"/></svg>
+            <h2 id="rio-titulo">Rio</h2>
+            <p id="rio-pista"></p>
+            <div class="dica-area" id="dica-area">
+              <button class="botao-dica" id="ver-dica" type="button" aria-expanded="false" aria-controls="dica">Ver uma dica</button>
+              <p id="dica" hidden></p>
+            </div>
+            <div class="linha-agua" aria-hidden="true"></div>
+          </article>
+        </aside>
+        <section class="pergunta-area" aria-describedby="rio-titulo rio-pista">
+          <div class="pergunta-meta"><span id="rodada-numero">Pergunta 1 de 5</span><span id="numero-opcoes">2 alternativas</span></div>
+          <h1 id="pergunta">Qual característica corresponde a este rio?</h1>
+          <div id="opcoes" class="opcoes" role="group" aria-labelledby="pergunta"></div>
+          <div id="feedback-area" class="feedback-area" aria-live="polite" hidden>
+            <strong id="feedback"></strong>
+            <p id="explicacao"></p>
+            <p id="mensagem-nivel" class="mensagem-nivel"></p>
+            <button class="botao botao-marinho" id="proximo" type="button">Próximo rio</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="tela resultado" id="resultado" aria-labelledby="titulo-resultado" hidden>
+      <header class="marca marca-resultado">
+        <a class="marca-nome" href="../../../aluno/jogos.html" aria-label="Hidrografias — voltar aos jogos">
+          <span>Hidrografias</span><svg class="marca-mapa" viewBox="0 0 60 68" aria-hidden="true"><path d="m8 9 15 2 5-5 9 4 5 7 9 3-2 8 5 6-5 6 1 8-8 4-3 9-8 1-5-6-9 1-4-9-7-5 3-8-5-8 4-7z"/></svg>
+        </a>
+      </header>
+      <div class="resultado-conteudo">
+        <div class="texto-resultado">
+          <p class="sobretitulo">Desafio concluído</p>
+          <h1 id="titulo-resultado">Você navegou<br>pelo Brasil!</h1>
+          <div class="numeros-resultado">
+            <div><strong id="pontos-final">50</strong><span>pontos</span></div>
+            <div><strong id="acertos-final">5</strong><span>acertos</span></div>
+            <div><strong id="tempo-final">00:00</strong><span>tempo</span></div>
+          </div>
+          <p class="resumo-final" id="resumo-final"></p>
+          <button class="botao botao-ouro" id="repetir" type="button">Jogar novamente</button>
+          <div class="links-resultado">
+            <button id="revisar" type="button">Revisar rios</button>
+            <a href="../../../aluno/jogos.html">Voltar aos jogos</a>
+          </div>
+          <p id="aviso-salvar" class="aviso-salvar" hidden>Resultado desta partida não pôde ser salvo no ranking.</p>
+        </div>
+        <div class="copero-resultado" aria-hidden="true"><img src="../assets/personagens/copero-marinheiro-pose-aprovada.png" alt=""></div>
+      </div>
+    </section>
+  </main>
+  <dialog id="revisao" class="dialog-revisao" aria-labelledby="titulo-revisao">
+    <div class="dialog-cabecalho"><div><span class="sobretitulo">Seu caderno de bordo</span><h2 id="titulo-revisao">Rios que você descobriu.</h2></div><button id="fechar-revisao" class="fechar-dialogo" type="button" aria-label="Fechar revisão">×</button></div>
+    <p id="resumo-revisao"></p><ol id="lista-revisao"></ol>
+  </dialog>
+</body>
+</html>

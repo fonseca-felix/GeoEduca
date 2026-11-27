@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b0a32">
+  <meta name="description" content="Complete as capitais dos 26 estados brasileiros e do Distrito Federal, no GeoEduca.">
+  <title>Complete a Capital | GeoEduca</title>
+  <link rel="icon" type="image/svg+xml" href="assets/brand-brasil.svg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preload" href="assets/copero-vestuario-2-musculos.png" as="image">
+</head>
+<body data-screen="telaInicial">
+  <a class="skip-link" href="#conteudo">Ir ao conteúdo</a>
+  <header class="site-header">
+    <div class="brand" aria-label="GeoEduca: Complete a Capital">
+      <span class="brand-map" aria-hidden="true"></span>
+      <span>COMPLETE<br>A CAPITAL<span class="brand-line"></span></span>
+    </div>
+    <div class="header-right">
+      <span class="header-mode">Geografia do Brasil</span>
+      <a class="header-link" href="../../aluno/jogos.html">Outros jogos <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="conteudo">
+    <section class="screen home-screen" id="tela-inicio" aria-labelledby="titulo-inicio">
+      <div class="home-shape" aria-hidden="true"></div>
+      <div class="home-copy">
+        <p class="eyebrow">UM DESAFIO DE GEOGRAFIA</p>
+        <h1 id="titulo-inicio">Cada estado.<br>Uma capital.</h1>
+        <p class="home-lead">Você conhece as capitais do Brasil? Descubra as letras, complete os nomes e explore as 27 unidades federativas.</p>
+        <button class="primary-button" id="btn-iniciar" type="button">Começar desafio <span aria-hidden="true">→</span></button>
+        <p class="cover-meta">27 capitais <span aria-hidden="true">·</span> 270 pontos possíveis</p>
+      </div>
+      <img class="home-mascot" src="assets/copero-vestuario-2-musculos.png" alt="Copero explorador com os dois braços erguidos e os punhos fechados, usando chapéu, colete cáqui e lenço azul">
+    </section>
+    <section class="screen play-screen" id="tela-jogo" aria-labelledby="titulo-jogo" hidden>
+      <div class="play-head">
+        <div class="play-intro">
+          <p class="eyebrow">DESAFIO GEOGRÁFICO <span>·</span> BRASIL</p>
+          <h1 id="titulo-jogo">Complete a capital.</h1>
+          <p class="lead">Observe o estado e escreva o nome da capital correspondente.</p>
+        </div>
+        <div class="round-status" aria-live="polite">
+          <div class="status-unit"><span class="status-label">PONTUAÇÃO</span><span class="status-value"><strong id="game-score">0</strong><small>/ 270 pts</small></span></div>
+          <span class="status-rule" aria-hidden="true"></span>
+          <div class="status-unit"><span class="status-label">ETAPA</span><span class="status-value"><strong id="game-step">1</strong><small>/ 27</small></span></div>
+        </div>
+      </div>
+      <div class="play-layout"><article class="game-card-body"><div class="game-content-panel" id="play-area" aria-live="polite"></div></article></div>
+    </section>
+  </main>
+  <noscript><p class="noscript-message">Ative o JavaScript para jogar Complete a Capital.</p></noscript>
+  <!-- Integração opcional com os scripts já existentes da plataforma GeoEduca. -->
+  <script src="../../js/api.js" defer></script>
+  <script src="../../js/auth.js" defer></script>
+  <script src="../../js/theme.js" defer></script>
+  <script src="../../js/ui.js" defer></script>
+  <script src="../../js/sidebar.js" defer></script>
+  <script src="../../js/aluno/character.js" defer></script>
+  <script src="../../js/darkmode.js" defer></script>
+<script src="game.js" defer></script>
+</body>
+</html>

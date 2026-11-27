@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b0a32">
+  <meta name="description" content="Encontre os seis pares de biomas e características com o Copero.">
+  <title>Memória dos Biomas · GeoEduca</title>
+  <link rel="icon" href="../assets/brand-brasil.svg">
+  <link rel="stylesheet" href="../css/memoria-biomas.css">
+  <script src="../js/memoria-biomas.js" defer></script>
+  <link rel="stylesheet" href="../css/geoeduca-harmonia.css">
+</head>
+<body class="ge-harmony ge-biomas" data-screen="abertura">
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+  <header class="cabecalho">
+    <div class="marca" aria-label="Memória dos Biomas"><span>MEMÓRIA<br>DOS BIOMAS</span><span class="marca-mapa" aria-hidden="true"></span></div>
+    <div class="metricas" hidden>
+      <img src="../assets/personagens/copero-naturalista-avatar.webp" width="48" height="48" alt="Copero" class="avatar">
+      <span class="metrica-pares"><strong id="pares">0</strong> de 6 <span>pares</span></span>
+      <span class="metrica-jogadas">Jogadas <strong id="jogadas">0</strong></span>
+      <span class="metrica-tempo"><span class="sr-only">Tempo: </span><strong id="tempo">00:00</strong></span>
+    </div>
+    <a class="voltar" href="../../../aluno/jogos.html">Voltar ao painel</a>
+  </header>
+  <main id="conteudo">
+    <section id="abertura" class="tela tela-abertura" aria-labelledby="titulo-abertura">
+      <div class="curva" aria-hidden="true"></div>
+      <div class="texto-abertura">
+        <h1 id="titulo-abertura">Cada bioma<br>tem seu par.</h1>
+        <p>Encontre os nomes e suas características.</p>
+        <button id="iniciar" type="button" class="botao botao-marinho">Começar desafio</button>
+        <p class="legenda">6 pares · 12 cartas</p>
+      </div>
+      <img class="mascote mascote-abertura" src="../assets/personagens/copero-naturalista-pose-aprovada.png" width="1920" height="1920" alt="Copero de colete verde e camiseta marfim, comemorando">
+    </section>
+    <section id="partida" class="tela tela-partida" aria-labelledby="titulo-partida" hidden>
+      <div class="ge-play-head" aria-label="Identificação do desafio">
+  <div class="ge-play-head-intro">
+    <p class="ge-play-eyebrow">GEOGRAFIA DO BRASIL</p>
+    <h2 class="ge-play-title">Memória dos Biomas</h2>
+    <p class="ge-play-desc">Associe cada bioma às suas características.</p>
+  </div>
+  <div class="ge-play-accent" aria-hidden="true"><span></span><span></span><span></span></div>
+</div>
+      <h1 id="titulo-partida" tabindex="-1">Encontre os pares dos biomas</h1>
+      <p class="instrucao">Combine o nome de cada bioma com sua característica.</p>
+      <div id="tabuleiro" class="tabuleiro" role="group" aria-label="12 cartas de memória" aria-busy="false"></div>
+      <p id="feedback" class="feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+    </section>
+    <section id="resultado" class="tela tela-resultado" aria-labelledby="titulo-resultado" hidden>
+      <div class="texto-resultado">
+        <h1 id="titulo-resultado" tabindex="-1">Todos os pares<br>encontrados!</h1>
+        <div class="resultado-metricas">
+          <div><strong id="resultado-pontos">60</strong><span>pontos</span></div>
+          <div><strong>6 de 6</strong><span>pares</span></div>
+          <div><strong id="resultado-tempo">00:00</strong><span>tempo</span></div>
+        </div>
+        <p id="resultado-jogadas" class="resultado-jogadas"></p>
+        <button id="repetir" class="botao" type="button">Jogar novamente</button>
+        <div class="resultado-links">
+          <button id="revisar" class="link-botao" type="button">Revisar biomas</button>
+          <a class="voltar" href="../../../aluno/jogos.html">Voltar ao painel</a>
+        </div>
+        <p id="aviso-salvar" class="aviso" role="status" hidden>Não foi possível salvar o resultado neste navegador. Sua partida foi concluída.</p>
+      </div>
+      <img class="mascote mascote-resultado" src="../assets/personagens/copero-naturalista-pose-aprovada-recorte.png" width="1920" height="1920" alt="Copero naturalista com os punhos erguidos">
+    </section>
+  </main>
+  <dialog id="revisao" aria-labelledby="titulo-revisao">
+    <div class="revisao-cabecalho"><p>SEU CADERNO DE BIOMAS</p><form method="dialog"><button class="fechar" aria-label="Fechar revisão" type="submit">×</button></form></div>
+    <h2 id="titulo-revisao">Um Brasil, seis biomas.</h2>
+    <ul id="lista-biomas" class="lista-biomas"></ul>
+  </dialog>
+  <noscript><p class="aviso-sem-js">Ative o JavaScript para jogar.</p></noscript>
+</body>
+</html>

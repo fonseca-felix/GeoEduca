@@ -1,0 +1,258 @@
+/* GEOEDUCA | Camada oficial de harmonização visual dos 8 jogos.
+   Referências: Caça-Palavras, Complete a Capital, Desafio da Posição,
+   Fronteiras com Cronômetro. Aplicada apenas aos quatro jogos do TCC.
+   Sem alteração de regras, dados, JavaScript ou ilustrações do Copero. */
+.ge-harmony{
+  --ge-navy:#0b0a32;--ge-gold:#cca43b;--ge-cream:#f7f3e9;
+  --ge-green:#233b0b;--ge-border:#ded7c7;--ge-ink:#0b0a32;
+  --ge-muted:#716b77;--ge-success:#2c6628;--ge-danger:#b43d41;
+  --ge-pad:clamp(18px,5.4vw,100px);
+  font-family:Arial,Helvetica,sans-serif;
+}
+.ge-harmony .ge-play-head{
+  width:100%;max-width:1240px;margin:0 auto;
+  padding:0 0 clamp(13px,2dvh,20px);border-bottom:1px solid var(--ge-border);
+  display:flex;justify-content:space-between;align-items:center;gap:20px;
+  color:var(--ge-ink);flex:none;
+}
+.ge-harmony .ge-play-head-intro{border-left:4px solid var(--ge-gold);padding-left:15px;min-width:0}
+.ge-harmony .ge-play-eyebrow{
+  margin:0 0 5px!important;color:#907120!important;font:800 10px/1.25 Arial,Helvetica,sans-serif!important;
+  letter-spacing:.15em;text-transform:uppercase;
+}
+.ge-harmony .ge-play-title{
+  margin:0!important;color:var(--ge-navy)!important;
+  font:700 clamp(28px,3vw,42px)/1.04 Georgia,'Times New Roman',serif!important;
+  letter-spacing:-.045em;
+}
+.ge-harmony .ge-play-desc{
+  margin:6px 0 0!important;color:var(--ge-muted)!important;
+  font:400 clamp(11px,1vw,13px)/1.35 Arial,Helvetica,sans-serif!important;
+}
+.ge-harmony .ge-play-accent{display:flex;gap:7px;align-items:center;opacity:.9}
+.ge-harmony .ge-play-accent span{display:block;width:9px;height:9px;border:1px solid #d9c998;border-radius:50%;background:var(--ge-gold)}
+.ge-harmony .ge-play-accent span:nth-child(2){opacity:.6}
+.ge-harmony .ge-play-accent span:nth-child(3){opacity:.3}
+.ge-harmony :is(.cartao-rio,.cartao-estado,.cartao-mapa,.pista){
+  border:1px solid var(--ge-border);background:#f5f1e7;border-radius:18px;
+  box-shadow:none;color:var(--ge-ink);
+}
+.ge-harmony :is(.opcao,#opcoes button,.opcoes button){
+  background:rgba(255,255,255,.64);color:var(--ge-ink);
+  border:1px solid #d8cbb5;border-radius:11px;
+  box-shadow:0 2px 3px #0b0a3205;
+  font-family:Georgia,'Times New Roman',serif;
+  font-weight:700;transition:background .16s,border-color .16s,transform .16s;
+}
+.ge-harmony :is(.opcao,#opcoes button,.opcoes button):hover:not(:disabled){background:#fff9ed;border-color:#b89a50;transform:translateY(-1px)}
+.ge-harmony :is(.opcao,#opcoes button,.opcoes button):focus-visible,
+.ge-harmony :is(.botao,.botao-dica,.pista-dica,.carta):focus-visible{outline:3px solid var(--ge-gold);outline-offset:3px}
+.ge-harmony :is(.opcao.correta,.opcoes .correta,#opcoes button.resposta-certa){background:#edf6e5;border-color:#8eb174;color:var(--ge-success)}
+.ge-harmony :is(.opcao.errada,.opcoes .errada,#opcoes button.resposta-errada){background:#fff0ed;border-color:#d59b91;color:var(--ge-danger)}
+.ge-harmony :is(.feedback-area,.feedback-row){border-radius:12px}
+.ge-harmony .ge-play-head .ge-play-title{max-width:100%}
+.ge-harmony button:not(.carta):disabled{cursor:default}
+
+/* Jogo 1: Bandeira e Estado */
+.ge-bandeira[data-screen=telaJogo] .site-header{height:73px;padding:12px var(--pad)}
+.ge-bandeira[data-screen=telaJogo] .brand{font-size:14px;line-height:1.1}
+.ge-bandeira[data-screen=telaJogo] .brand-map{width:30px;height:36px}
+.ge-bandeira[data-screen=telaJogo] .header-right{gap:17px}
+.ge-bandeira[data-screen=telaJogo] .header-mode{font-size:11px;color:#d8d2e2}
+.ge-bandeira[data-screen=telaJogo] .header-progress{font-size:12px}
+.ge-bandeira .quiz-screen{padding:94px var(--ge-pad) 18px;justify-content:flex-start;gap:clamp(14px,2dvh,24px)}
+.ge-bandeira .quiz-screen .ge-play-head{max-width:1240px}
+.ge-bandeira .quiz-screen #game-container{width:100%;flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+.ge-bandeira .quiz-screen .rodada{max-width:1240px;gap:clamp(18px,3.4vw,55px);align-items:center}
+.ge-bandeira .quiz-screen .pista{min-height:clamp(240px,42dvh,380px);padding:clamp(16px,2.6vw,36px)}
+.ge-bandeira .pista-simbolo{color:var(--ge-gold)}
+.ge-bandeira .pista-rotulo,.ge-bandeira .rodada-numero{color:#967721}
+.ge-bandeira .pista-dica{border:1px solid #d2bd8e;border-radius:10px;background:#fffaf0}
+.ge-bandeira #opcoes{gap:10px}
+.ge-bandeira #opcoes button{min-height:52px;padding:10px 15px;font-size:clamp(14px,1.3vw,19px)}
+.ge-bandeira .quiz-screen .pergunta{font-size:clamp(28px,3.3vw,43px)}
+.ge-bandeira .result-screen .result-stats>div{border-color:#b5ab91}
+.ge-bandeira .result-screen .result-actions :is(button,a){border-radius:11px}
+
+/* Jogo 2: Hidrografias */
+.ge-hidro .jogo{background:var(--ge-cream);display:flex;flex-direction:column;min-height:100dvh;padding:0}
+.ge-hidro .barra-jogo{min-height:73px;flex:none;padding:10px var(--ge-pad)}
+.ge-hidro .barra-jogo .marca-nome{font:bold clamp(13px,1.4vw,18px)/1.15 Georgia,'Times New Roman',serif;color:#fff}
+.ge-hidro .barra-jogo .marca-mapa{width:29px;height:34px;fill:var(--ge-gold)}
+.ge-hidro .painel-metricas{gap:16px;font-size:clamp(13px,1.3vw,18px)}
+.ge-hidro .painel-metricas strong{color:#f5f1e7}
+.ge-hidro .painel-metricas time{color:var(--ge-gold)}
+.ge-hidro .jogo .ge-play-head{padding-top:19px;margin-top:0}
+.ge-hidro .jogo-conteudo{
+  flex:1;width:100%;min-height:0;max-width:1240px;
+  margin:0 auto;gap:clamp(18px,3.6vw,55px);padding:clamp(15px,2.8dvh,26px) 0;
+  grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center;
+}
+.ge-hidro .coluna-rio{gap:11px}
+.ge-hidro .etapas li{border-color:var(--ge-border);background:transparent;border-radius:10px}
+.ge-hidro .etapas li[aria-current=step]{background:var(--ge-navy);border-color:var(--ge-navy);color:#fff}
+.ge-hidro .cartao-rio{min-height:clamp(255px,43dvh,400px);padding:22px;position:relative}
+.ge-hidro .etiqueta-rio{background:#ede1c2;color:#8a6a18;border-radius:7px;padding:8px 12px;font-size:11px}
+.ge-hidro .ondas{stroke:#9bbdbb;margin:18px 0 7px;width:112px}
+.ge-hidro .cartao-rio h2{font:700 clamp(29px,3.1vw,42px)/1.07 Georgia,serif;color:var(--ge-navy)}
+.ge-hidro .cartao-rio>p{font:500 clamp(13px,1.2vw,16px)/1.4 Arial,Helvetica,sans-serif;color:var(--ge-muted)}
+.ge-hidro .linha-agua{opacity:.3}
+.ge-hidro .pergunta-meta{font-size:11px;letter-spacing:.04em;color:#84776d}
+.ge-hidro .pergunta-area h1{font:700 clamp(26px,3vw,41px)/1.07 Georgia,serif;letter-spacing:-.035em;margin:12px 0 16px;padding-left:14px;border-left:4px solid var(--ge-gold)}
+.ge-hidro .opcoes{gap:10px}
+.ge-hidro .opcao{min-height:55px;padding:10px 14px;font:700 clamp(14px,1.3vw,18px)/1.27 Georgia,serif}
+.ge-hidro .opcao .letra{background:#f0e3c4;color:#a18333;border-radius:8px;width:32px;height:32px;flex:0 0 32px}
+.ge-hidro .feedback-area{background:#f5f0e7;border:1px solid var(--ge-border)}
+.ge-hidro .botao-dica{color:#82641c;text-decoration-color:var(--ge-gold)}
+.ge-hidro .resultado .numeros-resultado>div{padding:8px 16px;border-right:1px solid rgba(255,255,255,.28)}
+.ge-hidro .resultado .numeros-resultado>div:last-child{border-right:none}
+
+/* Jogo 3: Memória dos Biomas */
+.ge-biomas[data-screen=partida] .cabecalho{height:73px;padding:10px var(--ge-pad)}
+.ge-biomas[data-screen=partida] .marca{font-size:13px}
+.ge-biomas[data-screen=partida] .marca-mapa{width:31px;height:36px}
+.ge-biomas[data-screen=partida] .metricas{gap:clamp(12px,2vw,28px);font-size:13px}
+.ge-biomas[data-screen=partida] .metricas>span{padding-left:clamp(12px,1.5vw,22px)}
+.ge-biomas[data-screen=partida] .metricas strong{font-size:clamp(18px,1.8vw,26px)}
+.ge-biomas .tela-partida{padding:96px var(--ge-pad) 18px;justify-content:flex-start;align-items:stretch}
+.ge-biomas .tela-partida>.ge-play-head{width:100%}
+.ge-biomas .tela-partida>h1{font:700 clamp(19px,2.3vw,30px)/1.1 Georgia,serif;text-align:left;margin:15px auto 0;width:100%;max-width:1120px}
+.ge-biomas .instrucao{width:100%;max-width:1120px;text-align:left;margin:5px auto 0;font-size:12px;color:var(--ge-muted)}
+.ge-biomas .tabuleiro{max-width:1120px;gap:clamp(8px,1vw,14px);margin:clamp(12px,1.7dvh,22px) auto 0}
+.ge-biomas .carta{min-height:clamp(76px,12.1dvh,127px);border-radius:12px;border:1px solid #c6ad72}
+.ge-biomas .carta .folha{color:var(--ge-gold)}
+.ge-biomas .carta.aberta{background:#fffcf5;border-color:#91a577}
+.ge-biomas .carta.encontrada{background:#edf6e5;border-color:#72955b}
+.ge-biomas .feedback{margin:12px auto 0;font-size:13px}
+.ge-biomas .resultado-metricas>div{border-color:#a49c88}
+
+/* Jogo 4: Ordenando por Região */
+.ge-regiao[data-screen=partida] .cabecalho{height:73px;padding:10px var(--ge-pad)}
+.ge-regiao[data-screen=partida] .marca{font-size:13px}
+.ge-regiao[data-screen=partida] .marca-mapa{width:31px;height:36px}
+.ge-regiao[data-screen=partida] .metricas{gap:clamp(12px,2vw,28px);font-size:13px}
+.ge-regiao[data-screen=partida] .metricas>span{padding-left:clamp(12px,1.5vw,22px)}
+.ge-regiao[data-screen=partida] .metricas strong{font-size:clamp(18px,1.8vw,26px)}
+.ge-regiao .tela-partida{padding:96px var(--ge-pad) 18px;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;gap:clamp(14px,2.5dvh,24px)}
+.ge-regiao .tela-partida>.ge-play-head{width:100%}
+.ge-regiao .tela-partida>.rodada{flex:1;align-items:center;gap:clamp(18px,4vw,60px);max-width:1240px}
+.ge-regiao .cartao-estado{min-height:clamp(230px,42dvh,365px);padding:clamp(18px,2.5vw,34px);border-radius:18px}
+.ge-regiao .cartao-mapa{border-radius:18px;background:#f4ecdd}
+.ge-regiao .cartao-estado .rotulo{border-radius:8px;background:#eadfc1;color:#7b611c}
+.ge-regiao .sigla{background:#eee0bf;color:#886419;border-radius:8px}
+.ge-regiao .respostas h1{padding-left:13px;border-left:4px solid var(--ge-gold);font:700 clamp(28px,3vw,42px)/1.12 Georgia,serif}
+.ge-regiao .opcoes{gap:10px;margin-top:16px}
+.ge-regiao .opcoes button{min-height:53px;padding:10px 15px;font-size:clamp(15px,1.3vw,18px)}
+.ge-regiao .proximo{min-height:45px}
+.ge-regiao .tela-resultado .resultado-metricas>div{border-color:#a49c88}
+.ge-regiao dialog{border:1px solid var(--ge-border);border-radius:16px}
+
+@media (max-width:900px){
+  .ge-harmony .ge-play-accent{display:none}
+  .ge-hidro .jogo .ge-play-head{width:calc(100% - 36px);padding-top:12px}
+  .ge-hidro .jogo-conteudo{width:100%;padding:12px 18px 18px;gap:22px}
+  .ge-hidro .cartao-rio{min-height:260px}
+  .ge-regiao .tela-partida>.rodada{gap:18px}
+  .ge-biomas .tabuleiro{gap:9px}
+}
+@media (max-width:650px){
+  .ge-harmony .ge-play-head{padding-bottom:9px;gap:10px}
+  .ge-harmony .ge-play-head-intro{padding-left:10px;border-left-width:3px}
+  .ge-harmony .ge-play-eyebrow{font-size:8px;margin-bottom:3px!important}
+  .ge-harmony .ge-play-title{font-size:clamp(23px,6.6vw,29px)!important}
+  .ge-harmony .ge-play-desc{font-size:10px!important;margin-top:3px!important}
+  .ge-bandeira[data-screen=telaJogo] .site-header{height:58px;padding:8px 14px}
+  .ge-bandeira[data-screen=telaJogo] .brand{font-size:10px}
+  .ge-bandeira[data-screen=telaJogo] .brand-map{width:25px;height:29px}
+  .ge-bandeira[data-screen=telaJogo] .header-mode{display:none}
+  .ge-bandeira .quiz-screen{padding:72px 14px 10px;gap:11px}
+  .ge-bandeira .quiz-screen .pista{min-height:0;padding:12px}
+  .ge-bandeira #opcoes button{min-height:40px;padding:6px 10px;font-size:13px}
+  .ge-bandeira .quiz-screen .pergunta{font-size:22px}
+  .ge-hidro .barra-jogo{min-height:56px;padding:7px 14px}
+  .ge-hidro .barra-jogo .marca-nome{font-size:14px}
+  .ge-hidro .painel-metricas{font-size:12px;gap:9px}
+  .ge-hidro .painel-metricas .divisor{height:24px}
+  .ge-hidro .jogo .ge-play-head{padding-top:10px;width:calc(100% - 28px)}
+  .ge-hidro .jogo-conteudo{display:grid;grid-template-columns:minmax(0,1fr);gap:13px;padding:12px 14px 14px;align-content:start}
+  .ge-hidro .coluna-rio{gap:8px}
+  .ge-hidro .etapas li{padding:7px 8px;font-size:11px}
+  .ge-hidro .cartao-rio{min-height:clamp(150px,27dvh,220px);padding:12px}
+  .ge-hidro .ondas{width:76px;margin:9px 0 3px}
+  .ge-hidro .cartao-rio h2{font-size:28px}
+  .ge-hidro .cartao-rio>p{font-size:12px;margin-top:6px}
+  .ge-hidro .acertos-contagem{font-size:11px}
+  .ge-hidro .pergunta-area h1{font-size:24px;margin:6px 0 10px}
+  .ge-hidro .opcoes{gap:7px}
+  .ge-hidro .opcao{min-height:46px;padding:7px 10px;font-size:13px}
+  .ge-hidro .opcao .letra{width:26px;height:26px;flex-basis:26px}
+  .ge-biomas[data-screen=partida] .cabecalho,.ge-regiao[data-screen=partida] .cabecalho{height:58px;padding:7px 12px}
+  .ge-biomas[data-screen=partida] .marca,.ge-regiao[data-screen=partida] .marca{font-size:10px}
+  .ge-biomas[data-screen=partida] .marca-mapa,.ge-regiao[data-screen=partida] .marca-mapa{width:23px;height:27px}
+  .ge-biomas[data-screen=partida] .metricas,.ge-regiao[data-screen=partida] .metricas{gap:7px;font-size:10px}
+  .ge-biomas[data-screen=partida] .metricas>span,.ge-regiao[data-screen=partida] .metricas>span{padding-left:7px}
+  .ge-biomas[data-screen=partida] .metricas strong,.ge-regiao[data-screen=partida] .metricas strong{font-size:16px}
+  .ge-biomas .tela-partida,.ge-regiao .tela-partida{padding:72px 12px 12px;gap:8px}
+  .ge-biomas .tela-partida>h1{font-size:18px;margin-top:9px}
+  .ge-biomas .instrucao{font-size:11px;margin-top:3px}
+  .ge-biomas .tabuleiro{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:8px}
+  .ge-biomas .carta{min-height:clamp(68px,9.9dvh,100px);padding:6px;border-radius:9px}
+  .ge-biomas .carta .conteudo{font-size:clamp(10px,3.3vw,14px)}
+  .ge-biomas .carta .folha{width:24px;height:27px}
+  .ge-regiao .tela-partida>.rodada{grid-template-columns:1fr;gap:10px;align-content:start}
+  .ge-regiao .cartao-estado{min-height:160px;padding:13px;gap:9px}
+  .ge-regiao #estado{font-size:clamp(30px,8vw,42px)}
+  .ge-regiao .respostas h1{font-size:26px}
+  .ge-regiao .opcoes{gap:7px;margin-top:10px}
+  .ge-regiao .opcoes button{min-height:41px;font-size:13px;padding:7px 10px}
+}
+@media (max-width:375px){
+  .ge-biomas .ge-play-desc,.ge-regiao .ge-play-desc,.ge-bandeira .ge-play-desc{display:none}
+  .ge-hidro .ge-play-desc{display:none}
+  .ge-biomas .carta{min-height:62px}
+  .ge-hidro .cartao-rio{min-height:135px}
+  .ge-hidro .ondas{width:54px;margin:5px 0}
+  .ge-hidro .cartao-rio h2{font-size:22px}
+}
+@media (max-height:650px) and (min-width:651px){
+  .ge-hidro .jogo-conteudo{padding:10px 0;gap:15px}
+  .ge-hidro .cartao-rio{min-height:230px}
+  .ge-biomas .tela-partida,.ge-regiao .tela-partida{padding-top:83px}
+  .ge-biomas .carta{min-height:76px}
+  .ge-regiao .cartao-estado{min-height:235px}
+}
+@media (prefers-reduced-motion:reduce){
+  .ge-harmony *{transition:none!important;animation:none!important}
+}
+
+/* Resultado: a mesma leitura editorial dos quatro jogos-modelo,
+   preservando o Copero temático no canto direito. */
+.ge-bandeira[data-screen=telaResultado]{background:var(--ge-cream);color:var(--ge-navy)}
+.ge-bandeira .result-screen{background:var(--ge-cream);color:var(--ge-navy)}
+.ge-bandeira .result-screen h1{color:var(--ge-navy)}
+.ge-bandeira .result-screen .bandeira-kicker{color:#967721}
+.ge-bandeira .result-screen .result-stats{margin-block:24px;border-top:1px solid var(--ge-border);border-bottom:1px solid var(--ge-border);padding-block:16px}
+.ge-bandeira .result-screen .result-stats>div{border-color:var(--ge-border)}
+.ge-bandeira .result-screen .result-stats strong{color:var(--ge-navy)}
+.ge-bandeira .result-screen .result-stats span{color:var(--ge-muted)}
+.ge-bandeira .result-screen .primary-button{background:var(--ge-navy);color:var(--ge-cream);width:auto;min-width:min(100%,260px)}
+.ge-bandeira .result-screen .result-actions .text-button{color:var(--ge-navy);font-size:13px}
+.ge-bandeira .result-screen .result-mascot{width:min(44vw,575px);height:65dvh;bottom:0;right:1vw}
+.ge-bandeira .result-screen .result-copy{width:58%}
+
+@media(max-width:650px){
+ .ge-bandeira .result-screen,.ge-hidro .resultado,.ge-biomas .tela-resultado,.ge-regiao .tela-resultado{min-height:100dvh;padding-top:clamp(100px,15dvh,140px);padding-bottom:35dvh;display:block;overflow:hidden}
+ .ge-bandeira .result-screen .result-copy,.ge-biomas .tela-resultado .texto-resultado,.ge-regiao .tela-resultado .texto-resultado{width:100%;max-width:100%}
+ .ge-bandeira .result-screen .result-copy h1,.ge-hidro .resultado .texto-resultado h1,.ge-biomas .tela-resultado .texto-resultado h1,.ge-regiao .tela-resultado .texto-resultado h1{font-size:clamp(28px,8vw,42px);white-space:normal}
+ .ge-bandeira .result-screen .result-mascot,.ge-biomas .tela-resultado .mascote-resultado,.ge-regiao .tela-resultado .mascote-resultado{height:33dvh;width:80vw;right:-8vw;bottom:0}
+ .ge-hidro .resultado .resultado-conteudo{display:flex;flex-direction:column;align-items:stretch;min-height:0}
+ .ge-hidro .resultado .texto-resultado{padding-top:0}
+ .ge-hidro .resultado .copero-resultado{height:30dvh;min-height:0;justify-content:flex-end}
+ .ge-hidro .resultado .copero-resultado img{max-height:100%}
+ .ge-biomas .tela-resultado .resultado-metricas,.ge-regiao .tela-resultado .resultado-metricas,.ge-hidro .resultado .numeros-resultado,.ge-bandeira .result-screen .result-stats{margin-block:17px;padding-block:11px}
+ .ge-biomas .tela-resultado .resultado-metricas strong,.ge-regiao .tela-resultado .resultado-metricas strong,.ge-hidro .resultado .numeros-resultado strong,.ge-bandeira .result-screen .result-stats strong{font-size:clamp(21px,6vw,31px)}
+}
+.ge-bandeira .result-screen .result-mascot{mix-blend-mode:normal}
+
+/* GeoEduca — uniformidade com os quatro jogos-base: sem ornamento de pontos no cabeçalho da partida. */
+.ge-harmony .ge-play-accent{display:none!important}

@@ -1,0 +1,11 @@
+GEOEDUCA | CAÇA-PALAVRAS · REDESIGN FIEL
+
+Base visual: jogos aprovados do JOGOS.zip (especialmente Detetive do Brasil e Bandeira e Estado).
+
+Alterado: somente a estrutura visual da tela da partida e o style.css. A tela inicial e as imagens originais foram mantidas.
+
+Mecânica preservada sem mudanças: banco de 20 palavras; 5 sorteadas por rodada; grade 12×12; 10 pontos por palavra; 50 pontos máximos; oito direções; novas rodadas e resultados salvos no navegador.
+
+Abra caca_palavras.html para uma prévia independente. Na plataforma GeoEduca, mantenha a estrutura de pastas da integração dos scripts ../js/*.js, que não estão incluídos neste pacote.
+
+Responsividade: desktop, tablet, celular e paisagem. Em telas muito baixas, o tamanho das letras é reduzido para priorizar o acesso integral sem rolagem.

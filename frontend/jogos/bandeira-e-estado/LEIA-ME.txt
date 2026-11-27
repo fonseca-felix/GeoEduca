@@ -1,0 +1,28 @@
+BANDEIRA E ESTADO · GEOEDUCA
+
+COMO ABRIR
+Extraia o ZIP inteiro e abra index.html no navegador.
+Também é possível abrir html/bandeira_estado.html diretamente.
+
+ORGANIZAÇÃO
+html/    Páginas do jogo e tela de retorno da versão avulsa.
+css/     Folhas de estilo.
+js/      Motor original e lógica do Bandeira e Estado.
+assets/  Bandeiras, Copero, mapa e fonte com sua licença.
+index.html é o atalho de entrada.
+
+COMO JOGAR
+Leia a pista, escolha um dos quatro estados e revele a bandeira.
+Ver dica mostra a sigla. Cada acerto vale 10 pontos; a meta é 60.
+O tempo conta apenas enquanto a pista está aberta para resposta.
+No resultado, use Revisar bandeiras para rever os estados da partida.
+
+INTEGRAÇÃO
+Copie as quatro pastas juntas, preservando esta estrutura.
+O endereço do jogo é html/bandeira_estado.html.
+Para voltar ao seu painel, ajuste os links jogos.html do HTML do jogo
+para o endereço do seu painel. html/jogos.html é apenas o retorno avulso.
+A pontuação e o formato de registro do resultado permanecem iguais.
+
+As bandeiras vêm do GeoBR.
+A licença da fonte está em assets/fonts/LICENCA.txt.

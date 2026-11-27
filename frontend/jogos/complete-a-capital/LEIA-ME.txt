@@ -1,0 +1,19 @@
+GEOEDUCA | COMPLETE A CAPITAL
+
+Vestuário aprovado: opção 2, Copero explorador em busto.
+Padrão visual: o mesmo do Caça-Palavras aprovado (paleta navy/dourado/creme).
+
+Abra index.html ou complete_capital.html.
+Os scripts ../js/ originais foram mantidos como integração opcional. Fora da plataforma, o jogo básico funciona com: index.html, style.css, game.js e assets/.
+O link "Outros jogos" aponta para jogos.html, página que deve existir na plataforma.
+A pontuação e o tempo são salvos no localStorage geoeduca_results quando disponíveis.
+
+Regras preservadas do HTML recebido:
+- 27 unidades federativas e suas capitais
+- 10 pontos por acerto; total de 270 pontos
+- Uma dica disponível por estado, sem penalização
+- Pular devolve o estado ao final da fila
+- Cronômetro e gravação de resultados (gameId: 9)
+- Respostas aceitam nomes com ou sem acentos
+
+Modificações de UX: tela inicial de apresentação e novo layout sem rolagem; não há Copero no cabeçalho da partida.

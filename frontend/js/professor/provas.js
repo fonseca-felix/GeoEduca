@@ -7,6 +7,41 @@ document.addEventListener('DOMContentLoaded', () => {
   let salas = [];
   let alunos = [];
   let currentSendProvaId = null;
+
+  // Ordem pedagógica das salas (6º Ano A até Ensino Médio)
+  const SALA_ORDER = [
+    '6º Ano A', '6º Ano B', '7º Ano A', '7º Ano B',
+    '8º Ano A', '8º Ano B', '9º Ano A', '9º Ano B',
+    '1ª Série A', '1ª Série B', '2ª Série A', '2ª Série B',
+    '3ª Série A', '3ª Série B'
+  ];
+
+  function sortSalas(lista) {
+    if (!Array.isArray(lista)) return [];
+    function normalize(str) {
+      return (str || '').toLowerCase().replace(/[º°ª]/g, '').replace(/\s+/g, ' ').trim();
+    }
+    const normalizedOrder = SALA_ORDER.map(normalize);
+
+    function getIndex(nome) {
+      const norm = normalize(nome);
+      const idx = normalizedOrder.indexOf(norm);
+      if (idx !== -1) return idx;
+      for (let i = 0; i < normalizedOrder.length; i++) {
+        if (norm === normalizedOrder[i] || norm.startsWith(normalizedOrder[i])) return i;
+      }
+      return -1;
+    }
+
+    return [...lista].sort((a, b) => {
+      const ia = getIndex(a.nome);
+      const ib = getIndex(b.nome);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return (a.nome || '').localeCompare(b.nome || '', 'pt-BR', { numeric: true, sensitivity: 'base' });
+    });
+  }
   
   // Variáveis para o fluxo de criação
   let creationData = {
@@ -18,9 +53,18 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   let currentQuestionIndex = 0;
 
-  // Variável para correção
+  // Variáveis para correção
   let currentGradingProvaId = null;
   let currentProvaQuestoes = [];
+  let currentGradingResponses = [];
+  let currentSelectedStudentData = null;
+  let currentQuestionScores = {};
+
+  function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    }[m]));
+  }
 
   async function loadInitialData() {
     try {
@@ -29,9 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
         api.get('/salas'),
         api.get('/alunos')
       ]);
-      provas = provasRes;
-      salas = salasRes;
-      alunos = alunosRes;
+      provas = provasRes || [];
+      salas = sortSalas(salasRes);
+      alunos = (alunosRes || []).sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR'));
       
       renderProvas();
       populateGradingSalas();
@@ -285,15 +329,20 @@ document.addEventListener('DOMContentLoaded', () => {
       container.innerHTML = '<div class="custom-option" data-value="">Nenhuma sala encontrada</div>';
       return;
     }
+    const sortedItems = sortSalas(items);
     container.innerHTML = '<div class="custom-option selected" data-value="">Selecione...</div>' + 
-      items.map(s => `<div class="custom-option" data-value="${s.id}">${s.nome}</div>`).join('');
+      sortedItems.map(s => `<div class="custom-option" data-value="${s.id}">${s.nome}</div>`).join('');
   }
 
   /* ========================================================
      CORREÇÃO DA PROVA
   ======================================================== */
   function populateGradingSalas() {
-    renderCustomSelectOptions('custom-select-grade-sala-options', salas);
+    const container = document.getElementById('custom-select-grade-sala-options');
+    if (!container) return;
+    const sorted = sortSalas(salas);
+    container.innerHTML = '<div class="custom-option selected" data-value="">Selecione a sala...</div>' +
+      sorted.map(s => `<div class="custom-option" data-value="${s.id}">${s.nome}</div>`).join('');
     setupCustomSelect('custom-select-grade-sala', 'gradeSalaSelect', () => window.loadGradingData());
   }
 
@@ -313,12 +362,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    list.innerHTML = alunos.map(a => `
-      <label class="send-student-item" style="display:flex; gap:0.6rem; align-items:center; margin-bottom:0.75rem; cursor:pointer;" data-nome="${a.nome.toLowerCase()}">
+    const sortedAlunos = [...alunos].sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'pt-BR'));
+    list.innerHTML = sortedAlunos.map(a => `
+      <label class="send-student-item" style="display:flex; gap:0.6rem; align-items:center; margin-bottom:0.75rem; cursor:pointer;" data-nome="${(a.nome || '').toLowerCase()}">
         <input type="checkbox" data-aluno-id="${a.id}" />
         <div style="display:flex; flex-direction:column;">
           <span style="font-weight:600;color:#0f172a;">${a.nome}</span>
-          <span style="font-size:0.78rem;color:#6b7280;">RM: ${a.rm} • ${a.salaNome || ''}</span>
+          <span style="font-size:0.78rem;color:#6b7280;">RM: ${a.rm || 'N/A'} • ${a.salaNome || a.sala || ''}</span>
         </div>
       </label>
     `).join('');
@@ -337,12 +387,12 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   window.filterGradingStudents = function() {
-    const term = (document.getElementById('gradeSearchInput')?.value || '').toLowerCase();
-    const items = document.querySelectorAll('#students-list-container .student-item');
+    const term = (document.getElementById('gradeSearchInput')?.value || '').toLowerCase().trim();
+    const items = document.querySelectorAll('#students-list-container .student-grading-card');
     items.forEach(el => {
-      const nome = el.querySelector('.student-header')?.textContent.toLowerCase() || '';
-      if (nome.includes(term)) {
-        el.style.display = 'block';
+      const data = el.dataset.nome || '';
+      if (!term || data.includes(term)) {
+        el.style.display = 'flex';
       } else {
         el.style.display = 'none';
       }
@@ -412,150 +462,402 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.openGrading = function(provaId, provaTitulo) {
     currentGradingProvaId = provaId;
-    // Buscar as questões para saber quais são discursivas
     const prova = provas.find(p => p.id === provaId);
-    currentProvaQuestoes = prova ? prova.questoes : [];
+    currentProvaQuestoes = prova ? (prova.questoes || []) : [];
 
     document.getElementById('grading-title').textContent = `Correção: ${provaTitulo}`;
     document.getElementById('gradeSalaSelect').value = '';
+    const salaText = document.getElementById('custom-select-grade-sala-text');
+    if (salaText) salaText.textContent = 'Selecione a sala...';
     
-    document.getElementById('grading-content').style.display = 'none';
-    document.getElementById('grading-loading').style.display = 'none';
-    document.getElementById('grading-empty').style.display = 'block';
+    // Reset para view de lista de alunos
+    window.backToGradingList();
     
+    // Reset estado da lista: solicitar que a professora escolha a sala primeiro
+    const loadingEl = document.getElementById('grading-loading');
+    const emptyEl = document.getElementById('grading-empty');
+    const listContainer = document.getElementById('students-list-container');
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (listContainer) listContainer.innerHTML = '';
+    if (emptyEl) {
+      emptyEl.innerHTML = `
+        <i class="fa-solid fa-chalkboard-user" style="font-size:2rem; margin-bottom:0.75rem; display:block; color:#94a3b8;"></i>
+        Por favor, selecione uma sala acima para ver os alunos que realizaram a prova.
+      `;
+      emptyEl.style.display = 'block';
+    }
+
     Modal.open('modal-grading');
   };
 
+  window.backToGradingList = function() {
+    const listView = document.getElementById('grading-list-view');
+    const detailView = document.getElementById('grading-detail-view');
+    if (listView) listView.style.display = 'block';
+    if (detailView) detailView.style.display = 'none';
+    currentSelectedStudentData = null;
+    currentQuestionScores = {};
+  };
+
   window.loadGradingData = async function() {
-    const salaId = document.getElementById('gradeSalaSelect').value;
-    if(!salaId) {
-      document.getElementById('grading-content').style.display = 'none';
-      document.getElementById('grading-empty').style.display = 'block';
+    const salaId = document.getElementById('gradeSalaSelect')?.value || '';
+    const loadingEl = document.getElementById('grading-loading');
+    const emptyEl = document.getElementById('grading-empty');
+    const listContainer = document.getElementById('students-list-container');
+
+    if (!salaId) {
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (listContainer) listContainer.innerHTML = '';
+      if (emptyEl) {
+        emptyEl.innerHTML = `
+          <i class="fa-solid fa-chalkboard-user" style="font-size:2rem; margin-bottom:0.75rem; display:block; color:#94a3b8;"></i>
+          Por favor, selecione uma sala acima para ver os alunos que realizaram a prova.
+        `;
+        emptyEl.style.display = 'block';
+      }
       return;
     }
 
-    document.getElementById('grading-empty').style.display = 'none';
-    document.getElementById('grading-content').style.display = 'none';
-    document.getElementById('grading-loading').style.display = 'block';
+    if (loadingEl) loadingEl.style.display = 'block';
+    if (emptyEl) emptyEl.style.display = 'none';
+    if (listContainer) listContainer.innerHTML = '';
 
     try {
-      const data = await api.get(`/provas/${currentGradingProvaId}/respostas/sala/${salaId}`);
-      renderGradingContent(data);
-      document.getElementById('grading-loading').style.display = 'none';
-      document.getElementById('grading-content').style.display = 'block';
+      let data;
+      try {
+        data = await api.get(`/provas/${currentGradingProvaId}/respostas?salaId=${salaId}`);
+      } catch (e1) {
+        data = await api.get(`/provas/${currentGradingProvaId}/respostas/sala/${salaId}`);
+      }
+      const rawList = Array.isArray(data) ? data : [];
+      currentGradingResponses = rawList.filter(item => item.respondeu && item.resposta);
+      
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (currentGradingResponses.length === 0) {
+        if (emptyEl) {
+          emptyEl.innerHTML = `
+            <i class="fa-solid fa-inbox" style="font-size:2rem; margin-bottom:0.75rem; display:block; color:#94a3b8;"></i>
+            Nenhum aluno desta sala realizou ou entregou a prova ainda.
+          `;
+          emptyEl.style.display = 'block';
+        }
+      } else {
+        renderGradingList(currentGradingResponses);
+      }
     } catch(err) {
-      document.getElementById('grading-loading').style.display = 'none';
-      Toast.error('Erro ao carregar', err.message);
+      if (loadingEl) loadingEl.style.display = 'none';
+      Toast.error('Erro ao carregar', err.message || 'Falha ao buscar entregas');
     }
   };
 
-  function renderGradingContent(data) {
-    const container = document.getElementById('students-list-container');
-    
-    // Filtrar apenas quem respondeu
-    const responded = data.filter(s => s.respondeu);
-    
-    if (responded.length === 0) {
-      container.innerHTML = '<div style="padding:2rem;text-align:center;color:#6b7280;">Nenhum aluno desta sala entregou a prova ainda.</div>';
+  function renderGradingList(items) {
+    const listContainer = document.getElementById('students-list-container');
+    const emptyEl = document.getElementById('grading-empty');
+    if (!listContainer) return;
+
+    if (!items || items.length === 0) {
+      if (emptyEl) emptyEl.style.display = 'block';
+      listContainer.innerHTML = '';
       return;
     }
 
-    container.innerHTML = responded.map(s => {
-      const r = s.resposta;
-      const penalidades = (r.saidasAba || 0) * 0.5;
-      
-      // Renderizar todas as respostas (objetivas e discursivas)
-      const respostasHtml = r.respostas.map(resp => {
-        // Encontrar a questão para saber o valor máximo
-        const qData = currentProvaQuestoes.find(q => q.id === resp.questaoId);
-        const valorMax = qData ? qData.valor : 10;
-        const textoQ = qData ? qData.texto : 'Questão Desconhecida';
-        
-        if (resp.tipo === 'descritiva') {
-          return `
-            <div class="correction-item">
-              <div class="correction-q-text">${textoQ} (Max: ${valorMax} pts)</div>
-              <div class="correction-a-text">${resp.respostaTexto || 'Em branco'}</div>
-              <div class="grading-row">
-                <label style="font-size:0.875rem; font-weight:600;">Nota atribuída:</label>
-                <input type="number" step="0.5" min="0" max="${valorMax}" class="grading-input" 
-                       id="grade-${r.id}-${resp.questaoId}" placeholder="Ex: ${valorMax}" />
-              </div>
-            </div>
-          `;
-        } else {
-          // Objetiva (alternativa)
-          const isCorrect = resp.acertou;
-          return `
-            <div class="correction-item" style="border-left: 4px solid ${isCorrect ? 'var(--success)' : 'var(--error)'};">
-              <div class="correction-q-text">${textoQ} (Max: ${valorMax} pts)</div>
-              <div class="correction-a-text" style="color: ${isCorrect ? 'var(--success)' : 'var(--error)'};">
-                <strong>Selecionou:</strong> ${resp.respostaSelecionada || 'Nenhuma'} 
-                ${isCorrect ? '✅ Acertou' : '❌ Errou'}
-              </div>
-            </div>
-          `;
-        }
-      }).join('');
+    if (emptyEl) emptyEl.style.display = 'none';
 
-      const hasRespostas = respostasHtml.length > 0;
-      const hasDiscursivas = r.respostas.some(resp => resp.tipo === 'descritiva');
-      
-      // Se já estiver corrigida, mostrar a nota final. Se não, mostrar botão de salvar.
-      const statusBadge = r.status === 'corrigida' 
-        ? `<span style="color:#059669; font-size:0.875rem; background:#d1fae5; padding:0.2rem 0.5rem; border-radius:4px;">Corrigida (Total: ${r.notaAutomatica + (r.notaManual||0)})</span>` 
-        : `<span style="color:#d97706; font-size:0.875rem; background:#fef3c7; padding:0.2rem 0.5rem; border-radius:4px;">Pendente</span>`;
+    listContainer.innerHTML = items.map(s => {
+      const r = s.resposta || {};
+      const status = r.status || 'pendente';
+      const isCorrigida = status === 'corrigida';
+      const isRevisao = status === 'em_revisao';
+
+      let statusBadge = '';
+      if (isCorrigida) {
+        const notaExibida = Number(r.notaFinal !== undefined ? r.notaFinal : ((r.notaAutomatica || 0) + (r.notaManual || 0)));
+        const notaStr = notaExibida % 1 === 0 ? notaExibida.toFixed(0) : notaExibida.toFixed(1);
+        statusBadge = `<span class="badge" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-weight:700; padding:5px 12px; border-radius:8px; font-size:0.825rem;">
+          <i class="fa-solid fa-check"></i> Corrigida • Nota "${notaStr}"
+        </span>`;
+      } else if (isRevisao) {
+        statusBadge = `<span class="badge" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-weight:600; padding:5px 12px; border-radius:8px; font-size:0.825rem;">
+          <i class="fa-solid fa-pen"></i> Em Revisão
+        </span>`;
+      } else {
+        statusBadge = `<span class="badge" style="background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:600; padding:5px 12px; border-radius:8px; font-size:0.825rem;">
+          <i class="fa-solid fa-clock"></i> Pendente
+        </span>`;
+      }
+
+      const dataFormatada = r.dataEnvio ? new Date(r.dataEnvio).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Recente';
 
       return `
-        <div class="student-item">
-          <div class="student-header">
-            ${s.alunoNome}
-            ${statusBadge}
-          </div>
-          <div class="student-meta">
-            <span>Nota Automática (Objetivas): <strong>${r.notaAutomatica.toFixed(2)}</strong></span>
-            ${penalidades > 0 ? `<span style="color:#dc2626;">Penalidade (Saídas de Aba): <strong>-${penalidades.toFixed(2)}</strong> (${r.saidasAba} saídas)</span>` : `<span style="color:#059669;">Nenhuma saída de aba (Honesto)</span>`}
-          </div>
-          
-          <div class="student-body">
-            ${hasRespostas ? respostasHtml : '<div style="color:#6b7280; font-size:0.875rem; margin-bottom:1rem;">Nenhuma resposta registrada.</div>'}
-            
-            ${r.status !== 'corrigida' ? `
-              <div class="final-grade-box">
-                <div>
-                  <strong>Correção Manual:</strong> ${hasDiscursivas ? 'Some as notas das discursivas e insira o total manual aqui (a nota final somará com a automática).' : 'A prova é apenas objetiva. Clique em Finalizar Correção para confirmar a nota automática.'}
-                </div>
-                <div style="display:flex; gap:0.5rem;">
-                  ${hasDiscursivas ? `<input type="number" step="0.5" min="0" id="manualTotal-${r.id}" class="form-control" style="width:100px;" placeholder="Total pts" />` : `<input type="hidden" id="manualTotal-${r.id}" value="0" />`}
-                  <button class="btn btn-primary" onclick="submitGrade('${r.id}')">${hasDiscursivas ? 'Salvar Nota' : 'Finalizar Correção'}</button>
-                </div>
+        <div class="student-grading-card" onclick="openStudentCorrection('${r.id}')" data-nome="${(s.alunoNome || '').toLowerCase()} ${(s.salaNome || '').toLowerCase()}">
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <div style="width:42px; height:42px; border-radius:10px; background:#eff6ff; color:#3b82f6; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1.1rem; border:1px solid #dbeafe;">
+              ${(s.alunoNome || 'A')[0].toUpperCase()}
+            </div>
+            <div>
+              <div style="font-weight:700; font-size:1rem; color:#0f172a;">${s.alunoNome}</div>
+              <div style="font-size:0.825rem; color:#64748b; margin-top:2px;">
+                ${s.salaNome || 'Sala Geral'} • RM: ${s.alunoRm || 'N/A'} • Entregue às ${dataFormatada}
               </div>
-            ` : ''}
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            ${statusBadge}
+            <button type="button" class="btn btn-outline" style="padding:0.4rem 0.85rem; font-size:0.8rem; background:#fff;">
+              ${isCorrigida ? 'Revisar' : 'Corrigir'} &rarr;
+            </button>
           </div>
         </div>
       `;
     }).join('');
   }
 
-  window.submitGrade = async function(respostaId) {
-    const input = document.getElementById(`manualTotal-${respostaId}`);
-    if(!input) return;
+  window.openStudentCorrection = function(respostaId) {
+    const item = currentGradingResponses.find(x => x.id === respostaId || (x.resposta && x.resposta.id === respostaId));
+    if (!item) {
+      Toast.error('Erro', 'Entrega não encontrada');
+      return;
+    }
 
-    const notaManual = parseFloat(input.value) || 0;
-    
-    try {
-      input.disabled = true;
-      await api.put(`/provas/respostas/${respostaId}/corrigir`, {
-        notaManual: notaManual,
-        feedback: '' // Pode adicionar campo de feedback depois se quiser
-      });
-      Toast.success('Nota salva com sucesso!');
+    currentSelectedStudentData = item;
+    currentQuestionScores = {};
+
+    // Switch view
+    document.getElementById('grading-list-view').style.display = 'none';
+    document.getElementById('grading-detail-view').style.display = 'block';
+
+    const r = item.resposta || {};
+    const infoContainer = document.getElementById('detail-student-info');
+    if (infoContainer) {
+      const dataFormatada = r.dataEnvio ? new Date(r.dataEnvio).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Recente';
+      infoContainer.innerHTML = `
+        <span style="color:#0f172a; font-size:1.05rem;"><i class="fa-solid fa-user-graduate" style="color:#3b82f6;"></i> ${item.alunoNome}</span>
+        <span style="color:#64748b; font-size:0.875rem;">(${item.salaNome || 'Sala'}) • Entregue: ${dataFormatada}</span>
+      `;
+    }
+
+    renderStudentQuestions(item);
+  };
+
+  function renderStudentQuestions(item) {
+    const container = document.getElementById('student-questions-container');
+    if (!container) return;
+
+    const r = item.resposta || {};
+    const respostasAluno = r.respostas || [];
+
+    // Mapear cada questão da prova
+    container.innerHTML = currentProvaQuestoes.map((q, idx) => {
+      const resp = respostasAluno.find(x => x.questaoId === q.id) || {};
+      const valorMax = Number(q.valor !== undefined ? q.valor : 1);
+      const isAlternativa = q.tipo === 'alternativa';
+
+      let questaoBodyHtml = '';
+
+      if (isAlternativa) {
+        // Inicializar pontuação objetiva: se aluno acertou, ponto inteiro; se errou, 0
+        const acertouPadrao = resp.acertou !== undefined ? resp.acertou : (resp.respostaSelecionada === q.correta);
+        const notaPrevia = resp.notaAtribuida !== undefined ? Number(resp.notaAtribuida) : (acertouPadrao ? valorMax : 0);
+        currentQuestionScores[q.id] = notaPrevia;
+
+        const opcoes = q.opcoes || [];
+        const opcoesHtml = opcoes.map((opt, oIdx) => {
+          const isSelected = resp.respostaSelecionada === opt || resp.respostaSelecionada === oIdx;
+          const isCorrect = q.correta === opt || q.correta === oIdx;
+          
+          let borderStyle = 'border: 1px solid #e2e8f0; background: #fff;';
+          let indicatorIcon = '';
+          if (isSelected && isCorrect) {
+            borderStyle = 'border: 2px solid #10b981; background: #ecfdf5; font-weight:600; color:#065f46;';
+            indicatorIcon = '<span style="color:#10b981; margin-left:auto; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Selecionou (Correta)</span>';
+          } else if (isSelected && !isCorrect) {
+            borderStyle = 'border: 2px solid #ef4444; background: #fef2f2; font-weight:600; color:#991b1b;';
+            indicatorIcon = '<span style="color:#ef4444; margin-left:auto; font-weight:700;"><i class="fa-solid fa-circle-xmark"></i> Selecionou (Incorreta)</span>';
+          } else if (isCorrect) {
+            borderStyle = 'border: 1px dashed #10b981; background: #f0fdf4; color:#065f46;';
+            indicatorIcon = '<span style="color:#10b981; font-size:0.75rem; margin-left:auto;"><i class="fa-solid fa-check"></i> Gabarito Oficial</span>';
+          }
+
+          return `
+            <div style="padding: 0.65rem 1rem; border-radius: 8px; margin-bottom: 0.4rem; display: flex; align-items: center; ${borderStyle}">
+              <span>${escapeHtml(opt)}</span>
+              ${indicatorIcon}
+            </div>
+          `;
+        }).join('');
+
+        questaoBodyHtml = `
+          <div style="margin-bottom: 1rem;">
+            ${opcoesHtml}
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:0.75rem 1rem; border-radius:10px; border:1px solid #e2e8f0; flex-wrap:wrap; gap:0.5rem;">
+            <span style="font-size:0.875rem; font-weight:600; color:#334155;">Avaliação da Questão Objetiva:</span>
+            <div class="grade-btn-group" id="btn-group-${q.id}">
+              <button type="button" class="${currentQuestionScores[q.id] > 0 ? 'active-full' : ''}" onclick="setObjectiveScore('${q.id}', ${valorMax})">
+                <i class="fa-solid fa-check"></i> Ponto Inteiro (${valorMax} pts)
+              </button>
+              <button type="button" class="${currentQuestionScores[q.id] === 0 ? 'active-zero' : ''}" onclick="setObjectiveScore('${q.id}', 0)">
+                <i class="fa-solid fa-xmark"></i> 0 pts
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        // Discursiva
+        const notaPrevia = resp.notaAtribuida !== undefined ? Number(resp.notaAtribuida) : (Number(resp.nota) || 0);
+        currentQuestionScores[q.id] = notaPrevia;
+
+        questaoBodyHtml = `
+          <div style="margin-bottom: 0.75rem;">
+            <label style="font-size:0.8rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.04em;">Resposta do Aluno:</label>
+            <div class="correction-a-text">${resp.respostaTexto ? escapeHtml(resp.respostaTexto) : '<em style="color:#94a3b8;">Questão deixada em branco pelo aluno.</em>'}</div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:0.75rem 1rem; border-radius:10px; border:1px solid #e2e8f0; flex-wrap:wrap; gap:0.5rem;">
+            <span style="font-size:0.875rem; font-weight:600; color:#334155;">Atribuir Pontuação Discursiva:</span>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <input type="number" step="0.25" min="0" max="${valorMax}" class="form-control" style="width:90px; text-align:center; font-weight:700; font-size:1rem; padding:0.4rem;" value="${notaPrevia}" id="input-disc-${q.id}" oninput="setDiscursiveScore('${q.id}', this.value, ${valorMax})" />
+              <span style="font-size:0.875rem; color:#64748b; font-weight:600;">/ ${valorMax} pts</span>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="correction-item" id="card-q-${q.id}">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:0.75rem;">
+            <div class="correction-q-text">
+              <span style="background:#e0e7ff; color:#4338ca; padding:2px 8px; border-radius:6px; font-size:0.8rem; margin-right:6px;">Questão ${idx + 1}</span>
+              ${escapeHtml(q.texto)}
+            </div>
+            <span style="font-size:0.8rem; font-weight:700; color:#64748b; background:#f1f5f9; padding:4px 10px; border-radius:8px; white-space:nowrap;">
+              Vale ${valorMax} pt${valorMax === 1 ? '' : 's'}
+            </span>
+          </div>
+          ${questaoBodyHtml}
+        </div>
+      `;
+    }).join('');
+
+    recalculateFinalGrade();
+  }
+
+  window.setObjectiveScore = function(questaoId, pts) {
+    currentQuestionScores[questaoId] = pts;
+    const group = document.getElementById(`btn-group-${questaoId}`);
+    if (group) {
+      const btns = group.querySelectorAll('button');
+      if (btns[0] && btns[1]) {
+        if (pts > 0) {
+          btns[0].className = 'active-full';
+          btns[1].className = '';
+        } else {
+          btns[0].className = '';
+          btns[1].className = 'active-zero';
+        }
+      }
+    }
+    recalculateFinalGrade();
+  };
+
+  window.setDiscursiveScore = function(questaoId, value, maxVal) {
+    let parsed = parseFloat(value);
+    if (isNaN(parsed) || parsed < 0) parsed = 0;
+    if (parsed > maxVal) parsed = maxVal;
+    currentQuestionScores[questaoId] = parsed;
+    recalculateFinalGrade();
+  };
+
+  function recalculateFinalGrade() {
+    let sumObj = 0;
+    let sumDisc = 0;
+
+    currentProvaQuestoes.forEach(q => {
+      const pts = Number(currentQuestionScores[q.id]) || 0;
+      if (q.tipo === 'alternativa') {
+        sumObj += pts;
+      } else {
+        sumDisc += pts;
+      }
+    });
+
+    const r = currentSelectedStudentData ? (currentSelectedStudentData.resposta || {}) : {};
+    const penalidades = Number(r.penalidadeAntiCola || 0);
+
+    let total = sumObj + sumDisc - penalidades;
+    if (total < 0) total = 0;
+
+    const displayGradeEl = document.getElementById('display-final-grade');
+    if (displayGradeEl) {
+      displayGradeEl.textContent = total % 1 === 0 ? total.toFixed(0) : total.toFixed(1);
+    }
+
+    const objEl = document.getElementById('grade-sub-obj');
+    if (objEl) objEl.textContent = sumObj % 1 === 0 ? sumObj.toFixed(0) : sumObj.toFixed(1);
+
+    const discEl = document.getElementById('grade-sub-disc');
+    if (discEl) discEl.textContent = sumDisc % 1 === 0 ? sumDisc.toFixed(0) : sumDisc.toFixed(1);
+
+    const penalEl = document.getElementById('grade-sub-penal');
+    if (penalEl) {
+      penalEl.innerHTML = penalidades > 0 ? ` - Penalidade (${penalidades.toFixed(2)} pts)` : '';
+    }
+  }
+
+  window.saveStudentGrade = async function(novoStatus) {
+    if (!currentSelectedStudentData) return;
+    const r = currentSelectedStudentData.resposta || {};
+
+    let sumObj = 0;
+    let sumDisc = 0;
+    const respostasAvaliadas = (r.respostas || []).map(resp => {
+      const pts = currentQuestionScores[resp.questaoId] !== undefined 
+        ? currentQuestionScores[resp.questaoId] 
+        : (resp.acertou ? 1 : 0);
       
-      // Recarregar os dados
-      loadGradingData();
+      const q = currentProvaQuestoes.find(x => x.id === resp.questaoId);
+      if (q && q.tipo === 'alternativa') {
+        sumObj += pts;
+      } else {
+        sumDisc += pts;
+      }
+
+      return {
+        ...resp,
+        notaAtribuida: pts
+      };
+    });
+
+    const penalidades = Number(r.penalidadeAntiCola || 0);
+    let finalGrade = Math.max(0, sumObj + sumDisc - penalidades);
+    finalGrade = Math.round(finalGrade * 100) / 100;
+
+    const btnRevisar = document.getElementById('btn-revisar-grade');
+    const btnConcluir = document.getElementById('btn-concluir-grade');
+    if (btnRevisar) btnRevisar.disabled = true;
+    if (btnConcluir) btnConcluir.disabled = true;
+
+    try {
+      await api.put(`/provas/respostas/${r.id}/corrigir`, {
+        notaManual: sumDisc,
+        notaFinal: finalGrade,
+        status: novoStatus,
+        respostasAvaliadas: respostasAvaliadas
+      });
+
+      if (novoStatus === 'corrigida') {
+        Toast.success('Correção Concluída!', `A nota final "${finalGrade % 1 === 0 ? finalGrade.toFixed(0) : finalGrade.toFixed(1)}" foi gravada com sucesso.`);
+      } else {
+        Toast.success('Rascunho Salvo', 'A prova foi marcada como em revisão.');
+      }
+
+      // Voltar para a lista e recarregar
+      window.backToGradingList();
+      window.loadGradingData();
     } catch(err) {
-      input.disabled = false;
-      Toast.error('Erro ao salvar', err.message);
+      Toast.error('Erro ao salvar', err.message || 'Tente novamente.');
+    } finally {
+      if (btnRevisar) btnRevisar.disabled = false;
+      if (btnConcluir) btnConcluir.disabled = false;
     }
   };
 

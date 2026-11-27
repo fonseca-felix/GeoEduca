@@ -269,28 +269,28 @@
 </div>
 
 <!-- Modal Enviar Quiz -->
-<div class="modal-overlay" id="modal-send-quiz">
-  <div class="modal-content" style="max-width: 650px; display: flex; flex-direction: column; max-height: 90vh;">
+<div class="modal-overlay" <div class="modal-overlay" id="modal-send-quiz">
+  <div class="modal-content" style="max-width: 820px; width: 95%; display: flex; flex-direction: column; min-height: 540px; max-height: 90vh; overflow: visible !important;">
     <div class="modal-header">
       <h2 class="modal-title">Enviar Quiz</h2>
       <button class="btn-close" onclick="Modal.close('modal-send-quiz')">&times;</button>
     </div>
-    <div class="modal-body" style="overflow-y: auto; flex: 1; min-height: 200px;">
+    <div class="modal-body" style="overflow-y: visible !important; flex: 1; min-height: 340px; padding: 2rem;">
       <div class="form-group">
         <label class="form-label">Destino</label>
-        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-          <label style="display:flex; gap:0.5rem; align-items:center;">
+        <div style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom: 0.5rem;">
+          <label style="display:flex; gap:0.5rem; align-items:center; cursor: pointer; font-weight: 500;">
             <input type="radio" name="sendQuizTargetType" value="sala" checked />
             Sala
           </label>
-          <label style="display:flex; gap:0.5rem; align-items:center;">
+          <label style="display:flex; gap:0.5rem; align-items:center; cursor: pointer; font-weight: 500;">
             <input type="radio" name="sendQuizTargetType" value="alunos" />
             Alunos (um ou vários)
           </label>
         </div>
       </div>
 
-      <div id="sendQuizSalaBlock">
+      <div id="sendQuizSalaBlock" style="min-height: 220px; padding-bottom: 2rem;">
         <div class="form-group">
           <label class="form-label">Selecione a sala</label>
           <div class="custom-select-wrapper" id="custom-select-send-quiz-sala">

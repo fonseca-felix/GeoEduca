@@ -96,20 +96,12 @@ function buildProfessorSidebar(basePath = '../') {
         <span class="sidebar-nav-icon">${NAV_ICONS.leitor}</span>
         <span class="sidebar-nav-text">Leitor de Provas</span>
       </a>
-      <a class="sidebar-nav-item" href="${basePath}professor/jogos.html" data-tooltip="Jogos">
-        <span class="sidebar-nav-icon">${NAV_ICONS.jogos}</span>
-        <span class="sidebar-nav-text">Jogos</span>
-      </a>
       <a class="sidebar-nav-item" href="${basePath}professor/rota27.html" data-tooltip="Rota 27 (IA)">
         <span class="sidebar-nav-icon">${NAV_ICONS.rota27}</span>
         <span class="sidebar-nav-text">Rota 27 (IA)</span>
       </a>
 
       <span class="sidebar-nav-label">Avaliação</span>
-      <a class="sidebar-nav-item" href="${basePath}professor/resultados.html" data-tooltip="Resultados">
-        <span class="sidebar-nav-icon">${NAV_ICONS.resultados}</span>
-        <span class="sidebar-nav-text">Resultados</span>
-      </a>
       <a class="sidebar-nav-item" href="${basePath}professor/resultados_brazilguessr.html" data-tooltip="Resultados BrazilGuessr">
         <span class="sidebar-nav-icon">${NAV_ICONS.jogos}</span>
         <span class="sidebar-nav-text">Result. BrazilGuessr</span>
